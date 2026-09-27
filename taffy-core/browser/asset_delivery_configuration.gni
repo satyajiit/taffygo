@@ -1,0 +1,56 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+declare_args() {
+  # The origin the product's own artifacts are fetched from, compiled into
+  # trusted browser code. Only an origin: every path is the catalog's, and a
+  # path never travels with an origin attached, so nothing a message carries
+  # can move a device to a different host.
+  #
+  # **Empty, and that is the shipped value** (decision 0202). The four required
+  # artifacts are in the package and the delivery plane installs them from
+  # there before the first scan, so a build of this tree has nothing to fetch.
+  #
+  # Empty is a defined state rather than a broken one, which is the whole
+  # reason the argument survives its origin:
+  # `ValidateAssetDeliveryConfiguration` answers `kAbsent` and
+  # `ProfileAssetPlane::Perform` refuses every fetch with
+  # `kOriginRefusedPermanent`, a reason a person can read. Both halves of that
+  # sentence are checked rather than argued —
+  # `asset_delivery_configuration_unittest.cc` for the first and
+  # `profile_asset_plane_unittest.cc` for the second, the latter with the
+  # control that says a configured origin is still asked. It stays an argument
+  # because pointing it at a public release page later is then configuration
+  # rather than code, and because `python-toolkit` — the one `on-demand` row,
+  # which the package does not carry — has nowhere else to come from. What it
+  # may not become again is a host this project operates (decision 0200).
+  #
+  # Until 2026-09-20 the value here named a host this project operated. No
+  # build names it now, and nothing in the tree fetches from it; taking the
+  # host itself down is the owner's act outside this repository. The
+  # assertions below are what a future value has to pass; they are unchanged
+  # and they do not fire on an empty one.
+  taffy_asset_origin = ""
+}
+
+# An origin that is set must be well-formed before GN creates a product graph.
+# The browser repeats every one of these checks at run time; this is the earlier
+# of the two, and the one that fails on a builder rather than on a phone.
+if (taffy_asset_origin != "") {
+  assert(len(taffy_asset_origin) <= 253,
+         "taffy_asset_origin exceeds the maximum host length")
+
+  _asset_origin_scheme = string_split(taffy_asset_origin, "://")
+  assert(len(_asset_origin_scheme) == 2 && _asset_origin_scheme[0] == "https",
+         "taffy_asset_origin must be an https origin")
+
+  _asset_origin_host = _asset_origin_scheme[1]
+  assert(_asset_origin_host != "" &&
+             string_replace(_asset_origin_host, "/", "") == _asset_origin_host,
+         "taffy_asset_origin must be a bare origin with no path")
+  assert(string_replace(_asset_origin_host, "@", "") == _asset_origin_host,
+         "taffy_asset_origin must carry no credentials")
+}

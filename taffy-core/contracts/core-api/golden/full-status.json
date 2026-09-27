@@ -1,0 +1,798 @@
+{
+  "availability": 1,
+  "generation": 11,
+  "active_tasks": [
+    {
+      "task_id": "task-fixture-17",
+      "revision": 4,
+      "phase": 2,
+      "progress_basis_points": 3750,
+      "status_message_key": "task.waiting_for_approval",
+      "failure": null,
+      "goal": "Compare the verified evidence",
+      "template_id": 0,
+      "workspace_id": "workspace-fixture-2",
+      "pending_ask_prompt": null,
+      "pending_field_value_request": null,
+      "allowed_controls": [
+        0,
+        2,
+        3
+      ],
+      "artifacts": [
+        {
+          "artifact_id": "artifact-fixture-1",
+          "kind": 2,
+          "workspace_revision": 4,
+          "accepted": true
+        }
+      ],
+      "activity": [
+        {
+          "sequence": 1,
+          "kind": 0,
+          "host": "shop.example.invalid",
+          "count": 0,
+          "at_epoch_ms": 1788911100000
+        },
+        {
+          "sequence": 2,
+          "kind": 1,
+          "host": "shop.example.invalid",
+          "count": 0,
+          "at_epoch_ms": 1788911160000
+        },
+        {
+          "sequence": 3,
+          "kind": 2,
+          "host": "reviews.example.invalid",
+          "count": 0,
+          "at_epoch_ms": 1788911220000
+        },
+        {
+          "sequence": 4,
+          "kind": 4,
+          "host": null,
+          "count": 0,
+          "at_epoch_ms": 1788911280000
+        }
+      ],
+      "pending_action": {
+        "action_id": "action-fixture-3",
+        "host": "shop.example.invalid",
+        "item_count": 2,
+        "summary_message_key": "action.compare_items"
+      }
+    }
+  ],
+  "auth_state": {
+    "phase": 4,
+    "account": {
+      "account_id": "account-fixture-1",
+      "display_name": "Taffy Tester",
+      "email": "tester@example.invalid",
+      "method": 0
+    },
+    "pending_email": null,
+    "failure": null,
+    "entitlement": {
+      "plan_id": "plan-standard",
+      "credits_granted": 1000,
+      "credits_remaining": 964,
+      "next_renewal_epoch_seconds": 1788912000,
+      "valid_until_epoch_seconds": 0
+    },
+    "methods": [
+      {
+        "provider": 0,
+        "availability": 0
+      },
+      {
+        "provider": 1,
+        "availability": 0
+      },
+      {
+        "provider": 2,
+        "availability": 0
+      },
+      {
+        "provider": 3,
+        "availability": 0
+      }
+    ]
+  },
+  "workspaces": [
+    {
+      "workspace_id": "workspace-fixture-2",
+      "revision": 7,
+      "goal": "Compare the verified evidence",
+      "phase": 4,
+      "last_updated_epoch_ms": 1787337000000,
+      "template_id": 0,
+      "sources": [
+        {
+          "source_id": "source-fixture-1",
+          "title": "Independent comparison",
+          "host": "reviews.example.invalid",
+          "read_at_epoch_ms": 1787336900000,
+          "fact_count": 1,
+          "excluded": false
+        }
+      ],
+      "facts": [
+        {
+          "fact_id": "fact-fixture-1",
+          "field": "warranty",
+          "value": "two years",
+          "kind": 0,
+          "sources": [
+            "source-fixture-1"
+          ],
+          "correction": null,
+          "has_conflict": false,
+          "needs_new_source": false
+        }
+      ],
+      "saved": true,
+      "display_name": "Verified evidence comparison",
+      "deletion_preview": {
+        "sources": 1,
+        "facts": 1,
+        "artifact_metadata": 0,
+        "derived_indexes": 0,
+        "confirmation_token": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    }
+  ],
+  "workspace_export": null,
+  "asset_delivery": {
+    "platform_supported": true,
+    "network_cost": 1,
+    "metered_permitted": false,
+    "assets": [
+      {
+        "asset_id": "python-stdlib",
+        "asset_revision": "3.14.1-1",
+        "kind": 0,
+        "presence": 3,
+        "written_bytes": 14680064,
+        "total_bytes": 14680064,
+        "attempts": 1,
+        "refusal": null,
+        "waiting_until_monotonic_ms": 0
+      },
+      {
+        "asset_id": "python-packages",
+        "asset_revision": "2026-08-1",
+        "kind": 1,
+        "presence": 1,
+        "written_bytes": 262144,
+        "total_bytes": 1048576,
+        "attempts": 3,
+        "refusal": {
+          "reason": 7,
+          "retryable": true
+        },
+        "waiting_until_monotonic_ms": 90000
+      }
+    ]
+  },
+  "provider_roster": [
+    {
+      "provider_id": "anthropic",
+      "display_name": "Anthropic",
+      "origin": 0,
+      "auth_methods": [
+        0
+      ],
+      "stored": {
+        "auth_method": 0,
+        "state": 0,
+        "subscription_backed": false,
+        "account_label": null,
+        "plan_label": null
+      },
+      "signing_in": false,
+      "enabled": true,
+      "endpoint_host": null,
+      "configurable": true,
+      "endpoint_changed": false,
+      "catalog_layer": 0,
+      "selected_model_id": "claude-sonnet-4-5",
+      "thinking": {
+        "level": 4
+      },
+      "presentation": {
+        "key_prefix": "sk-ant-",
+        "get_key_url": "https://console.anthropic.com/settings/keys",
+        "docs_url": null
+      },
+      "endpoint_base": null,
+      "last_refusal": {
+        "refusal": 0,
+        "at_monotonic_ms": 486000
+      },
+      "model_count": 1,
+      "subscription": false,
+      "refused_endpoint_host": null
+    },
+    {
+      "provider_id": "xai",
+      "display_name": "xAI",
+      "origin": 0,
+      "auth_methods": [
+        0,
+        1
+      ],
+      "stored": {
+        "auth_method": 1,
+        "state": 1,
+        "subscription_backed": true,
+        "account_label": "person@example.invalid",
+        "plan_label": "SuperGrok"
+      },
+      "signing_in": false,
+      "enabled": true,
+      "endpoint_host": null,
+      "configurable": true,
+      "endpoint_changed": true,
+      "catalog_layer": 1,
+      "selected_model_id": null,
+      "thinking": null,
+      "presentation": {
+        "key_prefix": "xai-",
+        "get_key_url": null,
+        "docs_url": null
+      },
+      "endpoint_base": null,
+      "last_refusal": null,
+      "model_count": 1,
+      "subscription": true,
+      "refused_endpoint_host": "api.grok.example.invalid"
+    },
+    {
+      "provider_id": "my-gateway",
+      "display_name": "My gateway",
+      "origin": 1,
+      "auth_methods": [
+        0
+      ],
+      "stored": null,
+      "signing_in": false,
+      "enabled": true,
+      "endpoint_host": "gateway.example.invalid",
+      "configurable": true,
+      "endpoint_changed": false,
+      "catalog_layer": 2,
+      "selected_model_id": null,
+      "thinking": null,
+      "presentation": null,
+      "endpoint_base": "https://gateway.example.invalid/v1",
+      "last_refusal": null,
+      "model_count": 1,
+      "subscription": false,
+      "refused_endpoint_host": null
+    }
+  ],
+  "provider_probes": [
+    {
+      "provider_id": "anthropic",
+      "verdict": 0,
+      "at_monotonic_ms": 480000,
+      "endpoint": null
+    },
+    {
+      "provider_id": "openrouter",
+      "verdict": 10,
+      "at_monotonic_ms": 484000,
+      "endpoint": null
+    },
+    {
+      "provider_id": "my-gateway",
+      "verdict": 9,
+      "at_monotonic_ms": 492000,
+      "endpoint": {
+        "server_kind": 1,
+        "model_count": 3,
+        "models": [
+          {
+            "model_id": "qwen3-30b",
+            "display_name": "Qwen3 30B",
+            "context_window": 32768,
+            "max_output_tokens": 8192,
+            "reasoning": false,
+            "tool_calling": true
+          },
+          {
+            "model_id": "llama3.1-8b",
+            "display_name": "Llama 3.1 8B",
+            "context_window": 131072,
+            "max_output_tokens": 4096,
+            "reasoning": false,
+            "tool_calling": false
+          },
+          {
+            "model_id": "nomic-embed-text",
+            "display_name": "Nomic Embed Text",
+            "context_window": 8192,
+            "max_output_tokens": 0,
+            "reasoning": false,
+            "tool_calling": false
+          }
+        ],
+        "proved_base": "https://gateway.example.invalid/v1"
+      }
+    }
+  ],
+  "provider_models": [
+    {
+      "provider_id": "anthropic",
+      "model_id": "claude-sonnet-4-5",
+      "display_name": "Claude Sonnet 4.5",
+      "context_window": 200000,
+      "max_output_tokens": 64000,
+      "reasoning": true,
+      "tool_calling": true,
+      "roles": [
+        0,
+        1
+      ],
+      "input_modalities": [
+        0,
+        1
+      ],
+      "thinking_levels": [
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "provider_id": "xai",
+      "model_id": "grok-4",
+      "display_name": "Grok 4",
+      "context_window": 131072,
+      "max_output_tokens": 32768,
+      "reasoning": true,
+      "tool_calling": true,
+      "roles": [
+        0
+      ],
+      "input_modalities": [
+        0
+      ],
+      "thinking_levels": []
+    },
+    {
+      "provider_id": "my-gateway",
+      "model_id": "qwen3-30b",
+      "display_name": "Qwen3 30B",
+      "context_window": 32768,
+      "max_output_tokens": 8192,
+      "reasoning": false,
+      "tool_calling": true,
+      "roles": [
+        0,
+        1
+      ],
+      "input_modalities": [
+        0
+      ],
+      "thinking_levels": []
+    }
+  ],
+  "assistant_configuration": {
+    "revision": 7,
+    "disabled_abilities": [
+      7,
+      14
+    ],
+    "preset": 2,
+    "pace": 1,
+    "length": 2,
+    "check_in": 1
+  },
+  "library": {
+    "availability": 0,
+    "revision": 4,
+    "entries": [
+      {
+        "entry_id": "library-entry-1",
+        "revision": 2,
+        "collection_id": "workspace-123",
+        "collection_name": "TV research",
+        "source_workspace_id": "workspace-123",
+        "source_workspace_revision": 7,
+        "source_fact_id": "fact-warranty",
+        "field": "warranty",
+        "original_value": "one year",
+        "correction": "two years",
+        "kind": 1,
+        "sources": [
+          {
+            "source_id": "source-maker",
+            "title": "Manufacturer specifications",
+            "host": "maker.example",
+            "observed_at_epoch_ms": 1700000000000
+          }
+        ],
+        "captured_at_epoch_ms": 1700000001000,
+        "last_checked_epoch_ms": 1700000000000,
+        "has_conflict": false
+      }
+    ],
+    "search": {
+      "request_id": "library-search-1",
+      "query": "warranty",
+      "library_revision": 4,
+      "hits": [
+        {
+          "entry_id": "library-entry-1",
+          "age_ms": 1000
+        }
+      ]
+    },
+    "refresh_previews": [],
+    "refresh_results": []
+  },
+  "library_export": {
+    "request_id": "library-export-1",
+    "library_revision": 4,
+    "collection_id": "workspace-123",
+    "format": 0,
+    "content": "# TV research\n\n## warranty\n\ntwo years\n"
+  },
+  "memory": {
+    "availability": 0,
+    "revision": 3,
+    "records": [
+      {
+        "memory_id": "memory-1",
+        "revision": 2,
+        "statement": "Prefer short comparison tables",
+        "source_kind": 1,
+        "source_task_id": "task-41",
+        "source_workspace": {
+          "workspace_id": "workspace-123",
+          "display_name": "TV research"
+        },
+        "scope_kind": 0,
+        "scope_workspace": null,
+        "sensitivity": 0,
+        "created_at_epoch_ms": 1700000001000,
+        "updated_at_epoch_ms": 1700000002000,
+        "reviewed_at_epoch_ms": 1700000002000,
+        "expires_at_epoch_ms": 0
+      }
+    ],
+    "search": {
+      "request_id": "memory-search-1",
+      "query": "comparison",
+      "memory_revision": 3,
+      "hits": [
+        {
+          "memory_id": "memory-1"
+        }
+      ]
+    }
+  },
+  "saved_sign_ins": {
+    "availability": 1,
+    "revision": 5,
+    "records": [
+      {
+        "id": "sign-in-opaque-1",
+        "site": "accounts.example",
+        "username": "person@example.test",
+        "last_used_epoch_ms": 1700000002000
+      }
+    ]
+  },
+  "saved_details": {
+    "availability": 1,
+    "revision": 3,
+    "people": [
+      {
+        "id": "detail-opaque-1",
+        "given_name": "Priya",
+        "family_name": "Rao",
+        "email": "person@example.test",
+        "phone": "+91 90000 00000",
+        "address": "42 Example Road",
+        "postcode": "560001",
+        "country": "IN"
+      }
+    ]
+  },
+  "site_skills": [
+    {
+      "skill_id": "compare-products",
+      "origin": "https://shop.example",
+      "provenance": 0,
+      "status": 1,
+      "active_version": 2,
+      "step_count": 3,
+      "installed_at_epoch_ms": 1700000001000,
+      "updated_at_epoch_ms": 1700000002000,
+      "recorded_from_task_id": null,
+      "reviewed_steps": []
+    },
+    {
+      "skill_id": "learned-document",
+      "origin": "https://example.test",
+      "provenance": 1,
+      "status": 0,
+      "active_version": 1,
+      "step_count": 3,
+      "installed_at_epoch_ms": 1700000003000,
+      "updated_at_epoch_ms": 1700000003000,
+      "recorded_from_task_id": "task-completed-1",
+      "reviewed_steps": [
+        {
+          "verb": "browser.navigate",
+          "arguments": [
+            {
+              "parameter": 0,
+              "kind": 5,
+              "value": 0,
+              "purpose": 0,
+              "public_address": "https://example.test/entry",
+              "semantic_target": null
+            }
+          ],
+          "postcondition": 1,
+          "has_fill": false,
+          "fill_purpose": 0
+        },
+        {
+          "verb": "user.handover",
+          "arguments": [
+            {
+              "parameter": 0,
+              "kind": 2,
+              "value": 1,
+              "purpose": 0,
+              "public_address": null,
+              "semantic_target": null
+            }
+          ],
+          "postcondition": 0,
+          "has_fill": false,
+          "fill_purpose": 0
+        },
+        {
+          "verb": "browser.download.from_link",
+          "arguments": [
+            {
+              "parameter": 0,
+              "kind": 6,
+              "value": 0,
+              "purpose": 0,
+              "public_address": null,
+              "semantic_target": {
+                "role": 9,
+                "phrase": 10
+              }
+            }
+          ],
+          "postcondition": 7,
+          "has_fill": false,
+          "fill_purpose": 0
+        }
+      ]
+    }
+  ],
+  "builtin_skills": [
+    {
+      "reference": {
+        "skill_id": 0,
+        "version": 1
+      },
+      "required_ability": 0,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 12,
+      "available_tool_count": 12,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 1,
+        "version": 1
+      },
+      "required_ability": 11,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 14,
+      "available_tool_count": 14,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 2,
+        "version": 1
+      },
+      "required_ability": 4,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 13,
+      "available_tool_count": 13,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 3,
+        "version": 1
+      },
+      "required_ability": 1,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 8,
+      "available_tool_count": 8,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 4,
+        "version": 1
+      },
+      "required_ability": 2,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 7,
+      "available_tool_count": 7,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 5,
+        "version": 1
+      },
+      "required_ability": 8,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 7,
+      "available_tool_count": 7,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 6,
+        "version": 1
+      },
+      "required_ability": 3,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 7,
+      "available_tool_count": 7,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 7,
+        "version": 1
+      },
+      "required_ability": 6,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 12,
+      "available_tool_count": 12,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 8,
+        "version": 1
+      },
+      "required_ability": 5,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 12,
+      "available_tool_count": 12,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 9,
+        "version": 1
+      },
+      "required_ability": 7,
+      "enabled": false,
+      "availability": 1,
+      "required_tool_count": 9,
+      "available_tool_count": 5,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 10,
+        "version": 1
+      },
+      "required_ability": 12,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 14,
+      "available_tool_count": 14,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 11,
+        "version": 1
+      },
+      "required_ability": 14,
+      "enabled": false,
+      "availability": 0,
+      "required_tool_count": 9,
+      "available_tool_count": 9,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 12,
+        "version": 1
+      },
+      "required_ability": 13,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 6,
+      "available_tool_count": 6,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 13,
+        "version": 1
+      },
+      "required_ability": 15,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 6,
+      "available_tool_count": 6,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 14,
+        "version": 1
+      },
+      "required_ability": 9,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 6,
+      "available_tool_count": 6,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    },
+    {
+      "reference": {
+        "skill_id": 15,
+        "version": 1
+      },
+      "required_ability": 10,
+      "enabled": true,
+      "availability": 0,
+      "required_tool_count": 8,
+      "available_tool_count": 8,
+      "required_part_count": 0,
+      "installed_part_count": 0
+    }
+  ],
+  "projection_mode": 0,
+  "projection_omissions": []
+}

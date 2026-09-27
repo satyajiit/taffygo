@@ -1,0 +1,34 @@
+# The delivery plane's browser half: the bytes of the product's own artifacts.
+#
+# The parent directory's rules carry almost all of it. Three grants are local
+# because this subsystem and the account plane are the only two that make an
+# outbound request, and the grant should say so where it is used rather than at
+# a level that would hand it to every seam in //taffy/browser:
+#
+#   net/traffic_annotation      required of every request Chromium sends
+#   services/network/public/mojom  the typed shape a response head arrives in
+#   services/network/test       test-only, below
+#
+# The fourth grant is not about the network. An asset the catalog packs as a
+# container is opened here rather than anywhere else, because opening it means
+# a seek and an inflate on a descriptor — blocking work this subsystem already
+# has a sequence for, and work no process above the browser may do on a path.
+#
+#   third_party/zlib/google     the archive reader
+include_rules = [
+  "+net/base",
+  "+net/traffic_annotation",
+  "+services/network/public/mojom",
+  "+third_party/zlib/google",
+]
+
+specific_include_rules = {
+  # A fake loader factory rather than an embedded test server, because these
+  # tests are about answers a real origin cannot be asked for on demand: a
+  # `206` carrying half an artifact, a `200` answering a range request, a `404`
+  # with no body at all. Each is a path through the resume and verify logic,
+  # and each has to be dictated to be exercised.
+  ".*unittest\.(cc|h)": [
+    "+services/network/test",
+  ],
+}

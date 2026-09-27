@@ -1,0 +1,12 @@
+{
+  "structs": [
+    {
+      "name": "ProfileDirectoryEffect",
+      "description": "A deviant effect that would hand the sandboxed core a directory to read.",
+      "fields": [
+        {"name": "effect_id", "type": "string", "ordinal": 0, "description": "The effect identifier this contract does carry."},
+        {"name": "profile_path", "type": "string", "ordinal": 1, "description": "The profile directory the effect would read, which the service must never receive."}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+Phosphor Icons (ImageVector subset)
+===================================
+
+Vendored asset: the path data in `../src/main/kotlin/com/taffygo/browser/ui/core/ui/TaffyIconPaths.kt`
+                and `../src/main/kotlin/com/taffygo/browser/ui/core/ui/TaffyIconCanvasPaths.kt`
+                and the ImageVector vals in `../src/main/kotlin/com/taffygo/browser/ui/core/ui/TaffyIcon.kt`
+                (a subset of 80 glyphs, Phosphor Icons, MIT)
+Licence:        MIT (vendor/phosphor.MIT.txt, next to this file)
+Source:         https://cdn.jsdelivr.net/gh/phosphor-icons/core@main/assets/<weight>/<name>.svg
+                for the regular weight, and .../assets/<weight>/<name>-<weight>.svg
+                for every other one (the jsDelivr mirror of phosphor-icons/core@main;
+                raw.githubusercontent.com was rate-limited)
+Licence source: https://cdn.jsdelivr.net/gh/phosphor-icons/core@main/LICENSE
+Downloaded:     2026-08-17, the first-run glyphs on 2026-08-18,
+                magnifying-glass and dots-three-vertical on 2026-08-19, and
+                speaker-high and speaker-slash on 2026-08-21, sun, moon-stars,
+                gear, trash, table, arrow-up-right and image on 2026-08-22, and
+                the fill weights of sun and moon-stars on 2026-08-23, and
+                books, download-simple and squares-four on 2026-08-25, and
+                user-circle, clock, identification-card, newspaper, monitor,
+                star and sliders-horizontal on 2026-08-28, and caret-left,
+                copy-simple, translate, funnel, chart-bar, question, text-aa
+                and flag on 2026-08-29, and minus on 2026-09-01, and
+                arrow-up on 2026-09-02, and play on 2026-09-10
+
+glyphs=80
+
+The 79 glyphs, each a single filled path on the source's 256 viewport,
+transcribed into `ImageVector.Builder` calls with no hand-editing:
+
+  regular: lock-simple, shield-check, arrow-clockwise, waveform, sparkle,
+           prohibit, browsers, share-network, arrow-left, arrow-right, arrow-up, plus,
+           minus,
+           x, pencil-simple, clock-counter-clockwise, bookmark-simple,
+           article, chat-circle, password, globe-simple, info, key, tag,
+           envelope-simple, cloud, arrows-clockwise, cloud-arrow-up,
+           puzzle-piece, bell-ringing, magnifying-glass, dots-three-vertical,
+           speaker-high, speaker-slash, sun, moon-stars, gear, trash, table,
+           arrow-up-right, image, books, download-simple, squares-four,
+           user-circle, clock, identification-card, newspaper, monitor, star,
+           sliders-horizontal, copy-simple, translate, funnel, chart-bar,
+           question, text-aa, flag
+  fill:    pause, play, hand, check-circle, circle-half, stop-circle, warning,
+           eye-slash, hand-pointing, users-three, house, crown-simple,
+           detective, film-strip, export, gift, sun, moon-stars
+  bold:    check, caret-down, caret-right, caret-left (bold because none has
+           a fill weight — DESIGN.md §4)
+
+Weights follow `handoff/DESIGN.md` section 4: regular for controls, fill for
+status glyphs, bold only where fill does not exist.
+
+sun and moon-stars are vendored twice, in both weights, and both are used. The
+regular pair is the Appearance control on screen SCR-001, which is a control.
+The fill pair is the body of the theme transition, which is not: nothing taps
+it, and it draws about five times larger than the biggest icon size section 4
+lists, where regular strokes thin to hairlines.

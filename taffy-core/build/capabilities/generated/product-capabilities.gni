@@ -1,0 +1,25 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# Generated from //taffy/build/product-capabilities.json. Do not edit.
+# Configuration fingerprint: sha256:f72e05085633c2d0a1ac32ecf34ec37c00ecd27d80668c61cee0276bf35e4723
+
+declare_args() {
+  # A new or unclassified profile is fail-closed by default.
+  taffy_capability_profile = "candidate"
+}
+
+assert(taffy_capability_profile == "candidate" ||
+           taffy_capability_profile == "development",
+       "taffy_capability_profile must be candidate or development")
+
+if (taffy_capability_profile == "candidate") {
+  taffy_capability_cpp_define = "TAFFY_CAPABILITY_PROFILE_CANDIDATE"
+  taffy_capability_rustflags = [ "--cfg=taffy_candidate_capabilities" ]
+} else {
+  taffy_capability_cpp_define = "TAFFY_CAPABILITY_PROFILE_DEVELOPMENT"
+  taffy_capability_rustflags = []
+}

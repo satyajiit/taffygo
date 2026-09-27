@@ -1,0 +1,67 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="rapid-navigation-race">
+<title>Rapid navigation race</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Rapid navigation race</h1>
+  <p class="who">Route and document changes arrive faster than an observe-then-act
+  cycle. Press start, or load with <code>?auto=1</code>.</p>
+</header>
+
+<p>
+  <button type="button" id="start">Start the sequence</button>
+  <button type="button" id="stop">Stop</button>
+</p>
+
+<p class="note">Step <span id="step">0</span> of 6 &middot; current route
+<code id="route">/race/rapid-navigation.html</code></p>
+
+<ol id="plan">
+  <li>250 ms — <code>history.pushState</code> to <code>#/one</code></li>
+  <li>500 ms — <code>history.pushState</code> to <code>#/two</code></li>
+  <li>750 ms — <code>history.replaceState</code> to <code>#/three</code></li>
+  <li>1000 ms — <code>history.back()</code></li>
+  <li>1250 ms — <code>history.pushState</code> to <code>#/four</code></li>
+  <li>1500 ms — cross-document navigation to the redirect chain</li>
+</ol>
+
+<p class="flag" id="final-note">Step 6 leaves this document. A handle taken at
+step 0 must not survive it.</p>
+
+<script>
+  (function () {
+    "use strict";
+    var timers = [];
+    var stepLabel = document.getElementById("step");
+    var routeLabel = document.getElementById("route");
+
+    function mark(n, route) {
+      stepLabel.textContent = String(n);
+      routeLabel.textContent = route;
+    }
+
+    function run() {
+      stop();
+      timers.push(setTimeout(function () { history.pushState({}, "", "#/one"); mark(1, location.pathname + location.hash); }, 250));
+      timers.push(setTimeout(function () { history.pushState({}, "", "#/two"); mark(2, location.pathname + location.hash); }, 500));
+      timers.push(setTimeout(function () { history.replaceState({}, "", "#/three"); mark(3, location.pathname + location.hash); }, 750));
+      timers.push(setTimeout(function () { history.back(); mark(4, location.pathname + location.hash); }, 1000));
+      timers.push(setTimeout(function () { history.pushState({}, "", "#/four"); mark(5, location.pathname + location.hash); }, 1250));
+      timers.push(setTimeout(function () { mark(6, "/r/hop1"); location.assign("/r/hop1"); }, 1500));
+    }
+
+    function stop() {
+      for (var i = 0; i < timers.length; i++) { clearTimeout(timers[i]); }
+      timers = [];
+    }
+
+    document.getElementById("start").addEventListener("click", run);
+    document.getElementById("stop").addEventListener("click", stop);
+    if (location.search.indexOf("auto=1") >= 0) { run(); }
+  })();
+</script>

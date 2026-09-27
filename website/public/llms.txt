@@ -1,0 +1,26 @@
+# TaffyGo
+
+> TaffyGo is a free, open-source Chromium browser for Android that blocks ads and trackers. Its built-in assistant, Taffy, works with the AI provider you connect. There is no account, and Matterward Labs runs no server for it.
+
+## Pages
+
+- [TaffyGo, the browser that does the busywork with you](https://taffygo.com/): What the app does, on screens captured from a phone, and how to install it.
+- [Hand Taffy an errand | TaffyGo](https://taffygo.com/product/): One errand from the request to the result, in three screens.
+- [Built for phones | TaffyGo](https://taffygo.com/built-for-phones/): The bottom row, Taffy's tabs kept apart from yours, and the light and dark themes.
+- [Contact | TaffyGo](https://taffygo.com/contact/): Issues, discussions and private security reports, all on GitHub.
+- [Privacy policy | TaffyGo](https://taffygo.com/privacy/): What stays on the phone, what goes to websites and to your AI provider, and what reaches us: nothing.
+- [Delete your data | TaffyGo](https://taffygo.com/delete-my-data/): There is nothing on our side to delete. How to clear what TaffyGo keeps on the phone.
+- [Terms of use | TaffyGo](https://taffygo.com/terms/): The Mozilla Public License 2.0, no warranty, and the services you connect yourself.
+- [Open-source licences | TaffyGo](https://taffygo.com/licenses/): Where the notices for the app and for this website are.
+
+## Get it
+
+- Google Play: https://play.google.com/store/apps/details?id=com.taffygo.browser
+- APK: https://github.com/satyajiit/taffygo/releases/latest
+- Source: https://github.com/satyajiit/taffygo
+
+## Contact
+
+Publisher: Matterward Labs Private Limited
+
+Bugs and questions: https://github.com/satyajiit/taffygo/issues and https://github.com/satyajiit/taffygo/discussions

@@ -1,0 +1,70 @@
+{
+  "availability": 0,
+  "snapshot": {
+    "document_id": "selected-page",
+    "document_revision": 7,
+    "host": "docs.example.test",
+    "secure_context": true,
+    "private_profile": false,
+    "document_state": 0,
+    "adapters": [
+      {"kind": 0, "status": 0, "version": 1},
+      {"kind": 1, "status": 1, "version": 1}
+    ],
+    "nodes": [
+      {
+        "display_id": "item-1",
+        "role": 0,
+        "name": "Retention policy",
+        "sensitivity": 0,
+        "text_run_count": 0,
+        "text_byte_count": 0,
+        "value_present": false,
+        "value_withheld": false
+      },
+      {
+        "display_id": "item-2",
+        "role": 6,
+        "name": null,
+        "sensitivity": 1,
+        "text_run_count": 1,
+        "text_byte_count": 24,
+        "value_present": true,
+        "value_withheld": true
+      }
+    ],
+    "edges": [
+      {
+        "from_display_id": "item-1",
+        "to_display_id": "item-2",
+        "relationship": 0,
+        "inferred": false
+      }
+    ],
+    "frames": [
+      {
+        "main_frame": true,
+        "out_of_process": false,
+        "cross_origin": false,
+        "included": true
+      }
+    ],
+    "truncation": {
+      "truncated": true,
+      "budgets_reached": [0],
+      "omitted_node_count": 3,
+      "omitted_text_bytes": 120,
+      "omitted_frame_count": 0,
+      "may_change_answer": true
+    },
+    "redaction": {
+      "redacted_field_count": 1,
+      "suppressed_secret_count": 1,
+      "sensitive_zone_count": 1,
+      "filtered_frame_count": 0
+    },
+    "warnings": [6, 7],
+    "site_skill_offer_availability": 0,
+    "site_skill_offers": []
+  }
+}

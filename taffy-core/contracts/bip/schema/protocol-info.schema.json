@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "protocol-info.schema.json",
+  "title": "BIP capability advertisement",
+  "description": "What one BIP endpoint actually supports. A caller reads this before it asks for anything: naming a capability the endpoint does not advertise returns UNSUPPORTED rather than a degraded result that looks complete. Protocol specification section 6.2.",
+  "x-bip-module": "protocol_info",
+  "$defs": {
+    "AdapterKind": {
+      "title": "AdapterKind",
+      "description": "An evidence adapter. DOM, accessibility, form, and metadata adapters are the observation set the first read-oriented workflow needs; selection and layout adapters annotate the nodes those produce rather than producing nodes of their own, one with what the user currently has selected and one with visibility, occlusion, and bounds; document, media, and site adapters belong to their own milestones and appear here only when an endpoint really advertises them. An adapter produces evidence with source, confidence, and sensitivity annotations; it never declares an action authorized or a derived fact correct. Which information can be safely and cheaply extracted on the supported devices is [Open (OD-030)], and which visibility and occlusion checks are reliable enough for action policy is [Open (OD-054)]. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "x-bip-added-in": {
+        "SELECTION": "0.2",
+        "LAYOUT": "0.2"
+      },
+      "enum": [
+        "DOM",
+        "ACCESSIBILITY",
+        "FORMS",
+        "METADATA",
+        "BROWSER",
+        "DOCUMENT_VIEWER",
+        "MEDIA",
+        "SITE",
+        "VISION",
+        "SELECTION",
+        "LAYOUT"
+      ]
+    },
+    "ObservationScope": {
+      "title": "ObservationScope",
+      "description": "How much of a document one request covers. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": ["VIEWPORT", "INTERACTIVE", "SELECTION", "SECTION", "DOCUMENT"]
+    },
+    "RedactionFeature": {
+      "title": "RedactionFeature",
+      "description": "A redaction capability an endpoint implements. No single detector is sufficient, so features stack; an endpoint that cannot run a feature a policy requires refuses the request rather than emitting unredacted evidence. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "x-bip-added-in": {
+        "CONTENT_TRUST_LABELLING": "0.4",
+        "INJECTION_SIGNAL_DETECTION": "0.4"
+      },
+      "enum": [
+        "SECRET_VALUE_SUPPRESSION",
+        "SENSITIVE_ZONE_CLASSIFICATION",
+        "PATTERN_DETECTORS",
+        "URL_MINIMIZATION",
+        "ORIGIN_POLICY_FILTER",
+        "INCOGNITO_POLICY_FILTER",
+        "ORGANIZATION_POLICY_FILTER",
+        "CONTENT_TRUST_LABELLING",
+        "INJECTION_SIGNAL_DETECTION"
+      ]
+    },
+    "ProtocolLimits": {
+      "title": "ProtocolLimits",
+      "description": "The bounds this endpoint enforces on CPU, memory, payload size, extraction time, and update rate. The schema owns the field set; it deliberately owns no values. Every numeric bound here is a device-floor and page-corpus measurement that is still [Open (OD-031)], and the endpoint reports what it currently enforces at runtime.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "max_message_bytes": { "$ref": "identity.schema.json#/$defs/ByteCount" },
+        "max_nodes": { "$ref": "identity.schema.json#/$defs/Count" },
+        "max_text_bytes": { "$ref": "identity.schema.json#/$defs/ByteCount" },
+        "max_total_bytes": { "$ref": "identity.schema.json#/$defs/ByteCount" },
+        "max_depth": { "$ref": "identity.schema.json#/$defs/Count" },
+        "max_frames": { "$ref": "identity.schema.json#/$defs/Count" },
+        "max_delta_queue_depth": { "$ref": "identity.schema.json#/$defs/Count" },
+        "max_snapshot_deadline_ms": { "$ref": "identity.schema.json#/$defs/DurationMillis" },
+        "min_delta_interval_ms": { "$ref": "identity.schema.json#/$defs/DurationMillis" }
+      },
+      "required": [
+        "max_message_bytes",
+        "max_nodes",
+        "max_text_bytes",
+        "max_total_bytes",
+        "max_depth",
+        "max_frames",
+        "max_delta_queue_depth",
+        "max_snapshot_deadline_ms",
+        "min_delta_interval_ms"
+      ]
+    },
+    "ProtocolInfo": {
+      "title": "ProtocolInfo",
+      "description": "The endpoint's own account of what it supports. Advertising is not authorization: a listed action type still needs a capability, an actor lease, and, where policy says so, an approval before anything happens.",
+      "type": "object",
+      "additionalProperties": true,
+      "x-bip-message": true,
+      "properties": {
+        "protocol_version": { "$ref": "identity.schema.json#/$defs/ProtocolVersion" },
+        "implementation_id": {
+          "description": "Opaque build identifier of the endpoint implementation. Not a version number and not a device identifier.",
+          "type": "string",
+          "maxLength": 128
+        },
+        "supported_adapters": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/AdapterKind" }
+        },
+        "supported_scopes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/ObservationScope" }
+        },
+        "supported_action_types": {
+          "description": "The action types this endpoint will accept. It states what the endpoint can perform for this document and nothing else; whether the product may ask is decided elsewhere and is never inferred from this list. An endpoint MUST NOT list a type it cannot perform — an over-report here causes exactly the failure section 6.2 exists to prevent, a caller planning against a capability that is not there — and MUST NOT list one no node in the document can accept.",
+          "type": "array",
+          "maxItems": 16,
+          "items": { "$ref": "action.schema.json#/$defs/ActionType" }
+        },
+        "supported_redaction_features": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/RedactionFeature" }
+        },
+        "limits": { "$ref": "#/$defs/ProtocolLimits" }
+      },
+      "required": [
+        "protocol_version",
+        "implementation_id",
+        "supported_adapters",
+        "supported_scopes",
+        "supported_action_types",
+        "supported_redaction_features",
+        "limits"
+      ]
+    }
+  }
+}

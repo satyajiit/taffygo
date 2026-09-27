@@ -1,0 +1,46 @@
+{
+  "operation": {
+    "operation_id": "op-observe-1",
+    "service_generation": 4,
+    "task_revision": 9,
+    "deadline_monotonic_ms": 120000,
+    "idempotency_key": "observe-task-9-action-3"
+  },
+  "effect_id": "effect-observe-1",
+  "kind": 1,
+  "retry_class": 0,
+  "storage_commit": null,
+  "page_observation": {
+    "tab_id": "tab-4",
+    "frame_id": "frame-7",
+    "page_epoch": "epoch-12",
+    "scope": 0,
+    "max_bytes": 262144,
+    "task_id": "task-9",
+    "action_id": "action-3",
+    "capability_id": "capability-generation-4-action-3",
+    "proposal_digest": "sha256-proposal-fixture",
+    "idempotency_key": "observe-task-9-action-3",
+    "authority_subject": {
+      "kind": 0,
+      "authority_subject_id": "task-9"
+    },
+    "max_nodes": 0,
+    "max_text_bytes": 0,
+    "max_frames": 0,
+    "deadline_ms": 0,
+    "expected_graph_revision": 12
+  },
+  "model_request": null,
+  "network_request": null,
+  "browser_action": null,
+  "tool_job": null,
+  "secure_store": null,
+  "auth_surface": null,
+  "permission_request": null,
+  "asset_delivery": null,
+  "catalog_fetch": null,
+  "provider_listing_fetch": null,
+  "composer_completion": null,
+  "custom_endpoint_probe": null
+}

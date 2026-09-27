@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  The locales the UI layer ships. English is the default res/values table;
+  Hindi is offered in every country because values-hi exists. Android 13
+  reads only this static list. Android 14+ may receive the same list from
+  the browser Activity, never a country-narrowed English-only override.
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en"/>
+    <locale android:name="hi"/>
+</locale-config>

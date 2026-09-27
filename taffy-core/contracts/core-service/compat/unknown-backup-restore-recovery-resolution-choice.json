@@ -1,0 +1,12 @@
+{
+  "operation": {
+    "operation_id": "resolve-recovery-unknown-choice",
+    "service_generation": 7,
+    "task_revision": 0,
+    "deadline_monotonic_ms": 42000,
+    "idempotency_key": "resolve-recovery-unknown-choice"
+  },
+  "history_prefix": [],
+  "choice": 255,
+  "intent_id": "discard-1"
+}

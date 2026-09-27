@@ -1,0 +1,70 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="sensitive-form">
+<title>Sensitive checkout form</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Sensitive checkout form</h1>
+  <p class="who">Every value below is a fake, greppable canary. None of them may
+  appear in a snapshot, a model request, a log, an export, or a crash report.</p>
+</header>
+
+<p id="order-summary">Order summary: Lumen Arc desk lamp, quantity 1,
+<strong>$129.00</strong>. Delivery to the fixture address.</p>
+
+<form id="checkout" action="/forms/submit" method="post">
+  <input type="hidden" id="csrf" name="csrf_token" value="TAFFYGO-CANARY-SESSION-1C7A22">
+
+  <fieldset>
+    <legend>Account</legend>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" autocomplete="username"
+           value="fixture-user@primary.taffy.test">
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password"
+           value="TAFFYGO-CANARY-PASSWORD-4F1A9C">
+
+    <label for="otp">One-time code</label>
+    <input id="otp" name="otp" type="text" inputmode="numeric" autocomplete="one-time-code"
+           value="TAFFYGO-CANARY-OTP-9D2E60">
+  </fieldset>
+
+  <fieldset>
+    <legend>Payment</legend>
+    <label for="card">Card number</label>
+    <input id="card" name="card" type="text" autocomplete="cc-number" value="4111 1111 1111 1111">
+
+    <label for="cvv">Security code</label>
+    <input id="cvv" name="cvv" type="text" autocomplete="cc-csc" value="TAFFYGO-CANARY-CVV-77C41B">
+
+    <label for="expiry">Expiry</label>
+    <input id="expiry" name="expiry" type="text" autocomplete="cc-exp" value="04/2031">
+  </fieldset>
+
+  <fieldset>
+    <legend>Recovery and integrations</legend>
+    <label for="recovery">Recovery code</label>
+    <input id="recovery" name="recovery" type="text" autocomplete="off"
+           value="TAFFYGO-CANARY-RECOVERY-B85F30">
+
+    <label for="seed">Wallet recovery phrase</label>
+    <textarea id="seed" name="seed" rows="2">TAFFYGO-CANARY-SEED-2B44E8</textarea>
+
+    <label for="api-key">Integration key</label>
+    <input id="api-key" name="api_key" type="text" autocomplete="off"
+           value="TAFFYGO-CANARY-APIKEY-6E30D9">
+  </fieldset>
+
+  <p>
+    <button type="submit" id="pay">Pay $129.00</button>
+  </p>
+</form>
+
+<p class="note" id="structural-note">A snapshot may record that a password field,
+a security-code field and a one-time-code field are present. It may not record
+what is in them, how long they are, or any value derived from them.</p>

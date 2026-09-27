@@ -1,0 +1,53 @@
+From d632827ad494e4e0506d5b8012632fb3bca05a2c Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sat, 22 Aug 2026 03:22:34 +0530
+Subject: register the profile core utility service
+
+Register the Taffy service factory on the utility main thread and link its downstream implementation into chrome utility. The Mojo interface selects the kService sandbox; browser profile ownership remains outside this patch.
+
+Taffy-Patch: 0028
+
+diff --git a/chrome/utility/BUILD.gn b/chrome/utility/BUILD.gn
+index 48138252497a5..17842e15ec01f 100644
+--- a/chrome/utility/BUILD.gn
++++ b/chrome/utility/BUILD.gn
+@@ -72,6 +72,7 @@ static_library("utility") {
+     "//services/service_manager/public/cpp",
+     "//skia",
+     "//sql",
++    "//taffy/utility:registry",
+     "//third_party/blink/public/common",
+     "//third_party/zlib/google:zip",
+     "//ui/base:buildflags",
+diff --git a/chrome/utility/DEPS b/chrome/utility/DEPS
+index 7d88045f10f62..08d77766bbf2e 100644
+--- a/chrome/utility/DEPS
++++ b/chrome/utility/DEPS
+@@ -80,6 +80,7 @@ include_rules = [
+   "+services/proxy_resolver_win",
+   "+services/screen_ai",
+   "+skia/ext",
++  "+taffy/utility",
+   "+third_party/blink/public/common",
+   "+third_party/zlib/google",
+ ]
+diff --git a/chrome/utility/services.cc b/chrome/utility/services.cc
+index 37f6b72d73e90..5af558d1caa09 100644
+--- a/chrome/utility/services.cc
++++ b/chrome/utility/services.cc
+@@ -30,6 +30,7 @@
+ #include "pdf/buildflags.h"
+ #include "printing/buildflags/buildflags.h"
+ #include "services/passage_embeddings/passage_embeddings_service.h"
++#include "taffy/utility/service_factory.h"
+ #include "ui/accessibility/accessibility_features.h"
+ 
+ #if BUILDFLAG(IS_ANDROID)
+@@ -475,6 +476,7 @@ void RegisterElevatedMainThreadServices(mojo::ServiceFactory& services) {
+ }
+ 
+ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
++  taffy::RegisterUtilityMainThreadServices(services);
+   services.Add(RunFilePatcher);
+   services.Add(RunUnzipper);
+   services.Add(RunCSVPasswordParser);

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+The label a debug build wears.
+
+Debug builds carry the application id `com.taffygo.browser.debug` (decision
+0012), so a debug build and a release build install side by side. Two icons
+with the same label on one launcher is a real way to lose an afternoon, so
+the label is suffixed to match the application id.
+
+This directory is selected in place of `../res/` by `taffy_branding.gni` when
+`is_debug` is true. It exists as a separate resource directory rather than as
+a second string name because the manifest names one resource, `app_name`, and
+the build decides what that resource contains.
+-->
+<resources>
+    <string name="app_name" translatable="false">TaffyGo Debug</string>
+</resources>

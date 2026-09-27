@@ -1,0 +1,48 @@
+{
+  "operation": {
+    "operation_id": "op-23",
+    "service_generation": 2,
+    "task_revision": 5,
+    "deadline_monotonic_ms": 60000,
+    "idempotency_key": "tool-op-23-1"
+  },
+  "job_id": "job-1",
+  "runtime": 0,
+  "tool_id": "statistics.describe",
+  "tool_version": "1",
+  "operation_kind": 0,
+  "budget": {
+    "max_input_bytes": 1048576,
+    "max_output_bytes": 1048576,
+    "max_memory_bytes": 134217728,
+    "max_cpu_ms": 5000,
+    "max_temporary_bytes": 8388608,
+    "max_output_chunks": 16
+  },
+  "bundled_python": {
+    "entrypoint_id": "describe",
+    "input": [1, 2, 3]
+  },
+  "local_model": null,
+  "media_probe": null,
+  "audio_extract": null,
+  "frame_sample": null,
+  "transcode": null,
+  "signed_wasm": null,
+  "input_payload": {
+    "transport": 0,
+    "byte_length": 3,
+    "digest": [3, 144, 88, 198, 242, 192, 203, 73, 44, 83, 59, 10, 77, 20, 239, 119, 204, 15, 120, 171, 204, 206, 213, 40, 125, 132, 161, 162, 1, 28, 251, 129]
+  },
+  "output_payload": {
+    "transport": 0,
+    "max_byte_length": 1048576
+  },
+  "local_embedding": null,
+  "python_library": {
+    "library_id": "python.stdlib",
+    "library_version": "3.14.0",
+    "archive_bytes": 12582912,
+    "archive_digest": [16, 138, 215, 86, 192, 23, 58, 104, 189, 86, 49, 251, 147, 79, 13, 33, 135, 147, 85, 139, 56, 197, 7, 209, 141, 132, 72, 190, 117, 247, 179, 153]
+  }
+}

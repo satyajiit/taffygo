@@ -1,0 +1,145 @@
+Bundled delivery artifacts (decision 0202)
+==========================================
+
+Vendored assets: the four required delivery artifacts, committed as bytes and
+                 seeded into the delivery store from the APK on first run.
+                 One file per distinct blob, not per catalogue variant:
+                 python-stdlib is published at two paths, android-arm64 and
+                 android-x64, and they are one byte-identical object.
+Owners:          each artifact keeps the terms it arrived with; the
+                 Licence field below names them one by one
+Licence:         no new licence is granted here. Each container keeps the
+                 terms of what it was built from, and where those sources are
+                 is not uniform — two are vendored in this tree and two are
+                 not, which is the same split as the rebuild section below:
+                   easylist-base   EasyList and EasyPrivacy, GPL-3.0 elected
+                                   from the dual offer; snapshots and text
+                                   vendored at taffy-core/third_party/
+                                   easylist/vendor/easylist.GPL3.txt
+                   start-scenes    first-party generated media, reserved by
+                                   TRADEMARKS.md — the row "The start-page
+                                   paintings", 24 members under taffy-core/
+                                   ui/android/core/ui/vendor/start-scenes/
+                                   webp/. A fork must replace these.
+                   python-stdlib   CPython under the PSF licence; the text is
+                                   tracked at taffy-core/third_party/cpython/
+                                   LICENSE even though the source it was
+                                   built from is not
+                   country-flags   flag-icons under MIT; the text is tracked
+                                   at taffy-core/third_party/flag-icons/
+                                   vendor/flag-icons.MIT.txt even though no
+                                   artwork is
+Source:          fetched 2026-09-20 from the publication origin this
+                 project operated until decision 0200 retired it; nothing
+                 fetches from that origin now
+Version:         one per artifact, in The artifacts below. That list is a
+                 reading of the `bundled` block of taffy-core/components/
+                 delivery/core/rust/asset-plane/catalog/source/assets.json,
+                 which is the checked copy; the entry counts beside each
+                 are from the fetch and are checked nowhere.
+
+Why the bytes are committed rather than built
+---------------------------------------------
+
+Decision 0202 point 4 decides this and gives the reasoning; what follows is
+that reasoning checked against this tree, because a provenance record that
+restates a decision without verifying it is worth nothing.
+
+Two of the four cannot be rebuilt on a clean checkout at all:
+
+  * python-stdlib   is built from taffy-core/third_party/cpython/src/Lib,
+                    which ./tools/chromium/sync unpacks from the pinned
+                    tarball and this repository does not track. Measured:
+                    `git ls-files 'taffy-core/third_party/cpython/src/*'`
+                    returns nothing.
+  * country-flags   commits no artwork at all. Its recipe fetches the pinned
+                    flag-icons 7.5.0 tarball and rasterises it through
+                    librsvg, cairo and cwebp. Measured: no tracked .svg and
+                    no tracked .webp anywhere under
+                    taffy-core/third_party/flag-icons/.
+
+The other two **do** rebuild from the tree, and are committed anyway:
+
+  * easylist-base   rebuilds byte-identically from the snapshots committed
+                    under taffy-core/third_party/easylist/vendor/.
+  * start-scenes    rebuilds from 24 committed WebP members under
+                    taffy-core/ui/android/core/ui/vendor/start-scenes/webp/.
+                    Measured: 24 tracked members, and the pack carries 25
+                    entries — those 24 plus its own NOTICE.
+
+They are committed because committing two and building two would be two
+mechanisms for one kind of thing, which is decision 0202's own reason rather
+than an inference drawn here.
+
+One hazard applies to all four and would bite quietly if any of them were
+rebuilt during the build instead. taffy-core/third_party/cpython/tools/
+artifact_zip.py pins entry order, timestamps, permission bits, create_system
+and COMPRESS_LEVEL = 9 — but a deflate *level* is not a deflate
+*implementation*, and the bytes are still whatever the host's zlib writes. A
+pack rebuilt elsewhere is a different digest for identical contents, and the
+delivery plane checks the digest.
+
+The artifacts
+-------------
+
+Four files, one per distinct blob:
+
+  easylist-base.zip    easylist-base at revision 202608272347-taffy.1,
+                       3 entries, carrying the android-arm64 and android-x64
+                       variants
+  stdlib.zip           python-stdlib at revision 3.14.7-taffy.1, 564 entries,
+                       carrying both Android variants -- the catalogue
+                       publishes this blob at two paths and they are the same
+                       bytes, which is why there is one file here and not two
+  flags-4x3-webp.zip   country-flags at revision 7.5.0-taffy.1, 250 entries,
+                       carrying both Android variants
+  scenes-4x3-webp.zip  start-scenes at revision 20260910-taffy.1, 25 entries,
+                       carrying both Android variants
+
+Two gates read these bytes and they answer different questions.
+
+In the `files` lane, tools/lib/vendored_assets.py reads the `sha256_` and
+`bytes_` lines at the end of this file against this directory, both ways: a
+file whose bytes moved is a finding, a line naming a file that is not here is
+a finding, and a fifth artifact dropped in beside these four with no line of
+its own is a finding on the day it lands. This record carries no checksum of
+itself, because writing the line would change the bytes it measures; the gate
+excuses exactly this one file and nothing else in the directory.
+
+In the `catalog` lane, `bundled_finding` in bundled_rows.py, beside the
+asset-plane generator, reads the same files against the catalogue: each one's measured length and digest
+must equal the `transfer_bytes` and `digest` of every variant the `bundled`
+block of assets.json says it satisfies, every published variant of a
+`required` asset must be carried by one of these files, and no file here may
+be unaccounted for. That is the check that matters at install time. The device
+enforces the digest itself, on a phone, and a file replaced here without its
+catalogue row moving would otherwise reach a person as an artifact refused for
+a digest with no explanation attached.
+
+The four `bytes_` lines at the end of this file sum to 5757430, which is the
+figure decision 0202 gives for what bundling adds to the package.
+
+What is not here
+----------------
+
+python-toolkit, the fifth catalogued asset, is `on-demand` and has publication
+`unpublished` on every variant with no path. There was nothing to fetch and
+nothing was fetched. It stays a catalogue row with no bundled file, which is
+the state the seeder must tolerate: `required` is what gets bundled, and an
+`on-demand` artifact with no origin is simply never installed.
+
+The non-Android variants — macos-arm64, macos-x64, windows-x64, windows-arm64
+— are `unpublished` for every asset. TaffyGo is an Android product; those rows
+describe a shape the catalogue can express and this product does not build.
+
+The checked facts
+-----------------
+
+sha256_easylist_base_zip=c1ea235b7eb1de2efa7b6fd6f5af802fa548e779b9e008efe98ff629a16eef10
+bytes_easylist_base_zip=1183665
+sha256_stdlib_zip=a01d637051448386b07865ca543c8dd3aed00a9e374385aa971de94334fee363
+bytes_stdlib_zip=2769014
+sha256_flags_4x3_webp_zip=46d06699bd17d6943eeb2d4540b707eae34c6313ac01d1835c61201b2decb5b5
+bytes_flags_4x3_webp_zip=584892
+sha256_scenes_4x3_webp_zip=1a6d9eeee5df0725f35d6dfdd6028ee90aa79312b35c4a01d8f856525f40c566
+bytes_scenes_4x3_webp_zip=1219859

@@ -1,0 +1,58 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="consent-dialog">
+<title>Consent dialog over an article</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Desk lamp buying guide</h1>
+  <p class="who">The article is present in the document but covered by a modal
+  consent dialog until a choice is recorded.</p>
+</header>
+
+<article id="article" aria-hidden="true">
+  <h2>Choosing a desk lamp</h2>
+  <p id="article-body">Diffuse light at roughly 600 lux was the most comfortable
+  setting in the fixture measurements. The Lumen Arc reached that level at 40 cm.</p>
+  <p>Price at the time of writing: <strong>$129.00</strong>.</p>
+</article>
+
+<div class="overlay" id="consent" role="dialog" aria-modal="true" aria-labelledby="consent-title">
+  <div class="panel">
+    <h2 id="consent-title">Choose how this fixture site uses cookies</h2>
+    <p>Strictly necessary cookies keep the fixture session working. Measurement
+    and advertising cookies are optional.</p>
+    <p>
+      <button type="button" id="accept-all">Accept all</button>
+      <button type="button" id="reject-optional">Reject optional</button>
+      <button type="button" id="manage">Manage choices</button>
+    </p>
+    <p class="note">No choice has been recorded. The article underneath is inert
+    until one is.</p>
+  </div>
+</div>
+
+<script>
+  (function () {
+    "use strict";
+    var consent = document.getElementById("consent");
+    var article = document.getElementById("article");
+    function decide(choice) {
+      consent.remove();
+      article.removeAttribute("aria-hidden");
+      var mark = document.createElement("p");
+      mark.className = "note";
+      mark.id = "consent-outcome";
+      mark.textContent = "Recorded consent choice: " + choice + ".";
+      document.body.appendChild(mark);
+    }
+    document.getElementById("accept-all").addEventListener("click", function () { decide("accept-all"); });
+    document.getElementById("reject-optional").addEventListener("click", function () { decide("reject-optional"); });
+    document.getElementById("manage").addEventListener("click", function () {
+      document.getElementById("consent-title").textContent = "Manage choices (fixture stub)";
+    });
+  })();
+</script>

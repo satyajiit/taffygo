@@ -1,0 +1,11 @@
+{
+  "operation_kind": 0,
+  "bundled_python": {"output": [4, 5, 6]},
+  "local_model": null,
+  "media_probe": null,
+  "audio_extract": null,
+  "frame_sample": null,
+  "transcode": null,
+  "signed_wasm": null,
+  "local_embedding": null
+}

@@ -1,0 +1,32 @@
+From b60493333a250c8b630b8896de5df04bcc4f80e2 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Wed, 9 Sep 2026 21:50:39 +0530
+Subject: declare downstream credit directories for generated Android notices
+
+Android owns this hook for shipped overlay dependencies. Chromium's credits
+action already forwards extra_third_party_notice_dirs, but without a
+declaration the Android profiles cannot supply directories beneath the
+symlinked //taffy mount. Declare an empty default and keep dependency selection
+in the shared overlay credits args. The patch retires when upstream declares
+this hook or an equivalent downstream notice input; review at each milestone
+rebase.
+
+Specified by chromium/patches/0050-declare-downstream-credit-directories.md.
+
+Taffy-Patch: 0050
+
+diff --git a/components/resources/BUILD.gn b/components/resources/BUILD.gn
+index 3e45f8d1ea836..d1465107df474 100644
+--- a/components/resources/BUILD.gn
++++ b/components/resources/BUILD.gn
+@@ -17,6 +17,10 @@ declare_args() {
+   # Generating the credits page requires a filesystem traversal for licenses
+   # that is slow in some environments.
+   generate_about_credits = is_official_build
++
++  # Downstream notice directories can live behind a source mount that the
++  # filesystem scan does not follow. Expose the existing credits action hook.
++  extra_third_party_notice_dirs = []
+ }
+ 
+ buildflag_header("generate_about_credits_header") {

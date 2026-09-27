@@ -1,0 +1,21 @@
+[
+  {"file": "ready-task.json", "type": "CoreStatus"},
+  {"file": "full-status.json", "type": "CoreStatus"},
+  {"file": "signed-in-account.json", "type": "AuthViewState"},
+  {"file": "start-task-command.json", "type": "CoreCommand"},
+  {"file": "auth-credential-handle.json", "type": "CoreCommand"},
+  {"file": "correct-workspace-fact.json", "type": "CoreCommand"},
+  {"file": "request-workspace-export.json", "type": "CoreCommand"},
+  {"file": "page-inspector-documents.json", "type": "PageInspectorDocumentsView"},
+  {"file": "page-inspector-snapshot.json", "type": "PageInspectorSnapshotResult"},
+  {"file": "request-asset.json", "type": "CoreCommand"},
+  {"file": "save-provider-credential.json", "type": "CoreCommand"},
+  {"file": "set-provider-credential-state.json", "type": "CoreCommand"},
+  {"file": "set-provider-model-preference.json", "type": "CoreCommand"},
+  {"file": "probe-provider-key.json", "type": "CoreCommand"},
+  {"file": "probe-custom-endpoint.json", "type": "CoreCommand"},
+  {"file": "request-composer-completion.json", "type": "CoreCommand"},
+  {"file": "save-custom-provider.json", "type": "CoreCommand"},
+  {"file": "cancel-composer-completion.json", "type": "CoreCommand"},
+  {"file": "saved-flow-query-result.json", "type": "SavedFlowQueryResult"}
+]

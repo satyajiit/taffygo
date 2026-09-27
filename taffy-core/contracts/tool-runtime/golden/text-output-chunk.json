@@ -1,0 +1,15 @@
+{
+  "operation": {
+    "operation_id": "op-24",
+    "service_generation": 2,
+    "task_revision": 5,
+    "deadline_monotonic_ms": 60000,
+    "idempotency_key": "tool-op-24-1"
+  },
+  "job_id": "job-2",
+  "sequence": 1,
+  "kind": 0,
+  "text": {"utf8": [84, 97, 102, 102, 121]},
+  "binary": null,
+  "is_final": false
+}

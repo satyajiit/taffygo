@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<resources>
+    <string name="taffy_backup_delete_choose">बैकअप फ़ाइल हटाएँ…</string>
+    <string name="taffy_backup_delete_choose_help">पुराना बैकअप या वह फ़ाइल चुनें जिससे आपने डेटा बहाल किया था। रिकवरी कुंजी की ज़रूरत नहीं है। TaffyGo केवल फ़ाइल का नाम पढ़ता है और उसे मिटाने से पहले आपकी पुष्टि माँगता है।</string>
+    <string name="taffy_backup_delete_selected_name">चुनी गई फ़ाइल: %1$s</string>
+    <string name="taffy_backup_delete_selected_help">यह नाम स्टोरेज ऐप से आया है। TaffyGo ने फ़ाइल के अंदर का डेटा नहीं जाँचा है और यह भी नहीं जाँचा कि यह सही बैकअप है या नहीं। कुछ भी मिटाया नहीं गया है।</string>
+    <string name="taffy_backup_delete_selected_request">यह चुनी गई फ़ाइल हटाएँ…</string>
+    <string name="taffy_backup_delete_selected_warning">यह चुनी गई फ़ाइल मिटाएँ? इससे आपका एकमात्र बैकअप मिट सकता है। आपकी मौजूदा प्रोफ़ाइल और रिकवरी कुंजी नहीं बदलेंगी।</string>
+    <string name="taffy_backup_delete_reading_name">चुनी गई फ़ाइल का नाम पढ़ा जा रहा है। कुछ भी मिटाया नहीं जा रहा है…</string>
+    <string name="taffy_backup_delete_selection_unavailable">TaffyGo मिटाने के लिए नाम वाली फ़ाइल तैयार नहीं कर सका। कोई फ़ाइल नहीं मिटाई गई। उसे फिर से चुनें या स्टोरेज ऐप का इस्तेमाल करें।</string>
+    <string name="taffy_backup_delete_selection_cancelled">फ़ाइल चुनना रद्द किया गया। कोई फ़ाइल नहीं मिटाई गई।</string>
+    <string name="taffy_backup_copy_cleanup_help">इस निर्यात के लिए इस्तेमाल की गई फ़ाइल को हटा सकते हैं, भले ही वह अधूरी हो। इस स्क्रीन से जाने पर फ़ाइल नहीं हटेगी।</string>
+    <string name="taffy_backup_copy_delete_request">यह निर्यात की गई फ़ाइल हटाएँ…</string>
+    <string name="taffy_backup_copy_delete_warning">इस निर्यात के लिए चुनी गई फ़ाइल को मिटाएँ? इससे आपका एकमात्र बैकअप मिट सकता है। आपकी मौजूदा प्रोफ़ाइल और रिकवरी कुंजी नहीं बदलेंगी।</string>
+    <string name="taffy_backup_copy_retention">स्टोरेज ऐप फ़ाइल को ट्रैश या बैकअप में रख सकता है। दूसरी जगह बनाई गई कॉपियाँ नहीं हटेंगी।</string>
+    <string name="taffy_backup_copy_delete_confirm">यह फ़ाइल मिटाएँ</string>
+    <string name="taffy_backup_copy_keep">यह फ़ाइल रखें</string>
+    <string name="taffy_backup_copy_deleting">स्टोरेज ऐप से फ़ाइल मिटाने को कहा जा रहा है और जाँचा जा रहा है कि वह अब नहीं खुलती…</string>
+    <string name="taffy_backup_copy_deleted">स्टोरेज ऐप ने फ़ाइल मिटाने का अनुरोध स्वीकार किया और फ़ाइल अब अपनी पुरानी जगह पर नहीं खुलती। वह ट्रैश, बैकअप या दूसरी जगह की कॉपियों में अब भी हो सकती है।</string>
+    <string name="taffy_backup_copy_still_present">फ़ाइल अब भी खुलती है। उसके मिटने की पुष्टि नहीं हुई। स्टोरेज ऐप में जाँचें।</string>
+    <string name="taffy_backup_copy_delete_unverified">फ़ाइल मिटने की पुष्टि नहीं हो सकी। वह अब भी मौजूद हो सकती है। स्टोरेज ऐप में जाँचें; TaffyGo अपने-आप दोबारा कोशिश नहीं करेगा।</string>
+</resources>

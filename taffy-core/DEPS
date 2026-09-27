@@ -1,0 +1,42 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# Layering for //taffy.
+#
+# Two rules matter more than the rest and are repeated in every child DEPS:
+#   1. Portable layers never reach into the embedder. //chrome, //ios, and
+#      //android_webview are unreachable from common, contracts, components,
+#      services, renderer, resources, and UI projections. Product assembly in
+#      app/ and profile/window/tab coordination in browser/ declare only the
+#      narrow embedder edges they own in their child DEPS files.
+#   2. Renderer code never depends on browser code. The renderer is sandboxed
+#      and is trusted for nothing; if renderer code could include a browser
+#      header, the authority boundary would be one #include away from being
+#      accidental.
+
+include_rules = [
+  "-android_webview",
+  "-chrome",
+  "-chromecast",
+  "-ios",
+
+  # TaffyGo uses upstream components through reviewed public seams. A child
+  # DEPS file adds the narrow public prefix it consumes and records why.
+  "-components",
+
+  "+base",
+  "+build",
+  "+mojo/public/cpp/bindings",
+  "+mojo/public/cpp/system",
+  "+url",
+
+  # Process-side and Blink includes are granted per directory, not here:
+  # //taffy/renderer gets //content/public/renderer and Blink,
+  # //taffy/browser gets //content/public/browser. Neither gets
+  # both.
+  "-content",
+  "-third_party/blink",
+]

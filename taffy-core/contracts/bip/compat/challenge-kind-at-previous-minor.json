@@ -1,0 +1,52 @@
+{
+  "schema_version": "0.12",
+  "subscription_id": "sub_challenge_01",
+  "tab_id": "tab_01",
+  "frame_id": "frame_main",
+  "page_epoch": "epoch_challenge_01",
+  "from_revision": 8,
+  "to_revision": 9,
+  "event_sequence": 31,
+  "coalesced_mutation_count": 1,
+  "added_nodes": [],
+  "changed_nodes": [
+    {
+      "node": {
+        "node_id": "n_challenge_response",
+        "frame_id": "frame_main",
+        "role": "TEXT_FIELD",
+        "states": [
+          "VISIBLE",
+          "ENABLED",
+          "EDITABLE"
+        ],
+        "actions": [
+          "FOCUS",
+          "SET_TEXT",
+          "SCROLL_INTO_VIEW"
+        ],
+        "sensitivity": "CHALLENGE_RESPONSE",
+        "sources": [
+          "FORM_CONTROL"
+        ],
+        "confidence": 0.98,
+        "challenge_kind": "IMAGE"
+      },
+      "changed_fields": [
+        "CHALLENGE_KIND"
+      ]
+    }
+  ],
+  "removed_node_ids": [],
+  "changed_edges": [],
+  "invalidations": [],
+  "truncation": {
+    "truncated": false,
+    "budgets_reached": [],
+    "omitted_node_count": 0,
+    "omitted_text_bytes": 0,
+    "omitted_frame_count": 0,
+    "may_change_answer": false
+  },
+  "observed_at_monotonic_ms": 3100
+}

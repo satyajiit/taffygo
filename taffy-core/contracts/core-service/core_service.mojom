@@ -1,0 +1,182 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+module taffy.core_service.mojom;
+
+import "sandbox/policy/mojom/sandbox.mojom";
+import "taffy/contracts/core-service/generated/mojom/core_service.mojom";
+
+// Browser-owned callbacks. The service can propose effects and publish state;
+// neither method gives it a browser object, filesystem, network factory,
+// credential, or capability reference.
+interface CoreHost {
+  // Policy-minted authority must be registered in the profile browser ledger
+  // before a corresponding effect is dispatched. The complete binding never
+  // enters renderer, UI, or a tool worker.
+  RegisterCapability(MintedCapabilityGrant grant)
+      => (CapabilityRegistrationStatus status);
+  // Every state update is preceded by exactly one full pending-approval
+  // snapshot, including an empty snapshot. The browser atomically replaces
+  // its generation-bound registry only for the next state sequence, then
+  // acknowledges before the service publishes that state. Digests never
+  // enter CoreStateUpdate or any UI contract.
+  RegisterPendingApprovals(CoreStateBrowserBindings bindings)
+      => (PendingApprovalRegistrationStatus status);
+  // Browser binds the reducer's immutable proposal to a live document and a
+  // short task actor lease, then routes the complete request through the
+  // existing exact-request policy path. The result is returned only after a
+  // minted grant was registered in the browser ledger.
+  EvaluateTaskPolicy(TaskPolicyEffect effect)
+      => (PolicyEvaluationResult result);
+  // Executes one closed post-commit task effect. Unsupported runtime owners
+  // return a typed UNAVAILABLE terminal; no effect is silently dropped.
+  ExecuteTaskEffect(TaskEffectBinding effect)
+      => (TaskEffectCompletion completion);
+  // Sanitized visible task-answer residency. The browser validates and
+  // forwards these events to the one profile observer before acknowledging;
+  // raw provider frames and reasoning cannot be represented by this record.
+  PublishTaskAnswerEvents(array<TaskAnswerEvent> events) => (bool accepted);
+  EmitEffect(EffectEnvelope effect);
+  PublishState(CoreStateUpdate update);
+};
+
+// One ordered profile session. The browser owns the receiver and generation.
+interface CoreSession {
+  Submit(CoreServiceCommand command) => (Admission admission);
+  // Parses and validates one already-completed, bounded account-plane 2xx
+  // response on the ordered Rust sequence. The body and returned token bytes
+  // are transient: neither enters the reducer, journal, state, UI, or logs.
+  ValidateAccountTokenResponse(AccountTokenValidationRequest request)
+      => (AccountTokenValidationResult result);
+  // The browser supplies its generation-bound lease and approval facts; Rust
+  // makes the sole grant decision. A GRANTED response is registered through
+  // CoreHost before any corresponding effect may be emitted.
+  EvaluatePolicy(PolicyEvaluationRequest request)
+      => (PolicyEvaluationResult result);
+  // The browser supplies one exact validated BIP observation, but does not
+  // inspect or transform its graph body. Sandboxed Rust decodes it into
+  // PageArena and returns bounded immutable Markdown or canonical JSON.
+  ExportPageSnapshot(PageSnapshotExportCommand command)
+      => (PageSnapshotExportResult result);
+  CancelPageSnapshotExport(OperationEnvelope operation) => (bool accepted);
+  // Matches one already-completed exact observation against the bounded
+  // bootstrap catalogue. No page text, definition bytes, or authority leaves
+  // the isolated core; the result names only immutable matching versions.
+  MatchSiteSkills(SiteSkillMatchCommand command)
+      => (SiteSkillMatchResult result);
+  // Completes a durable PAUSING/CANCELLING transition only after the browser
+  // has revoked task authority and cancelled task-owned broker work for this
+  // exact generation and revision.
+  CompleteTaskSettlement(TaskSettlementBinding binding);
+  Cancel(OperationEnvelope operation);
+  // Delivers one ordered output chunk of a tool job whose output transport
+  // streams, before that job's terminal result. This is the seam that makes
+  // token-by-token output expressible at all: EffectResult carries the whole
+  // chunk list, so a reducer that only ever saw an EffectResult could not be
+  // handed a partial answer no matter what the worker did.
+  //
+  // It settles nothing. The exactly-once terminal completion still arrives as
+  // an EffectResult, a stream is known to have ended only by the chunk that
+  // marks itself final, and a chunk whose generation or revision is stale is
+  // dropped by the reducer exactly as a stale command would be.
+  DeliverToolStreamChunk(ToolStreamChunk chunk);
+  // One exact next raw provider chunk. The reply is withheld until Rust has
+  // consumed it and the browser has acknowledged every sanitized visible
+  // event, making this call the network backpressure boundary.
+  DeliverModelStreamChunk(ModelStreamChunk chunk)
+      => (ModelStreamChunkStatus status);
+  DeliverEffectResult(EffectResult result);
+  // Asks whether a managed-entitlement fetch is warranted for `reason`
+  // (decision 0082). The browser pokes — at bootstrap, after a sign-in
+  // exchange completes, on its cadence, after a quota-refused managed
+  // dispatch — and the ordered core decides; null means not warranted or one
+  // mint is already in flight. The returned effect carries no URL, token or
+  // account identity: the browser resolves the mint against its compiled
+  // worker origin and its own signed-in session.
+  PlanEntitlementRefresh(EntitlementFetchReason reason)
+      => (EffectEnvelope? effect);
+  // Delivers what the mint observed: a parsed summary on a definitive answer
+  // — a definitive absence included — or a non-completed result when the
+  // worker was not definitively heard. The token the summary arrived beside
+  // never crosses this call; the record has no field for one. The reply says
+  // whether a summary was installed, which is bookkeeping only — the state a
+  // surface draws rides the published status this delivery triggers.
+  DeliverEntitlementFetchResult(EffectResult result) => (bool installed);
+  // Canonicalizes one browser-owned typed snapshot into the encrypted
+  // manifest plaintext and exact payload source order. Record payload bytes,
+  // a destination handle, and recovery material cannot be represented by the
+  // request or response.
+  PrepareBackupManifest(BackupManifestPrepareRequest request)
+      => (BackupManifestPrepareResult result);
+  // Validates one manifest only after browser crypto has authenticated and
+  // decrypted it, then returns the exact bounded layout the browser must use
+  // while staging and hashing the payload stream.
+  InspectBackupManifest(BackupManifestInspectRequest request)
+      => (BackupManifestInspectResult result);
+  // Produces a plan only after every browser-staged range agrees with the
+  // authenticated manifest's position, length, and digest. No payload bytes,
+  // filesystem path, profile handle, or commit authority crosses this call.
+  PlanBackupRestore(BackupRestorePlanRequest request)
+      => (BackupRestorePlanResult result);
+  // Consumes exact person confirmation of the retained source-Core plan and
+  // returns authority only for isolated, reversible staging. The planning
+  // RPC's deadline is not a session deadline; this call carries its own live
+  // operation.
+  ConfirmBackupRestorePlan(BackupRestorePlanConfirmationRequest request)
+      => (BackupRestoreStageAuthorizationResult result);
+  // Reports a browser-reverified hidden stage and asks the source Core for the
+  // sole consumptive commit decision. The returned decision operation must
+  // still be live at the instant physical commit begins.
+  ReportBackupRestoreStageVerified(BackupRestoreStageVerificationRequest request)
+      => (BackupRestoreCommitAuthorizationResult result);
+  // Reports durable old-or-new truth for one issued commit. A fresh reporting
+  // operation is used even when physical completion outlives the original
+  // commit-decision deadline; OUTCOME_UNKNOWN never permits cleanup.
+  ReportBackupRestoreCommitOutcome(BackupRestoreCommitOutcomeReport report)
+      => (BackupRestoreProtocolResult result);
+  // Consumes the person's exact decision for a committed hidden candidate.
+  ChooseBackupRestoreResolution(BackupRestoreResolutionRequest request)
+      => (BackupRestoreResolutionAuthorizationResult result);
+  // Reports durable completion, definite non-completion, or unknown outcome
+  // for the exact issued publish/delete authorization.
+  ReportBackupRestoreResolutionOutcome(
+      BackupRestoreResolutionOutcomeReport report)
+      => (BackupRestoreProtocolResult result);
+  // Cancels only the exact retained precommit plan. Success permits abandoning
+  // its hidden reversible stage and cannot roll back issued physical work.
+  CancelBackupRestoreBeforeCommit(BackupRestoreCancellationRequest request)
+      => (BackupRestoreProtocolResult result);
+  // Reduces one bounded content-free durable recovery history inside the
+  // current source Core. The answer is observational only: it never replays a
+  // physical intent, publishes a candidate, or authorizes cleanup.
+  InspectBackupRestoreRecovery(BackupRestoreRecoveryInspectionRequest request)
+      => (BackupRestoreRecoveryInspectionResult result);
+  // Issues one fresh consumptive accept-or-discard decision over an exact
+  // settled durable recovery prefix. Inspection alone never reaches this
+  // authority-bearing call.
+  ChooseBackupRestoreRecoveryResolution(
+      BackupRestoreRecoveryResolutionRequest request)
+      => (BackupRestoreRecoveryResolutionAuthorizationResult result);
+  // Reports the exact durable suffix following one recovery resolution. The
+  // source Core derives old-or-new truth from the history and never trusts a
+  // caller-supplied outcome value.
+  ReportBackupRestoreRecoveryResolutionOutcome(
+      BackupRestoreRecoveryResolutionOutcomeReport report)
+      => (BackupRestoreProtocolResult result);
+  // Transient read-only catalogue query; no task or execution authority.
+  QuerySavedFlows(SavedFlowQueryCommand command)
+      => (SavedFlowQueryResult result);
+};
+
+// The root of one lazy, profile-partitioned utility process. A browser-side
+// profile manager serializes launch so only one root exists per generation.
+[ServiceSandbox=sandbox.mojom.Sandbox.kService]
+interface TaffyCoreService {
+  Initialize(CoreBootstrap bootstrap, pending_remote<CoreHost> host)
+      => (CoreBootstrapResult result);
+  OpenSession(string session_id, pending_receiver<CoreSession> receiver);
+  PrepareForShutdown() => (bool accepted);
+};

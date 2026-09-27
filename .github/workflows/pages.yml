@@ -1,0 +1,82 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# Builds website/ as a static export and publishes it to GitHub Pages. It is
+# the repository's only workflow, and it runs no gates: whoever changes the
+# site runs `pnpm --dir website lint`, `typecheck` and `test` before pushing.
+#
+# The base path comes from the repository variable SITE_BASE_PATH. Leave it
+# unset to serve the site at https://satyajiit.github.io/taffygo/, and set it
+# to "/" once taffygo.com points at GitHub Pages, so the site is built for the
+# root of that domain. Canonical links name https://taffygo.com either way.
+#
+# Settings > Pages > Build and deployment must be set to "GitHub Actions".
+
+name: Website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "website/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time. A run already deploying finishes rather than
+# leaving the site half replaced.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      # The pnpm version (11.8.0) comes from "packageManager" in the root
+      # package.json.
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # The lockfile and workspace file are at the repository root.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the static export
+        env:
+          NEXT_PUBLIC_BASE_PATH: ${{ vars.SITE_BASE_PATH || '/taffygo' }}
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: pnpm --dir website build
+
+      - name: Tell Pages not to run Jekyll
+        run: touch website/out/.nojekyll
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: website/out
+          include-hidden-files: true
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

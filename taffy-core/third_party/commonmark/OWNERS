@@ -1,0 +1,8 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# Review falls through to ../../OWNERS. Artifact changes must preserve the
+# Maven checksums, upstream license, and Gradle/GN version agreement recorded
+# in README.chromium and vendor/commonmark.txt.

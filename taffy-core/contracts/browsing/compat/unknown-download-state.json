@@ -1,0 +1,13 @@
+{
+  "download_id": "download-1",
+  "file_name": "report.pdf",
+  "host": "files.example.test",
+  "received_bytes": 0,
+  "total_bytes": 0,
+  "total_known": false,
+  "state": 200,
+  "failure": 0,
+  "destination": 1,
+  "resumable": false,
+  "requires_danger_confirmation": false
+}

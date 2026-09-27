@@ -1,0 +1,71 @@
+{
+  "schema_version": "0.5",
+  "action_id": "act_07",
+  "task_id": "task_07",
+  "principal": {
+    "kind": "ASSISTANT"
+  },
+  "action_type": "ACTIVATE",
+  "target_handle": {
+    "tab_id": "tab_07",
+    "frame_id": "frame_main",
+    "page_epoch": "epoch_f3",
+    "graph_revision": 6,
+    "node_id": "n_summary_link",
+    "expected_origin": {
+      "kind": "TUPLE",
+      "serialization": "https://forum.example.test"
+    }
+  },
+  "preconditions": [
+    {
+      "kind": "EXACT_PAGE_EPOCH",
+      "page_epoch": "epoch_f3"
+    },
+    {
+      "kind": "DOCUMENT_ACTIVE"
+    },
+    {
+      "kind": "NODE_EXISTS"
+    },
+    {
+      "kind": "DESTINATION_CLASS_ALLOWED"
+    },
+    {
+      "kind": "BUDGET_REMAINING"
+    }
+  ],
+  "expected_postconditions": [
+    {
+      "kind": "COMMITTED_NAVIGATION",
+      "expected_destination": {
+        "url_metadata": {
+          "origin": {
+            "kind": "TUPLE",
+            "serialization": "https://mail.example.test"
+          },
+          "disclosure": "ORIGIN_ONLY",
+          "has_query": true,
+          "has_fragment": false
+        },
+        "is_cross_origin": true,
+        "opens_new_tab": false,
+        "is_download": false
+      },
+      "allowed_origins": [
+        {
+          "kind": "TUPLE",
+          "serialization": "https://mail.example.test"
+        }
+      ],
+      "timeout_ms": 8000
+    }
+  ],
+  "idempotency_policy": "CONDITIONALLY_IDEMPOTENT",
+  "deadline_monotonic_ms": 26000,
+  "user_visible_reason": "Open the message the summary links to.",
+  "proposal_digest": {
+    "algorithm": "SHA_256",
+    "value": "9f2e7a1b6c0d5348e9f0a1b2c3d4e5f60718293a4b5c6d7e8f9012a3b4c5d6e7"
+  }
+}

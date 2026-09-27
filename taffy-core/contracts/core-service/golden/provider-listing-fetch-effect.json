@@ -1,0 +1,32 @@
+{
+  "operation": {
+    "operation_id": "provider-listing-1",
+    "service_generation": 4,
+    "task_revision": 0,
+    "deadline_monotonic_ms": 120000,
+    "idempotency_key": "provider-listing-key-1"
+  },
+  "effect_id": "listing-openrouter",
+  "kind": 11,
+  "retry_class": 0,
+  "storage_commit": null,
+  "page_observation": null,
+  "model_request": null,
+  "network_request": null,
+  "browser_action": null,
+  "tool_job": null,
+  "secure_store": null,
+  "auth_surface": null,
+  "permission_request": null,
+  "asset_delivery": null,
+  "catalog_fetch": null,
+  "provider_listing_fetch": {
+    "provider_id": "openrouter",
+    "endpoint": "https://openrouter.ai",
+    "wire_api": 2,
+    "credential_handle": "fixture-openrouter-handle",
+    "max_response_bytes": 262144
+  },
+  "composer_completion": null,
+  "custom_endpoint_probe": null
+}

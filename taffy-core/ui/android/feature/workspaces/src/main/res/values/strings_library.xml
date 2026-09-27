@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  Library surfaces (SCR-501–504). Bookmarks, Memory, and History are named
+  only to teach the split; none of those piles are drawn here.
+-->
+<resources>
+    <!-- Screen SCR-501 -->
+    <string name="taffy_library_home_title">Library</string>
+    <string name="taffy_library_home_search">Search Library</string>
+    <string name="taffy_library_home_loading">Loading Library</string>
+    <string name="taffy_library_home_empty_title">Nothing in Library yet</string>
+    <string name="taffy_library_home_empty_body">Bookmarks are pages you starred. Library is things you asked Taffy to keep. Memory is how you like to work, and it lives with You — not here. Keep a fact, a page extract, a file, or a workspace and it lands here.</string>
+    <string name="taffy_library_home_no_matches_title">Nothing matched</string>
+    <string name="taffy_library_home_no_matches_body">No collection or kept item has that.</string>
+    <string name="taffy_library_home_supporting">%1$s · %2$s</string>
+    <string name="taffy_library_home_description">%1$s, %2$s</string>
+    <string name="taffy_library_home_description_conflict">%1$s, %2$s, %3$s</string>
+    <plurals name="taffy_library_item_count">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
+    <plurals name="taffy_library_conflict_count">
+        <item quantity="one">%1$d conflict</item>
+        <item quantity="other">%1$d conflicts</item>
+    </plurals>
+    <string name="taffy_library_unavailable_title">Library isn\'t available right now</string>
+    <string name="taffy_library_unavailable_body">Things you asked Taffy to keep will show here when Library is connected. Nothing was loaded.</string>
+    <string name="taffy_library_pane_empty_title">Choose a collection</string>
+    <string name="taffy_library_pane_empty_body">Pick a collection from the list. Its kept items open here.</string>
+
+    <!-- Screen SCR-502 -->
+    <string name="taffy_library_collection_search">Search this collection</string>
+    <string name="taffy_library_collection_loading">Loading this collection</string>
+    <string name="taffy_library_collection_empty_title">This collection has nothing in it yet</string>
+    <string name="taffy_library_collection_empty_body">Keep a fact, a page extract, a file, or a workspace and it lands here.</string>
+    <string name="taffy_library_collection_missing_title">This collection isn\'t here</string>
+    <string name="taffy_library_collection_missing_body">It was removed, or Library isn\'t connected.</string>
+    <string name="taffy_library_collection_no_matches_title">Nothing matched</string>
+    <string name="taffy_library_collection_no_matches_body">No item in this collection has that.</string>
+    <string name="taffy_library_collection_refresh">Refresh items</string>
+    <string name="taffy_library_collection_export">Export</string>
+    <string name="taffy_library_collection_remove">Remove collection</string>
+    <string name="taffy_library_collection_disconnected">Refresh, export, and removing aren\'t connected yet. Nothing was changed.</string>
+    <string name="taffy_library_collection_not_refreshable">These saved pages do not have safe addresses to revisit. Nothing will be opened.</string>
+    <string name="taffy_library_refresh_title">Refresh this collection?</string>
+    <string name="taffy_library_refresh_work">Taffy will open %1$s and read %2$s only after you approve.</string>
+    <plurals name="taffy_library_refresh_navigation_count">
+        <item quantity="one">%1$d saved page</item>
+        <item quantity="other">%1$d saved pages</item>
+    </plurals>
+    <plurals name="taffy_library_refresh_observation_count">
+        <item quantity="one">%1$d page</item>
+        <item quantity="other">%1$d pages</item>
+    </plurals>
+    <string name="taffy_library_refresh_no_provider">No AI provider will be contacted.</string>
+    <string name="taffy_library_refresh_sources">Pages to revisit</string>
+    <string name="taffy_library_refresh_source">%1$s — %2$s</string>
+    <string name="taffy_library_refresh_confirm">Start refresh</string>
+    <string name="taffy_library_refresh_result">Refresh finished: %1$s, %2$s, %3$s. The original is still saved.</string>
+    <plurals name="taffy_library_refresh_changed_count">
+        <item quantity="one">%1$d changed item</item>
+        <item quantity="other">%1$d changed items</item>
+    </plurals>
+    <plurals name="taffy_library_refresh_missing_count">
+        <item quantity="one">%1$d missing item</item>
+        <item quantity="other">%1$d missing items</item>
+    </plurals>
+    <plurals name="taffy_library_refresh_unchanged_count">
+        <item quantity="one">%1$d unchanged item</item>
+        <item quantity="other">%1$d unchanged items</item>
+    </plurals>
+    <string name="taffy_library_collection_item_supporting">%1$s · %2$s</string>
+    <string name="taffy_library_collection_item_description">%1$s, %2$s</string>
+    <string name="taffy_library_collection_item_description_conflict">%1$s, %2$s, %3$s</string>
+
+    <!-- Screen SCR-503 -->
+    <string name="taffy_library_item_loading">Loading this item</string>
+    <string name="taffy_library_item_missing_title">This item isn\'t available</string>
+    <string name="taffy_library_item_missing_body">It was removed from Library, or Library isn\'t connected.</string>
+    <string name="taffy_library_item_sources">Sources</string>
+    <string name="taffy_library_item_source_chip">Source: %1$s</string>
+    <string name="taffy_library_item_related">Related items</string>
+    <string name="taffy_library_item_captured">Kept %1$s</string>
+    <string name="taffy_library_item_conflict">Sources disagree</string>
+    <string name="taffy_library_item_remove">Remove from Library</string>
+    <string name="taffy_library_item_disconnected">Removing from Library isn\'t connected yet. This item was not removed.</string>
+    <string name="taffy_library_item_description">%1$s</string>
+    <string name="taffy_library_item_description_conflict">%1$s, %2$s</string>
+
+    <!-- Screen SCR-504 -->
+    <string name="taffy_library_keep_title">Keep this</string>
+    <string name="taffy_library_keep_body">Choose a collection and what is kept. Keep this is how a fact, a page, a file, or a workspace lands in Library — not a page you starred, and not Memory.</string>
+    <string name="taffy_library_keep_loading">Loading collections</string>
+    <string name="taffy_library_keep_disconnected">Keep this isn\'t connected yet. Nothing was added to Library.</string>
+    <string name="taffy_library_keep_collections">Collection</string>
+    <string name="taffy_library_keep_what">What is kept</string>
+    <string name="taffy_library_keep_kind_fact">A fact</string>
+    <string name="taffy_library_keep_kind_page">A page extract</string>
+    <string name="taffy_library_keep_kind_file">A file</string>
+    <string name="taffy_library_keep_kind_workspace">A workspace</string>
+    <string name="taffy_library_keep_action">Keep</string>
+    <string name="taffy_workspace_detail_keep_fact">Keep this fact</string>
+    <string name="taffy_library_keep_no_collections">There is no collection to keep this in yet.</string>
+    <string name="taffy_library_keep_collection_description">%1$s, %2$s</string>
+    <string name="taffy_library_keep_kind_description">%1$s</string>
+</resources>

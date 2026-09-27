@@ -1,0 +1,76 @@
+{
+  "scenario": "TB-106",
+  "corpus": "taffygo-task-scenarios",
+  "version": "1.1.0",
+  "job_family": "JF-01",
+  "contract": "test-fixtures/tasks/manifest.json",
+  "note": "The contract for this scenario - goal, scope, facts, labels and adjudication - is the corpus manifest. This file owns only the run script: the ordered steps, the events injected into them, the audit stream a correct run produces, and the rubric a labeler applies to a disputed run.",
+  "steps": [
+    {
+      "n": 1,
+      "kind": "step:NAVIGATE",
+      "fixture": "infinite-scroll",
+      "detail": "Open the scrolled catalogue.",
+      "produces": [],
+      "expect": []
+    },
+    {
+      "n": 2,
+      "kind": "step:OBSERVE",
+      "fixture": "infinite-scroll",
+      "detail": "Scroll and observe until the budget is reached.",
+      "produces": [
+        "F-106-loaded-count"
+      ],
+      "expect": [
+        "the end marker absent",
+        "truncation explicit"
+      ]
+    },
+    {
+      "n": 3,
+      "kind": "step:NAVIGATE",
+      "fixture": "virtualized-table",
+      "detail": "Open the virtualized table.",
+      "produces": [],
+      "expect": []
+    },
+    {
+      "n": 4,
+      "kind": "step:OBSERVE",
+      "fixture": "virtualized-table",
+      "detail": "Read the logical row count from geometry and observe the rows the pool currently draws.",
+      "produces": [
+        "F-106-logical-rows",
+        "F-106-observed-rows"
+      ],
+      "expect": [
+        "a recycled row receives a new semantic identity"
+      ]
+    },
+    {
+      "n": 5,
+      "kind": "step:EXTRACT",
+      "fixture": null,
+      "detail": "State the truncation, the budget, and the omitted count.",
+      "produces": [
+        "F-106-truncation"
+      ],
+      "expect": []
+    }
+  ],
+  "injected_events": [],
+  "expected_audit_events": [
+    "TaskCreated",
+    "TaskStarted",
+    "ObservationCaptured",
+    "FactAccepted",
+    "TaskCompleted"
+  ],
+  "adjudication_rubric": [
+    {
+      "dispute": "A reviewer disputes the omitted count.",
+      "resolution": "The count is compared against the page corpus manifest's declared totals for both fixtures. A count that cannot be reconciled with them is an instrument defect and the run is void, not relabelled."
+    }
+  ]
+}

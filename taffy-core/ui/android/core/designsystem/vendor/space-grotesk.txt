@@ -1,0 +1,13 @@
+Space Grotesk (variable font, weights 300-700)
+==============================================
+
+Vendored asset: src/main/res/font/taffy_space_grotesk_variable.ttf
+Licence:        SIL Open Font License 1.1 (vendor/space-grotesk.OFL.txt, next to this
+                file — Android resource names are lowercase-only, so the licence text
+                cannot live inside res/font)
+Source:         https://raw.githubusercontent.com/google/fonts/main/ofl/spacegrotesk/SpaceGrotesk%5Bwght%5D.ttf
+                (fetched via the jsDelivr mirror of google/fonts@main; raw.githubusercontent.com was rate-limited)
+Licence source: https://raw.githubusercontent.com/google/fonts/main/ofl/spacegrotesk/OFL.txt
+Downloaded:     2026-08-17
+
+sha256=acad6de1fc93436f5c0f1f4137751ef04f1aea3063e7036535970ffcfbd79f72

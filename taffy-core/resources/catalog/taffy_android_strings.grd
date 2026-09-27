@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+The Java and Kotlin half of the TaffyGo string catalogue.
+
+Grit turns this into `values-<locale>/taffy_android_strings.xml`, which the
+Android resource pipeline compiles into `R.string.*`. That output shape is why
+this is a separate .grd from `taffy_strings.grd`: the pak half is read by
+browser-process C++ and the two never carry the same message twice.
+
+There is exactly one shipping locale today. PAR-L10N-001 requires English UI
+with every string externalized and pseudo-localization tested; the launch
+language set beyond English is `[Open (OD-060)]`, so `<translations>` below is
+empty rather than listing .xtb files that do not exist. Empty is the honest
+state and it is one line to change when OD-060 lands.
+
+VERIFY AT SP-01: the pseudo-locale build path at the pinned milestone — the
+`enable_pseudolocales` GN argument, the `ar-XB` and `en-XA` entries in
+build/config/locales.gni, and whether grit generates them for an `android`
+output type. Upstream files to read: build/config/locales.gni and
+tools/grit/grit/pseudolocales.py. Independently of that answer, the
+host-runnable check in tools/check_strings.py already pseudo-localizes this
+catalogue and asserts the properties that matter; the GN argument only decides
+whether a device build can also *show* it.
+-->
+<!-- `output_all_resource_defines` is deliberately absent: grit at milestone
+     152 removed the attribute and fails the parse on encountering it. This
+     file carried it from an older grit reference before any checkout
+     existed to test against. -->
+<grit latest_public_release="0" current_release="1"
+      source_lang_id="en"
+      enc_check="möl">
+  <outputs>
+    <output filename="values/taffy_android_strings.xml" type="android" lang="en" />
+  </outputs>
+  <translations>
+    <!-- Empty until OD-060 sets the launch languages. Each language added
+         here needs its own quality evidence (PAR-L10N-003). -->
+  </translations>
+  <release seq="1" allow_pseudo="true">
+    <messages fallback_to_english="true">
+      <part file="strings/taffy_download_strings.grdp" />
+    </messages>
+  </release>
+</grit>

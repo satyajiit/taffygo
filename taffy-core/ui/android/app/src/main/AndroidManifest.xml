@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  Gradle compiles the complete Compose projection but does not assemble a
+  second browser application. Chromium owns the Application, profile-keyed
+  runtime provider, activities, intent filters, permissions, and startup.
+-->
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!--
+      Voice entry starts only from its visible control and never persists audio.
+      Chromium's shipping manifest already declares this same permission; this
+      declaration keeps the complete Gradle projection honest.
+    -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <application
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/taffy_data_extraction_rules"
+        android:fullBackupContent="@xml/taffy_full_backup_content"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.TaffyGo.Starting"
+        tools:targetApi="34">
+        <service
+            android:name=".TaskContinuationService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="user_initiated_browser_research_with_visible_pause_stop_resume" />
+        </service>
+    </application>
+</manifest>

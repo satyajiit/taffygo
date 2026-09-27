@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Shadows the upstream resource of the same name: the round adaptive icon's
+foreground layer, which upstream keeps fully transparent because the whole
+art lives in the background layer. The same split holds for TaffyGo — the
+generated layered_app_icon_background carries the mark — so this layer stays
+a transparent shape, spelled with a framework colour reference because no
+literal colour value may live under branding/ while the palette is
+[Open (OD-071)].
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@android:color/transparent" />
+</shape>

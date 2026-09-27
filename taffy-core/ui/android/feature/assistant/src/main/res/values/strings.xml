@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  Every string the assistant surfaces show. The eight Assistant bar lines and
+  the timeline lines are the copy patterns of UX spec sections 4 and 6, kept
+  word for word: partial work is never rounded up, and stopped is never
+  conflated with failed.
+-->
+<resources>
+    <!-- Screen SCR-301 -->
+    <string name="taffy_assistant_idle">Taffy is waiting. Nothing is running.</string>
+    <string name="taffy_assistant_mode_state">%1$s, %2$s</string>
+    <string name="taffy_assistant_not_set_up">Taffy isn\'t set up yet. Tap to set up.</string>
+    <string name="taffy_assistant_listening">What should Taffy do?</string>
+    <string name="taffy_assistant_running_start">Taffy is getting started…</string>
+    <string name="taffy_assistant_phase_queued">Taffy is getting started…</string>
+    <string name="taffy_assistant_phase_planning">Taffy is planning…</string>
+    <string name="taffy_assistant_phase_observing">Taffy is reading the page…</string>
+    <string name="taffy_assistant_phase_thinking">Taffy is thinking…</string>
+    <string name="taffy_assistant_phase_acting">Taffy is working on the page…</string>
+    <string name="taffy_assistant_phase_verifying">Taffy is checking the result…</string>
+    <string name="taffy_assistant_phase_completing">Taffy is finishing up…</string>
+    <string name="taffy_assistant_notice_retrying">Taffy is trying your provider again…</string>
+    <string name="taffy_assistant_notice_switching_model">Taffy is switching to another model…</string>
+    <string name="taffy_assistant_notice_asking_again">Taffy is asking the model again…</string>
+    <string name="taffy_assistant_notice_blocked_move">Taffy\'s last move was refused. Trying another way…</string>
+    <string name="taffy_assistant_notice_plan_abandoned">Taffy\'s plan didn\'t work out. Finishing what it can…</string>
+    <string name="taffy_assistant_notice_outcome_unknown">Taffy isn\'t sure a step went through and won\'t repeat it.</string>
+    <plurals name="taffy_assistant_running">
+        <item quantity="one">Taffy is comparing %1$d page…</item>
+        <item quantity="other">Taffy is comparing %1$d pages…</item>
+    </plurals>
+    <plurals name="taffy_assistant_waiting">
+        <item quantity="one">Taffy needs your OK to open %1$d more tab</item>
+        <item quantity="other">Taffy needs your OK to open %1$d more tabs</item>
+    </plurals>
+    <string name="taffy_assistant_handover">Taffy stopped. The page is yours.</string>
+    <string name="taffy_assistant_ask">Taffy needs an answer to continue.</string>
+    <string name="taffy_assistant_input">Taffy needs something only you can fill in.</string>
+    <string name="taffy_assistant_waiting_start">Taffy needs your OK to go on.</string>
+    <plurals name="taffy_assistant_paused">
+        <item quantity="one">Paused — %1$d of %2$d page read</item>
+        <item quantity="other">Paused — %1$d of %2$d pages read</item>
+    </plurals>
+    <!-- A task with no plan has no denominator. Name what was read and
+         nothing else, rather than counting against a zero. -->
+    <string name="taffy_assistant_paused_read">Paused — %1$s</string>
+    <string name="taffy_assistant_done">Done — %1$s, %2$s</string>
+    <plurals name="taffy_count_sources">
+        <item quantity="one">%1$d source</item>
+        <item quantity="other">%1$d sources</item>
+    </plurals>
+    <plurals name="taffy_count_conflicts">
+        <item quantity="one">%1$d conflict</item>
+        <item quantity="other">%1$d conflicts</item>
+    </plurals>
+    <string name="taffy_assistant_partly_done">Partly done — %1$s</string>
+    <plurals name="taffy_count_pages_read">
+        <item quantity="one">%1$d page read</item>
+        <item quantity="other">%1$d pages read</item>
+    </plurals>
+    <!--
+      The one control UX spec section 4 gives the two finished states. It opens
+      the workspaces (SCR-304), where research lives once a task ends.
+    -->
+    <string name="taffy_assistant_core_unavailable">Taffy stopped unexpectedly. Browsing still works.</string>
+    <string name="taffy_assistant_retry_required">Taffy needs you to retry before this task can continue.</string>
+    <string name="taffy_assistant_stopped">You stopped Taffy.</string>
+    <!--
+      One sentence per way a task can end without finishing, and two for a
+      pause the provider caused. The state chip keeps its one word; these are
+      the line beside it, and the pill says the same one.
+    -->
+    <string name="taffy_assistant_failed">Couldn\'t finish — Taffy could not read enough to answer</string>
+    <string name="taffy_assistant_failed_provider">Couldn\'t finish — Taffy couldn\'t reach your provider</string>
+    <string name="taffy_assistant_failed_refused">Couldn\'t finish — your AI provider didn\'t accept this request</string>
+    <string name="taffy_assistant_failed_limit">Your AI provider limit was reached. Resume later, or switch models in settings.</string>
+    <string name="taffy_assistant_failed_offline">You\'re offline. Taffy will continue when you\'re back online.</string>
+    <string name="taffy_assistant_failed_budget">Couldn\'t finish — Taffy ran out of steps</string>
+    <string name="taffy_assistant_failed_deadline">Couldn\'t finish — Taffy ran out of time</string>
+    <string name="taffy_assistant_failed_policy">Couldn\'t finish — Taffy\'s moves were refused</string>
+    <string name="taffy_assistant_failed_unverified">Couldn\'t finish — Taffy couldn\'t confirm a step on the page</string>
+    <!-- Not "stopped unexpectedly": nothing inside Taffy broke. The core will
+         not guess whether a move took effect, and this is said while the task
+         is still held as well as after it ends, so it claims neither
+         (decision 0229). -->
+    <string name="taffy_assistant_failed_outcome_unknown">Taffy won\'t repeat a step it isn\'t sure of. Check the page to see if it happened.</string>
+    <!-- Taffy's own failure, and the only one that says so. It names the one
+         thing that helps, because a heading and a body that both say "stopped
+         unexpectedly" leave a person nothing to do. -->
+    <string name="taffy_assistant_failed_internal">Couldn\'t finish — something went wrong inside Taffy. Try asking again.</string>
+    <string name="taffy_assistant_paused_limit">Paused — your AI provider limit was reached. Resume later, or switch models in settings.</string>
+    <string name="taffy_assistant_paused_offline">Paused — you\'re offline. Resume when you\'re back online.</string>
+    <!-- Not "offline" and not "failed": the request left and nothing came back,
+         so the device may have a working network and the answer may already have
+         been billed. The sentence claims only what is known (decision 0217). -->
+    <string name="taffy_assistant_paused_no_answer">Paused — Taffy didn\'t hear back from the provider. Resume to continue.</string>
+    <string name="taffy_assistant_paused_busy">Paused — your AI provider is busy right now. Resume to try again.</string>
+    <!-- A pause that has not settled yet: the counts it would print are the ones it
+         held before it began stopping, and its denominator is often zero. -->
+    <string name="taffy_assistant_pausing">Pausing — Taffy is finishing the step it started.</string>
+
+    <!-- Screen SCR-303 -->
+    <!-- The heading over a failed task's reason: the same fact in three or four words. -->
+    <string name="taffy_task_failed_head_provider">Taffy could not reach your provider</string>
+    <string name="taffy_task_failed_head_refused">Your provider turned this down</string>
+    <string name="taffy_task_failed_head_limit">Your provider limit was reached</string>
+    <string name="taffy_task_failed_head_offline">You went offline</string>
+    <string name="taffy_task_failed_head_budget">Taffy ran out of steps</string>
+    <string name="taffy_task_failed_head_deadline">Taffy ran out of time</string>
+    <string name="taffy_task_failed_head_policy">A move was not allowed</string>
+    <string name="taffy_task_failed_head_unverified">Taffy could not confirm a step</string>
+    <string name="taffy_task_failed_head_outcome_unknown">Taffy isn\'t sure a step went through</string>
+    <string name="taffy_task_failed_head_sources">Taffy could not read enough</string>
+    <string name="taffy_task_failed_head_internal">Taffy stopped unexpectedly</string>
+    <!-- Tile labels. The count is drawn above them, so they carry none: a plural
+         with no formatting argument is an internationalization error, and the
+         counted phrase is the tile's announcement instead. -->
+    <string name="taffy_task_view_failed_pages">Pages read</string>
+    <string name="taffy_task_view_failed_facts">Things kept</string>
+    <plurals name="taffy_task_view_failed_kept">
+        <item quantity="one">%1$d thing kept</item>
+        <item quantity="other">%1$d things kept</item>
+    </plurals>
+    <string name="taffy_task_view_workspace_note">Taffy keeps what it read for this task in a temporary workspace on this phone. Save it to keep it, or discard it — either way, nothing leaves the phone.</string>
+    <string name="taffy_task_view_no_task_title">No task running</string>
+    <string name="taffy_task_view_retry">Retry Taffy</string>
+    <string name="taffy_task_view_save_workspace">Save workspace</string>
+    <string name="taffy_task_view_workspace_saved">Workspace saved</string>
+    <string name="taffy_task_view_discard_workspace">Discard temporary workspace</string>
+    <string name="taffy_task_view_discard_title">Discard this temporary workspace?</string>
+    <string name="taffy_task_view_discard_body">This removes the task’s temporary findings from this device. Exported files you saved are not affected.</string>
+    <string name="taffy_task_view_discard_confirm">Discard workspace</string>
+    <string name="taffy_task_view_discard_cancel">Keep it for now</string>
+    <string name="taffy_task_view_workspace_working">Working on it…</string>
+    <string name="taffy_task_view_workspace_busy">The last change to this workspace is still finishing. Give it a moment, then try again.</string>
+    <string name="taffy_task_view_workspace_refused">That change was refused. The workspace is unchanged.</string>
+    <string name="taffy_task_view_workspace_refusal_dismiss">OK</string>
+    <string name="taffy_task_view_resume_refused">This task cannot be continued. Stop it and ask again.</string>
+    <string name="taffy_task_view_control_refused">That was not taken. Try again, or stop this task.</string>
+    <string name="taffy_task_view_put_away">Put this away</string>
+    <string name="taffy_task_view_approval_title">Needs your OK</string>
+    <plurals name="taffy_task_view_approval_body">
+        <item quantity="one">Taffy wants to open %1$d more tab from %2$s.</item>
+        <item quantity="other">Taffy wants to open %1$d more tabs from %2$s.</item>
+    </plurals>
+    <string name="taffy_task_view_approve">Approve once</string>
+    <string name="taffy_task_view_deny">Deny</string>
+    <string name="taffy_task_view_ask_title">Taffy needs an answer</string>
+    <string name="taffy_task_view_ask_body">Taffy needs an answer to continue.</string>
+    <string name="taffy_task_view_ask_label">Your answer</string>
+    <string name="taffy_task_view_ask_send">Send</string>
+    <string name="taffy_task_view_ask_credential">Taffy will not take a code or password. Type it on the page instead.</string>
+    <!--
+      The wait card on the page (decision 0132 section 4). "Hand back" is the
+      person giving the page back to Taffy; "Take over" is the other direction.
+    -->
+    <string name="taffy_task_wait_handover_title">Taffy needs you on %1$s</string>
+    <string name="taffy_task_wait_handover_title_here">Taffy needs you on this page</string>
+    <string name="taffy_task_wait_finish">Finish this step, then hand the page back.</string>
+    <string name="taffy_task_wait_hand_back">Hand back to Taffy</string>
+    <string name="taffy_task_wait_stop">Stop</string>
+    <string name="taffy_start_page_task_try_again">Try again</string>
+    <string name="taffy_start_page_task_results">See results</string>
+    <string name="taffy_start_page_task_home">Home</string>
+    <string name="taffy_task_view_timeline_title">Recent activity</string>
+    <string name="taffy_task_view_timeline_empty_title">Nothing has happened yet</string>
+    <string name="taffy_task_view_timeline_empty_body">Every step appears here in plain language, newest first.</string>
+    <string name="taffy_task_view_core_unavailable_title">Taffy stopped unexpectedly</string>
+    <string name="taffy_task_view_core_unavailable_body">Browsing and your tabs still work. Taffy will restore this task from its saved checkpoint when the profile service is available.</string>
+    <string name="taffy_task_view_core_unavailable_chip">Taffy is unavailable. Browsing still works.</string>
+    <string name="taffy_task_view_retry_required_title">Taffy needs an explicit retry</string>
+    <string name="taffy_task_view_retry_required_body">Repeated failures paused automatic restarts. Retry when you are ready; Taffy will restore only committed work.</string>
+    <string name="taffy_task_view_retry_required_chip">Taffy needs you to retry before continuing.</string>
+    <string name="taffy_task_view_sources_title">Sources</string>
+    <string name="taffy_task_view_sources_empty_title">No sources yet</string>
+    <string name="taffy_task_view_sources_empty_body">Pages Taffy reads appear here, with what each one gave.</string>
+    <plurals name="taffy_task_view_source_facts">
+        <item quantity="one">%1$d fact</item>
+        <item quantity="other">%1$d facts</item>
+    </plurals>
+    <string name="taffy_task_view_source_excluded">Excluded — its facts were removed</string>
+    <string name="taffy_task_view_output_title">Key findings</string>
+    <string name="taffy_task_view_answer_streaming">Taffy is answering…</string>
+    <string name="taffy_task_view_answer_incomplete">Part of this answer could not be shown.</string>
+    <string name="taffy_task_view_answer_truncated">This answer is too long to show in full here.</string>
+    <string name="taffy_task_view_read_aloud_start">Read aloud</string>
+    <string name="taffy_task_view_read_aloud_cancel">Cancel read aloud</string>
+    <string name="taffy_task_view_read_aloud_stop">Stop reading</string>
+    <string name="taffy_task_view_read_aloud_preparing">Preparing read aloud…</string>
+    <string name="taffy_task_view_read_aloud_speaking">Reading the visible answer aloud.</string>
+    <string name="taffy_task_view_read_aloud_error">This phone could not read the answer aloud. Try again.</string>
+    <string name="taffy_task_view_output_empty_title">Nothing found yet</string>
+    <string name="taffy_task_view_output_empty_body">Facts appear here as Taffy reads, each with the page it came from.</string>
+    <string name="taffy_task_view_files_title">Files</string>
+    <string name="taffy_task_view_file_keep">Keep file</string>
+    <string name="taffy_task_view_file_save">Save</string>
+    <string name="taffy_task_view_file_share">Share</string>
+    <string name="taffy_task_view_file_ready">Ready to keep</string>
+    <string name="taffy_task_view_file_kept">Kept — ready to save or share</string>
+    <string name="taffy_task_view_file_preparing">Preparing file…</string>
+    <string name="taffy_task_view_file_failed">The file could not be delivered. Try again.</string>
+    <string name="taffy_task_view_file_description">%1$s, %2$s</string>
+    <string name="taffy_task_view_file_share_chooser">Share file</string>
+    <!-- Timeline lines -->
+    <string name="taffy_timeline_opened_page">Opened %1$s</string>
+    <string name="taffy_timeline_opened_page_unnamed">Opened a page</string>
+    <plurals name="taffy_timeline_read_page">
+        <item quantity="one">Read %1$s — found %2$d fact</item>
+        <item quantity="other">Read %1$s — found %2$d facts</item>
+    </plurals>
+    <string name="taffy_timeline_read_page_plain">Read %1$s</string>
+    <string name="taffy_timeline_read_page_unnamed">Read a page</string>
+    <string name="taffy_timeline_page_unavailable">Skipped %1$s — the page didn\'t load</string>
+    <string name="taffy_timeline_page_unavailable_unnamed">Skipped a page — it didn\'t load</string>
+    <string name="taffy_timeline_move_refused">Couldn\'t act on %1$s — Taffy tried another way</string>
+    <string name="taffy_timeline_move_refused_unnamed">Couldn\'t finish a step — Taffy tried another way</string>
+    <string name="taffy_timeline_asked_you">Asked you about %1$s</string>
+    <string name="taffy_timeline_asked_you_unnamed">Asked you</string>
+    <string name="taffy_timeline_you_answered">You answered</string>
+    <string name="taffy_timeline_handed_back">Handed %1$s back to you</string>
+    <string name="taffy_timeline_handed_back_unnamed">Handed the page back to you</string>
+    <string name="taffy_timeline_you_took_over">You took over. Taffy paused.</string>
+    <plurals name="taffy_timeline_built_output">
+        <item quantity="one">Built the output from %1$d fact</item>
+        <item quantity="other">Built the output from %1$d facts</item>
+    </plurals>
+
+    <!-- Fact kinds -->
+
+    <!-- Screen SCR-303 Remember this? -->
+    <string name="taffy_remember_this_title">Remember this for next time?</string>
+    <string name="taffy_remember_this_remember">Remember</string>
+    <string name="taffy_remember_this_not_now">Not now</string>
+
+    <!-- The form sheet: a site asked for something only the person can give. -->
+    <string name="taffy_task_input_title">Fill this in</string>
+    <string name="taffy_task_input_body">%1$s needs this before Taffy can go on.</string>
+    <string name="taffy_task_input_data">What you type here goes to %1$s and nowhere else. Taffy never sends it to your AI provider.</string>
+    <string name="taffy_task_input_send">Review</string>
+    <string name="taffy_task_input_review_title">Approve this form fill</string>
+    <string name="taffy_task_input_review_action">Taffy will fill these exact values into these fields on %1$s, in the order shown.</string>
+    <string name="taffy_task_input_review_reversible">This changes the fields only. It does not submit the form, and you can edit the fields on the page.</string>
+    <plurals name="taffy_task_input_review_expiry">
+        <item quantity="one">This approval can be used once. It expires %1$d second after you approve, or sooner if the page or task changes.</item>
+        <item quantity="other">This approval can be used once. It expires %1$d seconds after you approve, or sooner if the page or task changes.</item>
+    </plurals>
+    <string name="taffy_task_input_review_edit">Edit</string>
+    <string name="taffy_task_input_review_confirm">Approve once</string>
+    <string name="taffy_task_input_refused">That was not accepted. Nothing was kept \u2014 try again.</string>
+    <string name="taffy_task_input_unavailable">Taffy is not answering. Nothing was sent.</string>
+    <string name="taffy_task_input_pill">Taffy is waiting for you to fill something in on %1$s</string>
+    <string name="taffy_task_input_image_description">Picture from %1$s to read back</string>
+    <string name="taffy_task_input_image_unreadable">This picture did not arrive. Reload the page to ask for another one.</string>
+    <string name="taffy_task_input_interactive_title">Your turn on the page</string>
+    <string name="taffy_task_input_interactive_body">%1$s put a check on the page that only you can do. Taffy has marked where it is. Tell Taffy when it is done.</string>
+    <string name="taffy_task_input_interactive_done">I\'m done</string>
+
+    <!-- The set-up panel, where an AI surface has no provider to reach (SCR-301, SCR-303) -->
+    <string name="taffy_setup_needed_primary">Set up Taffy</string>
+    <string name="taffy_setup_needed_secondary">Not now</string>
+    <string name="taffy_task_view_failed_provider_title">Taffy couldn\'t reach your provider</string>
+    <string name="taffy_task_view_failed_provider_body">The provider didn\'t answer, or nothing is set up to answer. Check your key or plan, then try again.</string>
+    <string name="taffy_task_view_failed_refused_title">Your AI provider didn\'t accept this request</string>
+    <string name="taffy_task_view_failed_refused_body">Check your provider and model settings, or choose another provider, then try again.</string>
+    <!-- The Ask overlay's conversation (decision 0137). -->
+    <string name="taffy_ask_conversation_close">Close</string>
+    <!-- The exact task's pages and the activity underneath them. -->
+    <string name="taffy_task_browser_page">Page</string>
+    <string name="taffy_task_browser_open">Open %1$s</string>
+    <string name="taffy_task_browser_open_short">Open tab</string>
+    <plurals name="taffy_task_browser_pages">
+        <item quantity="one">%1$d page in this task</item>
+        <item quantity="other">%1$d pages in this task</item>
+    </plurals>
+    <string name="taffy_task_browser_activity">Taffy\'s activity</string>
+    <string name="taffy_task_browser_running">Taffy is reading your pages. You can take over any time.</string>
+    <string name="taffy_task_browser_handover">Open a tab to finish the step on the page. Then choose Hand back to Taffy.</string>
+    <string name="taffy_task_browser_question">Taffy has a question for you. Open the page to answer it.</string>
+    <string name="taffy_task_browser_waiting">Taffy is waiting for you before continuing.</string>
+    <string name="taffy_task_browser_paused">Paused. Resume when you are ready.</string>
+    <string name="taffy_task_browser_done">Finished. Your results are ready below.</string>
+    <string name="taffy_task_browser_partial">Partly finished. Review the findings below.</string>
+    <string name="taffy_task_browser_stopped">Stopped. Your pages are still here.</string>
+    <string name="taffy_task_browser_failed">Couldn\'t finish. Your pages are still available.</string>
+
+    <!-- Exact-task recording review and explicit acceptance. -->
+    <string name="taffy_task_flow_offer">Remember this flow?</string>
+    <string name="taffy_task_flow_offer_body">Taffy learned the steps on %1$s. Review them to use this flow again.</string>
+    <string name="taffy_task_flow_saved">Flow saved</string>
+    <string name="taffy_task_flow_saved_body">These steps are saved for %1$s. Taffy can offer them on a matching page.</string>
+    <string name="taffy_task_flow_review">Review flow</string>
+    <string name="taffy_task_flow_not_now">Not now</string>
+    <string name="taffy_task_flow_review_title">Save these steps?</string>
+    <string name="taffy_task_flow_save">Save this flow</string>
+    <string name="taffy_task_flow_saving">Saving…</string>
+    <string name="taffy_task_flow_back">Back</string>
+    <string name="taffy_task_flow_failed">This flow could not be saved. Try again after checking the current steps.</string>
+    <string name="taffy_task_pdf_ready">PDF ready</string>
+    <string name="taffy_task_file_ready">File ready</string>
+    <string name="taffy_task_file_on_device">Downloaded to this device.</string>
+    <string name="taffy_task_pdf_open">Open PDF</string>
+    <string name="taffy_task_file_open">Open file</string>
+    <string name="taffy_task_file_opening">Opening…</string>
+    <string name="taffy_task_file_open_failed">This file could not be opened. Check Downloads for its current status.</string>
+    <string name="taffy_task_file_open_failed_title">Couldn\'t open file</string>
+    <string name="taffy_task_file_show_downloads">View Downloads</string>
+    <string name="taffy_task_flow_loading">Loading full review…</string>
+    <string name="taffy_task_flow_load_failed">The full steps could not be loaded. Try loading them again.</string>
+    <string name="taffy_task_results_request">Your request</string>
+    <string name="taffy_task_results_fewer_steps">Show fewer steps</string>
+    <string name="taffy_task_results_all_steps">Show all steps</string>
+    <string name="taffy_task_results_correction">Your correction: %1$s</string>
+    <string name="taffy_task_results_conflict">Sources disagree</string>
+    <string name="taffy_task_results_new_source">Needs a new source</string>
+    <string name="taffy_task_results_source_reference">Source %1$s</string>
+
+    <!--
+      Reporting a response (decision 0253). TaffyGo has no server, so nothing
+      is sent from the app: an email draft opens in the person's own email
+      app, or a public GitHub issue opens in a tab with a title only.
+    -->
+    <string name="taffy_report_answer_action">Report this response</string>
+    <string name="taffy_report_answer_title">Report this response</string>
+    <string name="taffy_report_answer_body">If a response was offensive, harmful or wrong, tell the people who make TaffyGo. Nothing is sent from here.</string>
+    <string name="taffy_report_answer_email_explainer">Your email app opens a draft that holds this response, the AI providers set up on this phone and the TaffyGo version. You read it, add a note, and choose whether to send it.</string>
+    <string name="taffy_report_answer_email">Send by email</string>
+    <string name="taffy_report_answer_no_email_app">No email app on this phone opened the draft. You can write to %1$s from any email account.</string>
+    <string name="taffy_report_answer_issue">Open a public issue instead</string>
+    <string name="taffy_report_answer_issue_public">Anyone can read a GitHub issue, so it opens in a new tab with only a title filled in and none of this response.</string>
+    <!-- The public issue's title. The person can change it before posting. -->
+    <string name="taffy_report_answer_issue_title">Report about a response from Taffy</string>
+    <!-- The email draft. The person reads and edits all of it before sending. -->
+    <string name="taffy_report_answer_email_subject">TaffyGo: report about a response</string>
+    <string name="taffy_report_answer_email_body">Your note (what was wrong with this response):\n\n\n\n---\nThe response:\n%1$s\n\nAI providers set up on this phone:\n%2$s\n\nTaffyGo version: %3$s</string>
+    <string name="taffy_report_answer_email_shortened">%1$s\n[Cut here. The full response was longer.]</string>
+    <string name="taffy_report_answer_email_provider_model">%1$s, model: %2$s</string>
+    <string name="taffy_report_answer_email_provider_alone">%1$s (no model picked)</string>
+    <string name="taffy_report_answer_email_not_known">not known</string>
+</resources>

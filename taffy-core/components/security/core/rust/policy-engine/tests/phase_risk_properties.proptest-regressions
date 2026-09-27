@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 38a870bac6e5e91d9cdbab8c4411732817f1c040aad84f7cc6073a6a94915e8e # shrinks to class = SendMessage, left = Prepare, right = Commit
+cc bf6f11c960ce3f0d7e60d15deefef69b5281d8f751b5cef2122d54b5460b5895 # shrinks to class = SendMessage, phases = [Prepare, Commit]

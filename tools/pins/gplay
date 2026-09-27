@@ -1,0 +1,42 @@
+# Machine owner file for the "gplay (Play Console CLI)" row in TOOLCHAIN.md.
+# Format: `key=value`, `#` comments. Consumed by tools/bootstrap, tools/doctor,
+# tools/play and the `pins` lane of ./tools/check fast.
+#
+# gplay is https://github.com/tamtom/play-console-cli — a single Go binary, MIT
+# licensed, that speaks nine documented Google APIs. Decision 0142 section 9
+# records why it is used instead of the repository-owned client that preceded
+# it, and what this repository still owns.
+#
+# WHY A CHECKSUM AND NOT ONLY A VERSION
+#
+# This is the first tool this repository pins that (a) holds a credential able
+# to publish to the public store and (b) ships a self-update path. `gplay
+# update` replaces the binary in place, and it checks for a new version on
+# every startup unless told not to. A tool that can rewrite itself between two
+# runs is exactly what "this repository installs nothing unpinned at run time"
+# exists to refuse, so the version alone is not the pin: the SHA-256 of the
+# exact release asset for each host is, and ./tools/play verifies the binary it
+# is about to run against the line for this host before handing it anything.
+#
+# Consequently GPLAY_NO_UPDATE=1 is set by ./tools/play on every invocation.
+# Upgrading is an edit to this file plus a fresh `./tools/bootstrap`, which is
+# how every other pin here moves.
+#
+# GPLAY_NO_STAR_PROMPT=1 is also set. After a successful metadata push the tool
+# prints a suggestion that the agent driving it ask the person to star its
+# GitHub repository. It is polite about it — it never waits for input and never
+# stars anything itself — but a prompt addressed at an assistant, arriving
+# through tool output, asking for an action on the operator's own account, is
+# not an instruction this repository's tooling should carry into a release log.
+# Suppressing it also keeps the audit trail free of a line nobody asked for.
+#
+# Pinned 2026-09-08 to the current release. Checksums are the published
+# checksums.txt of that tag, recorded here rather than fetched, so that a
+# rewritten release asset is a mismatch instead of a silent upgrade.
+
+version=0.10.0
+repository=tamtom/play-console-cli
+sha256_darwin_arm64=8942801d5cd63bce768fd3d0b84bad2641fc711ffb8d74b9cda1566d0acd28ab
+sha256_darwin_amd64=51bc0340fed5daaaf4d633c04d8955bd2f255420fc6c4c6908ffbdc872f870b1
+sha256_linux_amd64=a2c09c1ba2b14604a14e369868678e75b2abde3e066902c030b16546a9c2863e
+sha256_linux_arm64=b3d8b74c16ebf107dbc5392d0c080b071da60318d27e3f9ff83cfe3d1f988e6d

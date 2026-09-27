@@ -1,0 +1,271 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# Fuzzers for every parser and every browser-facing renderer payload.
+#
+# The protocol requires all of them to be fuzzed, and the list is not a
+# judgement call: a target exists for each message a renderer can send the
+# browser, and for each pure function in //taffy/browser whose input
+# is page-derived. README.md carries the mapping and the reason each one is
+# here.
+#
+# Two things about the seed corpus are worth reading before changing anything.
+#
+# It is generated rather than committed. The seeds have to be Mojo wire bytes,
+# and only code linked against the generated bindings can produce those; a
+# directory of the contract's JSON would look like a seed corpus and would be
+# worth nothing, because every seed would be rejected in its first bytes.
+#
+# It fails rather than skips. write_wire_seeds stops the build when it meets a
+# golden document whose definition has no builder and is not on the list of
+# messages that never cross this boundary. A fuzzer that quietly lost its seeds
+# starts from nothing, which is indistinguishable from a fuzzer that found
+# nothing.
+
+import("//testing/libfuzzer/fuzzer_test.gni")
+
+_taffy_builds_fuzzers = !high_end_fuzzer_targets && !disable_libfuzzer &&
+                        use_fuzzing_engine && !use_chromium_fuzzilli
+
+# Upstream's fuzzer_test emits a non-testonly empty group when fuzzing is off.
+# TaffyGo's aggregate remains a test boundary in every configured graph, so
+# the disabled shape is an explicitly test-only group instead.
+template("_taffy_fuzzer_test") {
+  if (_taffy_builds_fuzzers) {
+    fuzzer_test(target_name) {
+      forward_variables_from(invoker,
+                             [
+                               "deps",
+                               "seed_corpus",
+                               "seed_corpus_deps",
+                               "sources",
+                             ])
+    }
+  } else {
+    not_needed(invoker, "*")
+    group(target_name) {
+      testonly = true
+    }
+  }
+}
+
+# The contract lives outside the Chromium source root, reached through the
+# overlay mount. GN cannot name those files in `inputs`, so the generator
+# declares what it read in a depfile with absolute paths — the same problem, and
+# the same solution, as the seeded-secret corpus generator in
+# //taffy/browser.
+#
+# VERIFY AT SP-01: that a depfile naming paths outside the source root is
+# honoured by Siso as well as by Ninja. This is the third generator in this
+# component carrying the item; if the answer is no, all three take the same
+# fallback and the trade belongs in one place in the SP-01 report.
+_seed_corpus_dir = "$target_gen_dir/wire_seeds"
+
+# A host tool: it runs at build time and never ships.
+#
+# Instantiated in the host toolchain rather than under an `is_linux || is_mac
+# || is_win` guard on the *target* OS. Every committed TaffyGo profile sets
+# `target_os = "android"`, so that guard was false in the target toolchain and
+# the executable simply did not exist, while `action("wire_seed_corpus")` below
+# depended on it unconditionally. GN answered
+#
+#   ERROR Unresolved dependencies.
+#   //taffy/test/fuzz:wire_seed_corpus(...android_clang_x64)
+#     needs //taffy/test/fuzz:write_wire_seeds(...android_clang_x64)
+#
+# the first time anything caused this file to be loaded. Nothing did until
+# //taffy:taffy_browsertests grew a dep on //taffy/test,
+# which is why a build file with an unresolvable edge sat here unnoticed.
+#
+# A build-time generator must be built for the machine running the build in any
+# case: an android-arm64 binary cannot execute on the builder.
+if (current_toolchain == host_toolchain) {
+  executable("write_wire_seeds") {
+    testonly = true
+
+    sources = [
+      "wire_seed_builder.cc",
+      "wire_seed_builder.h",
+      "write_wire_seeds.cc",
+    ]
+
+    deps = [
+      "//base",
+      "//mojo/core/embedder",
+      "//taffy/contracts/bip/mojom",
+      "//mojo/public/cpp/bindings",
+    ]
+  }
+}
+
+action("wire_seed_corpus") {
+  testonly = true
+  script = "//build/gn_run_binary.py"
+
+  # Named with the host toolchain explicitly, because this action runs on the
+  # builder while the rest of this file is compiled for the device.
+  deps = [ ":write_wire_seeds($host_toolchain)" ]
+
+  _tool = get_label_info(":write_wire_seeds($host_toolchain)", "root_out_dir") +
+          "/write_wire_seeds"
+  outputs = [ "$_seed_corpus_dir/seed.stamp" ]
+  depfile = "$target_gen_dir/wire_seeds.d"
+
+  args = [
+    rebase_path(_tool, root_build_dir),
+    # Chromium's file helpers deliberately refuse paths containing `..`.
+    # These are also the paths later written into the depfile, so pass the
+    # system-absolute spelling GN produces when `new_base` is omitted.
+    "--golden-dir=" + rebase_path("//taffy/test/data/contract/golden"),
+    "--compat-dir=" + rebase_path("//taffy/test/data/contract/compat"),
+    "--output-dir=" + rebase_path(_seed_corpus_dir, root_build_dir),
+    "--depfile=" + rebase_path(depfile, root_build_dir),
+  ]
+}
+
+# ---------------------------------------------------------------------------
+# Browser-facing renderer payloads
+# ---------------------------------------------------------------------------
+#
+# One target per message the browser receives. Each decodes through the
+# generated bindings and then converts the parts browser-process code actually
+# reads, because a decoder that accepts a message and a consumer that walks it
+# are two different attack surfaces.
+
+template("_taffy_wire_fuzzer") {
+  _taffy_fuzzer_test(target_name) {
+    forward_variables_from(invoker, [ "sources" ])
+    seed_corpus = _seed_corpus_dir
+    seed_corpus_deps = [ ":wire_seed_corpus" ]
+    deps = [
+      "//base",
+      "//taffy/browser:browser_shared",
+      "//taffy/browser/profile_store:unavailable_test_adapter",
+    "//taffy/browser:saved_data_unavailable_test_adapter",
+      "//taffy/contracts/bip/mojom",
+      "//taffy/common/public",
+      "//mojo/public/cpp/bindings",
+    ]
+    if (defined(invoker.deps)) {
+      deps += invoker.deps
+    }
+  }
+}
+
+_taffy_wire_fuzzer("taffy_bip_snapshot_result_fuzzer") {
+  sources = [ "snapshot_result_fuzzer.cc" ]
+}
+
+_taffy_wire_fuzzer("taffy_bip_page_delta_fuzzer") {
+  sources = [ "page_delta_fuzzer.cc" ]
+}
+
+_taffy_wire_fuzzer("taffy_bip_page_invalidation_fuzzer") {
+  sources = [ "page_invalidation_fuzzer.cc" ]
+}
+
+_taffy_wire_fuzzer("taffy_bip_backpressure_notice_fuzzer") {
+  sources = [ "backpressure_notice_fuzzer.cc" ]
+}
+
+_taffy_wire_fuzzer("taffy_bip_protocol_info_fuzzer") {
+  sources = [ "protocol_info_fuzzer.cc" ]
+}
+
+_taffy_wire_fuzzer("taffy_bip_renderer_action_result_fuzzer") {
+  sources = [ "renderer_action_result_fuzzer.cc" ]
+}
+
+_taffy_wire_fuzzer("taffy_bip_resolve_node_result_fuzzer") {
+  sources = [ "resolve_node_result_fuzzer.cc" ]
+}
+
+_taffy_wire_fuzzer("taffy_bip_subscription_result_fuzzer") {
+  sources = [ "subscription_result_fuzzer.cc" ]
+}
+
+# ---------------------------------------------------------------------------
+# Parsers whose input is page-derived
+# ---------------------------------------------------------------------------
+#
+# These take bytes rather than a decoded message, so their seed corpus is the
+# contract's own documents read directly: those are already in the encoding
+# these targets consume.
+
+_taffy_fuzzer_test("taffy_graph_payload_fuzzer") {
+  sources = [ "graph_payload_fuzzer.cc" ]
+  seed_corpus = "//taffy/test/data/contract/golden"
+  deps = [ "//base" ]
+}
+
+_taffy_fuzzer_test("taffy_origin_codec_fuzzer") {
+  sources = [ "origin_codec_fuzzer.cc" ]
+  deps = [
+    "//base",
+    "//content/test:test_support",
+    "//taffy/browser:browser_shared",
+    "//taffy/browser/profile_store:unavailable_test_adapter",
+    "//taffy/browser:saved_data_unavailable_test_adapter",
+    "//taffy/common/public",
+    "//url",
+  ]
+}
+
+_taffy_fuzzer_test("taffy_secret_shape_scanner_fuzzer") {
+  sources = [ "secret_shape_scanner_fuzzer.cc" ]
+  deps = [
+    "//base",
+    "//taffy/browser:browser_shared",
+    "//taffy/browser/profile_store:unavailable_test_adapter",
+    "//taffy/browser:saved_data_unavailable_test_adapter",
+  ]
+}
+
+_taffy_fuzzer_test("taffy_omnibox_input_classifier_fuzzer") {
+  sources = [ "omnibox_input_classifier_fuzzer.cc" ]
+  deps = [
+    "//base",
+    "//taffy/browser:browser_shared",
+    "//taffy/browser/profile_store:unavailable_test_adapter",
+    "//taffy/browser:saved_data_unavailable_test_adapter",
+    "//third_party/icu/fuzzers:fuzzer_support",
+  ]
+}
+
+_taffy_fuzzer_test("taffy_scrubbing_serializer_fuzzer") {
+  sources = [ "scrubbing_serializer_fuzzer.cc" ]
+  deps = [
+    "//base",
+    "//taffy/browser:browser_shared",
+    "//taffy/browser/profile_store:unavailable_test_adapter",
+    "//taffy/browser:saved_data_unavailable_test_adapter",
+    "//url",
+  ]
+}
+
+# Everything above, by reference, so a lane can build the set without listing
+# it. Adding a fuzzer means adding it here; README.md's table is the map from
+# target to the surface it covers, and the two are checked against each other at
+# review rather than by a script that would have to parse GN.
+group("fuzzers") {
+  testonly = true
+
+  deps = [
+    ":taffy_bip_backpressure_notice_fuzzer",
+    ":taffy_bip_page_delta_fuzzer",
+    ":taffy_bip_page_invalidation_fuzzer",
+    ":taffy_bip_protocol_info_fuzzer",
+    ":taffy_bip_renderer_action_result_fuzzer",
+    ":taffy_bip_resolve_node_result_fuzzer",
+    ":taffy_bip_snapshot_result_fuzzer",
+    ":taffy_bip_subscription_result_fuzzer",
+    ":taffy_graph_payload_fuzzer",
+    ":taffy_omnibox_input_classifier_fuzzer",
+    ":taffy_origin_codec_fuzzer",
+    ":taffy_scrubbing_serializer_fuzzer",
+    ":taffy_secret_shape_scanner_fuzzer",
+  ]
+}

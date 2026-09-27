@@ -1,0 +1,83 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="form-laboratory">
+<title>Form laboratory</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Form laboratory</h1>
+  <p class="who">Ordinary, non-sensitive controls: types, labels, validation,
+  disabled and read-only state, and a submit boundary the server refuses.</p>
+</header>
+
+<form id="lab-form" action="/forms/submit" method="post" novalidate>
+  <fieldset>
+    <legend>Delivery</legend>
+
+    <label for="full-name">Full name (required)</label>
+    <input id="full-name" name="full_name" type="text" required autocomplete="name"
+           aria-describedby="full-name-help">
+    <p id="full-name-help" class="note">Required. Empty submission shows the error below.</p>
+
+    <label for="quantity">Quantity</label>
+    <input id="quantity" name="quantity" type="number" min="1" max="5" step="1" value="1">
+
+    <label for="delivery-date">Preferred date</label>
+    <input id="delivery-date" name="delivery_date" type="date" value="2026-03-02">
+
+    <label for="region">Region</label>
+    <select id="region" name="region">
+      <option value="">Choose a region</option>
+      <option value="north" selected>North</option>
+      <option value="south">South</option>
+      <option value="east" disabled>East (unavailable)</option>
+    </select>
+
+    <label for="notes">Delivery notes</label>
+    <textarea id="notes" name="notes" rows="3" maxlength="120">Leave with the front desk.</textarea>
+
+    <label><input type="checkbox" id="gift-wrap" name="gift_wrap"> Gift wrap</label>
+    <label><input type="checkbox" id="terms" name="terms" required> I accept the fixture terms</label>
+
+    <fieldset>
+      <legend>Delivery speed</legend>
+      <label><input type="radio" name="speed" value="standard" checked> Standard</label>
+      <label><input type="radio" name="speed" value="express"> Express</label>
+      <label><input type="radio" name="speed" value="courier" disabled> Courier (unavailable)</label>
+    </fieldset>
+
+    <label for="account-ref">Account reference (read-only)</label>
+    <input id="account-ref" name="account_ref" type="text" value="FIXTURE-REF-2026" readonly>
+
+    <label for="legacy-code">Legacy code (disabled)</label>
+    <input id="legacy-code" name="legacy_code" type="text" value="LEGACY-000" disabled>
+  </fieldset>
+
+  <p>
+    <button type="submit" id="lab-submit">Place fixture order</button>
+    <button type="reset" id="lab-reset">Reset</button>
+  </p>
+</form>
+
+<p id="lab-error" class="flag" role="alert" hidden>Full name is required.</p>
+<p class="note">Submitting reaches <code>/forms/submit</code>, which answers 403.
+No fixture form ever records anything.</p>
+
+<script>
+  (function () {
+    "use strict";
+    var form = document.getElementById("lab-form");
+    var error = document.getElementById("lab-error");
+    form.addEventListener("submit", function (event) {
+      var name = document.getElementById("full-name").value.trim();
+      if (!name) {
+        event.preventDefault();
+        error.hidden = false;
+        document.getElementById("full-name").focus();
+      }
+    });
+  })();
+</script>

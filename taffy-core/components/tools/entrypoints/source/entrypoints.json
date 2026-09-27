@@ -1,0 +1,103 @@
+{
+  "registry": "tool-entrypoints",
+  "registry_version": 1,
+  "value_kinds": [
+    {
+      "name": "document-docx",
+      "description": "One Office Open XML text document, produced by the worker and returned as bytes."
+    },
+    {
+      "name": "json-utf8",
+      "description": "One bounded UTF-8 JSON document whose shape the entrypoint's own reader fixes. It names no file, no origin and no handle."
+    },
+    {
+      "name": "spreadsheet-xlsx",
+      "description": "One Office Open XML workbook, produced by the worker and returned as bytes. Nothing is written to a disk the worker can see, because it can see none."
+    },
+    {
+      "name": "table-csv-utf8",
+      "description": "Bounded UTF-8 comma-separated rows with a header row. The bytes are data, never a formula and never a reference to another cell."
+    }
+  ],
+  "native_paths": [
+    {
+      "id": "core.table.reshape",
+      "state": "active",
+      "description": "Selecting, ordering, grouping and pivoting rows is arithmetic over a bounded table. The portable core owns it, in Rust, in a process that already exists and that a person's data already crosses."
+    }
+  ],
+  "entrypoints": [
+    {
+      "id": "document.build",
+      "summary": "Compose one text document from a described outline and return its bytes.",
+      "native_alternative": "",
+      "inputs": [
+        {
+          "name": "document",
+          "kind": "json-utf8",
+          "required": true,
+          "description": "The described document: its sections, their headings and their paragraphs."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "document",
+          "kind": "document-docx",
+          "description": "The composed document as bytes."
+        }
+      ]
+    },
+    {
+      "id": "spreadsheet.build",
+      "summary": "Compose one workbook from tables and a described layout, and return its bytes.",
+      "native_alternative": "",
+      "inputs": [
+        {
+          "name": "workbook",
+          "kind": "json-utf8",
+          "required": true,
+          "description": "The described workbook: its sheets, their column headings and their formats."
+        },
+        {
+          "name": "rows",
+          "kind": "table-csv-utf8",
+          "required": true,
+          "description": "The cell values, already reshaped, one table per named sheet."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "spreadsheet",
+          "kind": "spreadsheet-xlsx",
+          "description": "The composed workbook as bytes."
+        }
+      ]
+    },
+    {
+      "id": "table.reshape",
+      "summary": "Select, order, group and pivot the rows of one bounded table.",
+      "native_alternative": "core.table.reshape",
+      "inputs": [
+        {
+          "name": "rows",
+          "kind": "table-csv-utf8",
+          "required": true,
+          "description": "The table to reshape."
+        },
+        {
+          "name": "recipe",
+          "kind": "json-utf8",
+          "required": true,
+          "description": "The described reshaping: which columns survive, in what order, grouped by what."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rows",
+          "kind": "table-csv-utf8",
+          "description": "The reshaped table."
+        }
+      ]
+    }
+  ]
+}

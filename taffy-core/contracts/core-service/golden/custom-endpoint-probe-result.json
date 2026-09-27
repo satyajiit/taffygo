@@ -1,0 +1,19 @@
+{
+  "provider_id": "my-gateway",
+  "reached": true,
+  "detected_server": {
+    "server_kind": 1
+  },
+  "model_count": 1,
+  "models": [
+    {
+      "model_id": "qwen3-30b",
+      "display_name": "Qwen3 30B",
+      "context_window": 32768,
+      "max_output_tokens": 8192,
+      "reasoning": false,
+      "tool_calling": true
+    }
+  ],
+  "proved_base": "http://workstation.local:11434/v1"
+}

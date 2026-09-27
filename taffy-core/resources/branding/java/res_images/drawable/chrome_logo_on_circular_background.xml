@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Shadows the upstream resource of the same name: the app-install promo art
+(a logo on a circular plate, drawn at about 31dp). The plate keeps
+upstream's framework white — no literal colour value may live under
+branding/ while the palette is [Open (OD-071)] — and the mark is the same
+generated app_icon bitmap the launcher shows, inset so it sits inside the
+plate.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+    <item
+        android:top="4dp"
+        android:bottom="4dp"
+        android:left="4dp"
+        android:right="4dp"
+        android:drawable="@mipmap/app_icon" />
+</layer-list>

@@ -1,0 +1,31 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//build/config/android/rules.gni")
+
+java_prebuilt("dagger_java") {
+  jar_path = "lib/dagger-2.60.1.jar"
+  supports_android = true
+  requires_android = false
+  enable_bytecode_checks = false
+  deps = [ ":jakarta_inject_java" ]
+}
+
+java_prebuilt("jakarta_inject_java") {
+  jar_path = "lib/jakarta.inject-api-2.0.1.jar"
+  supports_android = true
+  requires_android = false
+  enable_bytecode_checks = false
+  jar_excluded_patterns = [ "module-info.class" ]
+}
+
+java_group("taffy_dagger_runtime_java") {
+  public_deps = [
+    ":dagger_java",
+    ":jakarta_inject_java",
+    "//third_party/android_deps:javax_inject_javax_inject_java",
+  ]
+}

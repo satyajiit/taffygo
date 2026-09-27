@@ -1,0 +1,341 @@
+{
+  "schema_version": 32,
+  "seed": {
+    "task_id": "task-1",
+    "workspace_id": "workspace-1",
+    "browser_profile_id": "profile-1",
+    "kind": 0,
+    "user_goal": "Compare the verified evidence",
+    "control_mode": 1,
+    "snapshot": {
+      "assistant_config_version": 3,
+      "skill_version_id": "skill-compare-2",
+      "tool_allowlist": [
+        "observe_page",
+        "open_link"
+      ],
+      "capability_policy_version": 5,
+      "provider_route": null,
+      "milestone": 3,
+      "template_id": 0,
+      "consented_sources": [
+        {
+          "source_id": "source-1",
+          "tab_id": "tab-1",
+          "normalized_origin": "https://reviews.example.invalid",
+          "canonical_locator": null
+        }
+      ],
+      "source_discovery_enabled": true,
+      "browser_session_id": "session-1",
+      "remaining_new_source_cap": 3,
+      "discovery_tab_id": null,
+      "library_refresh": null,
+      "builtin_skill": null
+    },
+    "budgets": [
+      {
+        "kind": 0,
+        "limit": 4
+      },
+      {
+        "kind": 2,
+        "limit": 600000
+      }
+    ],
+    "deadline_monotonic_ms": 900000,
+    "predecessor_task_id": null,
+    "deadline_utc_ms": 1787337000000
+  },
+  "journal_entries": [
+    {
+      "variant": "Command",
+      "fields": {
+        "record": {
+          "sequence": 1,
+          "envelope": {
+            "idempotency_key": "start-1",
+            "expected_revision": 0,
+            "trace_id": "trace-1",
+            "command": {
+              "variant": "StartTask",
+              "fields": {
+                "preview": {
+                  "scope": {
+                    "included": [
+                      "source-1"
+                    ],
+                    "excluded": []
+                  },
+                  "provider_route": "route-managed-1",
+                  "budgets": [
+                    {
+                      "kind": 0,
+                      "limit": 4
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "source_id": "source-1",
+                      "tab_id": "tab-1",
+                      "normalized_origin": "https://reviews.example.invalid",
+                      "canonical_locator": null
+                    }
+                  ],
+                  "source_discovery_enabled": false,
+                  "new_source_cap": 0
+                }
+              }
+            }
+          },
+          "recorded_at_utc_ms": 1787336900000
+        }
+      }
+    },
+    {
+      "variant": "Event",
+      "fields": {
+        "record": {
+          "sequence": 2,
+          "event": {
+            "kind": 4,
+            "caused_by": 2,
+            "from": 1,
+            "to": 2,
+            "reason": 2,
+            "subject": {
+              "variant": "Action",
+              "fields": {
+                "id": "action-1"
+              }
+            }
+          },
+          "revision": 1,
+          "trace_id": "trace-1",
+          "causation_key": "start-1",
+          "recorded_at_utc_ms": 1787336900500
+        }
+      }
+    },
+    {
+      "variant": "Command",
+      "fields": {
+        "record": {
+          "sequence": 3,
+          "envelope": {
+            "idempotency_key": "model-turn-1",
+            "expected_revision": 1,
+            "trace_id": "trace-1",
+            "command": {
+              "variant": "RequestModelTurn",
+              "fields": {
+                "call_id": "model-call-1"
+              }
+            }
+          },
+          "recorded_at_utc_ms": 1787336901000
+        }
+      }
+    },
+    {
+      "variant": "Command",
+      "fields": {
+        "record": {
+          "sequence": 4,
+          "envelope": {
+            "idempotency_key": "model-turn-1-retry-1",
+            "expected_revision": 2,
+            "trace_id": "trace-1",
+            "command": {
+              "variant": "RequestModelAttempt",
+              "fields": {
+                "call_id": "model-call-1",
+                "attempt_ordinal": 1,
+                "candidate_ordinal": 0,
+                "kind": 0
+              }
+            }
+          },
+          "recorded_at_utc_ms": 1787336902000
+        }
+      }
+    },
+    {
+      "variant": "Command",
+      "fields": {
+        "record": {
+          "sequence": 5,
+          "envelope": {
+            "idempotency_key": "model-turn-1-reply",
+            "expected_revision": 3,
+            "trace_id": "trace-1",
+            "command": {
+              "variant": "RecordModelTurn",
+              "fields": {
+                "call_id": "model-call-1",
+                "digest": {
+                  "stop": 1,
+                  "overflow": null,
+                  "input_units": 4821,
+                  "output_units": 96,
+                  "cache_read_units": 2048,
+                  "cache_write_units": 0,
+                  "answer_segment_count": 1,
+                  "tool_call_count": 1,
+                  "refused_tool_call_count": 0,
+                  "readability": 0,
+                  "offered_node_count": 37,
+                  "omitted_node_count": 4,
+                  "unreadable_node_count": 0,
+                  "unreadable_text_bytes": 0,
+                  "render_digest": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    25,
+                    26,
+                    27,
+                    28,
+                    29,
+                    30,
+                    31,
+                    32
+                  ]
+                }
+              }
+            }
+          },
+          "recorded_at_utc_ms": 1787336903000
+        }
+      }
+    },
+    {
+      "variant": "Command",
+      "fields": {
+        "record": {
+          "sequence": 6,
+          "envelope": {
+            "idempotency_key": "model-turn-2-gap",
+            "expected_revision": 4,
+            "trace_id": "trace-1",
+            "command": {
+              "variant": "RecordModelTurnGap",
+              "fields": {
+                "call_id": "model-call-2",
+                "gap": 2
+              }
+            }
+          },
+          "recorded_at_utc_ms": 1787336905000
+        }
+      }
+    },
+    {
+      "variant": "Command",
+      "fields": {
+        "record": {
+          "sequence": 7,
+          "envelope": {
+            "idempotency_key": "propose-dom-read-1",
+            "expected_revision": 5,
+            "trace_id": "trace-1",
+            "command": {
+              "variant": "ProposeAction",
+              "fields": {
+                "proposal": {
+                  "tool_name": "browser.dom.read",
+                  "plan_step_id": null,
+                  "action_class": 0,
+                  "tab_id": "tab-1",
+                  "node_id": null,
+                  "idempotency_key": "dom-read-1",
+                  "idempotency": 0,
+                  "required_for_step": true,
+                  "budget_draw": null,
+                  "proposal_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+                  "destination_address": null,
+                  "canonical_intent": [
+                    116, 97, 102, 102, 121, 46, 97, 99,
+                    116, 105, 111, 110, 45, 105, 110, 116,
+                    101, 110, 116, 46, 118, 49,
+                    0, 1, 0, 0, 0, 0, 0, 0, 0, 9,
+                    1, 5, 0, 0, 0, 0, 0, 0, 0,
+                    116, 97, 98, 45, 49,
+                    2, 1, 0, 0, 0, 0, 0, 0, 0, 0
+                  ]
+                }
+              }
+            }
+          },
+          "recorded_at_utc_ms": 1787336906000
+        }
+      }
+    }
+  ],
+  "effect_intents": [
+    {
+      "variant": "ReleaseTaskTabs",
+      "fields": {}
+    },
+    {
+      "variant": "RequestPermission",
+      "fields": {
+        "request_id": "permission-1",
+        "permission": 0,
+        "deadline_monotonic_ms": 930000,
+        "deadline_utc_ms": 1787337030000,
+        "browser_session_id": "session-1"
+      }
+    },
+    {
+      "variant": "CallModel",
+      "fields": {
+        "call_id": "model-call-1"
+      }
+    },
+    {
+      "variant": "AwaitHandover",
+      "fields": {
+        "handover_id": "turn-1-handover-0",
+        "window_ms": 300000
+      }
+    }
+  ],
+  "audit_records": [
+    {
+      "event_id": "audit-1",
+      "event_type": 4,
+      "actor": 1,
+      "task_id": "task-1",
+      "subject_kind": 0,
+      "subject_id": "action-1",
+      "revision": 1,
+      "sequence": 2,
+      "trace_id": "trace-1",
+      "occurred_at_utc_ms": 1787336900500,
+      "dropped_field_count": 0,
+      "content_values_retained": false
+    }
+  ]
+}

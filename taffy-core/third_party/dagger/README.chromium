@@ -1,0 +1,326 @@
+# For more information on these fields, see:
+# https://chromium.googlesource.com/chromium/src/+/HEAD/docs/adding_to_third_party.md#readme_chromium
+#
+# TaffyGo owns this directory. It is vendored under //taffy rather
+# than under //third_party/android_deps on purpose, and the reason is recorded
+# in docs/decisions/0031-one-tree-and-dependency-injection.md: android_deps
+# commits no jars (its DEPS entries pin CIPD packages in a namespace a fork
+# cannot publish to) and the roller regenerates its build files, which is the
+# clobber shape OD-076 has recorded four times. Nothing here edits an upstream
+# file, so a Chromium roll cannot touch it.
+#
+# Every jar below is byte-identical to the artifact Maven Central serves for the
+# coordinate named in its block. The Gradle and GN builds both use Dagger
+# 2.60.1 from the version owned by gradle/libs.versions.toml, so both builds run
+# the same processor over the same sources.
+#
+# Two of the sixteen reach a device; the other fourteen run on the build host
+# inside kapt and are never dexed. Each block says which it is in its Shipped
+# field, and tools/lib/vendored_assets.py holds every checksum against
+# vendor/dagger.txt.
+
+Name: Dagger
+Short Name: dagger
+URL: https://repo.maven.apache.org/maven2/com/google/dagger/dagger/2.60.1/dagger-2.60.1.jar
+Version: 2.60.1
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: yes
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+The dependency-injection runtime: Provider, Lazy, MembersInjector and the
+generated factories' base types. Reaches the device.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: Jakarta Dependency Injection
+Short Name: jakarta.inject-api
+URL: https://repo.maven.apache.org/maven2/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar
+Version: 2.0.1
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: yes
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+jakarta.inject.Provider, which Dagger 2.60's generated code implements
+alongside the javax.inject spelling. Reaches the device.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: Dagger Compiler
+Short Name: dagger-compiler
+URL: https://repo.maven.apache.org/maven2/com/google/dagger/dagger-compiler/2.60.1/dagger-compiler-2.60.1.jar
+Version: 2.60.1
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+The annotation processor. Runs on the build host inside kapt and never
+reaches an APK.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: Dagger SPI
+Short Name: dagger-spi
+URL: https://repo.maven.apache.org/maven2/com/google/dagger/dagger-spi/2.60.1/dagger-spi-2.60.1.jar
+Version: 2.60.1
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+The binding-graph model dagger-compiler is written against. Host only.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: JavaPoet
+Short Name: javapoet
+URL: https://repo.maven.apache.org/maven2/com/squareup/javapoet/1.13.0/javapoet-1.13.0.jar
+Version: 1.13.0
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+The Java source generator both processors emit through. Host only.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: KotlinPoet
+Short Name: kotlinpoet
+URL: https://repo.maven.apache.org/maven2/com/squareup/kotlinpoet/1.11.0/kotlinpoet-1.11.0.jar
+Version: 1.11.0
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+The Kotlin source generator on dagger-compiler's classpath. Host only.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: Kotlin Metadata JVM
+Short Name: kotlin-metadata-jvm
+URL: https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-metadata-jvm/2.3.21/kotlin-metadata-jvm-2.3.21.jar
+Version: 2.3.21
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+How the processors read @kotlin.Metadata to tell a Kotlin object from a
+class and a nullable parameter from a platform type. This is the jar
+decision 0031 names as the one a kotlinc roll can break. Host only.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: Kotlin Standard Library
+Short Name: kotlin-stdlib
+URL: https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/2.4.10/kotlin-stdlib-2.4.10.jar
+Version: 2.4.10
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+On the processor classpath so javac can resolve kotlin.Metadata in full.
+Without it the processors die with IncompleteAnnotationException. The
+stdlib the compiled Kotlin links against is Chromium's own
+//third_party/kotlin_stdlib, not this jar. Host only.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: KSP API
+Short Name: symbol-processing-api
+URL: https://repo.maven.apache.org/maven2/com/google/devtools/ksp/symbol-processing-api/2.3.11/symbol-processing-api-2.3.11.jar
+Version: 2.3.11
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+dagger-compiler is compiled against both the javac and the KSP element
+models and loads classes from this jar during processor start-up. TaffyGo
+runs the javac half; the jar is present so the classpath resolves.
+Host only.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: Guava
+Short Name: guava
+URL: https://repo.maven.apache.org/maven2/com/google/guava/guava/33.6.0-jre/guava-33.6.0-jre.jar
+Version: 33.6.0-jre
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+dagger-compiler's collection and graph library. Host only.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: Guava InternalFutureFailureAccess
+Short Name: failureaccess
+URL: https://repo.maven.apache.org/maven2/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar
+Version: 1.0.1
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+Guava's split-out future-failure package, a hard runtime dependency of the
+jar above. Host only.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: google-java-format
+Short Name: google-java-format
+URL: https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/1.33.0/google-java-format-1.33.0.jar
+Version: 1.33.0
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+Formats the Java the processors generate. Host only.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: javax.inject
+Short Name: javax.inject
+URL: https://repo.maven.apache.org/maven2/javax/inject/javax.inject/1/javax.inject-1.jar
+Version: 1
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+The JSR-330 annotations on the processor classpath. The copy the compiled
+Kotlin links against, and the one that reaches the device, is Chromium's
+//third_party/android_deps:javax_inject_javax_inject_java. Host only.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: JSR-305 annotations
+Short Name: jsr305
+URL: https://repo.maven.apache.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar
+Version: 3.0.2
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+@Nullable and friends, referenced from Guava's and Dagger's signatures.
+Host only.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: IncAp
+Short Name: incap
+URL: https://repo.maven.apache.org/maven2/net/ltgt/gradle/incap/incap/0.2/incap-0.2.jar
+Version: 0.2
+Update Mechanism: Manual
+License: Apache-2.0
+License File: LICENSE
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+The incremental-annotation-processing markers Dagger's processors carry.
+Host only.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------
+
+Name: Checker Framework compatibility qualifiers
+Short Name: checker-compat-qual
+URL: https://repo.maven.apache.org/maven2/org/checkerframework/checker-compat-qual/2.5.3/checker-compat-qual-2.5.3.jar
+Version: 2.5.3
+Update Mechanism: Manual
+License: GPL-2.0-with-classpath-exception, MIT
+License File: LICENSE.checker-framework
+Shipped: no
+Security Critical: no
+CPEPrefix: unknown
+
+Description:
+Nullness qualifiers named in Guava's older signatures. Dual-licensed;
+TaffyGo takes it under the MIT half. Host only, and the only artifact here
+that is not plain Apache-2.0.
+
+Local Modifications:
+None.
+-------------------- DEPENDENCY DIVIDER --------------------

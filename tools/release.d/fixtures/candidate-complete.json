@@ -1,0 +1,516 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-08-17T09:42:11Z",
+  "generator": {
+    "name": "tools/release",
+    "command": "./tools/release manifest --profile release-arm64 --kind candidate",
+    "host": "linux/x86-64"
+  },
+  "release": {
+    "kind": "candidate",
+    "package_id": "com.taffygo.browser",
+    "version_name": "1.0.0",
+    "version_code": 1,
+    "environment": "internal-validation",
+    "promotable": true,
+    "notes": [
+      "Fixture only. Every digest below is synthetic and no artifact of these hashes exists.",
+      "This is the schema-complete candidate shape; the promotion self-test adds byte-backed benchmark-run rows."
+    ]
+  },
+  "source": {
+    "taffy": {
+      "revision": "0f5e0a0d6c1b4e2a9f8d7c6b5a4938271605f4e3",
+      "dirty": false,
+      "branch": "main",
+      "remote": "https://github.com/taffygo/taffy-go"
+    }
+  },
+  "chromium": {
+    "milestone": "152",
+    "tag": "152.0.7977.42",
+    "commit": "db8ceb709fe92f3bb010fb982d6300e54de6dc6a",
+    "security_patch_level": 1,
+    "security_advisories": [
+      "upstream-issue-fixture-0001"
+    ],
+    "patch_queue": {
+      "count": 10,
+      "modified_upstream_lines": 191,
+      "security_count": 1,
+      "digest": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce"
+    },
+    "depot_tools_revision": "13febbee9ece9e03df923f69d540afc63c6db93e"
+  },
+  "build": {
+    "profile": "release-arm64",
+    "args_digest": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+    "hermetic": true,
+    "host": {
+      "os": "linux",
+      "arch": "x86-64",
+      "runner": "taffy-release-linux-1",
+      "image_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "caches": {
+      "siso": {
+        "enabled": false
+      },
+      "ccache": {
+        "enabled": false
+      },
+      "sccache": {
+        "enabled": false
+      }
+    },
+    "started_at": "2026-08-17T06:02:00Z",
+    "finished_at": "2026-08-17T09:38:40Z"
+  },
+  "toolchain": [
+    {
+      "component": "Chromium revision (stable milestone tag)",
+      "version": "db8ceb709fe92f3bb010fb982d6300e54de6dc6a",
+      "owner_file": "chromium/REVISION"
+    },
+    {
+      "component": "Chromium security patch level",
+      "version": "1",
+      "owner_file": "chromium/SECURITY_PATCH_LEVEL"
+    },
+    {
+      "component": "depot_tools revision",
+      "version": "13febbee9ece9e03df923f69d540afc63c6db93e",
+      "owner_file": "tools/pins/depot_tools"
+    },
+    {
+      "component": "Rust toolchain (portable host loop)",
+      "version": "1.96.0",
+      "owner_file": "rust-toolchain.toml"
+    }
+  ],
+  "platform": {
+    "min_sdk": 29,
+    "target_sdk": 37,
+    "compile_sdk": 37,
+    "abis": [
+      "arm64-v8a"
+    ],
+    "sixteen_kb_alignment": "pass"
+  },
+  "artifacts": [
+    {
+      "path": "taffy-public-1.0.0-arm64.apk",
+      "kind": "apk",
+      "sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+      "size_bytes": 92341760,
+      "abi": "arm64-v8a"
+    },
+    {
+      "path": "taffy-public-tests-1.0.0-arm64.apk",
+      "kind": "test-apk",
+      "sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+      "size_bytes": 33554432,
+      "abi": "arm64-v8a"
+    },
+    {
+      "path": "taffy-public-1.0.0.aab",
+      "kind": "bundle",
+      "sha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+      "size_bytes": 118293504
+    },
+    {
+      "path": "mapping.txt",
+      "kind": "mapping",
+      "sha256": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+      "size_bytes": 8421376
+    },
+    {
+      "path": "symbols-arm64.zip",
+      "kind": "symbols",
+      "sha256": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+      "size_bytes": 734003200,
+      "abi": "arm64-v8a"
+    },
+    {
+      "path": "sbom.cdx.json",
+      "kind": "sbom",
+      "sha256": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+      "size_bytes": 412672
+    },
+    {
+      "path": "licenses.json",
+      "kind": "license-inventory",
+      "sha256": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+      "size_bytes": 189440
+    },
+    {
+      "path": "vulnerabilities.json",
+      "kind": "vulnerability-report",
+      "sha256": "19581e27de7ced00ff1ce50b2047e7a567c76b1cbaebabe5ef03f7c3017bb5b7",
+      "size_bytes": 20480
+    },
+    {
+      "path": "provenance.intoto.jsonl",
+      "kind": "provenance",
+      "sha256": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+      "size_bytes": 6144
+    },
+    {
+      "path": "security-drill.json",
+      "kind": "drill-record",
+      "sha256": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+      "size_bytes": 4096
+    },
+    {
+      "path": "candidate-tests.xml",
+      "kind": "test-report",
+      "sha256": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+      "size_bytes": 262144
+    },
+    {
+      "path": "benchmark-report.json",
+      "kind": "benchmark-report",
+      "sha256": "9999999999999999999999999999999999999999999999999999999999999999",
+      "size_bytes": 65536
+    },
+    {
+      "path": "evidence-index.json",
+      "kind": "evidence-index",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "size_bytes": 32768
+    },
+    {
+      "path": "rollback-rehearsal.json",
+      "kind": "rollback-evidence",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "size_bytes": 16384
+    }
+  ],
+  "dependencies": {
+    "lock_digests": [
+      {
+        "file": "Cargo.lock",
+        "sha256": "3fdba35f04dc8c462986c992bcf875546257113072a909c162f7e470e581e278"
+      },
+      {
+        "file": "pnpm-lock.yaml",
+        "sha256": "8527a891e224136950ff32ca212b45bc93f69fbb801c3b1ebedac52775f99e61"
+      },
+      {
+        "file": "gradle/libs.versions.toml",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "sbom": {
+      "format": "CycloneDX",
+      "spec_version": "1.6",
+      "path": "sbom.cdx.json",
+      "sha256": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+      "component_count": 812,
+      "ecosystems": [
+        {
+          "name": "rust",
+          "status": "complete",
+          "component_count": 41,
+          "evidence_command": "cargo metadata --locked --format-version 1"
+        },
+        {
+          "name": "javascript",
+          "status": "complete",
+          "component_count": 604,
+          "evidence_command": "pnpm licenses list --json"
+        },
+        {
+          "name": "gradle",
+          "status": "complete",
+          "component_count": 167,
+          "evidence_command": "gradle module cache POM scan"
+        },
+        {
+          "name": "chromium",
+          "status": "complete",
+          "component_count": 2200,
+          "evidence_command": "Chromium third-party license tooling on the Linux builder",
+          "schema_version": 1,
+          "kind": "chromium-shipped-license-inventory",
+          "source_revision": "cccccccccccccccccccccccccccccccccccccccc",
+          "upstream_revision": "db8ceb709fe92f3bb010fb982d6300e54de6dc6a",
+          "profile": "release-arm64",
+          "target": "//taffy/app/android:taffy_public_apk"
+        },
+        {
+          "name": "android-native",
+          "status": "complete",
+          "component_count": 10,
+          "evidence_command": "packaged native library scan of the built candidate",
+          "schema_version": 1,
+          "kind": "android-packaged-native-inventory",
+          "source_revision": "cccccccccccccccccccccccccccccccccccccccc",
+          "upstream_revision": "db8ceb709fe92f3bb010fb982d6300e54de6dc6a",
+          "profile": "release-arm64",
+          "target": "//taffy/app/android:taffy_public_apk",
+          "artifact": "taffy-public-1.0.0-arm64.apk",
+          "artifact_sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "package_name": "com.taffygo.browser"
+        }
+      ]
+    },
+    "license_inventory": {
+      "path": "licenses.json",
+      "sha256": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+      "entry_count": 812,
+      "unresolved": 0
+    },
+    "vulnerability_scan": {
+      "tool": "fixture-scanner",
+      "status": "clean",
+      "ran_at": "2026-08-17T09:40:02Z",
+      "findings": 0,
+      "path": "vulnerabilities.json"
+    }
+  },
+  "signing": {
+    "separation": {
+      "build_job": "build",
+      "signing_job": "sign",
+      "distinct": true
+    },
+    "credential_source": "oidc",
+    "long_lived_token": false,
+    "certificate": {
+      "sha256_fingerprint": "252f10c83610ebca1a059c0bae8255eba2f95be4d1d7bcfa89d7248a82d9f111",
+      "subject": "CN=TaffyGo Release, O=TaffyGo",
+      "custody": "hardware-backed, dual control"
+    }
+  },
+  "provenance": {
+    "predicate_type": "https://slsa.dev/provenance/v1",
+    "builder_id": "https://github.com/taffygo/taffy-go/.github/workflows/release.yml",
+    "path": "provenance.intoto.jsonl",
+    "sha256": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+    "invocation": {
+      "workflow": "release",
+      "repository": "taffygo/taffy-go",
+      "ref": "refs/tags/v1.0.0",
+      "sha": "0f5e0a0d6c1b4e2a9f8d7c6b5a4938271605f4e3",
+      "run_id": "1447229001",
+      "run_attempt": "1"
+    }
+  },
+  "tests": {
+    "corpus_version": "web-fixtures-1",
+    "benchmark_baseline": "immutable-baseline-2026-08-17",
+    "benchmark_evidence": "benchmark-report.json",
+    "benchmark_evidence_sha256": "9999999999999999999999999999999999999999999999999999999999999999",
+    "benchmark_runs": 62,
+    "benchmark_scenarios": 31,
+    "benchmark_measured": true,
+    "benchmark_approved": true,
+    "device_matrix_id": "candidate-matrix-fixture-1",
+    "suites": [
+      {
+        "name": "check-docs",
+        "result": "pass",
+        "shards": 1,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "check-fast",
+        "result": "pass",
+        "shards": 1,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "taffy_unittests",
+        "result": "pass",
+        "shards": 4,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "taffy_browsertests",
+        "result": "pass",
+        "shards": 4,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "taffy_public_test_apk",
+        "result": "pass",
+        "shards": 1,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "taffy_shell_junit_tests",
+        "result": "pass",
+        "shards": 1,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "android-instrumentation",
+        "result": "pass",
+        "shards": 2,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "diagnostic-sanitizer",
+        "result": "pass",
+        "shards": 2,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "bip-fuzzers",
+        "result": "pass",
+        "shards": 13,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "upstream-regression",
+        "result": "pass",
+        "shards": 8,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "benchmark-production",
+        "result": "pass",
+        "shards": 1,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "accessibility",
+        "result": "pass",
+        "shards": 1,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "privacy-data-deletion",
+        "result": "pass",
+        "shards": 1,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "release-configuration",
+        "result": "pass",
+        "shards": 1,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      },
+      {
+        "name": "rollback-rehearsal",
+        "result": "pass",
+        "shards": 1,
+        "retries": 0,
+        "skipped": 0,
+        "report_path": "candidate-tests.xml"
+      }
+    ],
+    "devices": [
+      {
+        "model": "fixture-reference-low",
+        "api": 29,
+        "abi": "arm64-v8a",
+        "tier": "low",
+        "matrix_row": "physical-low-api29",
+        "approved": true
+      },
+      {
+        "model": "fixture-reference-mid",
+        "api": 34,
+        "abi": "arm64-v8a",
+        "tier": "mid",
+        "matrix_row": "physical-mid-api34",
+        "approved": true
+      },
+      {
+        "model": "fixture-reference-high",
+        "api": 37,
+        "abi": "arm64-v8a",
+        "tier": "high",
+        "matrix_row": "physical-high-api37",
+        "approved": true
+      }
+    ]
+  },
+  "identity": {
+    "capability_profile": {
+      "name": "candidate",
+      "projection_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "configuration_fingerprint": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "accepted_milestone": "M8",
+      "delegated_task_start": true,
+      "task_milestone": "M8",
+      "policy_milestone": "M7"
+    },
+    "evidence_index": {
+      "path": "evidence-index.json",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "source_revision": "0f5e0a0d6c1b4e2a9f8d7c6b5a4938271605f4e3"
+    }
+  },
+  "rollback": {
+    "result": "pass",
+    "record_path": "rollback-rehearsal.json",
+    "record_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "approvals": [
+    {
+      "role": "product",
+      "identity": "fixture-product-owner",
+      "at": "2026-08-17T10:00:00Z",
+      "evidence": "review-record-fixture"
+    },
+    {
+      "role": "browser",
+      "identity": "fixture-browser-owner",
+      "at": "2026-08-17T10:01:00Z"
+    },
+    {
+      "role": "security",
+      "identity": "fixture-security-owner",
+      "at": "2026-08-17T10:02:00Z"
+    },
+    {
+      "role": "privacy",
+      "identity": "fixture-privacy-owner",
+      "at": "2026-08-17T10:03:00Z"
+    },
+    {
+      "role": "release",
+      "identity": "fixture-release-owner",
+      "at": "2026-08-17T10:04:00Z"
+    }
+  ],
+  "security_drill": {
+    "advisory": "upstream-issue-fixture-0001",
+    "record_path": "security-drill.json",
+    "record_sha256": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+    "detection_to_artifact_seconds": 46680,
+    "artifact_to_distribution_seconds": 208800,
+    "objective_register_entry": "OD-052"
+  }
+}

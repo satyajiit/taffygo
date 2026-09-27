@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  History and Bookmarks (SCR-201, SCR-202). Prefix taffy_pages_ so these
+  names cannot collide with the browsing strings.xml E2 owns.
+-->
+<resources>
+    <!-- Screen SCR-201 -->
+    <string name="taffy_pages_history_title">History</string>
+    <string name="taffy_pages_history_search">Search history</string>
+    <string name="taffy_pages_history_clear">Clear</string>
+    <string name="taffy_pages_history_caption">Pages Taffy opened for a task are not in History.</string>
+    <string name="taffy_pages_history_empty_title">No history on this phone yet.</string>
+    <string name="taffy_pages_history_empty_body">Pages Taffy opened for a task are not in History.</string>
+    <string name="taffy_pages_history_no_matches_title">Nothing here matches.</string>
+    <string name="taffy_pages_history_no_matches_body">Nothing in History matches that search.</string>
+    <string name="taffy_pages_history_unavailable_title">History isn\'t available right now.</string>
+    <string name="taffy_pages_history_unavailable_body">TaffyGo has no visit list to show, and it will not invent one.</string>
+    <string name="taffy_pages_history_loading">Loading history</string>
+    <string name="taffy_pages_history_today">Today</string>
+    <string name="taffy_pages_history_yesterday">Yesterday</string>
+    <string name="taffy_pages_history_delete">Remove from History</string>
+    <string name="taffy_pages_history_delete_confirm_title">Remove this page from History?</string>
+    <string name="taffy_pages_history_delete_confirm_body">%1$s, %2$s. This only removes the visit on this phone.</string>
+    <string name="taffy_pages_history_row_description">%1$s, %2$s, %3$s. Opens this page.</string>
+    <string name="taffy_pages_history_supporting">%1$s · %2$s</string>
+
+    <!-- Screen SCR-202 -->
+    <string name="taffy_pages_bookmarks_title">Bookmarks</string>
+    <string name="taffy_pages_bookmarks_search">Search bookmarks</string>
+    <string name="taffy_pages_bookmarks_import">Import</string>
+    <string name="taffy_pages_bookmarks_export">Export</string>
+    <string name="taffy_pages_bookmarks_imported">Import complete. Added: %1$d; already saved: %2$d; unsupported: %3$d.</string>
+    <string name="taffy_pages_bookmarks_exported">Bookmarks exported.</string>
+    <string name="taffy_pages_bookmarks_transfer_failed">That bookmark file could not be read or written.</string>
+    <string name="taffy_pages_bookmarks_empty_title">No bookmarks yet.</string>
+    <string name="taffy_pages_bookmarks_empty_body">Star a page from This site → Save page. Bookmarks are pages you starred, not Library and not Memory.</string>
+    <string name="taffy_pages_bookmarks_no_matches_title">Nothing here matches.</string>
+    <string name="taffy_pages_bookmarks_no_matches_body">Nothing in Bookmarks matches that search.</string>
+    <string name="taffy_pages_bookmarks_unavailable_title">Bookmarks aren\'t available right now.</string>
+    <string name="taffy_pages_bookmarks_unavailable_body">TaffyGo has no bookmark list to show, and it will not invent one.</string>
+    <string name="taffy_pages_bookmarks_loading">Loading bookmarks</string>
+    <string name="taffy_pages_bookmarks_folder_all">All</string>
+    <string name="taffy_pages_bookmarks_folder_description">%1$s. Shows bookmarks in this folder.</string>
+    <string name="taffy_pages_bookmarks_delete">Remove bookmark</string>
+    <string name="taffy_pages_bookmarks_edit">Edit bookmark</string>
+    <string name="taffy_pages_bookmarks_delete_confirm_title">Remove this bookmark?</string>
+    <string name="taffy_pages_bookmarks_delete_confirm_body">%1$s, %2$s. This only removes the star on this phone.</string>
+    <string name="taffy_pages_bookmarks_row_description">%1$s, %2$s. Opens this page.</string>
+    <string name="taffy_pages_bookmarks_edit_title">Edit bookmark</string>
+    <string name="taffy_pages_bookmarks_edit_name">Name</string>
+    <string name="taffy_pages_bookmarks_edit_folder">Folder</string>
+    <string name="taffy_pages_bookmarks_save">Save</string>
+
+    <string name="taffy_pages_remove">Remove</string>
+    <string name="taffy_pages_cancel">Cancel</string>
+</resources>

@@ -1,0 +1,556 @@
+{
+  "root": "TaskTransactionBatch",
+  "function_suffix": "transaction_batch",
+  "schema_version_field": "schema_version",
+  "schema_version": 32,
+  "magic": "TAFFYTXN",
+  "max_bytes_limit": "MAX_EFFECT_BYTES",
+  "max_collection_items": 4096,
+  "max_string_bytes": 65536,
+  "types": {
+    "enums": [
+      {"name": "PersistedTaskKind", "description": "Closed task kind.", "members": [
+        {"name": "Research", "wire": 0}, {"name": "Errand", "wire": 1}
+      ]},
+      {"name": "PersistedTaskTemplateId", "description": "Closed reviewed task workflow.", "members": [
+        {"name": "CompareProducts", "wire": 0}, {"name": "SummarizeEvidence", "wire": 1},
+        {"name": "BuildSourceTable", "wire": 2}, {"name": "WebErrand", "wire": 3}
+      ]},
+      {"name": "PersistedBuiltinSkillId", "description": "Stable compiled built-in skill identity.", "members": [
+        {"name": "GeneralWebResearch", "wire": 0}, {"name": "DeepResearch", "wire": 1},
+        {"name": "ProductComparison", "wire": 2}, {"name": "MultiTabComparison", "wire": 3},
+        {"name": "WebsiteSummarizer", "wire": 4}, {"name": "PdfAnalysis", "wire": 5},
+        {"name": "DataExtraction", "wire": 6}, {"name": "FormAssistant", "wire": 7},
+        {"name": "Shopping", "wire": 8}, {"name": "DownloadOrganizer", "wire": 9},
+        {"name": "TravelResearch", "wire": 10}, {"name": "VideoTranscriptAnalyzer", "wire": 11},
+        {"name": "ImageUnderstanding", "wire": 12}, {"name": "LibraryBuilder", "wire": 13},
+        {"name": "SpreadsheetBuilder", "wire": 14}, {"name": "DocumentGenerator", "wire": 15}
+      ]},
+      {"name": "PersistedControlMode", "description": "Closed task control mode.", "members": [
+        {"name": "User", "wire": 0}, {"name": "Shared", "wire": 1}, {"name": "Assistant", "wire": 2}
+      ]},
+      {"name": "PersistedMilestone", "description": "Closed build milestone.", "members": [
+        {"name": "M0", "wire": 0}, {"name": "M1", "wire": 1}, {"name": "M2", "wire": 2},
+        {"name": "M3", "wire": 3}, {"name": "M4", "wire": 4}, {"name": "M5", "wire": 5},
+        {"name": "M6", "wire": 6}, {"name": "M7", "wire": 7}, {"name": "M8", "wire": 8}
+      ]},
+      {"name": "PersistedBudgetKind", "description": "Closed task budget kind.", "members": [
+        {"name": "MaxSources", "wire": 0}, {"name": "MaxWorkingTabs", "wire": 1},
+        {"name": "MaxWallTimeMillis", "wire": 2}, {"name": "MaxModelRequests", "wire": 3},
+        {"name": "MaxInputTokensOrBytes", "wire": 4}, {"name": "MaxOutputTokensOrBytes", "wire": 5},
+        {"name": "MaxCost", "wire": 6}, {"name": "MaxNavigationDepth", "wire": 7},
+        {"name": "MaxRetriesPerStep", "wire": 8}, {"name": "MaxArtifactBytes", "wire": 9}
+      ]},
+      {"name": "PersistedPauseCause", "description": "Closed pause cause.", "members": [
+        {"name": "User", "wire": 0}, {"name": "BackgroundRestricted", "wire": 1},
+        {"name": "ProviderLimit", "wire": 2}, {"name": "Offline", "wire": 3},
+        {"name": "NoAnswer", "wire": 4}, {"name": "ProviderBusy", "wire": 5}
+      ]},
+      {"name": "PersistedStepKind", "description": "Closed plan step kind.", "members": [
+        {"name": "Observe", "wire": 0}, {"name": "Navigate", "wire": 1}, {"name": "Extract", "wire": 2},
+        {"name": "Infer", "wire": 3}, {"name": "AskUser", "wire": 4}, {"name": "Export", "wire": 5}
+      ]},
+      {"name": "PersistedStepState", "description": "Closed plan step state.", "members": [
+        {"name": "Pending", "wire": 0}, {"name": "Ready", "wire": 1}, {"name": "Running", "wire": 2},
+        {"name": "Waiting", "wire": 3}, {"name": "Succeeded", "wire": 4}, {"name": "Skipped", "wire": 5},
+        {"name": "Failed", "wire": 6}, {"name": "Cancelled", "wire": 7}, {"name": "Superseded", "wire": 8}
+      ]},
+      {"name": "PersistedActionClass", "description": "Closed proposed action class.", "members": [
+        {"name": "ObservePage", "wire": 0}, {"name": "ScrollIntoView", "wire": 1},
+        {"name": "OpenLink", "wire": 2}, {"name": "CreateTaskTab", "wire": 3},
+        {"name": "SyntheticClick", "wire": 4}, {"name": "MoveFocus", "wire": 5},
+        {"name": "FillField", "wire": 6}, {"name": "SelectOption", "wire": 7},
+        {"name": "ToggleControl", "wire": 8}, {"name": "SubmitForm", "wire": 9},
+        {"name": "StartDownload", "wire": 10}, {"name": "UploadFile", "wire": 11},
+        {"name": "SendMessage", "wire": 12}, {"name": "Purchase", "wire": 13},
+        {"name": "ExtractCredential", "wire": 14}, {"name": "BypassAccessControl", "wire": 15},
+        {"name": "ExecuteToolJob", "wire": 16},
+        {"name": "LibraryRead", "wire": 17}, {"name": "LibraryWrite", "wire": 18},
+        {"name": "MemoryRead", "wire": 19}, {"name": "MemoryWrite", "wire": 20},
+        {"name": "ControlTab", "wire": 21}, {"name": "ProfileStoreRead", "wire": 22}
+      ]},
+      {"name": "PersistedIdempotencyClass", "description": "Closed action recovery class.", "members": [
+        {"name": "PureRead", "wire": 0}, {"name": "IdempotentWrite", "wire": 1},
+        {"name": "ConditionallyIdempotent", "wire": 2}, {"name": "Consequential", "wire": 3}
+      ]},
+      {"name": "PersistedActionResultCode", "description": "Closed BIP action result code.", "members": [
+        {"name": "Verified", "wire": 0}, {"name": "DeniedByPolicy", "wire": 1},
+        {"name": "ApprovalRequired", "wire": 2}, {"name": "ApprovalDenied", "wire": 3},
+        {"name": "ActorLeaseMissing", "wire": 4}, {"name": "CapabilityExpired", "wire": 5},
+        {"name": "TabGone", "wire": 6}, {"name": "FrameGone", "wire": 7},
+        {"name": "DocumentInactive", "wire": 8}, {"name": "StalePageEpoch", "wire": 9},
+        {"name": "StaleGraph", "wire": 10}, {"name": "NodeGone", "wire": 11},
+        {"name": "OriginChanged", "wire": 12}, {"name": "RoleOrActionChanged", "wire": 13},
+        {"name": "NotVisible", "wire": 14}, {"name": "Occluded", "wire": 15},
+        {"name": "NotEnabled", "wire": 16}, {"name": "NotEditable", "wire": 17},
+        {"name": "SensitiveField", "wire": 18}, {"name": "DestinationChanged", "wire": 19},
+        {"name": "Unsupported", "wire": 20}, {"name": "BudgetExceeded", "wire": 21},
+        {"name": "DispatchFailed", "wire": 22}, {"name": "NavigationStarted", "wire": 23},
+        {"name": "PostconditionTimeout", "wire": 24}, {"name": "PostconditionFailed", "wire": 25},
+        {"name": "CancelledByUser", "wire": 26}, {"name": "CancelledByNavigation", "wire": 27},
+        {"name": "RendererCrashed", "wire": 28}, {"name": "OutcomeUnknown", "wire": 29},
+        {"name": "InternalError", "wire": 30}, {"name": "EgressNotAuthorized", "wire": 31},
+        {"name": "DestinationClassRestricted", "wire": 32}, {"name": "UntrustedContentOrigin", "wire": 33},
+        {"name": "PreparedEffectChanged", "wire": 34}, {"name": "CommitWithoutPrepare", "wire": 35},
+        {"name": "GraphMovedDuringPreflight", "wire": 36},
+        {"name": "ValueReferenceUnknown", "wire": 37}
+      ]},
+      {"name": "PersistedObservationCompleteness", "description": "Closed completeness of durable page evidence.", "members": [
+        {"name": "Complete", "wire": 0}, {"name": "Incomplete", "wire": 1}
+      ]},
+      {"name": "PersistedSensitivity", "description": "Closed BIP sensitivity retained without page content.", "members": [
+        {"name": "NotSensitive", "wire": 0}, {"name": "Personal", "wire": 1},
+        {"name": "Account", "wire": 2}, {"name": "Payment", "wire": 3},
+        {"name": "Identity", "wire": 4}, {"name": "Health", "wire": 5},
+        {"name": "Financial", "wire": 6}, {"name": "Legal", "wire": 7},
+        {"name": "PrivateCommunication", "wire": 8}, {"name": "Administration", "wire": 9},
+        {"name": "Credential", "wire": 10}, {"name": "UnknownSensitive", "wire": 11}
+      ]},
+      {"name": "PersistedFailureReason", "description": "Closed task failure reason.", "members": [
+        {"name": "BudgetExhausted", "wire": 0}, {"name": "ProviderUnavailable", "wire": 1},
+        {"name": "SourcesUnavailable", "wire": 2}, {"name": "UnverifiableAction", "wire": 3},
+        {"name": "JournalUnusable", "wire": 4}, {"name": "DeadlineExceeded", "wire": 5},
+        {"name": "ProviderRefused", "wire": 6}, {"name": "ProviderLimit", "wire": 7},
+        {"name": "Offline", "wire": 8}, {"name": "PolicyRefused", "wire": 9}
+      ]},
+      {"name": "PersistedPlatformPermission", "description": "Closed native permission kind retained by the task reducer.", "members": [
+        {"name": "Notifications", "wire": 0}, {"name": "Microphone", "wire": 1},
+        {"name": "Camera", "wire": 2}, {"name": "Location", "wire": 3}
+      ]},
+      {"name": "PersistedPermissionDecision", "description": "Closed terminal native permission decision.", "members": [
+        {"name": "Granted", "wire": 0}, {"name": "Denied", "wire": 1},
+        {"name": "Dismissed", "wire": 2}, {"name": "Unavailable", "wire": 3}
+      ]},
+      {"name": "PersistedArtifactKind", "description": "Closed artifact kind.", "members": [
+        {"name": "Markdown", "wire": 0}, {"name": "Csv", "wire": 1},
+        {"name": "Xlsx", "wire": 2}, {"name": "Pdf", "wire": 3},
+        {"name": "Docx", "wire": 4}, {"name": "Pptx", "wire": 5},
+        {"name": "WaveAudio", "wire": 6}, {"name": "FrameArchive", "wire": 7}
+      ]},
+      {"name": "PersistedGapReason", "description": "Closed unmet-result reason.", "members": [
+        {"name": "NotFoundInScope", "wire": 0}, {"name": "ConflictUnresolved", "wire": 1},
+        {"name": "BudgetReached", "wire": 2}, {"name": "SourceUnavailable", "wire": 3},
+        {"name": "StoppedByUser", "wire": 4}
+      ]},
+      {"name": "PersistedTaskState", "description": "Closed durable task state.", "members": [
+        {"name": "Draft", "wire": 0}, {"name": "AwaitingConsent", "wire": 1}, {"name": "Queued", "wire": 2},
+        {"name": "Running", "wire": 3}, {"name": "WaitingUser", "wire": 4}, {"name": "Pausing", "wire": 5},
+        {"name": "Paused", "wire": 6}, {"name": "Cancelling", "wire": 7}, {"name": "Completing", "wire": 8},
+        {"name": "Cancelled", "wire": 9}, {"name": "Completed", "wire": 10}, {"name": "Partial", "wire": 11},
+        {"name": "Failed", "wire": 12}
+      ]},
+      {"name": "PersistedStateReason", "description": "Closed task transition reason.", "members": [
+        {"name": "PreviewReady", "wire": 0}, {"name": "ScopeEdited", "wire": 1},
+        {"name": "InitialConsentAccepted", "wire": 2}, {"name": "ExecutorStarted", "wire": 3},
+        {"name": "ScopeExpansionNeedsConsent", "wire": 4}, {"name": "ApprovalAccepted", "wire": 5},
+        {"name": "ApprovalDenied", "wire": 6}, {"name": "UserInputNeeded", "wire": 7},
+        {"name": "UserInputSupplied", "wire": 8}, {"name": "UserPaused", "wire": 9},
+        {"name": "UserTookOver", "wire": 10}, {"name": "BackgroundRestricted", "wire": 11},
+        {"name": "SettlingComplete", "wire": 12}, {"name": "ResumeRequested", "wire": 13},
+        {"name": "StopRequested", "wire": 14}, {"name": "Discarded", "wire": 15},
+        {"name": "ResultCandidateReady", "wire": 16}, {"name": "ResultValidated", "wire": 17},
+        {"name": "ResultHasGaps", "wire": 18}, {"name": "CorrectionRequested", "wire": 19},
+        {"name": "TerminalFailure", "wire": 20}, {"name": "PermissionRequested", "wire": 21},
+        {"name": "PermissionDecided", "wire": 22}, {"name": "HandoverRequested", "wire": 23},
+        {"name": "HandoverCompleted", "wire": 24}, {"name": "HandoverExpired", "wire": 25},
+        {"name": "ProviderPaused", "wire": 26}, {"name": "FollowUpAsked", "wire": 27}
+      ]},
+      {"name": "PersistedCommandKind", "description": "Closed reducer command discriminant.", "members": [
+        {"name": "CreateTask", "wire": 0}, {"name": "EditScope", "wire": 1}, {"name": "StartTask", "wire": 2},
+        {"name": "AcceptInitialConsent", "wire": 3}, {"name": "ApproveAction", "wire": 4},
+        {"name": "DenyAction", "wire": 5}, {"name": "PauseTask", "wire": 6}, {"name": "TakeOver", "wire": 7},
+        {"name": "PauseSettled", "wire": 8}, {"name": "ResumeTask", "wire": 9}, {"name": "CancelTask", "wire": 10},
+        {"name": "CancelSettled", "wire": 11}, {"name": "ExecutorStarted", "wire": 12}, {"name": "SetPlan", "wire": 13},
+        {"name": "AdvanceStep", "wire": 14}, {"name": "RequestApproval", "wire": 15},
+        {"name": "RequestUserInput", "wire": 16}, {"name": "SupplyUserInput", "wire": 17},
+        {"name": "ProposeAction", "wire": 18}, {"name": "RecordPolicyDecision", "wire": 19},
+        {"name": "DispatchAction", "wire": 20}, {"name": "RecordActionOutcome", "wire": 21},
+        {"name": "ResultCandidateReady", "wire": 22}, {"name": "CompleteResultValidated", "wire": 23},
+        {"name": "PartialResultValidated", "wire": 24}, {"name": "ResumeForCorrection", "wire": 25},
+        {"name": "FailTask", "wire": 26}, {"name": "CorrectFact", "wire": 27},
+        {"name": "ExcludeSource", "wire": 28}, {"name": "AcceptArtifact", "wire": 29},
+        {"name": "ExportArtifact", "wire": 30}, {"name": "RequestPermission", "wire": 31},
+        {"name": "RecordPermissionResult", "wire": 32}, {"name": "RequestModelTurn", "wire": 33},
+        {"name": "RecordModelTurn", "wire": 34}, {"name": "RecordModelTurnGap", "wire": 35},
+        {"name": "RequestHandover", "wire": 36}, {"name": "CompleteHandover", "wire": 37},
+        {"name": "ExpireHandover", "wire": 38},
+        {"name": "RecordContextEviction", "wire": 39},
+        {"name": "RecordToolJobOutcome", "wire": 40},
+        {"name": "RequestFieldValues", "wire": 41}, {"name": "SupplyFieldValues", "wire": 42},
+        {"name": "RequestArtifact", "wire": 43},
+        {"name": "RecordDiscoveryTab", "wire": 44},
+        {"name": "RequestModelAttempt", "wire": 45}, {"name": "FollowUp", "wire": 46}
+      ]},
+      {"name": "PersistedEventKind", "description": "Closed reducer event discriminant.", "members": [
+        {"name": "TaskCreated", "wire": 0}, {"name": "SourceScopeSet", "wire": 1},
+        {"name": "ProviderRouteSelected", "wire": 2}, {"name": "ConsentRequested", "wire": 3},
+        {"name": "TaskQueued", "wire": 4}, {"name": "PlanCreated", "wire": 5},
+        {"name": "PlanSuperseded", "wire": 6}, {"name": "PlanStepAdvanced", "wire": 7},
+        {"name": "TaskStarted", "wire": 8}, {"name": "ActionProposed", "wire": 9},
+        {"name": "ApprovalRequested", "wire": 10}, {"name": "ApprovalDecided", "wire": 11},
+        {"name": "CapabilityIssued", "wire": 12}, {"name": "ActionRejected", "wire": 13},
+        {"name": "ActionDispatchStarted", "wire": 14}, {"name": "ActionVerificationCompleted", "wire": 15},
+        {"name": "TaskWaitingUser", "wire": 16}, {"name": "UserInputSupplied", "wire": 17},
+        {"name": "UserTookOver", "wire": 18}, {"name": "TaskPausing", "wire": 19},
+        {"name": "TaskPaused", "wire": 20}, {"name": "TaskResumed", "wire": 21},
+        {"name": "TaskCancelling", "wire": 22}, {"name": "TaskCancelled", "wire": 23},
+        {"name": "TaskCompleting", "wire": 24}, {"name": "TaskCompleted", "wire": 25},
+        {"name": "TaskPartial", "wire": 26}, {"name": "TaskFailed", "wire": 27},
+        {"name": "FactCorrected", "wire": 28}, {"name": "SourceExcluded", "wire": 29},
+        {"name": "ArtifactAccepted", "wire": 30}, {"name": "ArtifactExported", "wire": 31},
+        {"name": "BudgetCharged", "wire": 32}, {"name": "PermissionRequested", "wire": 33},
+        {"name": "PermissionDecided", "wire": 34}, {"name": "HandoverRequested", "wire": 35},
+        {"name": "HandoverCompleted", "wire": 36}, {"name": "HandoverExpired", "wire": 37},
+        {"name": "ArtifactReady", "wire": 38},
+        {"name": "DiscoveryTabPrepared", "wire": 39},
+        {"name": "ModelTurnRecorded", "wire": 40},
+        {"name": "ModelTurnGapRecorded", "wire": 41},
+        {"name": "ContextEvicted", "wire": 42}, {"name": "FollowUpAsked", "wire": 43}
+      ]},
+      {"name": "PersistedRevocationReason", "description": "Closed authority revocation reason.", "members": [
+        {"name": "UserTookOver", "wire": 0}, {"name": "DirectUserInput", "wire": 1},
+        {"name": "TaskCancelled", "wire": 2}, {"name": "PolicyRevoked", "wire": 3}, {"name": "TabClosed", "wire": 4}
+      ]},
+      {"name": "PersistedRecoveryRule", "description": "Closed ambiguous-effect recovery rule.", "members": [
+        {"name": "RetryWithinEpochAndBudget", "wire": 0}, {"name": "RetryAfterStateCheck", "wire": 1},
+        {"name": "ReconcileFirst", "wire": 2}, {"name": "NeverAutomatically", "wire": 3}
+      ]},
+      {"name": "PersistedAuditActor", "description": "Closed product-audit actor.", "members": [
+        {"name": "User", "wire": 0}, {"name": "TaskRuntime", "wire": 1}, {"name": "Policy", "wire": 2},
+        {"name": "Browser", "wire": 3}, {"name": "System", "wire": 4}
+      ]},
+      {"name": "PersistedAuditSubjectKind", "description": "Closed content-free audit subject kind.", "members": [
+        {"name": "Action", "wire": 0}, {"name": "Plan", "wire": 1}, {"name": "PlanStep", "wire": 2},
+        {"name": "Artifact", "wire": 3}, {"name": "Source", "wire": 4}, {"name": "Fact", "wire": 5},
+        {"name": "Capability", "wire": 6}, {"name": "PermissionRequest", "wire": 7},
+        {"name": "Handover", "wire": 8}, {"name": "ActorLease", "wire": 9},
+        {"name": "DiscoveryTab", "wire": 10}
+      ]},
+      {"name": "PersistedAuditEventType", "description": "Closed product-audit event type.", "members": [
+        {"name": "TaskCreated", "wire": 0}, {"name": "SourceScopeSet", "wire": 1},
+        {"name": "ProviderRouteSelected", "wire": 2}, {"name": "ConsentRequested", "wire": 3},
+        {"name": "TaskQueued", "wire": 4}, {"name": "PlanCreated", "wire": 5},
+        {"name": "PlanSuperseded", "wire": 6}, {"name": "PlanStepAdvanced", "wire": 7},
+        {"name": "TaskStarted", "wire": 8}, {"name": "ActorLeaseIssued", "wire": 9},
+        {"name": "ObservationCaptured", "wire": 10}, {"name": "ModelInvocationStarted", "wire": 11},
+        {"name": "ModelInvocationCompleted", "wire": 12}, {"name": "ActionProposed", "wire": 13},
+        {"name": "ApprovalRequested", "wire": 14}, {"name": "ApprovalDecided", "wire": 15},
+        {"name": "CapabilityIssued", "wire": 16}, {"name": "ActionRejected", "wire": 17},
+        {"name": "ActionDispatchStarted", "wire": 18}, {"name": "ActionVerificationCompleted", "wire": 19},
+        {"name": "UserTookOver", "wire": 20}, {"name": "TaskPausing", "wire": 21},
+        {"name": "TaskPaused", "wire": 22}, {"name": "TaskResumed", "wire": 23},
+        {"name": "TaskWaitingUser", "wire": 24}, {"name": "UserInputSupplied", "wire": 25},
+        {"name": "TaskCancelling", "wire": 26}, {"name": "TaskCompleting", "wire": 27},
+        {"name": "TaskPartial", "wire": 28}, {"name": "FactAccepted", "wire": 29},
+        {"name": "FactCorrected", "wire": 30}, {"name": "SourceExcluded", "wire": 31},
+        {"name": "ConflictDetected", "wire": 32}, {"name": "ArtifactReady", "wire": 33},
+        {"name": "ArtifactAccepted", "wire": 34}, {"name": "ArtifactExported", "wire": 35},
+        {"name": "BudgetCharged", "wire": 36}, {"name": "TaskCompleted", "wire": 37},
+        {"name": "TaskCancelled", "wire": 38}, {"name": "TaskFailed", "wire": 39},
+        {"name": "DeletionRequested", "wire": 40}, {"name": "DeletionCompleted", "wire": 41},
+        {"name": "PermissionRequested", "wire": 42}, {"name": "PermissionDecided", "wire": 43},
+        {"name": "HandoverRequested", "wire": 44}, {"name": "HandoverCompleted", "wire": 45},
+        {"name": "HandoverExpired", "wire": 46},
+        {"name": "DiscoveryTabPrepared", "wire": 47},
+        {"name": "ModelInvocationFailed", "wire": 48},
+        {"name": "ContextEvicted", "wire": 49}
+      ]},
+      {"name": "PersistedModelStopReason", "description": "Closed reason one model turn ended, in the reply's own terms rather than the runtime's.", "members": [
+        {"name": "Complete", "wire": 0}, {"name": "ToolCall", "wire": 1},
+        {"name": "Length", "wire": 2}, {"name": "ProviderStop", "wire": 3},
+        {"name": "Error", "wire": 4}
+      ]},
+      {"name": "PersistedModelAttemptKind", "description": "Closed reason one paid model sub-attempt follows the initial request.", "members": [
+        {"name": "Retry", "wire": 0}, {"name": "Failover", "wire": 1}
+      ]},
+      {"name": "PersistedTurnOverflow", "description": "Closed way a context overflow was noticed. Only the first is an error a provider volunteered; the other two are successes that are not, so which one it was is recorded rather than collapsed into a flag.", "members": [
+        {"name": "ProviderReported", "wire": 0}, {"name": "Silent", "wire": 1},
+        {"name": "Truncation", "wire": 2}
+      ]},
+      {"name": "PersistedTurnGap", "description": "Closed reason a model turn produced no readable reply. A cancelled or unsettled turn is journaled as one of these rather than left as a conversation ending on an unanswered request, because money may already have been spent.", "members": [
+        {"name": "Refused", "wire": 0}, {"name": "Unavailable", "wire": 1},
+        {"name": "Cancelled", "wire": 2}, {"name": "OutcomeUnknown", "wire": 3},
+        {"name": "Unreadable", "wire": 4}
+      ]},
+      {"name": "PersistedPageReadability", "description": "Closed verdict on the page projection a turn was built from. A blank page and a page this build was not allowed to read produce the same counts, and collapsing them would let one travel on as evidence that nothing was there.", "members": [
+        {"name": "Readable", "wire": 0}, {"name": "Empty", "wire": 1},
+        {"name": "Unreadable", "wire": 2}
+      ]},
+      {"name": "PersistedToolJobStatus", "description": "Closed terminal status of one tool job.", "members": [
+        {"name": "Succeeded", "wire": 0}, {"name": "Failed", "wire": 1},
+        {"name": "Cancelled", "wire": 2}, {"name": "OutcomeUnknown", "wire": 3},
+        {"name": "Unavailable", "wire": 4}
+      ]},
+      {"name": "PersistedToolRuntime", "description": "Closed isolated runtime family a tool job names.", "members": [
+        {"name": "Media", "wire": 0}, {"name": "Python", "wire": 1},
+        {"name": "LocalModel", "wire": 2}, {"name": "Wasm", "wire": 3}
+      ]}
+    ],
+    "structs": [
+      {"name": "PersistedBudget", "description": "One stated task budget.", "fields": [
+        {"name": "kind", "type": "PersistedBudgetKind"}, {"name": "limit", "type": "u64"}
+      ]},
+      {"name": "PersistedConsentedSource", "description": "One browser-resolved source accepted at initial consent.", "fields": [
+        {"name": "source_id", "type": "string"}, {"name": "tab_id", "type": "string"},
+        {"name": "normalized_origin", "type": "string"},
+        {"name": "canonical_locator", "type": "optional<string>"}
+      ]},
+      {"name": "PersistedLibraryRefreshSource", "description": "One exact approved source in a durable Library refresh.", "fields": [
+        {"name": "source_id", "type": "string"}, {"name": "title", "type": "string"},
+        {"name": "host", "type": "string"}, {"name": "canonical_locator", "type": "string"},
+        {"name": "original_content_digest", "type": "bytes32"}
+      ]},
+      {"name": "PersistedLibraryRefreshContext", "description": "Exact approved Library refresh context.", "fields": [
+        {"name": "preview_id", "type": "string"}, {"name": "library_revision", "type": "u64"},
+        {"name": "collection_id", "type": "string"}, {"name": "source_workspace_revision", "type": "u64"},
+        {"name": "sources", "type": "list<PersistedLibraryRefreshSource>"}
+      ]},
+      {"name": "PersistedBuiltinSkillReference", "description": "Exact compiled built-in binding frozen into a task.", "fields": [
+        {"name": "skill_id", "type": "PersistedBuiltinSkillId"}, {"name": "version", "type": "u32"}
+      ]},
+      {"name": "PersistedTaskSnapshot", "description": "Frozen task configuration.", "fields": [
+        {"name": "assistant_config_version", "type": "u32"}, {"name": "skill_version_id", "type": "optional<string>"},
+        {"name": "tool_allowlist", "type": "list<string>"}, {"name": "capability_policy_version", "type": "u32"},
+        {"name": "provider_route", "type": "optional<string>"}, {"name": "milestone", "type": "PersistedMilestone"},
+        {"name": "template_id", "type": "PersistedTaskTemplateId"},
+        {"name": "consented_sources", "type": "list<PersistedConsentedSource>"},
+        {"name": "source_discovery_enabled", "type": "bool"},
+        {"name": "browser_session_id", "type": "string"},
+        {"name": "remaining_new_source_cap", "type": "u32"},
+        {"name": "discovery_tab_id", "type": "optional<string>"},
+        {"name": "library_refresh", "type": "optional<PersistedLibraryRefreshContext>"},
+        {"name": "builtin_skill", "type": "optional<PersistedBuiltinSkillReference>"}
+      ]},
+      {"name": "PersistedTaskSeed", "description": "Complete immutable reducer seed.", "fields": [
+        {"name": "task_id", "type": "string"}, {"name": "workspace_id", "type": "optional<string>"},
+        {"name": "browser_profile_id", "type": "string"}, {"name": "kind", "type": "PersistedTaskKind"},
+        {"name": "user_goal", "type": "string"}, {"name": "control_mode", "type": "PersistedControlMode"},
+        {"name": "snapshot", "type": "PersistedTaskSnapshot"}, {"name": "budgets", "type": "list<PersistedBudget>"},
+        {"name": "deadline_monotonic_ms", "type": "optional<u64>"}, {"name": "predecessor_task_id", "type": "optional<string>"},
+        {"name": "deadline_utc_ms", "type": "optional<u64>"}
+      ]},
+      {"name": "PersistedSourceScope", "description": "Deterministic included and excluded source identities.", "fields": [
+        {"name": "included", "type": "list<string>"}, {"name": "excluded", "type": "list<string>"}
+      ]},
+      {"name": "PersistedScopePreview", "description": "Initial consent preview.", "fields": [
+        {"name": "scope", "type": "PersistedSourceScope"}, {"name": "provider_route", "type": "optional<string>"},
+        {"name": "budgets", "type": "list<PersistedBudget>"},
+        {"name": "sources", "type": "list<PersistedConsentedSource>"},
+        {"name": "source_discovery_enabled", "type": "bool"},
+        {"name": "new_source_cap", "type": "u32"}
+      ]},
+      {"name": "PersistedStepDraft", "description": "One deterministic plan step draft.", "fields": [
+        {"name": "kind", "type": "PersistedStepKind"}, {"name": "description", "type": "string"},
+        {"name": "dependencies", "type": "list<u64>"}
+      ]},
+      {"name": "PersistedPlanDraft", "description": "One deterministic plan draft.", "fields": [
+        {"name": "summary", "type": "string"}, {"name": "steps", "type": "list<PersistedStepDraft>"}
+      ]},
+      {"name": "PersistedBudgetDraw", "description": "One trusted proposal budget draw.", "fields": [
+        {"name": "kind", "type": "PersistedBudgetKind"}, {"name": "amount", "type": "u64"}
+      ]},
+      {"name": "PersistedActionProposal", "description": "A complete reducer action proposal without authority.", "fields": [
+        {"name": "tool_name", "type": "string"}, {"name": "plan_step_id", "type": "optional<string>"},
+        {"name": "action_class", "type": "PersistedActionClass"}, {"name": "tab_id", "type": "string"},
+        {"name": "node_id", "type": "optional<string>"}, {"name": "idempotency_key", "type": "string"},
+        {"name": "idempotency", "type": "PersistedIdempotencyClass"}, {"name": "required_for_step", "type": "bool"},
+        {"name": "budget_draw", "type": "optional<PersistedBudgetDraw>"}, {"name": "proposal_digest", "type": "string"},
+        {"name": "destination_address", "type": "optional<string>"},
+        {"name": "canonical_intent", "type": "bytes"}
+      ]},
+      {"name": "PersistedAuthorization", "description": "Opaque capability reference retained by the reducer.", "fields": [
+        {"name": "capability_id", "type": "string"}
+      ]},
+      {"name": "PersistedDenial", "description": "Closed policy denial retained by the reducer.", "fields": [
+        {"name": "code", "type": "PersistedActionResultCode"}
+      ]},
+      {"name": "PersistedObservationGraphSummary", "description": "Content-free structural counts decoded from a BIP graph.", "fields": [
+        {"name": "node_count", "type": "u32"}, {"name": "relationship_count", "type": "u32"},
+        {"name": "named_node_count", "type": "u32"}, {"name": "text_run_count", "type": "u64"},
+        {"name": "text_byte_count", "type": "u64"}
+      ]},
+      {"name": "PersistedPageObservationEvidence", "description": "Validated durable observation metadata without raw page content.", "fields": [
+        {"name": "service_generation", "type": "u64"}, {"name": "schema_version", "type": "string"},
+        {"name": "tab_id", "type": "string"}, {"name": "frame_id", "type": "string"},
+        {"name": "page_epoch", "type": "string"}, {"name": "graph_revision", "type": "u64"},
+        {"name": "normalized_origin", "type": "string"}, {"name": "private_profile", "type": "bool"},
+        {"name": "completeness", "type": "PersistedObservationCompleteness"},
+        {"name": "graph", "type": "PersistedObservationGraphSummary"},
+        {"name": "total_bytes", "type": "u32"}, {"name": "truncated", "type": "bool"},
+        {"name": "may_change_answer", "type": "bool"}, {"name": "redacted_field_count", "type": "u32"},
+        {"name": "suppressed_secret_value_count", "type": "u32"}, {"name": "sensitive_zone_count", "type": "u32"},
+        {"name": "policy_filtered_frame_count", "type": "u32"},
+        {"name": "highest_sensitivity", "type": "PersistedSensitivity"}
+      ]},
+      {"name": "PersistedActionOutcome", "description": "Closed browser action outcome.", "fields": [
+        {"name": "code", "type": "PersistedActionResultCode"}, {"name": "dispatch_id", "type": "optional<string>"},
+        {"name": "observed_at_monotonic_ms", "type": "u64"},
+        {"name": "observation", "type": "optional<PersistedPageObservationEvidence>"},
+        {"name": "discovered_source", "type": "optional<PersistedConsentedSource>"}
+      ]},
+      {"name": "PersistedUnmetRequirement", "description": "One labelled result gap.", "fields": [
+        {"name": "subject", "type": "string"}, {"name": "reason", "type": "PersistedGapReason"}
+      ]},
+      {"name": "PersistedTaskResult", "description": "Validated task result facts.", "fields": [
+        {"name": "artifact_ids", "type": "list<string>"}, {"name": "unmet", "type": "list<PersistedUnmetRequirement>"},
+        {"name": "fact_count", "type": "u64"}, {"name": "source_count", "type": "u64"}
+      ]},
+      {"name": "PersistedPermissionRequest", "description": "Exact pending native permission fact.", "fields": [
+        {"name": "request_id", "type": "string"}, {"name": "permission", "type": "PersistedPlatformPermission"},
+        {"name": "deadline_monotonic_ms", "type": "u64"}, {"name": "deadline_utc_ms", "type": "u64"},
+        {"name": "browser_session_id", "type": "string"}
+      ]},
+      {"name": "PersistedHandoverCompletion", "description": "What the browser reports when a handover ends because the person came back. Both lease identities are carried so an audit can separate the assistant activity before the handover from the activity after it, and the reducer refuses a completion that names the same identity twice. person_input is a saturating count of the discrete committed input the browser observed in the handed-over tab, clamped at a small ceiling on purpose: an exact key count is the length of whatever was typed, and a one-time code or a password is exactly what a person types during a handover. Movement, wheel and scroll are not counted, because looking at a challenge is not answering one.", "fields": [
+        {"name": "handover_id", "type": "string"}, {"name": "lease_before", "type": "string"},
+        {"name": "resumed_with", "type": "string"}, {"name": "person_input", "type": "u32"}
+      ]},
+      {"name": "PersistedPermissionResult", "description": "Exact terminal native permission fact.", "fields": [
+        {"name": "request_id", "type": "string"}, {"name": "permission", "type": "PersistedPlatformPermission"},
+        {"name": "decision", "type": "PersistedPermissionDecision"}
+      ]},
+      {"name": "PersistedToolJobOutcome", "description": "The durable record of what one tool job produced: a closed status, the digest of the output, and counts. The content itself never enters the journal - like a page observation it stays resident where the completion delivered it, and the digest is what makes this record checkable.", "fields": [
+        {"name": "status", "type": "PersistedToolJobStatus"},
+        {"name": "output_digest", "type": "optional<string>"},
+        {"name": "output_bytes", "type": "u64"}, {"name": "output_chunks", "type": "u32"}
+      ]},
+      {"name": "PersistedTurnDigest", "description": "The shape of one model turn, never its content: counts, closed enumerations and one render digest. It declares no string and no byte string, so page text, node names, tool arguments and model messages have no field here to travel in - the exclusion is structural rather than a rule a caller is asked to honour. The render digest names the exact projection the model was shown in thirty-two bytes, which replay compares and nobody can read a page back out of.", "fields": [
+        {"name": "stop", "type": "PersistedModelStopReason"},
+        {"name": "overflow", "type": "optional<PersistedTurnOverflow>"},
+        {"name": "input_units", "type": "u64"}, {"name": "output_units", "type": "u64"},
+        {"name": "cache_read_units", "type": "u64"}, {"name": "cache_write_units", "type": "u64"},
+        {"name": "answer_segment_count", "type": "u32"}, {"name": "tool_call_count", "type": "u32"},
+        {"name": "refused_tool_call_count", "type": "u32"},
+        {"name": "readability", "type": "PersistedPageReadability"},
+        {"name": "offered_node_count", "type": "u32"}, {"name": "omitted_node_count", "type": "u32"},
+        {"name": "unreadable_node_count", "type": "u32"},
+        {"name": "unreadable_text_bytes", "type": "u64"},
+        {"name": "render_digest", "type": "bytes32"}
+      ]},
+      {"name": "PersistedCommandEnvelope", "description": "Replayable reducer command envelope.", "fields": [
+        {"name": "idempotency_key", "type": "string"}, {"name": "expected_revision", "type": "u64"},
+        {"name": "trace_id", "type": "string"}, {"name": "command", "type": "PersistedCommand"}
+      ]},
+      {"name": "PersistedCommandRecord", "description": "Sequenced journal command record.", "fields": [
+        {"name": "sequence", "type": "u64"}, {"name": "envelope", "type": "PersistedCommandEnvelope"},
+        {"name": "recorded_at_utc_ms", "type": "u64"}
+      ]},
+      {"name": "PersistedTaskEvent", "description": "Content-free reducer event.", "fields": [
+        {"name": "kind", "type": "PersistedEventKind"}, {"name": "caused_by", "type": "PersistedCommandKind"},
+        {"name": "from", "type": "optional<PersistedTaskState>"}, {"name": "to", "type": "optional<PersistedTaskState>"},
+        {"name": "reason", "type": "optional<PersistedStateReason>"}, {"name": "subject", "type": "optional<PersistedEventSubject>"}
+      ]},
+      {"name": "PersistedEventRecord", "description": "Sequenced journal event record.", "fields": [
+        {"name": "sequence", "type": "u64"}, {"name": "event", "type": "PersistedTaskEvent"},
+        {"name": "revision", "type": "u64"}, {"name": "trace_id", "type": "string"},
+        {"name": "causation_key", "type": "string"}, {"name": "recorded_at_utc_ms", "type": "u64"}
+      ]},
+      {"name": "PersistedAuditRecord", "description": "Content-free independently redacted audit record.", "fields": [
+        {"name": "event_id", "type": "string"}, {"name": "event_type", "type": "PersistedAuditEventType"},
+        {"name": "actor", "type": "PersistedAuditActor"}, {"name": "task_id", "type": "string"},
+        {"name": "subject_kind", "type": "optional<PersistedAuditSubjectKind>"},
+        {"name": "subject_id", "type": "optional<string>"}, {"name": "revision", "type": "u64"},
+        {"name": "sequence", "type": "u64"}, {"name": "trace_id", "type": "string"},
+        {"name": "occurred_at_utc_ms", "type": "u64"}, {"name": "dropped_field_count", "type": "u64"},
+        {"name": "content_values_retained", "type": "bool"}
+      ]},
+      {"name": "TaskTransactionBatch", "description": "Canonical versioned task transaction persisted by the browser single writer.", "fields": [
+        {"name": "schema_version", "type": "u32"}, {"name": "seed", "type": "optional<PersistedTaskSeed>"},
+        {"name": "journal_entries", "type": "list<PersistedJournalEntry>"},
+        {"name": "effect_intents", "type": "list<PersistedEffectIntent>"},
+        {"name": "audit_records", "type": "list<PersistedAuditRecord>"}
+      ]}
+    ],
+    "unions": [
+      {"name": "PersistedProposalDecision", "description": "Closed reducer policy decision.", "variants": [
+        {"name": "Authorize", "wire": 0, "fields": [{"name": "authorization", "type": "PersistedAuthorization"}]},
+        {"name": "RequireApproval", "wire": 1, "fields": []},
+        {"name": "Deny", "wire": 2, "fields": [{"name": "denial", "type": "PersistedDenial"}]}
+      ]},
+      {"name": "PersistedCommand", "description": "Closed reducer command with exact typed bodies.", "variants": [
+        {"name": "CreateTask", "wire": 0, "fields": []},
+        {"name": "EditScope", "wire": 1, "fields": [{"name": "scope", "type": "PersistedSourceScope"}]},
+        {"name": "StartTask", "wire": 2, "fields": [{"name": "preview", "type": "PersistedScopePreview"}]},
+        {"name": "AcceptInitialConsent", "wire": 3, "fields": [{"name": "approval", "type": "string"}]},
+        {"name": "ApproveAction", "wire": 4, "fields": [{"name": "approval", "type": "string"}, {"name": "still_current", "type": "bool"}, {"name": "expires_at_monotonic_ms", "type": "u64"}, {"name": "expires_at_utc_ms", "type": "u64"}, {"name": "browser_session_id", "type": "string"}]},
+        {"name": "DenyAction", "wire": 5, "fields": [{"name": "approval", "type": "string"}]},
+        {"name": "PauseTask", "wire": 6, "fields": [{"name": "cause", "type": "PersistedPauseCause"}]},
+        {"name": "TakeOver", "wire": 7, "fields": []},
+        {"name": "PauseSettled", "wire": 8, "fields": []},
+        {"name": "ResumeTask", "wire": 9, "fields": []},
+        {"name": "CancelTask", "wire": 10, "fields": []},
+        {"name": "CancelSettled", "wire": 11, "fields": []},
+        {"name": "ExecutorStarted", "wire": 12, "fields": []},
+        {"name": "SetPlan", "wire": 13, "fields": [{"name": "plan", "type": "PersistedPlanDraft"}]},
+        {"name": "AdvanceStep", "wire": 14, "fields": [{"name": "plan_step_id", "type": "string"}, {"name": "to", "type": "PersistedStepState"}]},
+        {"name": "RequestApproval", "wire": 15, "fields": [{"name": "action_id", "type": "string"}]},
+        {"name": "RequestUserInput", "wire": 16, "fields": []},
+        {"name": "SupplyUserInput", "wire": 17, "fields": []},
+        {"name": "ProposeAction", "wire": 18, "fields": [{"name": "proposal", "type": "PersistedActionProposal"}]},
+        {"name": "RecordPolicyDecision", "wire": 19, "fields": [{"name": "action_id", "type": "string"}, {"name": "decision", "type": "PersistedProposalDecision"}, {"name": "dispatch_id", "type": "optional<string>"}]},
+        {"name": "DispatchAction", "wire": 20, "fields": [{"name": "action_id", "type": "string"}, {"name": "dispatch_id", "type": "string"}]},
+        {"name": "RecordActionOutcome", "wire": 21, "fields": [{"name": "action_id", "type": "string"}, {"name": "outcome", "type": "PersistedActionOutcome"}]},
+        {"name": "ResultCandidateReady", "wire": 22, "fields": []},
+        {"name": "CompleteResultValidated", "wire": 23, "fields": [{"name": "result", "type": "PersistedTaskResult"}]},
+        {"name": "PartialResultValidated", "wire": 24, "fields": [{"name": "result", "type": "PersistedTaskResult"}]},
+        {"name": "ResumeForCorrection", "wire": 25, "fields": []},
+        {"name": "FailTask", "wire": 26, "fields": [{"name": "reason", "type": "PersistedFailureReason"}]},
+        {"name": "CorrectFact", "wire": 27, "fields": [{"name": "fact_id", "type": "string"}]},
+        {"name": "ExcludeSource", "wire": 28, "fields": [{"name": "source_id", "type": "string"}]},
+        {"name": "AcceptArtifact", "wire": 29, "fields": [{"name": "artifact_id", "type": "string"}]},
+        {"name": "ExportArtifact", "wire": 30, "fields": [{"name": "artifact_id", "type": "string"}, {"name": "format", "type": "PersistedArtifactKind"}]},
+        {"name": "RequestPermission", "wire": 31, "fields": [{"name": "request", "type": "PersistedPermissionRequest"}]},
+        {"name": "RecordPermissionResult", "wire": 32, "fields": [{"name": "result", "type": "PersistedPermissionResult"}]},
+        {"name": "RequestModelTurn", "wire": 33, "fields": [{"name": "call_id", "type": "string"}]},
+        {"name": "RecordModelTurn", "wire": 34, "fields": [{"name": "call_id", "type": "string"}, {"name": "digest", "type": "PersistedTurnDigest"}]},
+        {"name": "RecordModelTurnGap", "wire": 35, "fields": [{"name": "call_id", "type": "string"}, {"name": "gap", "type": "PersistedTurnGap"}]},
+        {"name": "RequestHandover", "wire": 36, "fields": [{"name": "handover_id", "type": "string"}]},
+        {"name": "CompleteHandover", "wire": 37, "fields": [{"name": "completion", "type": "PersistedHandoverCompletion"}]},
+        {"name": "ExpireHandover", "wire": 38, "fields": [{"name": "handover_id", "type": "string"}]},
+        {"name": "RecordContextEviction", "wire": 39, "description": "Record that every turn at or below a boundary no longer fits the context budget. The transcript builder drops those exchanges before its byte ladder runs, so a replay composes the same shrunken conversation and an audit can derive exactly what the model could no longer see.", "fields": [{"name": "through_turn", "type": "u64", "description": "The highest turn ordinal evicted; every earlier turn goes with it."}]},
+        {"name": "RecordToolJobOutcome", "wire": 40, "description": "Record what one tool job produced, and settle its action. Apart from RecordActionOutcome because the outcomes speak different languages: an action outcome is a page-protocol result code, and a tool job has none.", "fields": [{"name": "action_id", "type": "string"}, {"name": "job_id", "type": "string"}, {"name": "outcome", "type": "PersistedToolJobOutcome"}]},
+        {"name": "RequestFieldValues", "wire": 41, "description": "Record that the person was asked to fill in a form (decision 0088). Names the form and never its fields: which of them need a person is the browser's judgement, made from the classification it re-reads at dispatch.", "fields": [{"name": "request_id", "type": "string"}, {"name": "tab_id", "type": "string"}, {"name": "node_id", "type": "string"}]},
+        {"name": "SupplyFieldValues", "wire": 42, "description": "Record that the person answered, and how many values they supplied. Carries a count and nothing else: what they typed was minted into the browser's vault and never entered the core, so there is nothing here to hold and nothing derived from it either - no length, no shape, no digest (decision 0063 section 4).", "fields": [{"name": "request_id", "type": "string"}, {"name": "supplied", "type": "u32"}]},
+        {"name": "RequestArtifact", "wire": 43, "description": "Record only a successful deterministic render of accepted cited workspace facts.", "fields": [{"name": "artifact_id", "type": "string"}, {"name": "format", "type": "PersistedArtifactKind"}, {"name": "workspace_revision", "type": "u64"}]},
+        {"name": "RecordDiscoveryTab", "wire": 44, "description": "Record the exact browser-session-owned blank tab created for a zero-source web errand before any discovery search may be proposed.", "fields": [{"name": "discovery_tab_id", "type": "string"}, {"name": "browser_session_id", "type": "string"}]},
+        {"name": "RequestModelAttempt", "wire": 45, "description": "Charge and authorize one exact next paid attempt of an in-flight logical model turn. The provider request stays transient; these ordinals prevent replay from inventing a different paid route.", "fields": [{"name": "call_id", "type": "string"}, {"name": "attempt_ordinal", "type": "u32"}, {"name": "candidate_ordinal", "type": "u32"}, {"name": "kind", "type": "PersistedModelAttemptKind"}]},
+        {"name": "FollowUp", "wire": 46, "description": "The person asked a follow-up of a finished task, which goes back to work. The question is staged by the runtime and never journaled (decision 0137).", "fields": []}
+      ]},
+      {"name": "PersistedEventSubject", "description": "Closed identifier-only event subject.", "variants": [
+        {"name": "Action", "wire": 0, "fields": [{"name": "id", "type": "string"}]},
+        {"name": "Plan", "wire": 1, "fields": [{"name": "id", "type": "string"}]},
+        {"name": "PlanStep", "wire": 2, "fields": [{"name": "id", "type": "string"}]},
+        {"name": "Artifact", "wire": 3, "fields": [{"name": "id", "type": "string"}]},
+        {"name": "Source", "wire": 4, "fields": [{"name": "id", "type": "string"}]},
+        {"name": "Fact", "wire": 5, "fields": [{"name": "id", "type": "string"}]},
+        {"name": "Capability", "wire": 6, "fields": [{"name": "id", "type": "string"}]},
+        {"name": "PermissionRequest", "wire": 7, "fields": [{"name": "id", "type": "string"}]},
+        {"name": "Handover", "wire": 8, "fields": [{"name": "id", "type": "string"}]},
+        {"name": "ActorLease", "wire": 9, "fields": [{"name": "id", "type": "string"}]},
+        {"name": "DiscoveryTab", "wire": 10, "fields": [{"name": "id", "type": "string"}]}
+      ]},
+      {"name": "PersistedJournalEntry", "description": "Closed append-only journal entry.", "variants": [
+        {"name": "Command", "wire": 0, "fields": [{"name": "record", "type": "PersistedCommandRecord"}]},
+        {"name": "Event", "wire": 1, "fields": [{"name": "record", "type": "PersistedEventRecord"}]}
+      ]},
+      {"name": "PersistedEffectIntent", "description": "Closed reducer effect intent committed before dispatch. CallModel carries the call identity and nothing else: the request it stands for holds the rendered page, and the journal records that a paid call was claimed rather than what was sent. The identity names which call this is, never where it sat in a batch, because a re-planned batch reuses positions and would mint an identity another call already spent.", "variants": [
+        {"name": "RevokeAuthority", "wire": 0, "fields": [{"name": "reason", "type": "PersistedRevocationReason"}]},
+        {"name": "AskPolicy", "wire": 1, "fields": [{"name": "action_id", "type": "string"}]},
+        {"name": "RequestApproval", "wire": 2, "fields": [{"name": "action_id", "type": "string"}]},
+        {"name": "DispatchAction", "wire": 3, "fields": [{"name": "action_id", "type": "string"}]},
+        {"name": "AwaitInFlightWork", "wire": 4, "fields": [{"name": "settle_with", "type": "PersistedCommandKind"}]},
+        {"name": "ReconcileAction", "wire": 5, "fields": [{"name": "action_id", "type": "string"}, {"name": "rule", "type": "PersistedRecoveryRule"}]},
+        {"name": "ReleaseTaskTabs", "wire": 6, "fields": []},
+        {"name": "GenerateArtifact", "wire": 7, "fields": [{"name": "artifact_id", "type": "string"}, {"name": "kind", "type": "PersistedArtifactKind"}, {"name": "workspace_revision", "type": "u64"}]},
+        {"name": "ExportArtifact", "wire": 8, "fields": [{"name": "artifact_id", "type": "string"}, {"name": "kind", "type": "PersistedArtifactKind"}, {"name": "workspace_revision", "type": "u64"}]},
+        {"name": "RequestPermission", "wire": 9, "fields": [{"name": "request_id", "type": "string"}, {"name": "permission", "type": "PersistedPlatformPermission"}, {"name": "deadline_monotonic_ms", "type": "u64"}, {"name": "deadline_utc_ms", "type": "u64"}, {"name": "browser_session_id", "type": "string"}]},
+        {"name": "CallModel", "wire": 10, "fields": [{"name": "call_id", "type": "string"}]},
+        {"name": "AwaitHandover", "wire": 11, "fields": [{"name": "handover_id", "type": "string"}, {"name": "window_ms", "type": "u32"}]},
+        {"name": "RunToolJob", "wire": 12, "description": "Journal the intent and hand one job to the tool broker: the dispatched half of a proposal whose class is ExecuteToolJob. The job reaches an isolated runtime the core supervises, never a page.", "fields": [{"name": "action_id", "type": "string"}, {"name": "job_id", "type": "string"}, {"name": "runtime", "type": "PersistedToolRuntime"}]},
+        {"name": "RequestFieldValues", "wire": 13, "description": "Ask the person to fill in a form's fields, and wait (decision 0088). Unlike AwaitHandover this revokes nothing: the person types into a surface Taffy draws rather than into the page, so the task's lease stands. Names the form and never its fields.", "fields": [{"name": "request_id", "type": "string"}, {"name": "tab_id", "type": "string"}, {"name": "node_id", "type": "string"}]},
+        {"name": "PrepareDiscoveryTab", "wire": 14, "description": "Commit the browser-session-bound blank-tab bootstrap before dispatch so restart cannot change whether discovery begins.", "fields": [{"name": "browser_session_id", "type": "string"}, {"name": "remaining_new_source_cap", "type": "u32"}]},
+        {"name": "RunLibraryTool", "wire": 15, "description": "Run one profile-local Library operation after policy authorization. The canonical action intent carries exact identifiers and revisions; this durable effect only correlates the action.", "fields": [{"name": "action_id", "type": "string"}]},
+        {"name": "RunMemoryTool", "wire": 16, "description": "Run one scoped profile-local Memory operation after policy authorization and explicit consent for every write. The canonical action intent carries exact identifiers, revisions, and resident content binding; this durable effect only correlates the action.", "fields": [{"name": "action_id", "type": "string"}]}
+      ]}
+    ]
+  }
+}

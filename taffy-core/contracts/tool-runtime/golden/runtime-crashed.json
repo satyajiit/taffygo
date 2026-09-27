@@ -1,0 +1,12 @@
+{
+  "operation": {
+    "operation_id": "op-23",
+    "service_generation": 2,
+    "task_revision": 5,
+    "deadline_monotonic_ms": 60000,
+    "idempotency_key": "tool-op-23-1"
+  },
+  "job_id": "job-1",
+  "status": 4,
+  "success": null
+}

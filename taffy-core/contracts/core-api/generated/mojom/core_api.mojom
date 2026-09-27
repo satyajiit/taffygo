@@ -1,0 +1,2023 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// Generated from schema/contract.json. Do not edit.
+// Contract core_api 3.49.
+
+module taffy.core_api.mojom;
+
+const uint64 kMaxSavedFlowQueryResults = 4;
+const uint64 kMaxCommandPayloadBytes = 65536;
+const uint64 kMaxEventPayloadBytes = 262144;
+const uint64 kMaxActiveTasks = 64;
+const uint64 kMaxProgressBasisPoints = 10000;
+const uint64 kMaxMessageKeyBytes = 256;
+const uint64 kMaxAuthEmailBytes = 320;
+const uint64 kMaxAuthDisplayNameBytes = 512;
+const uint64 kMaxAuthCredentialHandleBytes = 256;
+const uint64 kMaxAuthMethods = 4;
+const uint64 kMaxTaskGoalBytes = 8192;
+const uint64 kMaxTaskControls = 4;
+const uint64 kMaxTaskArtifacts = 16;
+const uint64 kMaxTaskActivity = 32;
+const uint64 kMaxTaskArtifactExportBytes = 16777216;
+const uint64 kMaxIdentifierBytes = 256;
+const uint64 kMaxWorkspaces = 32;
+const uint64 kMaxWorkspaceSources = 64;
+const uint64 kMaxWorkspaceFacts = 256;
+const uint64 kMaxWorkspaceDisplayNameBytes = 256;
+const uint64 kMaxWorkspaceConfirmationTokenBytes = 64;
+const uint64 kMaxFactSources = 16;
+const uint64 kMaxWorkspaceTitleBytes = 1024;
+const uint64 kMaxSourceHostBytes = 253;
+const uint64 kMaxTaskConsentSources = 64;
+const uint64 kMaxNewSourceCap = 64;
+const uint64 kMaxFactFieldBytes = 256;
+const uint64 kMaxFactValueBytes = 16384;
+const uint64 kMaxExportContentBytes = 131072;
+const uint64 kMaxLibraryEntries = 1024;
+const uint64 kMaxLibrarySources = 16;
+const uint64 kMaxLibraryQueryBytes = 512;
+const uint64 kMaxLibrarySearchResults = 32;
+const uint64 kMaxLibraryRefreshSources = 64;
+const uint64 kMaxLibraryRefreshResults = 64;
+const uint64 kMaxLibraryRefreshPreviewIdBytes = 64;
+const uint64 kMaxMemoryRecords = 512;
+const uint64 kMaxMemoryStatementBytes = 2048;
+const uint64 kMaxMemoryQueryBytes = 512;
+const uint64 kMaxMemorySearchResults = 32;
+const uint64 kMaxPageInspectorPayloadBytes = 131072;
+const uint64 kMaxPageInspectorDocuments = 1;
+const uint64 kMaxPageInspectorClaims = 4;
+const uint64 kMaxPageInspectorNodes = 128;
+const uint64 kMaxPageInspectorEdges = 256;
+const uint64 kMaxPageInspectorAdapters = 8;
+const uint64 kMaxPageInspectorFrames = 1;
+const uint64 kMaxPageInspectorWarnings = 32;
+const uint64 kMaxPageInspectorBudgets = 7;
+const uint64 kMaxPageInspectorIdentifierBytes = 64;
+const uint64 kMaxPageInspectorHostBytes = 253;
+const uint64 kMaxPageInspectorNameBytes = 512;
+const uint64 kMaxPageSnapshotExportBytes = 262144;
+const uint64 kMaxAssets = 64;
+const uint64 kMaxPartMemberPathBytes = 256;
+const uint64 kMaxPartMemberBytes = 4194304;
+const uint64 kMaxProviderIdBytes = 64;
+const uint64 kMaxProviderDisplayNameBytes = 128;
+const uint64 kMaxProviderEndpointBytes = 512;
+const uint64 kMaxCustomProviders = 32;
+const uint64 kMaxProviderRosterEntries = 96;
+const uint64 kMaxUserInputAnswerBytes = 512;
+const uint64 kMaxProviderModelEntries = 256;
+const uint64 kMaxModelIdBytes = 128;
+const uint64 kMaxModelDisplayNameBytes = 128;
+const uint64 kMaxModelRoles = 4;
+const uint64 kMaxModelInputModalities = 2;
+const uint64 kMaxModelThinkingLevels = 7;
+const uint64 kMaxProviderPresentationBytes = 512;
+const uint64 kMaxCustomModelEntries = 32;
+const uint64 kMaxComposerPrefixBytes = 4096;
+const uint64 kMaxComposerSuffixBytes = 1024;
+const uint64 kMaxComposerCompletionBytes = 512;
+const uint64 kMaxTaskAnswerDeltaBytes = 16384;
+const uint64 kMaxTaskAnswerResidencyBytes = 131072;
+const uint64 kMaxAssistantAbilities = 16;
+const uint64 kMaxBuiltinSkills = 16;
+const uint64 kMaxCoreStatusProjectionOmissions = 13;
+const uint64 kMaxSiteSkills = 64;
+const uint64 kMaxSkillIdBytes = 128;
+const uint64 kMaxSkillOriginBytes = 2048;
+const uint64 kMaxSkillMatchClauses = 8;
+const uint64 kMaxSkillSteps = 32;
+const uint64 kMaxSkillArgumentsPerStep = 16;
+const uint64 kMaxSkillToolNameBytes = 128;
+const uint64 kMaxPersonalityScale = 2;
+const uint64 kMaxSavedSignIns = 256;
+const uint64 kMaxSavedDetails = 64;
+const uint64 kMaxSavedSignInSiteBytes = 253;
+const uint64 kMaxSavedSignInUsernameBytes = 320;
+const uint64 kMaxSavedDetailNameBytes = 256;
+const uint64 kMaxSavedDetailEmailBytes = 320;
+const uint64 kMaxSavedDetailPhoneBytes = 128;
+const uint64 kMaxSavedDetailAddressBytes = 2048;
+const uint64 kMaxSavedDetailPostcodeBytes = 64;
+const uint64 kMaxSavedDetailCountryBytes = 128;
+
+enum CoreCommandKind {
+  kStartTask = 0,
+  kCancelTask = 1,
+  kApproveAction = 2,
+  kRetryCore = 3,
+  kPermissionResult = 4,
+  kStartAuth = 5,
+  kRequestEmailLink = 6,
+  kSignOut = 7,
+  kAuthCredentialResult = 8,
+  kCorrectWorkspaceFact = 9,
+  kExcludeWorkspaceSource = 10,
+  kRequestWorkspaceExport = 11,
+  kRequestAsset = 12,
+  kRemoveAsset = 13,
+  kSetAssetPolicy = 14,
+  kSaveProviderCredential = 15,
+  kForgetProviderCredential = 16,
+  kStartProviderAuth = 17,
+  kSaveCustomProvider = 18,
+  kRemoveCustomProvider = 19,
+  kCompleteHandover = 20,
+  kSupplyUserInput = 21,
+  kSetProviderCredentialState = 22,
+  kProbeProviderKey = 23,
+  kSetProviderModelPreference = 24,
+  kProbeCustomEndpoint = 25,
+  kRequestComposerCompletion = 26,
+  kCancelComposerCompletion = 27,
+  kPauseTask = 28,
+  kResumeTask = 29,
+  kTakeOver = 30,
+  kSetAssistantConfiguration = 31,
+  kSaveWorkspace = 32,
+  kRenameWorkspace = 33,
+  kDeleteWorkspace = 34,
+  kDiscardWorkspace = 35,
+  kSearchLibrary = 36,
+  kSaveLibraryFact = 37,
+  kRemoveLibraryEntry = 38,
+  kRequestLibraryExport = 39,
+  kSearchMemory = 40,
+  kUpsertMemory = 41,
+  kDeleteMemory = 42,
+  kAcceptTaskArtifact = 43,
+  kRequestTaskArtifactExport = 44,
+  kMutateSiteSkill = 45,
+  kCancelProviderAuth = 46,
+  kStartLibraryRefresh = 47,
+  kFollowUp = 48,
+};
+
+enum AssistantAbilityView {
+  kPagesLookup = 0,
+  kPagesCompare = 1,
+  kPagesSummarize = 2,
+  kPagesTable = 3,
+  kProducts = 4,
+  kOffers = 5,
+  kForm = 6,
+  kDownloads = 7,
+  kPdf = 8,
+  kSheet = 9,
+  kDocument = 10,
+  kDepth = 11,
+  kTrip = 12,
+  kPictures = 13,
+  kVideo = 14,
+  kKeep = 15,
+};
+
+enum BuiltinSkillIdView {
+  kGeneralWebResearch = 0,
+  kDeepResearch = 1,
+  kProductComparison = 2,
+  kMultiTabComparison = 3,
+  kWebsiteSummarizer = 4,
+  kPdfAnalysis = 5,
+  kDataExtraction = 6,
+  kFormAssistant = 7,
+  kShopping = 8,
+  kDownloadOrganizer = 9,
+  kTravelResearch = 10,
+  kVideoTranscriptAnalyzer = 11,
+  kImageUnderstanding = 12,
+  kLibraryBuilder = 13,
+  kSpreadsheetBuilder = 14,
+  kDocumentGenerator = 15,
+};
+
+enum BuiltinSkillAvailabilityView {
+  kAvailable = 0,
+  kRequiredToolUnavailable = 1,
+  kRequiredPartMissing = 2,
+  kProfileUnavailable = 3,
+  kPolicyUnavailable = 4,
+};
+
+enum CoreStatusProjectionMode {
+  kComplete = 0,
+  kRecoveryRequired = 1,
+};
+
+enum CoreStatusProjectionFamily {
+  kActiveTasks = 0,
+  kWorkspaces = 1,
+  kWorkspaceExport = 2,
+  kAssetDelivery = 3,
+  kProviderRoster = 4,
+  kProviderProbes = 5,
+  kProviderModels = 6,
+  kLibrary = 7,
+  kLibraryExport = 8,
+  kMemory = 9,
+  kSavedSignIns = 10,
+  kSavedDetails = 11,
+  kSiteSkills = 12,
+};
+
+enum SiteSkillMutationKind {
+  kTeach = 0,
+  kUpdate = 1,
+  kSetEnabled = 2,
+  kRemove = 3,
+};
+
+enum SiteSkillClauseKind {
+  kRolePresent = 0,
+  kPhraseAt = 1,
+  kStateAt = 2,
+};
+
+enum SiteSkillArgumentKind {
+  kFromEarlierStep = 0,
+  kFromPerson = 1,
+  kChoice = 2,
+  kCount = 3,
+  kFlag = 4,
+  kPublicAddress = 5,
+  kSemanticTarget = 6,
+};
+
+enum SiteSkillProvenanceView {
+  kAuthored = 0,
+  kRecordedFromTask = 1,
+};
+
+enum SiteSkillStatusView {
+  kDraft = 0,
+  kActive = 1,
+  kSuperseded = 2,
+  kRetired = 3,
+  kDisabled = 4,
+};
+
+enum PersonalityPresetView {
+  kCarefulResearcher = 0,
+  kQuickShopper = 1,
+  kTripPlanner = 2,
+};
+
+enum TaskTemplateId {
+  kCompareProducts = 0,
+  kSummarizeEvidence = 1,
+  kBuildSourceTable = 2,
+  kWebErrand = 3,
+};
+
+enum TaskProviderRoute {
+  kNotConfigured = 0,
+  kDirectUserKey = 1,
+  kManagedService = 2,
+  kNoModelRequired = 3,
+};
+
+enum TaskAttachedStore {
+  kHistory = 0,
+  kBookmarks = 1,
+  kOpenTabs = 2,
+};
+
+enum CoreAvailability {
+  kStarting = 0,
+  kReady = 1,
+  kUnavailable = 2,
+  kCircuitOpen = 3,
+};
+
+enum SavedDataAvailability {
+  kLoading = 0,
+  kReady = 1,
+  kUnavailable = 2,
+};
+
+enum TaskPhase {
+  kIdle = 0,
+  kPlanning = 1,
+  kWaitingForUser = 2,
+  kRunning = 3,
+  kCompleted = 4,
+  kFailed = 5,
+  kCancelled = 6,
+  kOutcomeUnknown = 7,
+  kPaused = 8,
+  kPartial = 9,
+};
+
+enum TaskControlKind {
+  kPause = 0,
+  kResume = 1,
+  kTakeOver = 2,
+  kStop = 3,
+};
+
+enum CoreFailureCode {
+  kCancelled = 0,
+  kDeadlineExceeded = 1,
+  kCoreUnavailable = 2,
+  kPolicyDenied = 3,
+  kInvalidRequest = 4,
+  kBackpressure = 5,
+  kOutcomeUnknown = 6,
+  kInternal = 7,
+  kBudgetExceeded = 8,
+  kProviderUnavailable = 9,
+  kSourcesUnavailable = 10,
+  kJournalUnusable = 11,
+  kUnverifiableAction = 12,
+  kProviderRefused = 13,
+  kProviderLimit = 14,
+  kOffline = 15,
+  kPolicyRefused = 16,
+};
+
+enum PlatformPermission {
+  kNotifications = 0,
+  kCamera = 1,
+  kMicrophone = 2,
+  kLocation = 3,
+  kReadUserFile = 4,
+  kWriteUserFile = 5,
+};
+
+enum PermissionDecision {
+  kGranted = 0,
+  kDenied = 1,
+  kUnavailable = 2,
+};
+
+enum AuthProvider {
+  kGoogle = 0,
+  kEmailLink = 1,
+  kGithub = 2,
+  kFacebook = 3,
+};
+
+enum AuthMethodAvailability {
+  kAvailable = 0,
+  kNotConfigured = 1,
+  kPlatformUnavailable = 2,
+};
+
+enum AuthPhase {
+  kInitializing = 0,
+  kSignedOut = 1,
+  kInFlight = 2,
+  kLinkSent = 3,
+  kSignedIn = 4,
+  kFailed = 5,
+};
+
+enum AuthFailureCode {
+  kNotConfigured = 0,
+  kCancelled = 1,
+  kNoCredential = 2,
+  kNetwork = 3,
+  kRejected = 4,
+  kInvalidRedirect = 5,
+  kCoreUnavailable = 6,
+  kUnknown = 7,
+};
+
+enum AuthCredentialStatus {
+  kSuccess = 0,
+  kCancelled = 1,
+  kNoCredential = 2,
+  kUnavailable = 3,
+};
+
+enum WorkspacePhase {
+  kRunning = 0,
+  kWaitingForUser = 1,
+  kPaused = 2,
+  kDone = 3,
+  kPartlyDone = 4,
+  kStopped = 5,
+  kFailed = 6,
+};
+
+enum WorkspaceFactKind {
+  kFromPage = 0,
+  kSummarized = 1,
+  kTaffyInference = 2,
+  kUserEntered = 3,
+};
+
+enum WorkspaceExportFormat {
+  kMarkdown = 0,
+  kCsv = 1,
+};
+
+enum TaskActivityKind {
+  kOpenedPage = 0,
+  kReadPage = 1,
+  kPageUnavailable = 2,
+  kMoveRefused = 3,
+  kAskedYou = 4,
+  kYouAnswered = 5,
+  kHandedBack = 6,
+  kYouTookOver = 7,
+  kBuiltOutput = 8,
+};
+
+enum TaskArtifactKind {
+  kMarkdown = 0,
+  kCsv = 1,
+  kXlsx = 2,
+  kPdf = 3,
+  kDocx = 4,
+  kPptx = 5,
+  kWaveAudio = 6,
+  kFrameArchive = 7,
+};
+
+enum LibraryAvailability {
+  kAvailable = 0,
+  kPrivateProfile = 1,
+  kUnavailable = 2,
+};
+
+enum LibraryRefreshDisposition {
+  kUnchanged = 0,
+  kChanged = 1,
+  kMissing = 2,
+};
+
+enum MemoryAvailability {
+  kAvailable = 0,
+  kPrivateProfile = 1,
+  kUnavailable = 2,
+};
+
+enum MemorySourceKind {
+  kYouWrote = 0,
+  kTaffySuggested = 1,
+};
+
+enum MemoryScopeKind {
+  kAllTasks = 0,
+  kWorkspace = 1,
+};
+
+enum MemorySensitivity {
+  kStandard = 0,
+  kSensitive = 1,
+};
+
+enum PageInspectorAvailability {
+  kAvailable = 0,
+  kNoSelectedPage = 1,
+  kDocumentUnavailable = 2,
+  kCoreUnavailable = 3,
+  kPolicyDenied = 4,
+  kBackpressure = 5,
+  kStaleDocument = 6,
+  kInvalidResponse = 7,
+};
+
+enum SiteSkillOfferAvailability {
+  kAvailable = 0,
+  kCoreUnavailable = 1,
+  kStaleDocument = 2,
+  kPrivateProfile = 3,
+  kIncomplete = 4,
+  kInvalidResponse = 5,
+};
+
+enum PageSnapshotExportFormat {
+  kMarkdown = 0,
+  kCanonicalJson = 1,
+};
+
+enum PageSnapshotExportAvailability {
+  kAvailable = 0,
+  kNoSelectedPage = 1,
+  kDocumentUnavailable = 2,
+  kCoreUnavailable = 3,
+  kPolicyDenied = 4,
+  kBackpressure = 5,
+  kStaleDocument = 6,
+  kPrivateProfile = 7,
+  kIncomplete = 8,
+  kOversize = 9,
+  kInvalidResponse = 10,
+  kCancelled = 11,
+  kReplayConflict = 12,
+};
+
+enum PageInspectorDocumentKind {
+  kSemanticPage = 0,
+};
+
+enum PageInspectorClaim {
+  kBrowserValidated = 0,
+  kPolicyAdmitted = 1,
+  kRedacted = 2,
+  kBounded = 3,
+};
+
+enum PageInspectorDocumentState {
+  kActive = 0,
+  kFrozen = 1,
+  kUnavailable = 2,
+};
+
+enum PageInspectorNodeRole {
+  kDocument = 0,
+  kSection = 1,
+  kText = 2,
+  kList = 3,
+  kTable = 4,
+  kLink = 5,
+  kControl = 6,
+  kMedia = 7,
+  kCommerce = 8,
+  kReference = 9,
+  kUnknown = 10,
+};
+
+enum PageInspectorSensitivity {
+  kPublic = 0,
+  kWithheld = 1,
+  kUnknown = 2,
+};
+
+enum PageInspectorRelationship {
+  kHierarchy = 0,
+  kLabel = 1,
+  kDescription = 2,
+  kControl = 3,
+  kTableHeader = 4,
+  kEntity = 5,
+  kSource = 6,
+  kOther = 7,
+};
+
+enum PageInspectorAdapterKind {
+  kStructure = 0,
+  kAccessibility = 1,
+  kForms = 2,
+  kMetadata = 3,
+  kBrowser = 4,
+};
+
+enum PageInspectorAdapterStatus {
+  kComplete = 0,
+  kPartial = 1,
+  kConflict = 2,
+  kUnsupported = 3,
+  kFailed = 4,
+};
+
+enum PageInspectorBudgetKind {
+  kItems = 0,
+  kText = 1,
+  kTotalBytes = 2,
+  kDepth = 3,
+  kFrames = 4,
+  kMessage = 5,
+  kDeadline = 6,
+};
+
+enum PageInspectorWarningCode {
+  kSourceUnavailable = 0,
+  kSourceFailed = 1,
+  kConflict = 2,
+  kFrameOmitted = 3,
+  kContentPartial = 4,
+  kSemanticsMissing = 5,
+  kContentWithheld = 6,
+  kLocationMinimized = 7,
+  kDeadline = 8,
+  kResourcePressure = 9,
+  kSuspiciousContent = 10,
+};
+
+enum CoreApiSubmissionStatus {
+  kAccepted = 0,
+  kInvalidRequest = 1,
+  kStaleGeneration = 2,
+  kStaleRevision = 3,
+  kDeadlineExceeded = 4,
+  kBackpressure = 5,
+  kCoreUnavailable = 6,
+  kDuplicate = 7,
+  kSourceNotOpen = 8,
+  kSourceAmbiguous = 9,
+  kWindowUnavailable = 10,
+};
+
+enum AssetKindView {
+  kPythonStdlib = 0,
+  kPythonPackages = 1,
+  kModelWeights = 2,
+  kModelTokenizer = 3,
+  kFilterList = 4,
+  kCountryFlags = 5,
+  kStartScenes = 6,
+};
+
+enum AssetPresenceView {
+  kAbsent = 0,
+  kPartial = 1,
+  kComplete = 2,
+  kInstalled = 3,
+};
+
+enum AssetNetworkCostView {
+  kOffline = 0,
+  kMetered = 1,
+  kUnmetered = 2,
+};
+
+enum AssetRefusalView {
+  kUnknownAsset = 0,
+  kNoVariantForPlatform = 1,
+  kNotPublishedYet = 2,
+  kCatalogRowIncomplete = 3,
+  kVariantTooLarge = 4,
+  kAttemptsExhausted = 5,
+  kIntegrityFailed = 6,
+  kNetworkNotPermitted = 7,
+  kDeclinedByPerson = 8,
+};
+
+enum PartMemberStatus {
+  kOk = 0,
+  kNotInstalled = 1,
+  kNotFound = 2,
+  kTooLarge = 3,
+  kUnreadable = 4,
+  kInvalidRequest = 5,
+};
+
+enum ProviderAuthMethodView {
+  kApiKey = 0,
+  kOauth = 1,
+};
+
+enum ProviderWireApiView {
+  kAnthropicMessages = 0,
+  kOpenAiResponses = 1,
+  kOpenAiCompletions = 2,
+  kGoogleGenerativeLanguage = 3,
+  kManaged = 4,
+  kOpenAiCodexResponses = 5,
+  kGoogleCloudCodeAssist = 6,
+};
+
+enum ProviderProbeVerdictView {
+  kUsable = 0,
+  kAuth = 1,
+  kBilling = 2,
+  kRateLimit = 3,
+  kOverloaded = 4,
+  kTimeout = 5,
+  kNetwork = 6,
+  kModelNotFound = 7,
+  kUnknown = 8,
+  kEndpointReached = 9,
+  kNoModelListed = 10,
+};
+
+enum ProviderCredentialStateView {
+  kUsable = 0,
+  kNeedsSignIn = 1,
+  kRefreshFailed = 2,
+};
+
+enum ProviderRefusalView {
+  kRateLimit = 0,
+  kBilling = 1,
+  kOverloaded = 2,
+};
+
+enum ProviderOriginView {
+  kCatalog = 0,
+  kCustom = 1,
+};
+
+enum CatalogLayerView {
+  kEmbeddedBaseline = 0,
+  kRemoteOverlay = 1,
+  kUserOverride = 2,
+};
+
+enum ThinkingLevelView {
+  kOff = 0,
+  kMinimal = 1,
+  kLow = 2,
+  kMedium = 3,
+  kHigh = 4,
+  kXhigh = 5,
+  kMax = 6,
+};
+
+enum ModelRoleView {
+  kPrimaryReasoning = 0,
+  kFastBrowsing = 1,
+  kVision = 2,
+  kEmbedding = 3,
+};
+
+enum InputModalityView {
+  kText = 0,
+  kImage = 1,
+};
+
+enum ServerKindView {
+  kOpenaiCompatible = 0,
+  kOllama = 1,
+  kLmStudio = 2,
+  kVllm = 3,
+  kLlamaCpp = 4,
+};
+
+enum SavedFlowQueryAvailability {
+  kAvailable = 0,
+  kPrivateProfile = 1,
+  kUnavailable = 2,
+  kInvalidRequest = 3,
+  kStaleRequest = 4,
+};
+
+struct OperationEnvelope {
+  string operation_id@0;
+  uint64 service_generation@1;
+  uint64 task_revision@2;
+  uint64 deadline_monotonic_ms@3;
+  string idempotency_key@4;
+};
+
+struct SiteSkillObservedClause {
+  SiteSkillClauseKind kind@0;
+  uint32 role@1;
+  uint32 detail@2;
+};
+
+struct SiteSkillSemanticTarget {
+  uint32 role@0;
+  uint32 phrase@1;
+};
+
+struct SiteSkillObservedArgument {
+  uint32 parameter@0;
+  SiteSkillArgumentKind kind@1;
+  uint64 value@2;
+  uint32 purpose@3;
+  string? public_address@4;
+  SiteSkillSemanticTarget? semantic_target@5;
+};
+
+struct SiteSkillObservedStep {
+  string verb@0;
+  array<SiteSkillObservedArgument> arguments@1;
+  uint32 postcondition@2;
+  bool has_fill@3;
+  uint32 fill_purpose@4;
+};
+
+struct SiteSkillMutationBody {
+  SiteSkillMutationKind kind@0;
+  string skill_id@1;
+  uint32 expected_version@2;
+  string origin@3;
+  array<SiteSkillObservedClause> clauses@4;
+  array<SiteSkillObservedStep> steps@5;
+  uint32 admitted@6;
+  bool enabled@7;
+  uint64 recorded_at_epoch_ms@8;
+};
+
+struct SiteSkillView {
+  string skill_id@0;
+  string origin@1;
+  SiteSkillProvenanceView provenance@2;
+  SiteSkillStatusView status@3;
+  uint32 active_version@4;
+  uint32 step_count@5;
+  uint64 installed_at_epoch_ms@6;
+  uint64 updated_at_epoch_ms@7;
+  string? recorded_from_task_id@8;
+  array<SiteSkillObservedStep> reviewed_steps@9;
+};
+
+struct SiteSkillOfferView {
+  string offer_id@0;
+  string skill_id@1;
+  uint32 active_version@2;
+  uint32 step_count@3;
+};
+
+struct CoreCommand {
+  OperationEnvelope operation@0;
+  CoreCommandKind kind@1;
+  StartTaskBody? start_task@2;
+  CancelTaskBody? cancel_task@3;
+  ApproveActionBody? approve_action@4;
+  RetryCoreBody? retry_core@5;
+  PermissionResultBody? permission_result@6;
+  StartAuthBody? start_auth@7;
+  EmailLinkBody? request_email_link@8;
+  SignOutBody? sign_out@9;
+  AuthCredentialResultBody? auth_credential_result@10;
+  CorrectWorkspaceFactBody? correct_workspace_fact@11;
+  ExcludeWorkspaceSourceBody? exclude_workspace_source@12;
+  RequestWorkspaceExportBody? request_workspace_export@13;
+  RequestAssetBody? request_asset@14;
+  RemoveAssetBody? remove_asset@15;
+  SetAssetPolicyBody? set_asset_policy@16;
+  SaveProviderCredentialBody? save_provider_credential@17;
+  ForgetProviderCredentialBody? forget_provider_credential@18;
+  StartProviderAuthBody? start_provider_auth@19;
+  SaveCustomProviderBody? save_custom_provider@20;
+  RemoveCustomProviderBody? remove_custom_provider@21;
+  CompleteHandoverBody? complete_handover@22;
+  SupplyUserInputBody? supply_user_input@23;
+  SetProviderCredentialStateBody? set_provider_credential_state@24;
+  ProbeProviderKeyBody? probe_provider_key@25;
+  SetProviderModelPreferenceBody? set_provider_model_preference@26;
+  ProbeCustomEndpointBody? probe_custom_endpoint@27;
+  RequestComposerCompletionBody? request_composer_completion@28;
+  CancelComposerCompletionBody? cancel_composer_completion@29;
+  PauseTaskBody? pause_task@30;
+  ResumeTaskBody? resume_task@31;
+  TakeOverBody? take_over@32;
+  SetAssistantConfigurationBody? set_assistant_configuration@33;
+  SaveWorkspaceBody? save_workspace@34;
+  RenameWorkspaceBody? rename_workspace@35;
+  DeleteWorkspaceBody? delete_workspace@36;
+  DiscardWorkspaceBody? discard_workspace@37;
+  SearchLibraryBody? search_library@38;
+  SaveLibraryFactBody? save_library_fact@39;
+  RemoveLibraryEntryBody? remove_library_entry@40;
+  RequestLibraryExportBody? request_library_export@41;
+  SearchMemoryBody? search_memory@42;
+  UpsertMemoryBody? upsert_memory@43;
+  DeleteMemoryBody? delete_memory@44;
+  AcceptTaskArtifactBody? accept_task_artifact@45;
+  RequestTaskArtifactExportBody? request_task_artifact_export@46;
+  SiteSkillMutationBody? mutate_site_skill@47;
+  CancelProviderAuthBody? cancel_provider_auth@48;
+  StartLibraryRefreshBody? start_library_refresh@49;
+  FollowUpBody? follow_up@50;
+};
+
+struct TaskConsentPreview {
+  array<string> source_hosts@0;
+  bool source_discovery_enabled@1;
+  uint32 new_source_cap@2;
+  TaskProviderRoute provider_route@3;
+  array<TaskAttachedStore> attached_stores@4;
+};
+
+struct StartTaskBody {
+  string request_id@0;
+  string goal@1;
+  TaskTemplateId template_id@2;
+  string? workspace_id@3;
+  TaskConsentPreview consent_preview@4;
+  string? skill_offer_id@5;
+};
+
+struct CancelTaskBody {
+  string task_id@0;
+};
+
+struct PauseTaskBody {
+  string task_id@0;
+};
+
+struct ResumeTaskBody {
+  string task_id@0;
+};
+
+struct TakeOverBody {
+  string task_id@0;
+};
+
+struct AssistantConfigurationView {
+  uint64 revision@0;
+  array<AssistantAbilityView> disabled_abilities@1;
+  PersonalityPresetView preset@2;
+  uint32 pace@3;
+  uint32 length@4;
+  uint32 check_in@5;
+};
+
+struct BuiltinSkillReferenceView {
+  BuiltinSkillIdView skill_id@0;
+  uint32 version@1;
+};
+
+struct BuiltinSkillView {
+  BuiltinSkillReferenceView reference@0;
+  AssistantAbilityView required_ability@1;
+  bool enabled@2;
+  BuiltinSkillAvailabilityView availability@3;
+  uint32 required_tool_count@4;
+  uint32 available_tool_count@5;
+  uint32 required_part_count@6;
+  uint32 installed_part_count@7;
+};
+
+struct CoreStatusProjectionOmission {
+  CoreStatusProjectionFamily family@0;
+  uint64 revision@1;
+  uint32 item_count@2;
+};
+
+struct SetAssistantConfigurationBody {
+  uint64 expected_revision@0;
+  array<AssistantAbilityView> disabled_abilities@1;
+  PersonalityPresetView preset@2;
+  uint32 pace@3;
+  uint32 length@4;
+  uint32 check_in@5;
+};
+
+struct CompleteHandoverBody {
+  string task_id@0;
+};
+
+struct SupplyUserInputBody {
+  string task_id@0;
+  string answer@1;
+};
+
+struct FollowUpBody {
+  string task_id@0;
+  string question@1;
+};
+
+struct ApproveActionBody {
+  string task_id@0;
+  string action_id@1;
+};
+
+struct RetryCoreBody {
+  uint64 observed_generation@0;
+};
+
+struct CoreFailure {
+  CoreFailureCode code@0;
+  bool retryable@1;
+  string? message_key@2;
+};
+
+struct TaskActivityView {
+  uint64 sequence@0;
+  TaskActivityKind kind@1;
+  string? host@2;
+  uint32 count@3;
+  uint64 at_epoch_ms@4;
+};
+
+struct TaskArtifactView {
+  string artifact_id@0;
+  TaskArtifactKind kind@1;
+  uint64 workspace_revision@2;
+  bool accepted@3;
+};
+
+struct TaskViewState {
+  string task_id@0;
+  uint64 revision@1;
+  TaskPhase phase@2;
+  uint32 progress_basis_points@3;
+  string? status_message_key@4;
+  CoreFailure? failure@5;
+  string goal@6;
+  TaskTemplateId template_id@7;
+  ActionApprovalView? pending_action@8;
+  string? workspace_id@9;
+  string? pending_ask_prompt@10;
+  string? pending_field_value_request@11;
+  array<TaskControlKind> allowed_controls@12;
+  array<TaskArtifactView> artifacts@13;
+  array<TaskActivityView> activity@14;
+};
+
+struct ActionApprovalView {
+  string action_id@0;
+  string? host@1;
+  uint32 item_count@2;
+  string summary_message_key@3;
+};
+
+struct StoredCredentialView {
+  ProviderAuthMethodView auth_method@0;
+  ProviderCredentialStateView state@1;
+  bool subscription_backed@2;
+  string? account_label@3;
+  string? plan_label@4;
+};
+
+struct ThinkingPreferenceView {
+  ThinkingLevelView level@0;
+};
+
+struct ProviderRefusalStateView {
+  ProviderRefusalView refusal@0;
+  uint64 at_monotonic_ms@1;
+};
+
+struct ProviderPresentationView {
+  string? key_prefix@0;
+  string? get_key_url@1;
+  string? docs_url@2;
+};
+
+struct ProviderModelView {
+  string provider_id@0;
+  string model_id@1;
+  string display_name@2;
+  uint64 context_window@3;
+  uint64 max_output_tokens@4;
+  bool reasoning@5;
+  bool tool_calling@6;
+  array<ModelRoleView> roles@7;
+  array<InputModalityView> input_modalities@8;
+  array<ThinkingLevelView> thinking_levels@9;
+};
+
+struct ProviderRosterEntry {
+  string provider_id@0;
+  string display_name@1;
+  ProviderOriginView origin@2;
+  array<ProviderAuthMethodView> auth_methods@3;
+  StoredCredentialView? stored@4;
+  bool signing_in@5;
+  bool enabled@6;
+  string? endpoint_host@7;
+  bool configurable@8;
+  bool endpoint_changed@9;
+  CatalogLayerView catalog_layer@10;
+  string? selected_model_id@11;
+  ThinkingPreferenceView? thinking@12;
+  ProviderPresentationView? presentation@13;
+  string? endpoint_base@14;
+  ProviderRefusalStateView? last_refusal@15;
+  uint32 model_count@16;
+  bool subscription@17;
+  string? refused_endpoint_host@18;
+};
+
+struct SetProviderCredentialStateBody {
+  string provider_id@0;
+  ProviderCredentialStateView state@1;
+};
+
+struct ProbeProviderKeyBody {
+  string provider_id@0;
+  string credential_handle@1;
+};
+
+struct ProviderProbeView {
+  string provider_id@0;
+  ProviderProbeVerdictView verdict@1;
+  uint64 at_monotonic_ms@2;
+  ProbeEndpointView? endpoint@3;
+};
+
+struct ProbeEndpointView {
+  ServerKindView server_kind@0;
+  uint32 model_count@1;
+  array<CustomModelSpecView> models@2;
+  string? proved_base@3;
+};
+
+struct DetectedServerView {
+  ServerKindView server_kind@0;
+};
+
+struct SavedSignInView {
+  string id@0;
+  string site@1;
+  string username@2;
+  uint64 last_used_epoch_ms@3;
+};
+
+struct SavedSignInsView {
+  SavedDataAvailability availability@0;
+  uint64 revision@1;
+  array<SavedSignInView> records@2;
+};
+
+struct SavedDetailView {
+  string id@0;
+  string given_name@1;
+  string family_name@2;
+  string email@3;
+  string phone@4;
+  string address@5;
+  string postcode@6;
+  string country@7;
+};
+
+struct SavedDetailsView {
+  SavedDataAvailability availability@0;
+  uint64 revision@1;
+  array<SavedDetailView> people@2;
+};
+
+struct CoreStatus {
+  CoreAvailability availability@0;
+  uint64 generation@1;
+  array<TaskViewState> active_tasks@2;
+  AuthViewState? auth_state@3;
+  array<WorkspaceViewState> workspaces@4;
+  WorkspaceExportView? workspace_export@5;
+  AssetDeliveryView? asset_delivery@6;
+  array<ProviderRosterEntry> provider_roster@7;
+  array<ProviderProbeView> provider_probes@8;
+  array<ProviderModelView> provider_models@9;
+  AssistantConfigurationView assistant_configuration@10;
+  LibraryViewState library@11;
+  LibraryExportView? library_export@12;
+  MemoryViewState memory@13;
+  SavedSignInsView saved_sign_ins@14;
+  SavedDetailsView saved_details@15;
+  array<SiteSkillView> site_skills@16;
+  array<BuiltinSkillView> builtin_skills@17;
+  CoreStatusProjectionMode projection_mode@18;
+  array<CoreStatusProjectionOmission> projection_omissions@19;
+};
+
+struct WorkspaceViewState {
+  string workspace_id@0;
+  uint64 revision@1;
+  string goal@2;
+  WorkspacePhase phase@3;
+  uint64 last_updated_epoch_ms@4;
+  TaskTemplateId template_id@5;
+  array<WorkspaceSourceView> sources@6;
+  array<WorkspaceFactView> facts@7;
+  bool saved@8;
+  string display_name@9;
+  WorkspaceDeletionPreviewView? deletion_preview@10;
+};
+
+struct WorkspaceDeletionPreviewView {
+  uint32 sources@0;
+  uint32 facts@1;
+  uint32 artifact_metadata@2;
+  uint32 derived_indexes@3;
+  string confirmation_token@4;
+};
+
+struct WorkspaceSourceView {
+  string source_id@0;
+  string title@1;
+  string host@2;
+  uint64 read_at_epoch_ms@3;
+  uint32 fact_count@4;
+  bool excluded@5;
+};
+
+struct WorkspaceFactView {
+  string fact_id@0;
+  string field@1;
+  string value@2;
+  WorkspaceFactKind kind@3;
+  array<string> sources@4;
+  string? correction@5;
+  bool has_conflict@6;
+  bool needs_new_source@7;
+};
+
+struct WorkspaceExportView {
+  string request_id@0;
+  string workspace_id@1;
+  uint64 revision@2;
+  WorkspaceExportFormat format@3;
+  string content@4;
+};
+
+struct LibrarySourceView {
+  string source_id@0;
+  string title@1;
+  string host@2;
+  uint64 observed_at_epoch_ms@3;
+};
+
+struct LibraryEntryView {
+  string entry_id@0;
+  uint64 revision@1;
+  string collection_id@2;
+  string collection_name@3;
+  string source_workspace_id@4;
+  uint64 source_workspace_revision@5;
+  string source_fact_id@6;
+  string field@7;
+  string original_value@8;
+  string? correction@9;
+  WorkspaceFactKind kind@10;
+  array<LibrarySourceView> sources@11;
+  uint64 captured_at_epoch_ms@12;
+  uint64 last_checked_epoch_ms@13;
+  bool has_conflict@14;
+};
+
+struct LibrarySearchHitView {
+  string entry_id@0;
+  uint64 age_ms@1;
+};
+
+struct LibrarySearchView {
+  string request_id@0;
+  string query@1;
+  uint64 library_revision@2;
+  array<LibrarySearchHitView> hits@3;
+};
+
+struct LibraryRefreshSourceView {
+  string source_id@0;
+  string title@1;
+  string host@2;
+};
+
+struct LibraryRefreshPreviewView {
+  string preview_id@0;
+  string collection_id@1;
+  uint64 library_revision@2;
+  uint64 source_workspace_revision@3;
+  TaskProviderRoute provider_route@4;
+  uint32 navigation_count@5;
+  uint32 observation_count@6;
+  array<LibraryRefreshSourceView> sources@7;
+};
+
+struct LibraryRefreshResultItemView {
+  string source_id@0;
+  LibraryRefreshDisposition disposition@1;
+};
+
+struct LibraryRefreshResultView {
+  string preview_id@0;
+  string collection_id@1;
+  array<LibraryRefreshResultItemView> items@2;
+};
+
+struct LibraryViewState {
+  LibraryAvailability availability@0;
+  uint64 revision@1;
+  array<LibraryEntryView> entries@2;
+  LibrarySearchView? search@3;
+  array<LibraryRefreshPreviewView> refresh_previews@4;
+  array<LibraryRefreshResultView> refresh_results@5;
+};
+
+struct LibraryExportView {
+  string request_id@0;
+  uint64 library_revision@1;
+  string? collection_id@2;
+  WorkspaceExportFormat format@3;
+  string content@4;
+};
+
+struct MemoryWorkspaceView {
+  string workspace_id@0;
+  string display_name@1;
+};
+
+struct MemoryRecordView {
+  string memory_id@0;
+  uint64 revision@1;
+  string statement@2;
+  MemorySourceKind source_kind@3;
+  string? source_task_id@4;
+  MemoryWorkspaceView? source_workspace@5;
+  MemoryScopeKind scope_kind@6;
+  MemoryWorkspaceView? scope_workspace@7;
+  MemorySensitivity sensitivity@8;
+  uint64 created_at_epoch_ms@9;
+  uint64 updated_at_epoch_ms@10;
+  uint64 reviewed_at_epoch_ms@11;
+  uint64 expires_at_epoch_ms@12;
+};
+
+struct MemorySearchHitView {
+  string memory_id@0;
+};
+
+struct MemorySearchView {
+  string request_id@0;
+  string query@1;
+  uint64 memory_revision@2;
+  array<MemorySearchHitView> hits@3;
+};
+
+struct MemoryViewState {
+  MemoryAvailability availability@0;
+  uint64 revision@1;
+  array<MemoryRecordView> records@2;
+  MemorySearchView? search@3;
+};
+
+struct CorrectWorkspaceFactBody {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+  string fact_id@2;
+  string value@3;
+};
+
+struct ExcludeWorkspaceSourceBody {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+  string source_id@2;
+};
+
+struct RequestWorkspaceExportBody {
+  string request_id@0;
+  string workspace_id@1;
+  uint64 expected_revision@2;
+  WorkspaceExportFormat format@3;
+};
+
+struct SaveWorkspaceBody {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+};
+
+struct RenameWorkspaceBody {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+  string display_name@2;
+};
+
+struct DeleteWorkspaceBody {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+  string confirmation_token@2;
+};
+
+struct DiscardWorkspaceBody {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+};
+
+struct SearchLibraryBody {
+  string request_id@0;
+  string query@1;
+  uint32 limit@2;
+  uint64 requested_at_epoch_ms@3;
+};
+
+struct SaveLibraryFactBody {
+  string workspace_id@0;
+  uint64 expected_workspace_revision@1;
+  string fact_id@2;
+  uint64 expected_library_revision@3;
+  uint64 expected_entry_revision@4;
+  uint64 approved_at_epoch_ms@5;
+};
+
+struct RemoveLibraryEntryBody {
+  string entry_id@0;
+  uint64 expected_library_revision@1;
+  uint64 expected_entry_revision@2;
+  uint64 removed_at_epoch_ms@3;
+};
+
+struct RequestLibraryExportBody {
+  string request_id@0;
+  uint64 expected_library_revision@1;
+  string? collection_id@2;
+  WorkspaceExportFormat format@3;
+};
+
+struct SearchMemoryBody {
+  string request_id@0;
+  string query@1;
+  uint32 limit@2;
+  uint64 requested_at_epoch_ms@3;
+};
+
+struct UpsertMemoryBody {
+  string? memory_id@0;
+  string statement@1;
+  MemoryScopeKind scope_kind@2;
+  MemoryWorkspaceView? scope_workspace@3;
+  MemorySensitivity sensitivity@4;
+  uint64 expected_memory_revision@5;
+  uint64 expected_record_revision@6;
+  uint64 expires_at_epoch_ms@7;
+  uint64 approved_at_epoch_ms@8;
+};
+
+struct DeleteMemoryBody {
+  string memory_id@0;
+  uint64 expected_memory_revision@1;
+  uint64 expected_record_revision@2;
+  uint64 deleted_at_epoch_ms@3;
+};
+
+struct AcceptTaskArtifactBody {
+  string task_id@0;
+  string artifact_id@1;
+};
+
+struct RequestTaskArtifactExportBody {
+  string request_id@0;
+  string task_id@1;
+  string artifact_id@2;
+  TaskArtifactKind kind@3;
+};
+
+struct StartAuthBody {
+  AuthProvider provider@0;
+};
+
+struct EmailLinkBody {
+  string email@0;
+};
+
+struct SignOutBody {
+  string? account_id@0;
+};
+
+struct AuthCredentialResultBody {
+  AuthProvider provider@0;
+  string? credential_handle@1;
+  AuthCredentialStatus status@2;
+  string flow_id@3;
+};
+
+struct AuthAccountView {
+  string account_id@0;
+  string? display_name@1;
+  string? email@2;
+  AuthProvider method@3;
+};
+
+struct AuthFailure {
+  AuthFailureCode code@0;
+  bool retryable@1;
+};
+
+struct AuthMethodView {
+  AuthProvider provider@0;
+  AuthMethodAvailability availability@1;
+};
+
+struct EntitlementView {
+  string plan_id@0;
+  uint64 credits_granted@1;
+  uint64 credits_remaining@2;
+  uint64 next_renewal_epoch_seconds@3;
+  uint64 valid_until_epoch_seconds@4;
+};
+
+struct AuthViewState {
+  AuthPhase phase@0;
+  AuthAccountView? account@1;
+  string? pending_email@2;
+  AuthFailure? failure@3;
+  array<AuthMethodView> methods@4;
+  EntitlementView? entitlement@5;
+};
+
+struct PageInspectorDocumentView {
+  string document_id@0;
+  PageInspectorDocumentKind kind@1;
+  string host@2;
+  array<PageInspectorClaim> claims@3;
+};
+
+struct PageInspectorDocumentsView {
+  PageInspectorAvailability availability@0;
+  array<PageInspectorDocumentView> documents@1;
+};
+
+struct PageInspectorAdapterView {
+  PageInspectorAdapterKind kind@0;
+  PageInspectorAdapterStatus status@1;
+  uint32 version@2;
+};
+
+struct PageInspectorNodeView {
+  string display_id@0;
+  PageInspectorNodeRole role@1;
+  string? name@2;
+  PageInspectorSensitivity sensitivity@3;
+  uint32 text_run_count@4;
+  uint64 text_byte_count@5;
+  bool value_present@6;
+  bool value_withheld@7;
+};
+
+struct PageInspectorEdgeView {
+  string from_display_id@0;
+  string to_display_id@1;
+  PageInspectorRelationship relationship@2;
+  bool inferred@3;
+};
+
+struct PageInspectorFrameView {
+  bool main_frame@0;
+  bool out_of_process@1;
+  bool cross_origin@2;
+  bool included@3;
+};
+
+struct PageInspectorTruncationView {
+  bool truncated@0;
+  array<PageInspectorBudgetKind> budgets_reached@1;
+  uint32 omitted_node_count@2;
+  uint32 omitted_text_bytes@3;
+  uint32 omitted_frame_count@4;
+  bool may_change_answer@5;
+};
+
+struct PageInspectorRedactionView {
+  uint32 redacted_field_count@0;
+  uint32 suppressed_secret_count@1;
+  uint32 sensitive_zone_count@2;
+  uint32 filtered_frame_count@3;
+};
+
+struct PageInspectorSnapshotView {
+  string document_id@0;
+  uint64 document_revision@1;
+  string host@2;
+  bool secure_context@3;
+  bool private_profile@4;
+  PageInspectorDocumentState document_state@5;
+  array<PageInspectorAdapterView> adapters@6;
+  array<PageInspectorNodeView> nodes@7;
+  array<PageInspectorEdgeView> edges@8;
+  array<PageInspectorFrameView> frames@9;
+  PageInspectorTruncationView truncation@10;
+  PageInspectorRedactionView redaction@11;
+  array<PageInspectorWarningCode> warnings@12;
+  SiteSkillOfferAvailability site_skill_offer_availability@13;
+  array<SiteSkillOfferView> site_skill_offers@14;
+};
+
+struct PageInspectorSnapshotResult {
+  PageInspectorAvailability availability@0;
+  PageInspectorSnapshotView? snapshot@1;
+};
+
+struct PageSnapshotExportView {
+  string request_id@0;
+  string document_id@1;
+  uint64 document_revision@2;
+  string origin@3;
+  PageSnapshotExportFormat format@4;
+  string mime_type@5;
+  string suggested_file_name@6;
+  array<uint8> content@7;
+  uint32 node_count@8;
+  uint32 redacted_field_count@9;
+  uint32 suppressed_secret_value_count@10;
+  uint32 withheld_field_count@11;
+  uint64 captured_at_epoch_ms@12;
+  bool source_query_withheld@13;
+  bool source_fragment_withheld@14;
+  bool secure_context@15;
+};
+
+struct PageSnapshotExportResult {
+  PageSnapshotExportAvailability availability@0;
+  PageSnapshotExportView? snapshot_export@1;
+};
+
+struct PermissionResultBody {
+  string request_id@0;
+  PlatformPermission permission@1;
+  PermissionDecision decision@2;
+};
+
+struct AssetRefusal {
+  AssetRefusalView reason@0;
+  bool retryable@1;
+};
+
+struct AssetViewState {
+  string asset_id@0;
+  string asset_revision@1;
+  AssetKindView kind@2;
+  AssetPresenceView presence@3;
+  uint64 written_bytes@4;
+  uint64 total_bytes@5;
+  uint32 attempts@6;
+  AssetRefusal? refusal@7;
+  uint64 waiting_until_monotonic_ms@8;
+};
+
+struct AssetDeliveryView {
+  bool platform_supported@0;
+  AssetNetworkCostView network_cost@1;
+  bool metered_permitted@2;
+  array<AssetViewState> assets@3;
+};
+
+struct RequestAssetBody {
+  string asset_id@0;
+  string asset_revision@1;
+};
+
+struct RemoveAssetBody {
+  string asset_id@0;
+  string asset_revision@1;
+};
+
+struct SetAssetPolicyBody {
+  AssetNetworkCostView network_cost@0;
+  bool metered_permitted@1;
+};
+
+struct SaveProviderCredentialBody {
+  string provider_id@0;
+  ProviderAuthMethodView auth_method@1;
+  string credential_handle@2;
+};
+
+struct ForgetProviderCredentialBody {
+  string provider_id@0;
+};
+
+struct StartProviderAuthBody {
+  string provider_id@0;
+};
+
+struct CancelProviderAuthBody {
+  string flow_id@0;
+};
+
+struct StartLibraryRefreshBody {
+  string preview_id@0;
+  string collection_id@1;
+  uint64 expected_library_revision@2;
+  uint64 expected_workspace_revision@3;
+  uint32 source_count@4;
+};
+
+struct CustomModelSpecView {
+  string model_id@0;
+  string display_name@1;
+  uint32 context_window@2;
+  uint32 max_output_tokens@3;
+  bool reasoning@4;
+  bool tool_calling@5;
+};
+
+struct SaveCustomProviderBody {
+  string provider_id@0;
+  string display_name@1;
+  string endpoint@2;
+  ProviderWireApiView wire_api@3;
+  string? credential_handle@4;
+  array<CustomModelSpecView> models@5;
+  DetectedServerView? detected_server@6;
+};
+
+struct ProbeCustomEndpointBody {
+  string endpoint@0;
+  ProviderWireApiView wire_api@1;
+  string? credential_handle@2;
+  string provider_id@3;
+};
+
+struct SetProviderModelPreferenceBody {
+  string provider_id@0;
+  string? model_id@1;
+  ThinkingPreferenceView? thinking@2;
+};
+
+struct RequestComposerCompletionBody {
+  string request_id@0;
+  string prefix@1;
+  string? suffix@2;
+};
+
+struct CancelComposerCompletionBody {
+  string request_id@0;
+};
+
+struct RemoveCustomProviderBody {
+  string provider_id@0;
+};
+
+struct SavedFlowQueryResult {
+  string request_id@0;
+  uint64 service_generation@1;
+  SavedFlowQueryAvailability availability@2;
+  array<SiteSkillView> flows@3;
+};
+
+interface TaffyProfileCoreApiObserver {
+  OnSnapshot@0(
+      CoreAvailability availability@0,
+      uint64 service_generation@1,
+      uint64 state_sequence@2,
+      uint32 status_schema_version@3,
+      array<uint8>? status_payload@4
+  );
+  OnPermissionRequest@1(string request_id@0, PlatformPermission permission@1);
+  OnAssetProgress@2(
+      string asset_id@0,
+      string asset_revision@1,
+      uint64 written_bytes@2,
+      uint64 total_bytes@3
+  );
+  OnComposerCompletion@3(string request_id@0, string? text@1);
+  OnTaskAnswerDelta@4(
+      string task_id@0,
+      string call_id@1,
+      uint32 sequence@2,
+      string? text@3,
+      bool terminal@4,
+      bool complete@5
+  );
+  OnTaskArtifactExport@5(
+      string request_id@0,
+      string task_id@1,
+      string artifact_id@2,
+      TaskArtifactKind kind@3,
+      array<uint8> content@4
+  );
+};
+
+interface TaffyProfileCoreApi {
+  Observe@0(pending_remote<TaffyProfileCoreApiObserver> observer@0);
+  StartTask@1(
+      string goal@0,
+      TaskTemplateId template_id@1,
+      string? workspace_id@2,
+      TaskConsentPreview consent_preview@3,
+      string? skill_offer_id@4
+  ) => (CoreApiSubmissionStatus status@0);
+  CancelTask@2(string task_id@0) => (CoreApiSubmissionStatus status@0);
+  ApproveAction@3(
+      string task_id@0,
+      string action_id@1
+  ) => (CoreApiSubmissionStatus status@0);
+  RetryCore@4(
+      uint64 observed_generation@0
+  ) => (CoreApiSubmissionStatus status@0);
+  StartAuth@5(AuthProvider provider@0) => (CoreApiSubmissionStatus status@0);
+  RequestEmailLink@6(string email@0) => (CoreApiSubmissionStatus status@0);
+  SignOut@7() => (CoreApiSubmissionStatus status@0);
+  DeliverCredentialResult@8(
+      string flow_id@0,
+      AuthProvider provider@1,
+      AuthCredentialStatus credential_status@2,
+      string? credential_handle@3
+  ) => (CoreApiSubmissionStatus status@0);
+  DeliverPermissionResult@9(
+      string request_id@0,
+      PlatformPermission permission@1,
+      PermissionDecision decision@2
+  ) => (CoreApiSubmissionStatus status@0);
+  CorrectWorkspaceFact@10(
+      string workspace_id@0,
+      uint64 expected_revision@1,
+      string fact_id@2,
+      string value@3
+  ) => (CoreApiSubmissionStatus status@0);
+  ExcludeWorkspaceSource@11(
+      string workspace_id@0,
+      uint64 expected_revision@1,
+      string source_id@2
+  ) => (CoreApiSubmissionStatus status@0);
+  RequestWorkspaceExport@12(
+      string request_id@0,
+      string workspace_id@1,
+      uint64 expected_revision@2,
+      WorkspaceExportFormat format@3
+  ) => (CoreApiSubmissionStatus status@0);
+  RequestAsset@13(
+      string asset_id@0,
+      string asset_revision@1
+  ) => (CoreApiSubmissionStatus status@0);
+  RemoveAsset@14(
+      string asset_id@0,
+      string asset_revision@1
+  ) => (CoreApiSubmissionStatus status@0);
+  SetAssetPolicy@15(
+      AssetNetworkCostView network_cost@0,
+      bool metered_permitted@1
+  ) => (CoreApiSubmissionStatus status@0);
+  ReadPartMember@16(
+      string asset_id@0,
+      string member_path@1
+  ) => (PartMemberStatus status@0, array<uint8>? bytes@1);
+  SaveProviderCredential@17(
+      string provider_id@0,
+      ProviderAuthMethodView auth_method@1,
+      string credential_handle@2
+  ) => (CoreApiSubmissionStatus status@0);
+  ForgetProviderCredential@18(
+      string provider_id@0
+  ) => (CoreApiSubmissionStatus status@0);
+  StartProviderAuth@19(
+      string provider_id@0
+  ) => (CoreApiSubmissionStatus status@0);
+  SaveCustomProvider@20(
+      string provider_id@0,
+      string display_name@1,
+      string endpoint@2,
+      ProviderWireApiView wire_api@3,
+      string? credential_handle@4,
+      array<CustomModelSpecView> models@5,
+      DetectedServerView? detected_server@6
+  ) => (CoreApiSubmissionStatus status@0);
+  RemoveCustomProvider@21(
+      string provider_id@0
+  ) => (CoreApiSubmissionStatus status@0);
+  CompleteHandover@22(string task_id@0) => (CoreApiSubmissionStatus status@0);
+  SupplyUserInput@23(
+      string task_id@0,
+      string answer@1
+  ) => (CoreApiSubmissionStatus status@0);
+  SetProviderCredentialState@24(
+      string provider_id@0,
+      ProviderCredentialStateView state@1
+  ) => (CoreApiSubmissionStatus status@0);
+  ProbeProviderKey@25(
+      string provider_id@0,
+      string credential_handle@1
+  ) => (CoreApiSubmissionStatus status@0);
+  SetProviderModelPreference@26(
+      string provider_id@0,
+      string? model_id@1,
+      ThinkingPreferenceView? thinking@2
+  ) => (CoreApiSubmissionStatus status@0);
+  ProbeCustomEndpoint@27(
+      string endpoint@0,
+      ProviderWireApiView wire_api@1,
+      string? credential_handle@2,
+      string provider_id@3
+  ) => (CoreApiSubmissionStatus status@0);
+  RequestComposerCompletion@28(
+      string request_id@0,
+      string prefix@1,
+      string? suffix@2
+  ) => (CoreApiSubmissionStatus status@0);
+  CancelComposerCompletion@29(
+      string request_id@0
+  ) => (CoreApiSubmissionStatus status@0);
+  PauseTask@30(string task_id@0) => (CoreApiSubmissionStatus status@0);
+  ResumeTask@31(string task_id@0) => (CoreApiSubmissionStatus status@0);
+  TakeOver@32(string task_id@0) => (CoreApiSubmissionStatus status@0);
+  SetAssistantConfiguration@33(
+      uint64 expected_revision@0,
+      array<AssistantAbilityView> disabled_abilities@1,
+      PersonalityPresetView preset@2,
+      uint32 pace@3,
+      uint32 length@4,
+      uint32 check_in@5
+  ) => (CoreApiSubmissionStatus status@0);
+  SaveWorkspace@34(
+      string workspace_id@0,
+      uint64 expected_revision@1
+  ) => (CoreApiSubmissionStatus status@0);
+  RenameWorkspace@35(
+      string workspace_id@0,
+      uint64 expected_revision@1,
+      string display_name@2
+  ) => (CoreApiSubmissionStatus status@0);
+  DeleteWorkspace@36(
+      string workspace_id@0,
+      uint64 expected_revision@1,
+      string confirmation_token@2
+  ) => (CoreApiSubmissionStatus status@0);
+  DiscardWorkspace@37(
+      string workspace_id@0,
+      uint64 expected_revision@1
+  ) => (CoreApiSubmissionStatus status@0);
+  SearchLibrary@38(
+      string request_id@0,
+      string query@1,
+      uint32 limit@2
+  ) => (CoreApiSubmissionStatus status@0);
+  SaveLibraryFact@39(
+      string workspace_id@0,
+      uint64 expected_workspace_revision@1,
+      string fact_id@2,
+      uint64 expected_library_revision@3,
+      uint64 expected_entry_revision@4
+  ) => (CoreApiSubmissionStatus status@0);
+  RemoveLibraryEntry@40(
+      string entry_id@0,
+      uint64 expected_library_revision@1,
+      uint64 expected_entry_revision@2
+  ) => (CoreApiSubmissionStatus status@0);
+  RequestLibraryExport@41(
+      string request_id@0,
+      uint64 expected_library_revision@1,
+      string? collection_id@2,
+      WorkspaceExportFormat format@3
+  ) => (CoreApiSubmissionStatus status@0);
+  SearchMemory@42(
+      string request_id@0,
+      string query@1,
+      uint32 limit@2
+  ) => (CoreApiSubmissionStatus status@0);
+  UpsertMemory@43(
+      string? memory_id@0,
+      string statement@1,
+      MemoryScopeKind scope_kind@2,
+      MemoryWorkspaceView? scope_workspace@3,
+      MemorySensitivity sensitivity@4,
+      uint64 expected_memory_revision@5,
+      uint64 expected_record_revision@6,
+      uint64 expires_at_epoch_ms@7
+  ) => (CoreApiSubmissionStatus status@0);
+  DeleteMemory@44(
+      string memory_id@0,
+      uint64 expected_memory_revision@1,
+      uint64 expected_record_revision@2
+  ) => (CoreApiSubmissionStatus status@0);
+  AcceptTaskArtifact@45(
+      string task_id@0,
+      string artifact_id@1
+  ) => (CoreApiSubmissionStatus status@0);
+  RequestTaskArtifactExport@46(
+      string request_id@0,
+      string task_id@1,
+      string artifact_id@2,
+      TaskArtifactKind kind@3
+  ) => (CoreApiSubmissionStatus status@0);
+  UpsertSavedDetail@47(
+      uint64 expected_revision@0,
+      string? detail_id@1,
+      string given_name@2,
+      string family_name@3,
+      string email@4,
+      string phone@5,
+      string address@6,
+      string postcode@7,
+      string country@8
+  ) => (CoreApiSubmissionStatus status@0);
+  DeleteSavedDetail@48(
+      string detail_id@0,
+      uint64 expected_revision@1
+  ) => (CoreApiSubmissionStatus status@0);
+  DeleteSavedSignIn@49(
+      string sign_in_id@0,
+      uint64 expected_revision@1
+  ) => (CoreApiSubmissionStatus status@0);
+  MutateSiteSkill@50(
+      SiteSkillMutationKind kind@0,
+      string skill_id@1,
+      uint32 expected_version@2,
+      string origin@3,
+      array<SiteSkillObservedClause> clauses@4,
+      array<SiteSkillObservedStep> steps@5,
+      uint32 admitted@6,
+      bool enabled@7
+  ) => (CoreApiSubmissionStatus status@0);
+  StartProviderAuthFlow@51(
+      string provider_id@0
+  ) => (CoreApiSubmissionStatus status@0, string? flow_id@1);
+  CancelProviderAuth@52(string flow_id@0) => (CoreApiSubmissionStatus status@0);
+  StartLibraryRefresh@53(
+      string preview_id@0,
+      string collection_id@1,
+      uint64 expected_library_revision@2,
+      uint64 expected_workspace_revision@3,
+      uint32 source_count@4
+  ) => (CoreApiSubmissionStatus status@0);
+  FollowUp@54(
+      string task_id@0,
+      string question@1
+  ) => (CoreApiSubmissionStatus status@0);
+  FindSavedFlows@55(
+      string request_id@0,
+      string goal@1
+  ) => (SavedFlowQueryResult result@0);
+  GetSavedFlowReview@56(
+      string request_id@0,
+      string skill_id@1,
+      uint32 expected_version@2
+  ) => (SavedFlowQueryResult result@0);
+  OpenSavedFlowStart@57(
+      string request_id@0,
+      string skill_id@1,
+      uint32 expected_version@2
+  ) => (CoreApiSubmissionStatus status@0);
+};
+
+interface TaffyPageInspector {
+  GetDocuments@0() => (PageInspectorDocumentsView result@0);
+  GetSnapshot@1(string document_id@0) => (PageInspectorSnapshotResult result@0);
+  ExportSnapshot@2(
+      string request_id@0,
+      string document_id@1,
+      PageSnapshotExportFormat format@2
+  ) => (PageSnapshotExportResult result@0);
+  CancelExport@3(string request_id@0) => (CoreApiSubmissionStatus status@0);
+};

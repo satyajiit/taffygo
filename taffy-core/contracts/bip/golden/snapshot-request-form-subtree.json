@@ -1,0 +1,50 @@
+{
+  "schema_version": "0.9",
+  "request_id": "req_form_001",
+  "profile_id": "prof_default",
+  "tab_id": "tab_01",
+  "root_frame_id": "frame_main",
+  "observed_frame_id": "frame_main",
+  "expected_page_epoch": "epoch_a1",
+  "scope": "SECTION",
+  "form_root": {
+    "node_id": "node_checkout_form",
+    "minimum_graph_revision": 42
+  },
+  "adapters": [
+    {
+      "adapter": "DOM",
+      "requirement": "REQUIRED"
+    },
+    {
+      "adapter": "FORMS",
+      "requirement": "REQUIRED"
+    },
+    {
+      "adapter": "ACCESSIBILITY",
+      "requirement": "OPTIONAL"
+    }
+  ],
+  "requested_fields": [
+    "ROLE",
+    "NAME",
+    "STATES",
+    "ATTRIBUTES",
+    "SENSITIVITY",
+    "EDGES"
+  ],
+  "include_child_frames": false,
+  "allowed_origins": [
+    {
+      "kind": "TUPLE",
+      "serialization": "https://shop.example.test"
+    }
+  ],
+  "max_nodes": 128,
+  "max_text_bytes": 8192,
+  "max_total_bytes": 32768,
+  "max_depth": 8,
+  "deadline_ms": 800,
+  "sensitivity_policy_id": "policy_form_inspect",
+  "task_purpose": "FORM_INSPECT"
+}

@@ -1,0 +1,297 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/screens/capture — one real screenshot off an attached Android phone,
+# with a clean status bar or none, and never a navigation bar.
+#
+# The screenshots are for the store listing and the website, and they have to
+# be the product as it ran. Each capture is written three ways under one run
+# directory: raw/<name>.png as the phone sent it, cropped/<name>.png at full
+# resolution with the system bars cut off, and webp/<name>.webp from the crop.
+# It also adds or replaces its entry in the run's manifest.json: what it
+# shows, its pixel sizes, every crop in pixels with the reason, and the app's
+# versionName and versionCode.
+#
+# The status bar is cleaned with SystemUI demo mode (12:00, full battery, no
+# notification icons). Some vendors honour only part of that, so the tool
+# reads the status-bar clock back through `uiautomator dump --windows` and
+# keeps the bar only when it says 12:00; otherwise the bar is cropped at the
+# inset the phone reports. Demo mode is always exited and
+# `sysui_demo_allowed` restored when the command ends, however it ends.
+#
+# A notification drawn over the app is not croppable, so the capture waits it
+# out: the same windows dump is read before and after each screencap, and a
+# frame taken while a heads-up was showing is thrown away and taken again.
+# Over Wi-Fi the adb server is often restarted by other tools on the host;
+# a host:port serial gets one `adb connect` before the tool gives up on it.
+#
+# It refuses rather than guesses: no adb, no phone, several phones and no
+# --device, a screen that is off or locked, a notification that will not go
+# away, or a capture that is not a PNG each stop the run with the reason. It
+# installs nothing on the phone and changes nothing there except demo mode,
+# for the length of one capture.
+#
+# Exit codes: 0 = captured and written, 1 = refused or failed, 2 = usage.
+
+set -euo pipefail
+HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+# shellcheck disable=SC1091
+. "$HERE/../lib/common.sh"
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/screens/capture [options] <name>
+       ./tools/screens/capture --insets [--device SERIAL]
+       ./tools/screens/capture --demo-off [--device SERIAL]
+
+Captures the phone's screen as <name> (lower case, digits and hyphens) into
+OUT/raw, OUT/cropped and OUT/webp, and records it in OUT/manifest.json.
+
+Options:
+  --out DIR          the run directory (or set TAFFY_SCREENS_OUT); created if absent
+  --device SERIAL    which phone, when adb sees more than one (or ANDROID_SERIAL)
+  --shows TEXT       what the screen shows, for the manifest
+  --substitute TEXT  this is not the screen the name promises; say what it is instead
+  --package NAME     the app whose version the manifest records
+                     (default com.taffygo.browser)
+  --status-bar MODE  auto (default): keep the bar only if demo mode is honoured;
+                     crop: always cut it; keep: never cut it
+  --no-demo          leave SystemUI demo mode alone (the status bar is then cut
+                     under auto, since nothing cleaned it)
+  --quality N        WebP quality, 1-100 (default 90)
+  --insets           print the measured bars and screen geometry, capture nothing
+  --demo-off         leave demo mode and set sysui_demo_allowed to 0, for a phone a
+                     killed run left in demo mode
+  -h, --help         show this help
+
+Environment:
+  ADB                    the adb binary (default: adb on PATH, then $ANDROID_HOME)
+  TAFFY_SCREENS_PYTHON   a python3 that can import Pillow (default: python3)
+
+Nothing here installs, uploads or publishes anything.
+USAGE
+}
+
+NAME='' OUT=${TAFFY_SCREENS_OUT:-} SERIAL=${ANDROID_SERIAL:-} SHOWS='' SUBSTITUTE=''
+PACKAGE='com.taffygo.browser' STATUS_MODE='auto' DEMO=1 QUALITY=90 ACTION='capture'
+PYTHON=${TAFFY_SCREENS_PYTHON:-python3}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --out) OUT=${2:?--out needs a directory}; shift 2 ;;
+    --device) SERIAL=${2:?--device needs a serial}; shift 2 ;;
+    --shows) SHOWS=${2-}; shift 2 ;;
+    --substitute) SUBSTITUTE=${2-}; shift 2 ;;
+    --package) PACKAGE=${2:?--package needs a name}; shift 2 ;;
+    --status-bar) STATUS_MODE=${2:?--status-bar needs auto, crop or keep}; shift 2 ;;
+    --no-demo) DEMO=0; shift ;;
+    --quality) QUALITY=${2:?--quality needs a number}; shift 2 ;;
+    --insets) ACTION='insets'; shift ;;
+    --demo-off) ACTION='demo-off'; shift ;;
+    -h|--help) usage; exit 0 ;;
+    -*) usage >&2; printf 'unknown option: %s\n' "$1" >&2; exit 2 ;;
+    *) [ -z "$NAME" ] || { usage >&2; exit 2; }; NAME=$1; shift ;;
+  esac
+done
+
+case "$STATUS_MODE" in auto|crop|keep) ;; *) usage >&2; exit 2 ;; esac
+case "$QUALITY" in ''|*[!0-9]*) usage >&2; exit 2 ;; esac
+if [ "$QUALITY" -lt 1 ] || [ "$QUALITY" -gt 100 ]; then usage >&2; exit 2; fi
+if [ "$ACTION" = capture ]; then
+  printf '%s' "$NAME" | grep -Eq '^[a-z0-9][a-z0-9-]*$' || { usage >&2; exit 2; }
+  [ -n "$OUT" ] || die "no run directory" "Pass --out DIR or set TAFFY_SCREENS_OUT."
+fi
+
+# --- the phone --------------------------------------------------------------
+
+ADB=${ADB:-}
+if [ -z "$ADB" ]; then
+  if have adb; then ADB=adb
+  elif [ -n "${ANDROID_HOME:-}" ] && [ -x "$ANDROID_HOME/platform-tools/adb" ]; then
+    ADB="$ANDROID_HOME/platform-tools/adb"
+  else
+    die "no adb on this host" "Install Android platform-tools, or set ADB=/path/to/adb."
+  fi
+fi
+
+# A Wi-Fi serial drops whenever anything on this host restarts the adb server
+# (another SDK's adb runs `kill-server` on a version mismatch), and the phone
+# is still there. One `adb connect` puts it back; a USB serial gets none.
+reconnect() { # [serial] — one `adb connect` for a Wi-Fi serial that has dropped
+  case "${1:-}" in
+    *:*) "$ADB" devices | awk -v s="$1" '$1 == s && $2 == "device" { found = 1 } END { exit !found }' \
+           || "$ADB" connect "$1" >/dev/null 2>&1 || true ;;
+  esac
+}
+reconnect "$SERIAL"
+ready=$("$ADB" devices | awk 'NR > 1 && $2 == "device" { print $1 }')
+count=$(printf '%s\n' "$ready" | grep -c . || true)
+ready_list=$(printf '%s\n' "$ready" | paste -sd ' ' -)
+if [ -z "$SERIAL" ]; then
+  [ "$count" -gt 0 ] || die "no phone is ready for adb" \
+    "Attach one with USB debugging on, or pair over Wi-Fi: adb pair, then adb connect." \
+    "Check with: $ADB devices -l"
+  [ "$count" -eq 1 ] || die "$count phones are ready; name one with --device" "Ready: $ready_list"
+  SERIAL=$ready
+else
+  printf '%s\n' "$ready" | grep -Fxq "$SERIAL" || die "$SERIAL is not among the ready phones" \
+    "Ready: ${ready_list:-none}"
+fi
+
+on() { "$ADB" -s "$SERIAL" "$@"; }
+sh_on() { on shell "$@" | tr -d '\r'; }
+
+demo() { # <command> [extras...]
+  local command=$1; shift
+  on shell am broadcast -a com.android.systemui.demo -e command "$command" "$@" >/dev/null
+}
+
+if [ "$ACTION" = demo-off ]; then
+  demo exit
+  on shell settings put global sysui_demo_allowed 0
+  ok "demo mode left on $SERIAL; sysui_demo_allowed is 0"
+  exit 0
+fi
+
+# Every dumpsys is read whole into a variable before it is searched. A
+# `grep -q` straight off adb stops reading at the first match, adb dies of the
+# closed pipe, and under pipefail an awake phone reads as a sleeping one.
+power=$(sh_on dumpsys power)
+case "$power" in
+  *mWakefulness=Awake*) ;;
+  *) die "the screen is off" "Wake and unlock the phone, then run this again." ;;
+esac
+case "$(sh_on dumpsys window)" in
+  *isKeyguardShowing=true*)
+    die "the phone is locked" "Unlock it; a capture of the lock screen is not a screen of the app." ;;
+esac
+
+size=$(sh_on wm size | awk -F': ' '/size/ { value = $2 } END { print value }')
+density=$(sh_on wm density | awk -F': ' '/density/ { value = $2 } END { print value }')
+model=$(sh_on getprop ro.product.model)
+release=$(sh_on getprop ro.build.version.release)
+case "$size" in *x*) ;; *) die "could not read the screen size from wm size" ;; esac
+
+if [ "$ACTION" = insets ]; then
+  say "$model, Android $release, $size px at $density dpi"
+  sh_on dumpsys window | grep -Eo 'type=(navigationBars|statusBars) frame=\[[^ ]*' | sort -u
+  exit 0
+fi
+
+"$PYTHON" -c 'import PIL' 2>/dev/null || die "Pillow is not importable from $PYTHON" \
+  "Make a venv with Pillow in it and set TAFFY_SCREENS_PYTHON to its python3."
+
+# --- demo mode, undone however this ends --------------------------------------
+
+DEMO_WAS=''
+WORK=$(mktemp -d "${TMPDIR:-/tmp}/taffy-screens.XXXXXX")
+# The adb connection can drop in the middle of a capture, and the phone must
+# not be left in demo mode because of it: the undo reconnects and tries five times,
+# and says so when it still could not reach the phone.
+finish() {
+  local tries=0
+  if [ -n "$DEMO_WAS" ]; then
+    case "$DEMO_WAS" in null|'') DEMO_WAS=0 ;; esac
+    while [ "$tries" -lt 5 ]; do
+      tries=$((tries + 1))
+      reconnect "$SERIAL"
+      if demo exit 2>/dev/null \
+        && on shell settings put global sysui_demo_allowed "$DEMO_WAS" >/dev/null 2>&1; then
+        DEMO_WAS=''
+        break
+      fi
+      sleep 2
+    done
+    [ -z "$DEMO_WAS" ] || warn "could not leave demo mode on $SERIAL; run: $0 --demo-off --device $SERIAL"
+  fi
+  rm -rf "$WORK"
+}
+trap finish EXIT
+trap 'exit 1' INT TERM
+
+crop_status=0 status_why=''
+if [ "$DEMO" -eq 1 ]; then
+  DEMO_WAS=$(sh_on settings get global sysui_demo_allowed)
+  on shell settings put global sysui_demo_allowed 1
+  demo enter
+  demo clock -e hhmm 1200
+  demo battery -e level 100 -e plugged false
+  demo network -e wifi show -e level 4
+  demo notifications -e visible false
+  sleep 1.5
+fi
+
+# The windows dump is read twice: once for the status-bar clock, and once
+# around every screencap for a notification drawn over the app. A heads-up
+# ("Wireless debugging connected" arrives each time adb reconnects) covers the
+# top of the screen for seconds, and a crop does not remove it.
+windows_dump() {
+  on shell uiautomator dump --windows /sdcard/taffy-screens-windows.xml >/dev/null 2>&1 || true
+  sh_on cat /sdcard/taffy-screens-windows.xml > "$WORK/windows.xml" 2>/dev/null || : > "$WORK/windows.xml"
+  on shell rm -f /sdcard/taffy-screens-windows.xml >/dev/null 2>&1 || true
+}
+notification_showing() {
+  grep -q 'resource-id="android:id/status_bar_latest_event_content"' "$WORK/windows.xml"
+}
+
+case "$STATUS_MODE" in
+  keep) status_why='' ;;
+  crop) crop_status=1; status_why='cut on request (--status-bar crop)' ;;
+  auto)
+    if [ "$DEMO" -eq 0 ]; then
+      crop_status=1; status_why='demo mode was not used (--no-demo), so nothing cleaned the bar'
+    else
+      windows_dump
+      clock=$(grep -Eo 'text="[^"]*" resource-id="com.android.systemui:id/clock"' "$WORK/windows.xml" \
+        | sed -E 's/^text="([^"]*)".*/\1/' | awk 'NR == 1' || true)
+      case "$clock" in
+        12:00*) status_why='' ;;
+        '') crop_status=1; status_why='demo mode could not be confirmed: no status-bar clock was readable' ;;
+        *) crop_status=1; status_why="demo mode not honoured: the status-bar clock read $clock, not 12:00" ;;
+      esac
+    fi
+    ;;
+esac
+
+# --- the capture ------------------------------------------------------------
+
+mkdir -p "$OUT/raw" "$OUT/cropped" "$OUT/webp"
+attempt=0 clean=0
+while [ "$attempt" -lt 20 ]; do
+  attempt=$((attempt + 1))
+  windows_dump
+  if notification_showing; then sleep 1; continue; fi
+  on exec-out screencap -p > "$WORK/shot.png"
+  windows_dump
+  if notification_showing; then sleep 1; continue; fi
+  clean=1
+  break
+done
+[ "$clean" -eq 1 ] || die "a notification stayed on the screen for $attempt tries" \
+  "Dismiss it, or close the notification shade, then run this again."
+signature=$(head -c 8 "$WORK/shot.png" | od -An -tx1 | tr -d ' \n')
+[ "$signature" = '89504e470d0a1a0a' ] || die "screencap did not return a PNG" \
+  "Check that the phone is awake and that adb exec-out works over this connection."
+sh_on dumpsys window > "$WORK/window.txt"
+mv "$WORK/shot.png" "$OUT/raw/$NAME.png"
+
+sh_on dumpsys package "$PACKAGE" > "$WORK/package.txt"
+version_name=$(awk -F= '/versionName=/ && !seen { print $2; seen = 1 }' "$WORK/package.txt")
+version_code=$(awk '/versionCode=/ && !seen { sub(/.*versionCode=/, ""); sub(/[^0-9].*/, ""); print; seen = 1 }' \
+  "$WORK/package.txt")
+
+set -- --out "$OUT" --name "$NAME" --dumpsys "$WORK/window.txt" \
+  --shows "$SHOWS" --substitute "$SUBSTITUTE" --quality "$QUALITY" \
+  --app "package=$PACKAGE" --app "versionName=${version_name:-not installed}" \
+  --app "versionCode=${version_code:-not installed}" \
+  --device "model=$model" --device "android=$release" --device "size_px=$size" \
+  --device "density_dpi=$density" --status-why "$status_why"
+[ "$crop_status" -eq 0 ] || set -- "$@" --crop-status
+"$PYTHON" "$HERE/frame.py" "$@" || die "the capture was saved to $OUT/raw/$NAME.png, but not cropped" \
+  "The reason is printed above."
+ok "$NAME from $model (Android $release, $size px, $density dpi)"
+[ -z "$status_why" ] || note "status bar cut: $status_why"

@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  Every string the browsing surfaces show. Copy follows the voice and naming
+  guide: name the actor, say the concrete thing, never round a failure up.
+-->
+<resources>
+    <!-- Screen SCR-101 -->
+    <string name="taffy_browser_loading">Loading…</string>
+    <string name="taffy_browser_address_hint">Type a site, a search, or a question</string>
+    <string name="taffy_browser_address_description">Address bar, showing %1$s</string>
+    <string name="taffy_browser_address_description_blank">Address bar, nothing open yet</string>
+    <!--
+      The same two, said of a private tab. The control the person is about to
+      type an address into says which tab it belongs to, because a screen reader
+      reaches it directly and never passes the band above it.
+    -->
+    <string name="taffy_browser_address_description_private">Address bar in a private tab, showing %1$s</string>
+    <string name="taffy_browser_address_description_blank_private">Address bar in a private tab, nothing open yet</string>
+    <!--
+      The band above the address bar while the tab is a private one. The
+      sentence is the promise itself: a violet band that does not say what it
+      means is a promise nobody made.
+    -->
+    <string name="taffy_browser_private_title">Private tab</string>
+    <string name="taffy_browser_private_body">It forgets everything when you close it.</string>
+    <!-- Title, then the sentence under it, spoken as one band. -->
+    <string name="taffy_browser_private_description">%1$s. %2$s</string>
+    <string name="taffy_browser_content_placeholder">The page draws here.</string>
+    <plurals name="taffy_browser_tabs">
+        <item quantity="one">%1$d tab</item>
+        <item quantity="other">%1$d tabs</item>
+    </plurals>
+    <string name="taffy_browser_downloads">Downloads</string>
+    <string name="taffy_browser_settings">Settings</string>
+    <!-- The action row's far-edge page and browser actions control. -->
+    <string name="taffy_browser_page_actions">Browser and page options</string>
+    <!-- The More group's name in the menu the page-actions control opens. -->
+    <string name="taffy_browser_more_title">More</string>
+    <!-- The site group's name in the same menu, drawn only over a page. -->
+    <string name="taffy_browser_menu_site">This site</string>
+    <string name="taffy_browser_menu_reload">Reload</string>
+    <string name="taffy_browser_menu_stop">Stop</string>
+    <string name="taffy_browser_menu_pages">Your pages</string>
+    <string name="taffy_browser_menu_find">Find in page</string>
+    <string name="taffy_browser_menu_share">Share</string>
+    <string name="taffy_browser_menu_save_page">Save page</string>
+    <string name="taffy_browser_menu_ads">Ads and trackers</string>
+    <string name="taffy_browser_menu_history">History</string>
+    <string name="taffy_browser_menu_bookmarks">Bookmarks</string>
+    <string name="taffy_browser_menu_library">Library</string>
+    <string name="taffy_browser_menu_you">You</string>
+    <!-- System share sheet title. Recipients are the person's to pick. -->
+    <string name="taffy_browser_share_chooser">Share this page</string>
+    <string name="taffy_browser_back">Back</string>
+    <string name="taffy_browser_forward">Forward</string>
+    <!--
+      Committing a search sends nothing anywhere, because no search engine has
+      been chosen (OD-019). These are the words that say so, rather than letting
+      an honest refusal look like a control that does not work. They promise
+      only what this build can actually do.
+    -->
+    <string name="taffy_browser_no_search_title">No search engine yet</string>
+    <string name="taffy_browser_no_search_body">TaffyGo hasn\'t chosen one, so nothing was sent — what you typed stayed on this phone. Type a site address to go straight there.</string>
+    <!-- Closes any notice. The notice waits until it is read; nothing times out. -->
+    <string name="taffy_browser_notice_dismiss">Got it</string>
+
+    <!-- Screen SCR-102 -->
+    <string name="taffy_new_tab_focus_address_bar">Type a site, a search, or a question</string>
+    <!--
+      The plus at the leading edge of the start page's field. It opens the same
+      anchored grid menu the three-dot control opens over a page; with no page
+      there is no site group, so it is not "Browser and page options".
+    -->
+    <string name="taffy_start_options">Browser options</string>
+    <string name="taffy_new_tab_workspaces">Workspaces</string>
+    <!--
+      The start page's rotating welcome line. A small fixed set, the product's
+      own words: nothing here is generated, fetched, or personalized.
+    -->
+    <string name="taffy_start_greeting_where_to">Where to today?</string>
+    <string name="taffy_start_greeting_fresh">A fresh start.</string>
+    <string name="taffy_start_greeting_ask">Type a site, or ask Taffy.</string>
+    <string name="taffy_start_greeting_ready">Ready when you are.</string>
+    <!-- A frequent-site tile: page title, then host. -->
+    <string name="taffy_start_frequent_description">%1$s, %2$s. Opens this site.</string>
+    <string name="taffy_start_frequent_empty">Sites you visit often appear here. Nothing leaves this phone.</string>
+    <!--
+      The start page waits on page intelligence. These are the words while it
+      does: never "Python", never "module", never "file". The install happens
+      once.
+    -->
+    <string name="taffy_start_preparing_title">Getting Taffy ready</string>
+    <string name="taffy_start_preparing_body">Taffy is being installed. This only happens once.</string>
+    <string name="taffy_start_preparing_installing">Taffy has arrived and is being checked.</string>
+    <string name="taffy_start_preparing_not_started">Taffy has not started yet, so there is nothing to report.</string>
+    <string name="taffy_start_preparing_offline">Waiting for a connection.</string>
+    <string name="taffy_start_preparing_failed">Could not finish. Try again.</string>
+    <string name="taffy_start_preparing_unavailable">This part of Taffy is not available on this device.</string>
+    <string name="taffy_start_preparing_progress">%1$d%% ready</string>
+
+    <!-- Screen SCR-103 -->
+    <string name="taffy_address_bar_title">Address bar</string>
+    <string name="taffy_address_bar_label">Site, search, question, or request</string>
+    <string name="taffy_address_bar_reading_go_to">Go to</string>
+    <string name="taffy_address_bar_reading_search">Search</string>
+    <string name="taffy_address_bar_reading_ask">Ask Taffy</string>
+    <string name="taffy_address_bar_reading_task">Task for Taffy</string>
+    <string name="taffy_address_bar_interpretation_description">%1$s: %2$s. Tap to use this reading.</string>
+    <string name="taffy_address_bar_suggestion_description">%1$s. %2$s</string>
+    <string name="taffy_address_bar_suggestion_supporting">%1$s · %2$s</string>
+    <string name="taffy_address_bar_reading_command">Browser command</string>
+    <!-- Beside the typed words under a suggestion: where choosing that row sends them. -->
+    <string name="taffy_address_bar_source_go_to">Web address</string>
+    <string name="taffy_address_bar_source_search">Web search</string>
+    <string name="taffy_address_bar_source_ask">Taffy answers</string>
+    <string name="taffy_address_bar_source_task">Taffy works across pages</string>
+    <string name="taffy_address_bar_source_command">Browser command</string>
+    <string name="taffy_address_bar_source_open_tab">Open tab</string>
+    <string name="taffy_address_bar_source_bookmark">Bookmark</string>
+    <string name="taffy_address_bar_source_history">History</string>
+
+    <!-- A task started where it was typed: the consent under the box (decision 0087 section 4), and why a start is not on offer -->
+    <plurals name="taffy_task_start_discovery">
+        <item quantity="one">Taffy will find the site and may open up to %1$d site.</item>
+        <item quantity="other">Taffy will find the site and may open up to %1$d sites.</item>
+    </plurals>
+    <string name="taffy_task_start_values">Taffy may ask you for things only you know. You type them in TaffyGo and they go only to the site.</string>
+    <!-- The stores the request carries, named in the consent (decision 0133 section 4) -->
+    <string name="taffy_task_start_store_history">your history</string>
+    <string name="taffy_task_start_store_bookmarks">your bookmarks</string>
+    <string name="taffy_task_start_store_open_tabs">your open tabs</string>
+    <string name="taffy_task_start_stores_one">Taffy can search %1$s for this.</string>
+    <string name="taffy_task_start_stores_two">Taffy can search %1$s and %2$s for this.</string>
+    <string name="taffy_task_start_stores_three">Taffy can search %1$s, %2$s and %3$s for this.</string>
+    <string name="taffy_task_start_route_direct">Page text goes directly to your provider.</string>
+    <string name="taffy_task_start_submitting">Starting Taffy…</string>
+    <string name="taffy_task_start_refused_no_goal">Say what Taffy should do.</string>
+    <string name="taffy_task_start_refused_setup_needed">Set up Taffy to do this. Nothing leaves this phone until you do.</string>
+    <string name="taffy_task_start_refused_not_ready">Taffy is still getting ready.</string>
+    <string name="taffy_task_start_refused_core_not_ready">Taffy is unavailable right now. Your tabs still work.</string>
+    <string name="taffy_task_start_refused_already_running">A task is already running. Stop it before starting another.</string>
+    <string name="taffy_task_start_refused_wrong_page_count">This kind of task reads pages you name. Tap to choose them.</string>
+    <string name="taffy_task_start_failed_invalid_request">Taffy could not read this request. Change it and try again.</string>
+    <string name="taffy_task_start_failed_stale_generation">Taffy restarted while this was sent. Try again.</string>
+    <string name="taffy_task_start_failed_stale_revision">Something changed while this was sent. Try again.</string>
+    <string name="taffy_task_start_failed_deadline_exceeded">Taffy did not start in time. Try again.</string>
+    <string name="taffy_task_start_failed_backpressure">Taffy is busy. Try again in a moment.</string>
+    <string name="taffy_task_start_failed_core_unavailable">Taffy is unavailable right now. Your tabs still work.</string>
+    <string name="taffy_task_start_failed_duplicate">Taffy already has this request.</string>
+    <string name="taffy_task_start_failed_protocol_violation">Taffy could not take this request. Try again.</string>
+    <string name="taffy_task_start_failed_source_not_open">Taffy can only read pages in your own tabs. Open the page in a new tab, then ask again.</string>
+    <string name="taffy_task_start_failed_source_ambiguous">More than one of your tabs is on the same site. Close the extra tabs, then ask again.</string>
+    <string name="taffy_task_start_failed_window_unavailable">Taffy works in one window at a time. Close any other TaffyGo window, then ask again.</string>
+    <string name="taffy_address_bar_command_history">Open history</string>
+    <string name="taffy_address_bar_command_bookmarks">Open bookmarks</string>
+    <string name="taffy_address_bar_command_downloads">Open downloads</string>
+    <string name="taffy_address_bar_command_settings">Open settings</string>
+    <string name="taffy_address_bar_command_clear_data">Open clear browsing data</string>
+    <!--
+      The send disc at the trailing edge of the field: the reading, then the
+      words it will carry. Named this way rather than with a bare verb, because
+      a disc called only "Go" is spoken the same whether it is about to open a
+      site or start a task.
+    -->
+    <string name="taffy_address_bar_send_description">%1$s: %2$s</string>
+    <!--
+      Removes a task shape chosen from the menu beside the field. Modelled on
+      taffy_ask_remove_page, which is the shipped pattern for a chip.
+    -->
+    <string name="taffy_address_bar_chip_remove">Remove %1$s from this request</string>
+    <!-- The stores a request carries whole (decision 0133): the third store's own word, and a tile whose store is on the request already -->
+    <string name="taffy_start_store_open_tabs">Open tabs</string>
+    <string name="taffy_start_store_attached">%1$s, attached</string>
+    <string name="taffy_address_voice_start">Speak</string>
+    <string name="taffy_address_voice_title">Voice input</string>
+    <string name="taffy_address_voice_ready">Start when you are ready.</string>
+    <string name="taffy_address_voice_permission">Waiting for microphone permission…</string>
+    <string name="taffy_address_voice_listening_title">Listening</string>
+    <string name="taffy_address_voice_listening">Speak now. Nothing is used until you review it.</string>
+    <string name="taffy_address_voice_processing_title">Preparing your words</string>
+    <string name="taffy_address_voice_processing">Your phone is finishing the words.</string>
+    <string name="taffy_address_voice_review_title">Use these words?</string>
+    <string name="taffy_address_voice_review">Review the words before they change the address box. Choosing what they mean is still a separate step.</string>
+    <string name="taffy_address_voice_error_title">Voice input unavailable</string>
+    <string name="taffy_address_voice_permission_denied">Microphone access was not allowed. You can type instead or allow it in Android settings.</string>
+    <string name="taffy_address_voice_unavailable">This phone has no speech service available right now.</string>
+    <string name="taffy_address_voice_no_speech">No words were heard. Close this message and try again.</string>
+    <string name="taffy_address_voice_busy">Your phone is busy with voice input. Try again in a moment.</string>
+    <string name="taffy_address_voice_connection">Your phone could not finish voice input. You can type instead.</string>
+    <string name="taffy_address_voice_too_long">Those words are too long for the address box. Say a shorter request.</string>
+    <string name="taffy_address_voice_failed">The phone could not turn that speech into text. Try again.</string>
+    <string name="taffy_address_voice_truncated">Only the first part fit. Review it carefully before using it.</string>
+    <string name="taffy_address_voice_privacy">Your phone turns audio into text. TaffyGo does not save the audio or give these words to Taffy or a page before you confirm them.</string>
+    <string name="taffy_address_voice_use">Use these words</string>
+    <string name="taffy_address_voice_cancel">Cancel</string>
+    <string name="taffy_address_voice_close">Close</string>
+    <!--
+      The composer's chip row (handoff mock 07). The heading and the three chip
+      labels are the handoff's own words; the description says what a chip
+      really does, which is open the picker rather than choose for you.
+    -->
+    <string name="taffy_address_bar_task_templates">TASK TEMPLATES</string>
+    <string name="taffy_address_bar_template_compare_products">Compare products</string>
+    <string name="taffy_address_bar_template_summarize_evidence">Summarize evidence</string>
+    <string name="taffy_address_bar_template_build_a_source_table">Build a source table</string>
+    <string name="taffy_address_bar_template_web_errand">Do this for me</string>
+
+    <!-- Screen SCR-104 -->
+    <string name="taffy_tab_switcher_new_tab">New tab</string>
+    <!-- The same control in the Private segment, which is where private browsing starts. -->
+    <string name="taffy_tab_switcher_new_private_tab">New private tab</string>
+    <string name="taffy_tab_switcher_search">Search open tabs</string>
+    <string name="taffy_tab_switcher_search_empty_title">No open tab matches</string>
+    <string name="taffy_tab_switcher_search_empty_body">Nothing open here contains “%1$s”. Your tabs are still open — clear the search to see them.</string>
+    <string name="taffy_tab_switcher_close_all">Close these tabs</string>
+    <string name="taffy_tab_switcher_close_all_title">Close these tabs?</string>
+    <string name="taffy_tab_switcher_close_all_body">Closes every tab in this group. Tabs Taffy opened for a running task stay open, so the task can still say where its facts came from.</string>
+    <string name="taffy_tab_switcher_close_all_confirm">Close them</string>
+    <string name="taffy_tab_switcher_close_all_cancel">Keep them</string>
+    <!-- The two segments of the switcher's control. -->
+    <string name="taffy_tab_switcher_your_tabs">Your tabs</string>
+    <string name="taffy_tab_switcher_private">Private</string>
+    <string name="taffy_tab_switcher_show_taffy_tabs">Show Taffy\'s tabs (%1$d)</string>
+    <string name="taffy_tab_switcher_hide_taffy_tabs">Hide Taffy\'s tabs (%1$d)</string>
+    <string name="taffy_tab_switcher_taffy_tabs">Taffy\'s tabs</string>
+    <!-- What the amber edge on a card means, said rather than only drawn. -->
+    <string name="taffy_tab_switcher_amber_legend">Amber edge: Taffy opened it for a task</string>
+    <string name="taffy_tab_switcher_close_description">Close %1$s</string>
+    <!--
+      A card's spoken description is assembled from the parts that are true of
+      it, in order, and this joins two of them. A part nothing is known about
+      is left out entirely rather than joined as an empty one.
+    -->
+    <string name="taffy_tab_switcher_description_join">%1$s, %2$s</string>
+    <!-- Said of the tab the person is looking at. -->
+    <string name="taffy_tab_switcher_showing_now">showing now</string>
+    <!-- Said of a tab Taffy opened for a task; the amber edge, in words. -->
+    <string name="taffy_tab_switcher_by_taffy">opened by Taffy</string>
+    <!--
+      What a card calls a tab that has not been anywhere: it has no host to show
+      and no title of its own, and the address behind it is never shown or read
+      aloud.
+    -->
+    <string name="taffy_tab_switcher_blank_tab">New tab</string>
+    <!-- A thumbnail is shown only when the browser supplies one. -->
+    <string name="taffy_tab_switcher_reading">Reading…</string>
+    <plurals name="taffy_tab_switcher_facts">
+        <item quantity="one">%1$d fact</item>
+        <item quantity="other">%1$d facts</item>
+    </plurals>
+    <!-- The count line under the grid: how many are open, how many are Taffy's. -->
+    <plurals name="taffy_tab_switcher_tab_count">
+        <item quantity="one">%1$d tab</item>
+        <item quantity="other">%1$d tabs</item>
+    </plurals>
+    <plurals name="taffy_tab_switcher_opened_by_taffy">
+        <item quantity="one">%1$d opened by Taffy</item>
+        <item quantity="other">%1$d opened by Taffy</item>
+    </plurals>
+    <string name="taffy_tab_switcher_counts">%1$s · %2$s</string>
+    <plurals name="taffy_tab_switcher_new_workspace">
+        <item quantity="one">New workspace from %1$d tab…</item>
+        <item quantity="other">New workspace from %1$d tabs…</item>
+    </plurals>
+    <!-- The action's own words, then what tapping it actually does. -->
+    <string name="taffy_tab_switcher_new_workspace_description">%1$s. Opens the task templates, where you choose the shape of the workspace.</string>
+    <!--
+      Ask Taffy about the tabs the person offered, or the one they are looking
+      at. The visible label is the same two words the address bar already uses.
+    -->
+    <string name="taffy_tab_switcher_ask_taffy">Ask Taffy</string>
+    <plurals name="taffy_tab_switcher_ask_taffy_pages">
+        <item quantity="one">Ask Taffy about %1$d page</item>
+        <item quantity="other">Ask Taffy about %1$d pages</item>
+    </plurals>
+    <!-- Said of a card in the Ask Taffy selection. -->
+    <string name="taffy_tab_switcher_chosen_for_ask">chosen for Ask Taffy</string>
+    <!-- How long a tab has been open, as a chip on the card. -->
+    <string name="taffy_tab_switcher_open_age_just">Just opened</string>
+    <plurals name="taffy_tab_switcher_open_age_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+    <plurals name="taffy_tab_switcher_open_age_hours">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+    <plurals name="taffy_tab_switcher_open_age_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <string name="taffy_tab_switcher_empty_title">No tabs open</string>
+    <string name="taffy_tab_switcher_empty_body">Open a tab to start browsing.</string>
+    <string name="taffy_tab_switcher_private_empty_title">No private tabs</string>
+    <string name="taffy_tab_switcher_private_empty_body">A private tab forgets everything when you close it. Open one with the add button here.</string>
+
+    <!-- Screen SCR-108 -->
+    <string name="taffy_error_offline_title">You\'re offline</string>
+    <string name="taffy_error_offline_body">This page needs a network connection. Nothing was sent.</string>
+    <string name="taffy_error_name_title">That address didn\'t resolve</string>
+    <string name="taffy_error_name_body">No server answered for that name. Check the spelling, or try again.</string>
+    <string name="taffy_error_unreachable_title">That site couldn\'t be reached</string>
+    <string name="taffy_error_unreachable_body">Nothing answered at that address. Check the spelling, or try again.</string>
+    <string name="taffy_error_timeout_title">The server didn\'t answer</string>
+    <string name="taffy_error_timeout_body">The page took too long. Trying again often works.</string>
+    <string name="taffy_error_certificate_title">This connection isn\'t private</string>
+    <string name="taffy_error_certificate_body">The site\'s certificate doesn\'t check out. Trying again won\'t change that, so TaffyGo stops here.</string>
+    <string name="taffy_error_crashed_title">This page stopped</string>
+    <string name="taffy_error_crashed_body">The page was showing, then it wasn\'t. Trying again usually brings it back.</string>
+    <string name="taffy_error_retry">Try again</string>
+
+    <!-- Screen SCR-203 -->
+    <string name="taffy_preparing_parts_retry">Try again</string>
+    <string name="taffy_preparing_parts_product_defect">Something is wrong with this part of Taffy</string>
+
+    <!-- Screen SCR-204, the site sheet for ad and tracker blocking. -->
+    <string name="taffy_site_filtering_title">Ads and trackers</string>
+    <plurals name="taffy_site_filtering_blocked">
+        <item quantity="one">%1$d tracker blocked on this page</item>
+        <item quantity="other">%1$d trackers blocked on this page</item>
+    </plurals>
+    <string name="taffy_site_filtering_page_stat">On this page</string>
+    <string name="taffy_site_filtering_none_yet">Nothing blocked on this page yet</string>
+    <string name="taffy_site_filtering_site_off">Ads and trackers are off on this site</string>
+    <string name="taffy_site_filtering_master_off">Ads and trackers are turned off for TaffyGo</string>
+    <string name="taffy_site_filtering_site_toggle">Block ads and trackers on this site</string>
+    <string name="taffy_site_filtering_site_failed">That change couldn\'t be saved. Ads and trackers are unchanged for this site.</string>
+    <string name="taffy_site_filtering_settings">All ads and trackers settings</string>
+    <string name="taffy_site_filtering_why_heading">Why this matters</string>
+    <string name="taffy_site_filtering_why_body">Fewer ads and trackers means pages usually load faster, and sites have less to follow you with.</string>
+    <string name="taffy_site_filtering_breakage">If this site is missing pieces, turn ads and trackers off for this site. You can turn them back on any time.</string>
+    <string name="taffy_site_filtering_connection">Connection</string>
+    <string name="taffy_site_filtering_secure">Secure connection</string>
+    <string name="taffy_site_filtering_insecure">Not a private connection</string>
+    <string name="taffy_site_filtering_permissions">Permissions</string>
+    <string name="taffy_site_filtering_permissions_loading">Checking changed permissions…</string>
+    <string name="taffy_site_filtering_permissions_empty">No changed permissions for this site.</string>
+    <string name="taffy_site_filtering_permissions_unavailable">Site permissions aren\'t available.</string>
+    <plurals name="taffy_site_filtering_permissions_changed">
+        <item quantity="one">%1$d changed permission</item>
+        <item quantity="other">%1$d changed permissions</item>
+    </plurals>
+    <plurals name="taffy_site_filtering_permissions_other">
+        <item quantity="one">%1$d other site permission change</item>
+        <item quantity="other">%1$d other site permission changes</item>
+    </plurals>
+    <string name="taffy_site_filtering_permissions_reset">Reset changed permissions</string>
+    <string name="taffy_site_filtering_permissions_reset_title">Reset site permissions?</string>
+    <string name="taffy_site_filtering_permissions_reset_body">Remove every saved permission choice for %1$s. The site will use your defaults and can ask again.</string>
+    <string name="taffy_site_filtering_permissions_reset_confirm">Reset permissions</string>
+    <string name="taffy_site_filtering_permissions_reset_cancel">Keep choices</string>
+    <string name="taffy_site_filtering_permissions_resetting">Resetting changed permissions…</string>
+    <string name="taffy_site_filtering_permissions_reset_done">Changed permissions were reset.</string>
+    <string name="taffy_site_filtering_permissions_reset_failed">Changed permissions couldn\'t be reset. The current choices are shown above.</string>
+    <string name="taffy_site_filtering_permission_location">Location</string>
+    <string name="taffy_site_filtering_permission_camera">Camera</string>
+    <string name="taffy_site_filtering_permission_microphone">Microphone</string>
+    <string name="taffy_site_filtering_permission_notifications">Notifications</string>
+    <string name="taffy_site_filtering_permission_javascript">JavaScript</string>
+    <string name="taffy_site_filtering_permission_pop_ups">Pop-ups and redirects</string>
+    <string name="taffy_site_filtering_permission_automatic_downloads">Automatic downloads</string>
+    <string name="taffy_site_filtering_permission_clipboard">Clipboard</string>
+    <string name="taffy_site_filtering_permission_sensors">Sensors</string>
+    <string name="taffy_site_filtering_permission_sound">Sound</string>
+    <string name="taffy_page_zoom_title">Page zoom</string>
+    <string name="taffy_page_zoom_smaller">Make page smaller</string>
+    <string name="taffy_page_zoom_larger">Make page larger</string>
+    <string name="taffy_page_zoom_percent">%1$d%%</string>
+    <string name="taffy_page_zoom_reset_description">Reset page zoom. Current zoom: %1$d%%</string>
+    <string name="taffy_page_zoom_unavailable">Zoom isn\'t available on this page.</string>
+    <string name="taffy_site_filtering_desktop">Desktop site</string>
+    <string name="taffy_site_filtering_desktop_unavailable">Desktop site isn\'t available yet.</string>
+    <string name="taffy_site_filtering_desktop_description">%1$s. %2$s</string>
+
+    <!-- Screen SCR-106, find in page. -->
+    <string name="taffy_find_placeholder">Find in page</string>
+    <string name="taffy_find_count">%1$d of %2$d</string>
+    <string name="taffy_find_next">Next match</string>
+    <string name="taffy_find_previous">Previous match</string>
+    <string name="taffy_find_close">Close find</string>
+    <string name="taffy_find_unavailable">Find in page isn\'t connected on this phone yet.</string>
+
+    <!-- Screen SCR-811, save page. -->
+    <string name="taffy_save_page_title">Save page</string>
+    <string name="taffy_save_page_save">Save</string>
+    <string name="taffy_save_page_cancel">Cancel</string>
+    <string name="taffy_save_page_unavailable">This page couldn\'t be saved on this phone yet.</string>
+    <string name="taffy_save_page_failed">That page wasn\'t saved. Try again.</string>
+    <string name="taffy_save_page_private">This is a private tab. It forgets everything when you close it, so this page can\'t be saved.</string>
+    <!-- The takeover band, frame and page cut-out (screen SCR-101). -->
+    <string name="taffy_browser_takeover_description">%1$s. %2$s</string>
+    <string name="taffy_browser_takeover_frame_description">Taffy is working on this page</string>
+    <string name="taffy_browser_takeover_highlight_description">Taffy marked the part of this page for you to do</string>
+    <string name="taffy_browser_takeover_lock_line">Taffy is working on this page</string>
+    <string name="taffy_browser_takeover_lock_hint_take_over">Take over to use it yourself</string>
+    <string name="taffy_browser_takeover_lock_hint_wait">Taffy will hand it back when it needs you</string>
+    <!-- The toolbar over a page opened for one errand (screen SCR-110). -->
+    <string name="taffy_errand_back">Back</string>
+    <string name="taffy_errand_close">Done</string>
+
+    <!-- The Ask overlay (SCR-301): the pages a question is about, and what asking sends (decisions 0034, 0035, 0087) -->
+    <string name="taffy_ask_composer_title">Ask Taffy</string>
+    <string name="taffy_ask_overlay_close">Close Ask Taffy</string>
+    <string name="taffy_ask_overlay_close_control">Close</string>
+    <string name="taffy_ask_add_pages">Add pages</string>
+    <string name="taffy_ask_tab_closed">This tab closed</string>
+    <string name="taffy_ask_taffy_opened">Taffy opened this</string>
+    <string name="taffy_ask_remove_page">Remove %1$s from pages Taffy will look at</string>
+    <string name="taffy_ask_page_spoken">%1$s, %2$s</string>
+    <string name="taffy_ask_will_do_none_private">Taffy can\'t read a private tab — it forgets everything when you close it. Open the page in one of your tabs and Taffy can read it there.</string>
+    <plurals name="taffy_count_pages">
+        <item quantity="one">%1$d page</item>
+        <item quantity="other">%1$d pages</item>
+    </plurals>
+    <string name="taffy_ask_disclosure_one_page">Taffy will send the title and the text of this page. %1$s</string>
+    <string name="taffy_ask_disclosure_many_pages">Taffy will send the titles and the text of these %1$s. %2$s</string>
+    <string name="taffy_ask_disclosure_closed">A page you chose is closed. Remove it, or open it again and add it.</string>
+    <string name="taffy_ask_same_site">These two tabs are on the same site. Close one before you ask.</string>
+    <string name="taffy_ask_scope_exact">Taffy reads only the pages above and opens no others.</string>
+    <string name="taffy_ask_disclosure_direct_compact">%1$s: titles and text go directly to your AI provider.</string>
+    <string name="taffy_ask_disclosure_local_compact">%1$s: processed on this device, without an AI provider.</string>
+    <string name="taffy_ask_scope_compact">Only these pages. No others opened.</string>
+    <string name="taffy_ask_values_compact">Private details you enter go only to the site.</string>
+    <string name="taffy_ask_field_hint_page">Ask about this page</string>
+    <string name="taffy_ask_field_hint_pages">Ask about these pages</string>
+    <string name="taffy_ask_field_hint_none">Ask Taffy anything</string>
+    <string name="taffy_task_start_route_no_model">Stays on this device. This reviewed task does not use a model.</string>
+
+    <!-- The Add pages sheet over the Ask overlay -->
+    <string name="taffy_attach_pages_title">Add pages</string>
+    <string name="taffy_attach_pages_body">Taffy will look at the pages you tick.</string>
+    <string name="taffy_attach_pages_search">Search open pages</string>
+    <string name="taffy_attach_pages_your_tabs">Your tabs</string>
+    <plurals name="taffy_attach_pages_selected">
+        <item quantity="one">%1$d selected</item>
+        <item quantity="other">%1$d selected</item>
+    </plurals>
+    <string name="taffy_attach_pages_empty_search">Those pages are still open. Nothing here matches.</string>
+    <string name="taffy_attach_pages_use">Use these pages</string>
+    <string name="taffy_attach_pages_caution">Taffy works better with a handful of pages.</string>
+    <string name="taffy_attach_pages_taffy_tabs">Taffy\'s tabs stay with the current job. They are not pages you can add.</string>
+    <string name="taffy_attach_pages_loading">Loading open pages</string>
+    <string name="taffy_attach_pages_unavailable_title">Taffy is unavailable right now</string>
+    <string name="taffy_attach_pages_unavailable_body">Your tabs still work. Try adding pages when Taffy is ready.</string>
+    <string name="taffy_attach_pages_row">%1$s, %2$s</string>
+    <string name="taffy_attach_pages_row_chosen">%1$s, %2$s, chosen</string>
+
+    <!-- The Ask overlay while nothing is set up: the set-up panel where the box would be -->
+    <string name="taffy_ask_setup_title">Taffy isn\'t set up yet</string>
+    <string name="taffy_ask_setup_body">Taffy needs a provider before it can answer a question or run a task. Add your key, sign in to a plan, or add a provider address of your own. Until then nothing leaves this phone.</string>
+    <string name="taffy_ask_setup_route_title">Taffy can\'t reach a provider yet</string>
+    <string name="taffy_ask_setup_route_direct_body">Taffy is set to use your key, but no key on this phone is ready to use. Add or check your key and Taffy can start.</string>
+    <string name="taffy_ask_setup_primary">Set up Taffy</string>
+    <string name="taffy_ask_setup_secondary">Not now</string>
+    <string name="taffy_page_flows_title">Saved flows</string>
+    <string name="taffy_page_flows_goal">Use saved flow on %1$s</string>
+    <string name="taffy_page_flows_refresh">Check this page again</string>
+    <string name="taffy_page_flows_view_steps">View saved steps</string>
+    <string name="taffy_page_flows_hide_steps">Hide saved steps</string>
+    <string name="taffy_page_flows_use">Use this flow</string>
+    <string name="taffy_page_flows_setup">Set up Taffy</string>
+    <string name="taffy_page_flows_loading">Checking this page for your saved flows…</string>
+    <string name="taffy_page_flows_ready">These saved flows match this page. Choose one for Taffy to use.</string>
+    <string name="taffy_page_flows_empty">No saved flow matches this page yet.</string>
+    <string name="taffy_page_flows_stale">This page or its saved flows changed. Check this page again to see what is available.</string>
+    <string name="taffy_page_flows_unavailable">Saved flows are unavailable for this page right now.</string>
+    <string name="taffy_page_flows_review_unavailable">Some saved flows need their full review loaded before they can be used.</string>
+    <string name="taffy_page_flows_manage">Manage saved flows</string>
+    <string name="taffy_page_flows_replay">Taffy will follow the saved steps on this site.</string>
+    <string name="taffy_page_flows_handover">You enter private details and complete verification on the site. Then hand back to Taffy.</string>
+    <plurals name="taffy_page_flows_permission"><item quantity="one">You allow this task to open up to %1$d new site.</item><item quantity="other">You allow this task to open up to %1$d new sites.</item></plurals>
+    <plurals name="taffy_page_flows_steps"><item quantity="one">A saved flow · %1$d step</item><item quantity="other">A saved flow · %1$d steps</item></plurals>
+    <string name="taffy_repeat_checking">Checking saved flows…</string>
+    <string name="taffy_repeat_title">A saved flow matches</string>
+    <string name="taffy_repeat_unavailable">Saved flows unavailable</string>
+    <string name="taffy_repeat_lookup_failed">Close this message and send your request again.</string>
+    <string name="taffy_repeat_body">Review its steps, then open the starting page. You will choose Use saved flow there before Taffy begins.</string>
+    <string name="taffy_repeat_open">Open starting page</string>
+    <string name="taffy_repeat_opening">Opening starting page…</string>
+    <string name="taffy_repeat_failed">The starting page could not be opened. Try again.</string>
+    <string name="taffy_repeat_dismiss">Close</string>
+    <string name="taffy_page_flows_review_load">Load full reviews</string>
+    <string name="taffy_page_flows_review_loading">Loading full reviews…</string>
+</resources>

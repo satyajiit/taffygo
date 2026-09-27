@@ -1,0 +1,71 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="corpus-index">
+<title>TaffyGo fixture corpus</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>TaffyGo fixture corpus</h1>
+  <p class="who">Deterministic and hostile page corpus. Served locally only.
+  See <code>README.md</code> and <code>manifest.json</code> for the contract.</p>
+</header>
+
+<p class="note">Corpus mode: <span id="mode">resolving…</span>. This index is a
+convenience map for humans; the authority is the manifest.</p>
+
+<h2>Primary origin</h2>
+<ul>
+  <li><a href="/article/quantum-storage-review.html">Static article</a></li>
+  <li><a href="/product/lumen-desk-lamp.html">Static product page</a></li>
+  <li><a href="/search/results.html">Search results</a></li>
+  <li><a href="/compare/desk-lamp-a.html">Comparison source A</a> &middot;
+      <a href="/compare/desk-lamp-b.html">B</a></li>
+  <li><a href="/spa/index.html">Single-page router</a></li>
+  <li><a href="/redirect/start.html">Redirect chain</a></li>
+  <li><a href="/popup/opener.html">Popup opener</a></li>
+  <li><a href="/race/node-swap.html">Mutation race</a> &middot;
+      <a href="/race/rapid-navigation.html">Rapid navigation race</a></li>
+  <li><a href="/shadow/open-root.html">Open shadow root</a> &middot;
+      <a href="/shadow/closed-root.html">Closed shadow root</a></li>
+  <li><a href="/list/infinite-scroll.html">Infinite scroll</a> &middot;
+      <a href="/list/virtualized-table.html">Virtualized table</a></li>
+  <li><a href="/frames/same-origin.html">Same-origin iframe</a> &middot;
+      <a href="/frames/cross-origin.html">Cross-origin iframe</a> &middot;
+      <a href="/frames/nested-oopif.html">Nested cross-origin frames</a></li>
+  <li><a href="/forms/laboratory.html">Form laboratory</a> &middot;
+      <a href="/forms/checkout-sensitive.html">Sensitive form</a></li>
+  <li><a href="/consent/cookie-wall.html">Consent dialog</a></li>
+  <li><a href="/auth/login.html">Login</a> &middot;
+      <a href="/auth/account.html">Account</a></li>
+  <li><a href="/files/transfer.html">Downloads and uploads</a></li>
+  <li><a href="/media/player.html">Media elements</a> &middot;
+      <a href="/media/datasheet.html">Inline PDF</a></li>
+  <li><a href="/network/slow-and-flaky.html">Slow and flaky</a> &middot;
+      <a href="/network/captive-portal.html">Captive portal</a></li>
+  <li><a href="/crash/renderer-crash.html">Renderer crash</a></li>
+  <li><a href="/a11y/rich.html">Accessibility rich</a> &middot;
+      <a href="/a11y/poor.html">Accessibility poor</a> &middot;
+      <a href="/a11y/hidden-and-offscreen.html">Hidden and off-screen</a></li>
+  <li><a href="/injection/iframe-host.html">Injection inside an iframe</a></li>
+  <li><a href="/errand/records-portal.html">Records office landing</a> &middot;
+      <a href="/errand/statement-request.html">Identified request form</a> &middot;
+      <a href="/errand/statement-ready.html">Statement ready</a> &middot;
+      <a href="/errand/framed-challenge.html">Framed partner check</a></li>
+</ul>
+
+<h2>Hostile origin</h2>
+<ul>
+  <li><a data-taffy-origin="hostile" data-taffy-path="/injection/visible.html">Visible instruction injection</a></li>
+  <li><a data-taffy-origin="hostile" data-taffy-path="/injection/hidden.html">Hidden instruction injection</a></li>
+</ul>
+
+<script>
+  window.addEventListener("load", function () {
+    if (window.taffyFixture) {
+      document.getElementById("mode").textContent = window.taffyFixture.mode;
+    }
+  });
+</script>

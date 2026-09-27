@@ -1,0 +1,15 @@
+# Machine owner file for the "depot_tools revision" row in TOOLCHAIN.md.
+# Format: `key=value`, `#` comments. Consumed by tools/bootstrap and tools/doctor.
+#
+# depot_tools auto-updates itself by default. TaffyGo pins it so a build is
+# reproducible from committed files alone: bootstrap checks out `revision` and
+# sets DEPOT_TOOLS_UPDATE=0 for the workspace.
+#
+# Pinned 2026-08-16 (SP-01, selection step): upstream HEAD at the time the
+# Chromium 152.0.7977.42 pin was recorded, via
+# `git ls-remote .../depot_tools.git HEAD`. If the first SP-01 sync on the
+# Linux builder needs a different revision to fetch this milestone, bump this
+# file and TOOLCHAIN.md together in that PR.
+
+url=https://chromium.googlesource.com/chromium/tools/depot_tools.git
+revision=13febbee9ece9e03df923f69d540afc63c6db93e

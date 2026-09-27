@@ -1,0 +1,31 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The Python tool runtime's build argument. This import is the whole of the
+# wiring, and it is enough: a tool runtime enters the product graph through
+# this registry and nowhere else, so declaring the argument reachable from here
+# is what makes it real to GN — listed by `gn args --list`, and refused when it
+# is set — without putting anything Python-shaped in the graph. At its default
+# there is no target to depend on and nothing below this line changes.
+import("//taffy/utility/python_runtime_configuration.gni")
+
+source_set("registry") {
+  sources = [
+    "service_factory.cc",
+    "service_factory.h",
+  ]
+  public_deps = [ "//mojo/public/cpp/bindings" ]
+  deps = [
+    "//taffy/contracts/core-service",
+    "//taffy/contracts/tool-runtime:tool_runtime_mojom",
+    "//taffy/services/core:service",
+    "//taffy/services/tool-runtime/media:media",
+  ]
+  if (taffy_python_runtime_in_current_toolchain) {
+    defines = [ "TAFFY_ENABLE_PYTHON_RUNTIME" ]
+    deps += [ "//taffy/services/tool-runtime/python:python" ]
+  }
+}

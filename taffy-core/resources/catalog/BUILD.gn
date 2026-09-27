@@ -1,0 +1,102 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# Every TaffyGo string a person reads, externalized (PAR-L10N-001).
+#
+# Two catalogues, split by who renders them and therefore by what grit has to
+# emit. Neither carries a message the other carries:
+#
+#   taffy_android_strings.grd  ->  values/*.xml  ->  R.string.*  (Java, Kotlin)
+#   taffy_strings.grd          ->  *.pak         ->  IDS_TAFFY_* (browser C++)
+#
+# The check that makes PAR-L10N-001 an actual gate rather than an intention is
+# tools/check_strings.py, and it deliberately does not need any of this: it
+# runs on a documentation host with no grit, no Chromium checkout and no
+# Android SDK, and it covers the Android resource files elsewhere in the
+# overlay as well as the catalogues here.
+
+import("//tools/grit/grit_rule.gni")
+
+if (is_android) {
+  import("//build/config/android/rules.gni")
+}
+
+# ---------------------------------------------------------------------------
+# Browser-process strings
+# ---------------------------------------------------------------------------
+
+# RESOLVED AT SP-01: a pak is loaded by being listed in the product's locale
+# repack, which lives in a file Chromium owns — the pattern and dep for this
+# catalogue are the repack half of patch 0003
+# (chromium/patches/0003-pack-taffy-string-resources.md), landed in
+# chrome/chrome_repack_locales.gni. `grit_strings` is upstream's own wrapper
+# for a string catalogue: it expands the per-locale (and, where the platform
+# enables them, per-gender) pak outputs the repack consumes, so the output
+# list here names only the header.
+grit_strings("taffy_strings") {
+  source = "taffy_strings.grd"
+
+  outputs = [ "grit/taffy_strings.h" ]
+  output_prefix = "taffy_strings_"
+
+  # The parts are inputs even though the .grd names them, because GN will not
+  # re-run grit for a changed part it has not been told about.
+  inputs = [ "strings/taffy_version_strings.grdp" ]
+}
+
+# ---------------------------------------------------------------------------
+# Android strings
+# ---------------------------------------------------------------------------
+
+if (is_android) {
+  # RESOLVED AT SP-01. Both templates live in //tools/grit/grit_rule.gni, not in
+  # build/config/android/rules.gni, and an Android string grd does not produce
+  # queryable `values/*.xml` at all — it produces a **resources zip**, which is
+  # why the previous shape failed with "This target is a binary target which
+  # can't be queried for its outputs" on `get_target_outputs`.
+  #
+  # The two-target shape is kept rather than collapsing into `java_strings_grd`,
+  # and the reason is `inputs`. `java_strings_grd` forwards only `deps` and
+  # `defines` to its inner grit target, so the `.grdp` part below would not be
+  # declared as an input and GN would not re-run grit when it changed — the
+  # exact staleness the comment beside `taffy_strings` above exists to prevent.
+  # `java_strings_grd_prebuilt` is upstream's supported way to wrap a grit target
+  # you declare yourself (chrome/app's `generated_resources_grd` does this), and
+  # it derives the zip path from the generating target's name, so the
+  # `resources_zip` value below is not free to change.
+  grit("taffy_android_strings") {
+    source = "taffy_android_strings.grd"
+
+    inputs = [
+      "strings/taffy_download_strings.grdp",
+    ]
+
+    create_android_resources = true
+    resources_zip = "$target_out_dir/taffy_android_strings.resources.zip"
+  }
+
+  # No `custom_package` here, and that is upstream's shape rather than an
+  # omission: `android_generated_resources` accepts only `testonly`,
+  # `visibility` and `resource_overlay`, so generated strings take the R class of
+  # the library that depends on them. Committed resource directories are the
+  # place a package is pinned — see `:shell_resources` in
+  # ../android/shell/BUILD.gn, which is where the shell's own `R.string`
+  # entries actually come from.
+  java_strings_grd_prebuilt("taffy_android_strings_grd") {
+    generating_target = ":taffy_android_strings"
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Everything a product target needs from this directory
+# ---------------------------------------------------------------------------
+
+group("resources") {
+  public_deps = [ ":taffy_strings" ]
+  if (is_android) {
+    public_deps += [ ":taffy_android_strings_grd" ]
+  }
+}

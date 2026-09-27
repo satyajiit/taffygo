@@ -1,0 +1,1345 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// The Browser Intelligence Protocol (BIP) wire contract between the TaffyGo
+// browser process and a sandboxed renderer.
+//
+// AUTHORITY. taffy-core/contracts/bip/schema is the wire contract. This file is its Mojo
+// projection and matches it field for field: same struct membership, same
+// field names, same optionality, same enumeration members. The only mechanical
+// difference is spelling — a schema member SCREAMING_SNAKE becomes the
+// Chromium enumerator kScreamingSnake — and the fixtures in taffy-core/contracts/bip/compat
+// are what prove the two stay aligned. If this file and the schema disagree,
+// the schema is right and this file is a defect.
+//
+// Design notes about the projection, all of which are deliberate:
+//
+//   * Identifiers are opaque strings, exactly as the schema defines them.
+//     They are not integers and not pointers. A closed tab's identifier is
+//     never reassigned, and a persisted identifier is diagnostic only: it can
+//     never become valid again after a session ends.
+//   * GraphRevision and EventSequence are integers because the schema makes
+//     them integers: a revision is monotonic within one epoch, and a sequence
+//     number has to be comparable to detect a gap.
+//   * BIP carries no wall-clock timestamps. Every time value is a monotonic
+//     reading in milliseconds, so a message cannot leak browsing time across a
+//     trust boundary.
+//   * Every enumeration here is CLOSED — no [Extensible], no [Default]. That
+//     is the schema's rule: "a consumer that receives a value outside this
+//     list MUST treat the message as unsupported and fail closed, and MUST NOT
+//     coerce the value to a known member." A closed mojom enum makes Mojo's
+//     own validator reject the message, which is the strictest possible form
+//     of failing closed and needs no discipline from any consumer. Growing an
+//     enumeration is a minor version step, and browser and renderer ship in
+//     one binary, so there is no skew to tolerate.
+//   * Structs are append-only. A new field goes at the end, is nullable or has
+//     a default, and carries [MinVersion] from the first shipped release. No
+//     field is removed, renumbered or repurposed.
+//
+// TRUST BOUNDARY. Everything a renderer sends is untrusted data:
+//
+//   * The browser broker assigns tab, frame, page epoch and graph revision. A
+//     renderer echoes them so the broker can reject a reply belonging to a
+//     retired document. The echo is checked, never adopted.
+//   * committed_url_metadata and origin_metadata are browser-owned in the
+//     schema. On this wire they arrive from a renderer, so the broker
+//     overwrites both from its own committed navigation record before any
+//     consumer sees them (protocol section 7.2).
+//   * A renderer cannot express that an action succeeded. RendererActionResult
+//     below has no member meaning "the effect happened"; only the
+//     browser-side verifier reaches VERIFIED (protocol section 11.6).
+//   * Browser-process C++ does not walk the semantic graph. Mojo performs the
+//     only deserialization, the broker checks bounded scalars, and
+//     interpretation happens in the isolated Rust core (Rule of Two).
+
+module taffy.mojom;
+
+import "taffy/contracts/bip/mojom/page_intelligence_identity.mojom";
+
+// Schema definitions with no Mojo projection. Each is listed here so the
+// contract checker can tell "deliberately absent" from "forgotten", and so a
+// reader can see the trust boundary in one place rather than inferring it:
+//
+// bip-not-projected: ActionProposal — authored by the assistant runtime and
+//   read by the browser-process broker. A renderer never proposes an action;
+//   if one could, the policy broker would be taking instructions from the
+//   least privileged process in the system.
+// bip-not-projected: AuthorizedActionEnvelope — the broker's own record that
+//   a proposal cleared policy. Sending it to a renderer would hand a sandboxed
+//   process the evidence of its own authorization, which it has no use for and
+//   every incentive to replay.
+// bip-not-projected: ActionResult — authored by the browser-side verifier
+//   after it observes the effect. It is the one message a renderer must not be
+//   able to write, because VERIFIED is the claim the whole action path exists
+//   to make trustworthy.
+
+// ---------------------------------------------------------------------------
+// Protocol negotiation (taffy-core/contracts/bip/schema/protocol-info.schema.json)
+// ---------------------------------------------------------------------------
+
+// The evidence adapters the protocol has names for. Not the adapters any one
+// endpoint has: a renderer advertises what it can actually run for the
+// document in front of it, and DOCUMENT_VIEWER, MEDIA, SITE and VISION belong
+// to their own milestones.
+enum AdapterKind {
+  kDom,
+  kAccessibility,
+  kForms,
+  kMetadata,
+  kBrowser,
+  kDocumentViewer,
+  kMedia,
+  kSite,
+  kVision,
+  // Appended, never inserted. A closed enumeration's order is normative here
+  // and in the schema, and a member placed in the middle would silently change
+  // what a value already on the wire means. These two arrived together in the
+  // minor step recorded in taffy-core/contracts/bip/schema/bip.version.json, and they are
+  // what lets the selection adapter and the layout adapter carry their own
+  // AdapterReport row instead of being described in a warning.
+  kSelection,
+  kLayout,
+};
+
+enum ObservationScope {
+  kViewport,
+  kInteractive,
+  kSelection,
+  kSection,
+  kDocument,
+};
+
+enum RedactionFeature {
+  kSecretValueSuppression,
+  kSensitiveZoneClassification,
+  kPatternDetectors,
+  kUrlMinimization,
+  kOriginPolicyFilter,
+  kIncognitoPolicyFilter,
+  kOrganizationPolicyFilter,
+  kContentTrustLabelling,
+  kInjectionSignalDetection,
+};
+
+// What one endpoint can actually carry. The broker clamps every request to
+// these, and then to the policy grant, before anything leaves the browser
+// process (protocol section 7.1). The numeric values an endpoint reports are
+// its own; the ratified device-floor ceiling is [Open (OD-031)].
+struct ProtocolLimits {
+  uint32 max_message_bytes;
+  uint32 max_nodes;
+  uint32 max_text_bytes;
+  uint32 max_total_bytes;
+  uint32 max_depth;
+  uint32 max_frames;
+  uint32 max_delta_queue_depth;
+  uint32 max_snapshot_deadline_ms;
+  uint32 min_delta_interval_ms;
+};
+
+// Negotiation happens before anything is requested. Every list is exhaustive:
+// anything absent is unsupported, and a request naming an unsupported
+// capability returns UNSUPPORTED rather than a degraded result that looks
+// complete (protocol section 6.2).
+struct ProtocolInfo {
+  // major.minor. The value itself lives only in taffy-core/contracts/bip/schema/bip.version.json.
+  string protocol_version;
+  string implementation_id;
+  array<AdapterKind> supported_adapters;
+  array<ObservationScope> supported_scopes;
+  // The production endpoint advertises the read-oriented set only. It never
+  // advertises the reserved M5 form actions, and the production dispatcher
+  // denies them even if an endpoint did.
+  array<ActionType> supported_action_types;
+  array<RedactionFeature> supported_redaction_features;
+  ProtocolLimits limits;
+};
+
+// ---------------------------------------------------------------------------
+// Observation (taffy-core/contracts/bip/schema/snapshot.schema.json)
+// ---------------------------------------------------------------------------
+
+enum AdapterRequirementLevel {
+  kRequired,
+  kOptional,
+};
+
+struct AdapterRequirement {
+  AdapterKind adapter;
+  AdapterRequirementLevel requirement;
+};
+
+// An adapter returns UNSUPPORTED, INCOMPLETE or CONFLICTED; it never
+// fabricates a normalized value to satisfy a requested schema
+// (protocol section 7.6).
+enum AdapterStatus {
+  kOk,
+  kIncomplete,
+  kConflicted,
+  kUnsupported,
+  kFailed,
+};
+
+struct AdapterReport {
+  AdapterKind adapter;
+  AdapterStatus status;
+  uint32 adapter_version;
+  uint32 extraction_rule_version;
+  // Stable diagnostic code. Never renderer-authored prose, and never page
+  // content: user-facing text comes from trusted local templates.
+  string? detail_code;
+};
+
+// Allowlisted typed attributes only. Arbitrary DOM attribute maps, event
+// handlers, raw HTML, scripts, stylesheets and unbounded attribute strings are
+// excluded by construction (protocol section 7.3).
+enum AttributeName {
+  kInputType,
+  kAutocompleteToken,
+  kHeadingLevel,
+  kListPosition,
+  kListSize,
+  kTableRowIndex,
+  kTableColumnIndex,
+  kLanguage,
+  kLinkRelation,
+  kMediaAltSource,
+  kCurrencyCode,
+  kRatingScaleMax,
+  kPlaceholderLabel,
+};
+
+struct NodeAttribute {
+  AttributeName name;
+  string value;
+};
+
+// Viewport-relative diagnostic hint. Never identity, and never an action
+// target (protocol sections 3.2 and 7.3).
+struct Bounds {
+  int32 x;
+  int32 y;
+  int32 width;
+  int32 height;
+};
+
+enum BudgetKind {
+  kMaxNodes,
+  kMaxTextBytes,
+  kMaxTotalBytes,
+  kMaxDepth,
+  kMaxFrames,
+  kMaxMessageBytes,
+  kDeadline,
+};
+
+// How much of a URL policy permitted into this message. Full URLs, queries and
+// fragments appear only when task and provider policy allow them
+// (protocol section 7.2).
+enum UrlDisclosure {
+  kOriginOnly,
+  kOriginAndPath,
+  kFullUrl,
+};
+
+struct UrlMetadata {
+  Origin origin;
+  UrlDisclosure disclosure;
+  // Present when disclosure is kOriginAndPath or kFullUrl.
+  string? path;
+  // Present only when disclosure is kFullUrl.
+  string? url;
+  // Reported even when the query itself is withheld, so a caller can tell the
+  // difference between "no query" and "query not disclosed".
+  bool has_query;
+  bool has_fragment;
+};
+
+struct Destination {
+  UrlMetadata url_metadata;
+  bool is_cross_origin;
+  bool opens_new_tab;
+  bool is_download;
+};
+
+enum SourceKind {
+  kDom,
+  kAccessibility,
+  kFormControl,
+  kJsonLd,
+  kMicrodata,
+  kBrowser,
+  kAdapter,
+};
+
+enum Transformation {
+  kNone,
+  kNormalized,
+  kInferred,
+  kRedacted,
+};
+
+// Which field of a node a piece of evidence explains.
+enum SemanticField {
+  kRole,
+  kName,
+  kDescription,
+  kTextRuns,
+  kStates,
+  kValueDescriptor,
+  kDestination,
+  kBounds,
+  kActions,
+  kAttributes,
+  kSensitivity,
+  kEdges,
+  kFrames,
+  kContentTrust,
+  kContentSignals,
+  kChallengeKind,
+};
+
+// Enough evidence to explain where a value came from, kept per field so that
+// conflicting evidence is preserved rather than resolved away
+// (protocol section 7.5).
+struct FieldEvidence {
+  SemanticField field;
+  SourceKind source_kind;
+  // Internal, bounded locator for diagnosis. Never a reusable action identity,
+  // and never a selector handed back as a target.
+  string source_locator;
+  uint32 extraction_rule_version;
+  Transformation transformation;
+  // 0.0 to 1.0. Null when the adapter declined to score.
+  double? confidence;
+};
+
+// Conservative classification (protocol section 9.2). kUnknownSensitive is
+// handled at least as strictly as its destination policy requires, and page
+// instructions can never lower a classification.
+enum Sensitivity {
+  kNotSensitive,
+  kPersonal,
+  kAccount,
+  kPayment,
+  kIdentity,
+  kHealth,
+  kFinancial,
+  kLegal,
+  kPrivateCommunication,
+  kAdministration,
+  kCredential,
+  kUnknownSensitive,
+  kOneTimeCode,
+  kChallengeResponse,
+};
+
+// Who authored a unit of content, as distinct from how much harm its
+// disclosure would cause (protocol section 9.4). The two axes are independent
+// and neither may be derived from the other. An absent label is
+// kUnknownUntrusted, and a derived value carries the least trusted label of its
+// inputs; nothing anywhere raises one.
+//
+// bip-trust-boundary: kUserAuthored, kTaffyAuthored and kModelAuthored are
+// projected because the checker requires the full enumeration, not because a
+// renderer may send them. The browser broker refuses a renderer-supplied
+// privileged label, exactly as it overwrites a renderer-reported origin.
+enum ContentTrust {
+  kUserAuthored,
+  kTaffyAuthored,
+  kFirstPartyDocument,
+  kUserGeneratedContent,
+  kThirdPartyEmbedded,
+  kModelAuthored,
+  kUnknownUntrusted,
+};
+
+// One observation about the shape or presentation of content, accumulated
+// during the traversal the endpoint already performs (protocol section 9.4).
+// A signal is evidence and never an authorization.
+//
+// The renderer accumulates these as a bit mask while it walks; the wire form is
+// this closed enumeration, in a bounded array. A mask cannot fail closed — a
+// reader silently ignores a bit it does not know — so the mask is expanded in
+// the serializer and never crosses the boundary.
+enum ContentSignal {
+  kHiddenByStyle,
+  kZeroWidthCharacters,
+  kBidiControlCharacters,
+  kEncodedBlob,
+  kImperativeInstructionShape,
+  kLanguageMismatch,
+  kCrossOriginFrameAuthored,
+};
+
+struct TextRun {
+  string text;
+  SourceKind source_kind;
+  Sensitivity sensitivity;
+  bool truncated;
+  // Optional bounded citation coordinates. These are descriptive evidence,
+  // never an action target or a path the renderer will resolve later.
+  string? source_locator;
+  uint32? source_start;
+  uint32? source_end;
+  ContentTrust? content_trust;
+  array<ContentSignal> content_signals;
+};
+
+enum ValueKind {
+  kText,
+  kNumber,
+  kDate,
+  kSelection,
+  kToggle,
+  kPrice,
+  kRating,
+  kAvailability,
+  // The control has a value and BIP will not carry it. Passwords, passcodes,
+  // PINs, CVVs, OTPs, recovery codes, passkeys, private keys, seed phrases,
+  // tokens, session cookies and platform credential payloads are never
+  // emitted in plaintext, and neither is a length-derived fingerprint of one
+  // (protocol section 9.1).
+  kSecretWithheld,
+  kUnknown,
+};
+
+struct ValueDescriptor {
+  ValueKind kind;
+  bool present;
+  bool redacted;
+  string? normalized_value;
+  string? unit;
+  string? currency_code;
+};
+
+// Both a state and its negation exist so that "not asserted" stays
+// distinguishable from "asserted false". An action policy that requires a
+// state is not satisfied by silence.
+enum NodeState {
+  kVisible,
+  kNotVisible,
+  kOffscreen,
+  kObscured,
+  kEnabled,
+  kDisabled,
+  kEditable,
+  kReadOnly,
+  kRequired,
+  kInvalid,
+  kChecked,
+  kUnchecked,
+  kMixed,
+  kSelected,
+  kExpanded,
+  kCollapsed,
+  kFocused,
+  kBusy,
+};
+
+// The initial task-oriented vocabulary (protocol section 7.4). How
+// model-facing roles are versioned without locking renderer schemas is
+// [Open (OD-028)].
+enum SemanticRole {
+  kDocument,
+  kRegion,
+  kHeading,
+  kParagraph,
+  kList,
+  kListItem,
+  kTable,
+  kTableRow,
+  kTableCell,
+  kLink,
+  kButton,
+  kSearchField,
+  kTextField,
+  kCheckbox,
+  kRadio,
+  kSelect,
+  kOption,
+  kImage,
+  kMedia,
+  kPrice,
+  kRating,
+  kAvailability,
+  kLabelValuePair,
+  kCitation,
+  kUnknownInteractive,
+  kUnknownContent,
+};
+
+enum RelationshipKind {
+  kContains,
+  kLabels,
+  kDescribes,
+  kControls,
+  kOwns,
+  kRowHeaderFor,
+  kColumnHeaderFor,
+  kSameEntityAs,
+  kSourceFor,
+};
+
+// Edges carry both endpoints' frame identifiers because a relationship can
+// cross a frame boundary, and a node identifier is only unique within one
+// frame plus epoch.
+struct SemanticEdge {
+  string from_frame_id;
+  string from_node_id;
+  string to_frame_id;
+  string to_node_id;
+  RelationshipKind relationship;
+  // True when an adapter inferred the relationship rather than reading it from
+  // the DOM or the accessibility tree. Inference is marked, never presented as
+  // fact (protocol section 7.4).
+  bool inferred;
+  double? confidence;
+};
+
+struct SemanticNode {
+  string node_id;
+  string frame_id;
+  SemanticRole role;
+  // Redacted and bounded.
+  string? name;
+  string? description;
+  array<TextRun> text_runs;
+  array<NodeState> states;
+  ValueDescriptor? value_descriptor;
+  Destination? destination;
+  Bounds? bounds;
+  // What the adapter believes can be attempted. This grants no permission
+  // whatsoever (protocol section 11.1).
+  array<ActionType> actions;
+  Sensitivity sensitivity;
+  array<SourceKind> sources;
+  double confidence;
+  array<NodeAttribute> attributes;
+  array<FieldEvidence> evidence;
+  ContentTrust? content_trust;
+  array<ContentSignal> content_signals;
+  ChallengeKind? challenge_kind;
+};
+
+enum FrameExclusionReason {
+  kCrossOriginPolicy,
+  kHiddenThirdParty,
+  kNotActive,
+  kBudgetExceeded,
+  kAdapterUnavailable,
+  kNotRequested,
+};
+
+// One frame of the tree. The renderer describes what it can see; the broker
+// owns the authoritative topology and rewrites parentage from Chromium's own
+// frame tree (protocol section 8.1).
+struct FrameDescriptor {
+  string frame_id;
+  string? parent_frame_id;
+  bool is_main_frame;
+  bool is_out_of_process;
+  bool is_cross_origin_to_parent;
+  OriginMetadata origin_metadata;
+  string page_epoch;
+  uint64 graph_revision;
+  DocumentLifecycleState lifecycle_state;
+  // False when the frame exists but its content was not extracted. A hidden
+  // third-party frame is not included merely because it exists
+  // (protocol section 8.1).
+  bool included;
+  FrameExclusionReason? exclusion_reason;
+  // Browser-owned. A renderer does not get to say who authored a frame.
+  ContentTrust? content_trust;
+};
+
+// Truncation is always explicit, including which budget was reached and
+// whether the omission could change an answer (protocol section 15).
+struct Truncation {
+  bool truncated;
+  array<BudgetKind> budgets_reached;
+  uint32 omitted_node_count;
+  uint32 omitted_text_bytes;
+  uint32 omitted_frame_count;
+  bool may_change_answer;
+};
+
+struct RedactionSummary {
+  array<RedactionFeature> applied_features;
+  uint32 redacted_field_count;
+  uint32 suppressed_secret_value_count;
+  uint32 sensitive_zone_count;
+  uint32 policy_filtered_frame_count;
+};
+
+enum WarningCode {
+  kAdapterUnavailable,
+  kAdapterFailed,
+  kConflictingEvidence,
+  kCrossOriginFrameOmitted,
+  kClosedShadowRootNotProjected,
+  kVirtualizedContentPartial,
+  kCanvasWithoutSemantics,
+  kSensitiveZoneSuppressed,
+  kUrlMinimizedByPolicy,
+  kDeadlineReached,
+  kMemoryPressure,
+  kInjectionSignalDetected,
+};
+
+struct SnapshotWarning {
+  WarningCode code;
+  string? frame_id;
+  string? node_id;
+  string? detail_code;
+};
+
+// The exact live form subtree a SECTION observation may read. This is
+// observation authority only: it never authorizes filling or submission. The
+// endpoint validates both the handle and the graph floor before and after
+// collection, and refuses a root that is absent, stale, changed, outside the
+// addressed document, or not a form.
+struct FormObservationRoot {
+  string node_id;
+  uint64 minimum_graph_revision;
+};
+
+// The exact live image or video node a kDocument observation may inspect.
+// Like FormObservationRoot, this is read-only authority and the endpoint
+// validates both identity fields before and after extraction.
+struct MediaObservationRoot {
+  string node_id;
+  uint64 minimum_graph_revision;
+};
+
+// Budgets here are already clamped: the broker narrows a client request to the
+// process-safe ceiling and then to the policy grant before the request leaves
+// the browser process. A request can never widen the granted policy
+// (protocol section 7.1).
+struct SnapshotRequest {
+  string schema_version;
+  string request_id;
+  string profile_id;
+  string tab_id;
+  string root_frame_id;
+  // The frame this request is addressed to, which is not the same question as
+  // the root of the observation: an endpoint is that root when the two are
+  // equal and a child frame when they are not. It has to be told, because the
+  // frame identity it holds for itself is one it minted in a namespace the
+  // broker does not share — so comparing its own against root_frame_id
+  // compares nothing, and answers "different" for the main frame of a
+  // first-party document as readily as for a genuine child.
+  //
+  // Null means an older broker that does not send it. That is not a licence to
+  // assume the safe-looking answer: an endpoint that is not told which frame it
+  // is treats itself as a cross-origin child, which raises its sensitivity
+  // floor rather than lowering it.
+  string? observed_frame_id;
+  // Null on first bind, required on refresh. A mismatch is rejected as stale
+  // rather than silently rebound to the new document.
+  string? expected_page_epoch;
+  ObservationScope scope;
+  array<AdapterRequirement> adapters;
+  array<SemanticField> requested_fields;
+  bool include_child_frames;
+  // Empty means "the root frame's own origin only", never "no restriction".
+  array<Origin> allowed_origins;
+  uint32 max_nodes;
+  uint32 max_text_bytes;
+  uint32 max_total_bytes;
+  uint32 max_depth;
+  uint32 deadline_ms;
+  string sensitivity_policy_id;
+  string task_purpose;
+  // Required exactly for kSection and null for every other scope.
+  FormObservationRoot? form_root;
+  // Optional only for kDocument, mutually exclusive with form_root.
+  MediaObservationRoot? media_root;
+};
+
+struct PageSnapshot {
+  string schema_version;
+  string snapshot_id;
+  string request_id;
+  string profile_id;
+  string browser_window_id;
+  string tab_id;
+  string root_frame_id;
+  string page_epoch;
+  uint64 graph_revision;
+  // Strictly increasing per epoch. A gap invalidates delta state and forces a
+  // fresh snapshot (protocol section 6.3).
+  uint64 event_sequence;
+  DocumentLifecycleState lifecycle_state;
+  // Renderer-reported on this wire, and therefore untrusted. The broker
+  // replaces both from its committed navigation record before any consumer
+  // sees them (protocol section 7.2).
+  UrlMetadata committed_url_metadata;
+  OriginMetadata origin_metadata;
+  uint64 capture_time_monotonic_ms;
+  ObservationScope scope;
+  array<AdapterReport> adapters;
+  array<SemanticNode> nodes;
+  array<SemanticEdge> edges;
+  array<FrameDescriptor> frames;
+  Truncation truncation;
+  RedactionSummary redaction_summary;
+  array<SnapshotWarning> warnings;
+  // The join over every node and frame included here, so a consumer reads
+  // the least trusted answer without walking the graph.
+  ContentTrust? lowest_content_trust;
+  // The exact validated root echoed from a kSection request. Null for every
+  // other scope.
+  FormObservationRoot? form_root;
+  // The exact validated media root echoed from a targeted kDocument request.
+  MediaObservationRoot? media_root;
+};
+
+// Why an observation did not produce a usable snapshot. Closed, like every
+// enumeration here: an unknown value fails closed (protocol section 15).
+// bip-transport-only: the observation reply code. The schema stops at PageSnapshot because
+//   JSON needs no envelope to say "there is no snapshot"; a Mojo method must
+//   answer with something.
+enum ObservationResultCode {
+  kOk,
+  kUnsupported,
+  kIncomplete,
+  kConflicted,
+  kStalePageEpoch,
+  kDocumentInactive,
+  kBudgetExceeded,
+  kDeadlineExceeded,
+  kCancelled,
+  kResourcePressure,
+  kInternalError,
+};
+
+// Exactly one terminal reply per request. A struct rather than a union so that
+// a later minor version can append a field without a wire break.
+// bip-transport-only: the reply message for GetSnapshot. It exists so a request has exactly
+//   one terminal answer on a pipe; the schema's PageSnapshot is what it
+//   carries.
+struct SnapshotResult {
+  string request_id;
+  ObservationResultCode code;
+  // Present if and only if code is kOk or kIncomplete.
+  PageSnapshot? snapshot;
+  array<SnapshotWarning> warnings;
+};
+
+// ---------------------------------------------------------------------------
+// Deltas and backpressure (taffy-core/contracts/bip/schema/delta.schema.json)
+// ---------------------------------------------------------------------------
+
+// Optional text and layout deltas are dropped before lifecycle or
+// node-removal signals (protocol section 10).
+enum DeltaCategory {
+  kText,
+  kLayout,
+  kAttribute,
+  kEdge,
+  kNodeAdded,
+  kNodeRemoved,
+  kLifecycle,
+};
+
+struct ChangedNode {
+  SemanticNode node;
+  array<SemanticField> changed_fields;
+};
+
+enum InvalidationReason {
+  kCrossDocumentCommit,
+  kHistoryRouteChange,
+  kChildFrameNavigation,
+  kOriginChanged,
+  kPrerenderActivation,
+  kBfcacheEntered,
+  kBfcacheRestored,
+  kSequenceGap,
+  kDeltaOverflow,
+  kUnknownDeltaField,
+  kAdapterRestart,
+  kBrokerInvalidation,
+  kMemoryPressure,
+  kRendererCrashed,
+  kEndpointDisconnected,
+  kTabClosed,
+  kProfileTeardown,
+  // Added at protocol 0.3. Deliberately not folded into kEndpointDisconnected
+  // or kRendererCrashed: a frame leaving the tree is ordinary lifecycle, and
+  // naming it as a lost pipe would make a routine subframe navigation
+  // indistinguishable from a renderer that died.
+  kFrameDetached,
+};
+
+struct PageInvalidation {
+  string schema_version;
+  // Null when the invalidation is not tied to one subscription.
+  string? subscription_id;
+  string tab_id;
+  string frame_id;
+  string page_epoch;
+  uint64 event_sequence;
+  InvalidationReason reason;
+  // True when the epoch itself is retired, so every handle inside it is dead.
+  // False when only the revision moved.
+  bool retires_page_epoch;
+  // True when a parent's handles survive because only a child frame changed
+  // (protocol section 13).
+  bool invalidates_child_frames_only;
+  bool resnapshot_required;
+  // Present when the broker has already bound a replacement epoch.
+  string? new_page_epoch;
+  uint64 observed_at_monotonic_ms;
+};
+
+// A delta applies only when page epoch, from_revision and sequence match the
+// subscriber's current projection. Anything else forces a resnapshot: deltas
+// are an optimization, and correctness always falls back to a bounded fresh
+// snapshot (protocol section 10).
+struct PageDelta {
+  string schema_version;
+  string subscription_id;
+  string tab_id;
+  string frame_id;
+  string page_epoch;
+  uint64 from_revision;
+  uint64 to_revision;
+  uint64 event_sequence;
+  // How many renderer mutations were coalesced. Coalescing never spans an
+  // action preflight and dispatch boundary in a way that hides a changed
+  // precondition (protocol section 5.3).
+  uint32 coalesced_mutation_count;
+  array<SemanticNode> added_nodes;
+  array<ChangedNode> changed_nodes;
+  array<string> removed_node_ids;
+  array<SemanticEdge> changed_edges;
+  array<PageInvalidation> invalidations;
+  Truncation truncation;
+  uint64 observed_at_monotonic_ms;
+};
+
+enum BackpressureAction {
+  kCoalesced,
+  kScopeReduced,
+  kSubscriptionPaused,
+  kResnapshotRequested,
+  kSubscriptionStopped,
+};
+
+struct BackpressureNotice {
+  string schema_version;
+  string subscription_id;
+  string tab_id;
+  string frame_id;
+  string page_epoch;
+  uint64 event_sequence;
+  BackpressureAction action;
+  uint32 dropped_delta_count;
+  array<DeltaCategory> dropped_categories;
+  uint32? queue_depth_hint;
+  ObservationScope? reduced_scope;
+  bool resnapshot_required;
+  uint64 observed_at_monotonic_ms;
+};
+
+// ---------------------------------------------------------------------------
+// Actions (taffy-core/contracts/bip/schema/action.schema.json)
+// ---------------------------------------------------------------------------
+
+// What an action does to a node.
+//
+// Three read: activate an ordinary link, move focus, bring a target into view.
+// Four write, and stopped being reserved wire values at protocol 0.8, which
+// means the contract now says what each one does rather than only that it
+// exists. Every one of them - reads included - is performed by asking the
+// platform accessibility layer to act, and by nothing else, so a submission
+// goes through the control the page offered and the page's own validation and
+// handlers run. A direct DOM setter, a synthesized event and a programmatic
+// form submission are all forbidden, because none of them is an act the page
+// agreed to and none can be verified against a postcondition (decision 0059).
+//
+// Expressible is not authorized, and four independent gates keep the write
+// surface shut: the tool that would name it belongs to milestone M5, every
+// write action class is one no ratified milestone has reached, the browser
+// dispatcher refuses a form write before a capability is consumed or a command
+// is built, and no adapter offers one of these in a node's actions[] - so a
+// command naming one is refused for want of an available action. The
+// requirements and threat-model extension that would open it are
+// [Open (OD-056)]. Protocol representation never implies product
+// authorization.
+enum ActionType {
+  kActivate,
+  kFocus,
+  kScrollIntoView,
+  kSetText,
+  kSelectOption,
+  kToggle,
+  kSubmitForm,
+};
+
+// kNone is the kind every read-oriented action type takes, and the kind
+// kSubmitForm takes: the submit control is the target, so there is nothing
+// left to say.
+enum ActionInputKind {
+  kNone,
+  kText,
+  kOption,
+  kToggleState,
+};
+
+// Who authored the bytes that enter a field is decided by which of these
+// fields is set, and this is the renderer-facing half of that rule.
+//
+// A proposal names a value and never carries one; by the time the browser
+// builds a RendererActionCommand it has resolved the reference and spent it,
+// so what arrives here is the resolved text with no reference beside it. A
+// command that carried both would be handing a sandboxed process something it
+// could present again — a reference that survives its own use is a capability
+// wearing a different name — and the endpoint refuses one that does
+// (action_command_translator.cc).
+struct ActionInput {
+  ActionInputKind kind;
+  Sensitivity sensitivity;
+  // Names a value the browser holds. It is on this struct because the struct
+  // is shared with the messages that carry a proposal inside the browser; a
+  // renderer never legitimately receives one, and a command carrying one is
+  // refused rather than executed with the reference ignored.
+  string? value_reference;
+  // Bounded text for a text-entry action, already resolved from a value
+  // reference by the browser. Never a value classified as a credential:
+  // credentials do not enter this wire in either direction, by value or by
+  // name.
+  string? text;
+  string? option_value;
+  bool? checked;
+};
+
+enum PrincipalKind {
+  kAssistant,
+  kSkill,
+};
+
+struct Principal {
+  PrincipalKind kind;
+  string? skill_version_id;
+};
+
+enum IdempotencyPolicy {
+  kPureRead,
+  kIdempotentWrite,
+  kConditionallyIdempotent,
+  // Never automatically retried after an ambiguous dispatch. Reconciliation or
+  // user review is required.
+  kNonIdempotent,
+};
+
+enum PreconditionKind {
+  kExactPageEpoch,
+  kAcceptableGraphRevision,
+  kExactOrigin,
+  kAllowedRedirectSet,
+  kDocumentActive,
+  kNodeExists,
+  kNodeRoleUnchanged,
+  kNodeActionAvailable,
+  kNodeStateAsserted,
+  kNodeStateAbsent,
+  kExpectedDestination,
+  kExpectedValueDigest,
+  kNotSensitiveField,
+  kNoUserInteractionSinceLease,
+  kBudgetRemaining,
+  // Appended at 0.5. kDestinationClassAllowed carries no operand on purpose:
+  // the class table is compiled in and is never supplied by a message.
+  kDestinationClassAllowed,
+  kContentTrustAtLeast,
+  // Appended at 0.6. kNoUndeclaredEgress likewise takes no operand: the
+  // channels a task declared are held by the browser, never by a message.
+  kPreparedEffectUnchanged,
+  kNoUndeclaredEgress,
+};
+
+// What a commit says it is committing. The prepare is named by identity and by
+// digest, and the authorizing gesture only by the monotonic time the browser
+// received it: the receipt is opaque and nothing here parses it.
+struct PreparedEffectBinding {
+  string prepared_action_id;
+  ContentDigest prepared_effect_digest;
+  uint64 prepared_at_monotonic_ms;
+  // Must postdate prepared_at_monotonic_ms, or the gesture cannot have been a
+  // response to the prepare.
+  uint64 gesture_at_monotonic_ms;
+};
+
+// A tagged condition. Only the members relevant to `kind` are populated;
+// everything else is null. The browser evaluates every precondition against
+// browser-owned state, and the renderer re-evaluates the subset it can see,
+// because state can race between observation and dispatch and a compromised
+// renderer may lie (protocol section 11.4).
+struct Precondition {
+  PreconditionKind kind;
+  string? page_epoch;
+  uint64? min_graph_revision;
+  Origin? origin;
+  array<Origin>? allowed_origins;
+  SemanticRole? expected_role;
+  ActionType? expected_action_type;
+  NodeState? node_state;
+  Destination? expected_destination;
+  ContentDigest? expected_value_digest;
+  Sensitivity? max_sensitivity;
+  ContentTrust? min_content_trust;
+  PreparedEffectBinding? prepared_effect;
+};
+
+// kNodeValueChanged and kBrowserFlowStarted are reserved beside the M5
+// form-action values: the read-oriented workflow writes no form values and
+// starts no download, file chooser or permission flow.
+enum PostconditionKind {
+  kNoMutation,
+  kCommittedNavigation,
+  kNewTabCreated,
+  kSectionVisible,
+  kSearchResultState,
+  kNodeStateChanged,
+  kNodeValueChanged,
+  kBrowserFlowStarted,
+  kLoadingStopped,
+  kDocumentAdvanced,
+};
+
+struct Postcondition {
+  PostconditionKind kind;
+  Destination? expected_destination;
+  array<Origin>? allowed_origins;
+  NodeState? expected_node_state;
+  uint32? timeout_ms;
+};
+
+// Which observer corroborated an effect. kRendererAcknowledgement is listed
+// because it is recorded, not because it is sufficient: on its own it means
+// DISPATCHED (protocol section 11.6).
+enum VerifierKind {
+  kBrowserNavigationEvent,
+  kBrowserTabEvent,
+  kFreshSnapshot,
+  kDeltaObservation,
+  kRendererAcknowledgement,
+  // Appended at 0.6. Browser-owned, and the only witness to a request that was
+  // never meant to happen: the component it would exonerate is the one that
+  // would have made it.
+  kBrowserNetworkEvent,
+};
+
+struct PostconditionOutcome {
+  Postcondition postcondition;
+  bool satisfied;
+  VerifierKind verifier;
+  uint64? observed_graph_revision;
+  string? detail_code;
+};
+
+// The full browser-side taxonomy (protocol section 11.7). It appears on this
+// wire only so that the renderer and the browser share one vocabulary in
+// generated bindings; a renderer never produces one of these values, and the
+// reply type it does produce is deliberately narrower.
+enum ActionResultCode {
+  kVerified,
+  kDeniedByPolicy,
+  kApprovalRequired,
+  kApprovalDenied,
+  kActorLeaseMissing,
+  kCapabilityExpired,
+  kTabGone,
+  kFrameGone,
+  kDocumentInactive,
+  kStalePageEpoch,
+  kStaleGraph,
+  kNodeGone,
+  kOriginChanged,
+  kRoleOrActionChanged,
+  kNotVisible,
+  kOccluded,
+  kNotEnabled,
+  kNotEditable,
+  kSensitiveField,
+  kDestinationChanged,
+  kUnsupported,
+  kBudgetExceeded,
+  kDispatchFailed,
+  kNavigationStarted,
+  kPostconditionTimeout,
+  kPostconditionFailed,
+  kCancelledByUser,
+  kCancelledByNavigation,
+  kRendererCrashed,
+  kOutcomeUnknown,
+  kInternalError,
+  // Appended at 0.5, never inserted: the browser persists the code in an
+  // action attempt, so renumbering would rewrite the meaning of stored records.
+  kEgressNotAuthorized,
+  kDestinationClassRestricted,
+  kUntrustedContentOrigin,
+  kPreparedEffectChanged,
+  kCommitWithoutPrepare,
+  // Appended at 0.7. Split out of kStaleGraph, which had been answering two
+  // different questions with one code: "the revision floor you named is behind
+  // the document" and "the browser knows this document moved and nobody has
+  // observed it since". They call for different next moves — the first is
+  // retried by re-observing at a newer revision, the second only by a fresh
+  // snapshot — and while they shared a code, a consumer could not choose.
+  kGraphMovedDuringPreflight,
+  // Appended at 0.11. Invalid, spent, expired, wrong-task and wrong-class
+  // browser-owned value references share this dedicated terminal.
+  kValueReferenceUnknown,
+};
+
+// The narrowed, one-use command the browser sends AFTER it has consumed the
+// capability. It carries only the renderer-local target and operation: no
+// capability reference, no approval receipt, no task or action identity
+// (protocol section 11.3).
+//
+// ActionProposal and AuthorizedActionEnvelope from the schema are deliberately
+// absent from this file. They never cross this boundary: a proposal lives
+// between the task engine and the policy engine inside the isolated core, and
+// an authorized envelope stops in the browser process. Putting either on a
+// renderer-facing interface would
+// hand a sandboxed process the evidence of its own authorization.
+struct RendererActionCommand {
+  string schema_version;
+  string command_id;
+  string frame_id;
+  string page_epoch;
+  uint64 required_graph_revision;
+  string node_id;
+  ActionType operation;
+  ActionInput? input;
+  array<Precondition> renderer_preconditions;
+  uint32 deadline_ms;
+};
+
+// What the renderer locally attempted.
+//
+// There is no member that means "the effect happened". kDispatched means the
+// renderer put the operation on the normal input path, which is a statement
+// about the renderer and not about the page; a compromised renderer would say
+// it regardless. VERIFIED is reachable only through the browser-side
+// postcondition verifier (protocol section 11.6), which is why this enum is
+// not simply ActionResultCode.
+// bip-transport-only: what a renderer says it attempted locally. Deliberately not
+//   ActionResultCode: no member of it can mean the effect happened, because
+//   only the browser-side verifier may say that.
+enum RendererActionOutcome {
+  kDispatched,
+  kUnsupported,
+  kStalePageEpoch,
+  kStaleGraph,
+  kNodeGone,
+  kOriginChanged,
+  kRoleOrActionChanged,
+  kNotVisible,
+  kOccluded,
+  kNotEnabled,
+  kNotEditable,
+  kSensitiveField,
+  kDestinationChanged,
+  kDocumentInactive,
+  kPreconditionFailed,
+  kDeadlineExceeded,
+  kCancelled,
+  kInternalError,
+};
+
+// The minimal re-read state the browser re-evaluates preconditions against
+// (protocol section 12, step 6). Deliberately small: it is the only part of a
+// renderer reply that browser-process C++ inspects field by field.
+// bip-transport-only: the bounded re-read of one node that ResolveNode and
+//   ExecuteRendererAction return. It is the only renderer reply browser-
+//   process C++ inspects field by field, which is why it is small and
+//   separate.
+struct ResolvedNode {
+  string node_id;
+  uint64 observed_at_revision;
+  SemanticRole role;
+  array<ActionType> actions;
+  array<NodeState> states;
+  Sensitivity sensitivity;
+  // Fresh node authorship. Renderer-only privileged labels are impossible;
+  // the browser maps any forged privileged value to UNKNOWN_UNTRUSTED.
+  ContentTrust content_trust;
+  ChallengeKind challenge_kind;
+  Destination? destination;
+  // Digest of the current non-sensitive value, when the caller declared an
+  // expected-value precondition. Never populated for a field classified above
+  // kNotSensitive.
+  ContentDigest? value_digest;
+  // Latest exact form-state mutation attributed to this node. It proves only
+  // that the value changed after a dispatch; no value-derived material crosses
+  // this boundary.
+  uint64 value_changed_at_revision;
+  // Fresh viewport-relative geometry of the image or embedded widget that
+  // justified challenge_kind. Transport-only and never identity: the browser
+  // clips it to the visible viewport and re-resolves it after any pixel copy.
+  Bounds? challenge_bounds;
+  // Exact browser-issued children when this node is an emitted form region.
+  // Bounded by the form adapter. Empty for an ordinary node; these identities
+  // still require individual ResolveNode calls before the browser uses them.
+  array<string> form_field_node_ids;
+  // Browser-redacted accessible label retained only for the trusted local
+  // form-confirmation surface. It is bounded by the renderer's shared text
+  // ledger and never enters a BIP snapshot, Core Service, or model request.
+  string display_label;
+};
+
+// bip-transport-only: the reply message for ExecuteRendererAction. The schema's ActionResult
+//   is browser-authored and never crosses this boundary.
+struct RendererActionResult {
+  string schema_version;
+  string command_id;
+  RendererActionOutcome outcome;
+  // Which precondition failed, when outcome is kPreconditionFailed. Reported
+  // for diagnosis; the browser has already re-checked all of them.
+  PreconditionKind? failed_precondition;
+  // State re-read at dispatch time, as the verifier's baseline.
+  ResolvedNode? observed_state;
+  // Revision at the moment the renderer acted, so the verifier can require a
+  // strictly newer observation before believing an effect.
+  uint64 observed_at_revision;
+};
+
+// ---------------------------------------------------------------------------
+// Node resolution
+// ---------------------------------------------------------------------------
+
+// bip-transport-only: the reply code for ResolveNode, for the same reason
+//   ObservationResultCode exists.
+enum NodeResolutionCode {
+  kOk,
+  kStalePageEpoch,
+  kStaleGraph,
+  kNodeGone,
+  kOriginChanged,
+  kDocumentInactive,
+  kUnsupported,
+  kInternalError,
+};
+
+// bip-transport-only: the request message for ResolveNode. Node re-resolution is a Mojo round
+//   trip with no JSON counterpart.
+struct ResolveNodeRequest {
+  string schema_version;
+  string request_id;
+  // Named node_handle rather than handle: `handle` is a mojom built-in type
+  // keyword (handle<message_pipe> and friends), so a field cannot use it. The
+  // first mojom parse of this file rejected it outright. This struct is
+  // bip-transport-only, so the name is not part of the contract's
+  // name-for-name projection and nothing in the JSON schema moves with it.
+  NodeHandle node_handle;
+  uint64 required_graph_revision;
+};
+
+// bip-transport-only: the reply message for ResolveNode.
+struct ResolveNodeResult {
+  string request_id;
+  NodeResolutionCode code;
+  ResolvedNode? node;
+};
+
+// ---------------------------------------------------------------------------
+// Subscriptions
+// ---------------------------------------------------------------------------
+
+// bip-transport-only: the request message for Subscribe. Subscription is a pipe-lifetime
+//   concern; the schema describes what a subscription delivers, not how one
+//   is opened.
+struct PageSubscriptionOptions {
+  string schema_version;
+  string request_id;
+  string frame_id;
+  string expected_page_epoch;
+  ObservationScope scope;
+  array<AdapterRequirement> adapters;
+  array<SemanticField> requested_fields;
+  uint32 max_nodes;
+  uint32 max_total_bytes;
+  // Renderer-side mutation coalescing window. The broker clamps it to the
+  // endpoint's min_delta_interval_ms and to the process ceiling.
+  uint32 coalescing_window_ms;
+  bool include_text_deltas;
+  bool include_layout_deltas;
+};
+
+// bip-transport-only: the reply message for Subscribe.
+struct SubscriptionResult {
+  string request_id;
+  ObservationResultCode code;
+  string? subscription_id;
+  uint64? base_revision;
+};
+
+// bip-transport-only: bounded renderer reply used only by the browser.
+struct MediaTargetResult {
+  string request_id;
+  MediaTargetResultCode code;
+  MediaTargetKind kind;
+  uint64 observed_graph_revision;
+  Bounds? bounds;
+  // Fresh viewport-relative rectangles the browser must paint opaque before
+  // encoding PAGE_SCREENSHOT. Empty for exact-node image/video capture.
+  array<Bounds> redaction_bounds;
+  array<MediaCaptionCue> loaded_caption_cues;
+};
+
+// ---------------------------------------------------------------------------
+// Interfaces (protocol section 6.1)
+// ---------------------------------------------------------------------------
+
+// Implemented by the renderer endpoint, one per frame, called by the browser
+// broker.
+//
+// VERIFY AT SP-04: whether this should be channel-associated or an ordinary
+// interface is [Open (OD-027)]. The broker binds it associated today because
+// the stale-node algorithm depends on observation and action messages keeping
+// their order relative to navigation IPCs; an ordinary interface would let an
+// action overtake a commit.
+interface PageIntelligence {
+  // Negotiation before anything else. An endpoint that cannot answer is
+  // unsupported, not assumed.
+  GetProtocolInfo() => (ProtocolInfo info);
+
+  GetSnapshot(SnapshotRequest request) => (SnapshotResult result);
+
+  Subscribe(PageSubscriptionOptions options,
+            pending_remote<PageDeltaClient> client)
+      => (SubscriptionResult result);
+
+  ResolveNode(ResolveNodeRequest request) => (ResolveNodeResult result);
+
+  // Revalidates one exact BIP media node, or the separately authorized visible
+  // viewport fallback, and returns current compositor geometry. The browser
+  // captures pixels and then repeats this call; changed kind, revision,
+  // geometry, or redaction bounds discard the capture.
+  InspectMediaTarget(MediaTargetRequest request) => (MediaTargetResult result);
+
+  // Preconditions are re-checked renderer-side immediately before the
+  // operation. A reserved M5 action type never reaches this method in a
+  // production build.
+  ExecuteRendererAction(RendererActionCommand command)
+      => (RendererActionResult result);
+
+  // Best effort. A late reply arriving after cancellation is dropped and
+  // counted, never delivered (protocol section 6.3).
+  Cancel(string command_id);
+};
+
+// Implemented by the browser broker, called by the renderer endpoint.
+interface PageDeltaClient {
+  OnDelta(PageDelta delta);
+  OnInvalidated(PageInvalidation invalidation);
+  OnBackpressure(BackpressureNotice notice);
+};

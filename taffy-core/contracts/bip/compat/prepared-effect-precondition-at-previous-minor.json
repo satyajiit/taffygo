@@ -1,0 +1,61 @@
+{
+  "schema_version": "0.6",
+  "action_id": "act_11",
+  "task_id": "task_09",
+  "principal": {
+    "kind": "ASSISTANT"
+  },
+  "action_type": "SUBMIT_FORM",
+  "target_handle": {
+    "tab_id": "tab_09",
+    "frame_id": "frame_main",
+    "page_epoch": "epoch_g4",
+    "graph_revision": 18,
+    "node_id": "n_confirm_button",
+    "expected_origin": {
+      "kind": "TUPLE",
+      "serialization": "https://shop.example.test"
+    }
+  },
+  "preconditions": [
+    {
+      "kind": "EXACT_PAGE_EPOCH",
+      "page_epoch": "epoch_g4"
+    },
+    {
+      "kind": "DOCUMENT_ACTIVE"
+    },
+    {
+      "kind": "NODE_EXISTS"
+    },
+    {
+      "kind": "PREPARED_EFFECT_UNCHANGED",
+      "prepared_effect": {
+        "prepared_action_id": "act_09",
+        "prepared_effect_digest": {
+          "algorithm": "SHA_256",
+          "value": "a1c3e5079b2d4f6881a3c5e70092b4d6f8012a3c5e709b1d3f5a7c9e10b2d4f6"
+        },
+        "prepared_at_monotonic_ms": 30400,
+        "gesture_at_monotonic_ms": 34960
+      }
+    },
+    {
+      "kind": "BUDGET_REMAINING"
+    }
+  ],
+  "expected_postconditions": [
+    {
+      "kind": "NODE_STATE_CHANGED",
+      "expected_node_state": "DISABLED",
+      "timeout_ms": 8000
+    }
+  ],
+  "idempotency_policy": "NON_IDEMPOTENT",
+  "deadline_monotonic_ms": 39000,
+  "user_visible_reason": "Place the order you confirmed.",
+  "proposal_digest": {
+    "algorithm": "SHA_256",
+    "value": "3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b"
+  }
+}

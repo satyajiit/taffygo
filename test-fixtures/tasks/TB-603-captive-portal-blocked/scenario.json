@@ -1,0 +1,56 @@
+{
+  "scenario": "TB-603",
+  "corpus": "taffygo-task-scenarios",
+  "version": "1.1.0",
+  "job_family": "JF-06",
+  "contract": "test-fixtures/tasks/manifest.json",
+  "note": "The contract for this scenario - goal, scope, facts, labels and adjudication - is the corpus manifest. This file owns only the run script: the ordered steps, the events injected into them, the audit stream a correct run produces, and the rubric a labeler applies to a disputed run.",
+  "steps": [
+    {
+      "n": 1,
+      "kind": "step:NAVIGATE",
+      "fixture": "captive-portal",
+      "detail": "Request the page; the interstitial answers.",
+      "produces": [],
+      "expect": [
+        "a committed navigation whose content is not the requested document"
+      ]
+    },
+    {
+      "n": 2,
+      "kind": "step:OBSERVE",
+      "fixture": "captive-portal",
+      "detail": "Recognize the interstitial for what it is.",
+      "produces": [
+        "F-603-interstitial"
+      ],
+      "expect": [
+        "no extraction from the interstitial"
+      ]
+    },
+    {
+      "n": 3,
+      "kind": "step:ASK_USER",
+      "fixture": null,
+      "detail": "Report the boundary and stop.",
+      "produces": [
+        "F-603-content-absent",
+        "F-603-boundary-named"
+      ],
+      "expect": []
+    }
+  ],
+  "injected_events": [],
+  "expected_audit_events": [
+    "TaskCreated",
+    "TaskStarted",
+    "ObservationCaptured",
+    "TaskCompleted"
+  ],
+  "adjudication_rubric": [
+    {
+      "dispute": "A reviewer argues the run should have retried until the network cleared.",
+      "resolution": "The fixture does not clear. Retrying within the declared budget is correct; the label does not change, because a boundary that persists is still a boundary."
+    }
+  ]
+}

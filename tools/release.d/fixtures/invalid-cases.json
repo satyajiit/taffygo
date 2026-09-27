@@ -1,0 +1,254 @@
+[
+  {
+    "name": "the source revision is missing",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/source/taffy/revision" }],
+    "expect": { "pointer": "/source/taffy/revision", "contains": "required and absent" }
+  },
+  {
+    "name": "an abbreviated revision is not a pin",
+    "profile": "candidate",
+    "patch": [{ "op": "set", "pointer": "/source/taffy/revision", "value": "0f5e0a0" }],
+    "expect": { "pointer": "/source/taffy/revision", "contains": "does not match" }
+  },
+  {
+    "name": "the working tree state is not asserted",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/source/taffy/dirty" }],
+    "expect": { "pointer": "/source/taffy/dirty", "contains": "required and absent" }
+  },
+  {
+    "name": "the Chromium security patch level is missing",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/chromium/security_patch_level" }],
+    "expect": { "pointer": "/chromium/security_patch_level", "contains": "required and absent" }
+  },
+  {
+    "name": "the patch-queue digest is missing",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/chromium/patch_queue/digest" }],
+    "expect": { "pointer": "/chromium/patch_queue/digest", "contains": "required and absent" }
+  },
+  {
+    "name": "the build profile is not a committed one",
+    "profile": "candidate",
+    "patch": [{ "op": "set", "pointer": "/build/profile", "value": "release-x64" }],
+    "expect": { "pointer": "/build/profile", "contains": "is not one of" }
+  },
+  {
+    "name": "an artifact carries no digest",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/artifacts/0/sha256" }],
+    "expect": { "pointer": "/artifacts/0/sha256", "contains": "required and absent" }
+  },
+  {
+    "name": "the artifact list is empty",
+    "profile": "candidate",
+    "patch": [{ "op": "set", "pointer": "/artifacts", "value": [] }],
+    "expect": { "pointer": "/artifacts", "contains": "at least 1 entry" }
+  },
+  {
+    "name": "the SBOM is declared with no ecosystems",
+    "profile": "candidate",
+    "patch": [{ "op": "set", "pointer": "/dependencies/sbom/ecosystems", "value": [] }],
+    "expect": { "pointer": "/dependencies/sbom/ecosystems", "contains": "at least 1 entry" }
+  },
+  {
+    "name": "the SBOM file is absent on a candidate",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/dependencies/sbom/path" }],
+    "expect": { "pointer": "/dependencies/sbom/path", "contains": "required for a \"candidate\" artifact" }
+  },
+  {
+    "name": "the license inventory has unresolved entries",
+    "profile": "candidate",
+    "patch": [{ "op": "set", "pointer": "/dependencies/license_inventory/unresolved", "value": -1 }],
+    "expect": { "pointer": "/dependencies/license_inventory/unresolved", "contains": "must be >= 0" }
+  },
+  {
+    "name": "the license inventory file is absent on a candidate",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/dependencies/license_inventory/path" }],
+    "expect": { "pointer": "/dependencies/license_inventory/path", "contains": "required for a \"candidate\" artifact" }
+  },
+  {
+    "name": "no lockfile digests at all",
+    "profile": "candidate",
+    "patch": [{ "op": "set", "pointer": "/dependencies/lock_digests", "value": [] }],
+    "expect": { "pointer": "/dependencies/lock_digests", "contains": "at least 1 entry" }
+  },
+  {
+    "name": "the vulnerability scan never ran on a candidate",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/dependencies/vulnerability_scan/ran_at" }],
+    "expect": { "pointer": "/dependencies/vulnerability_scan/ran_at", "contains": "required for a \"candidate\" artifact" }
+  },
+  {
+    "name": "build and signing ran as one job",
+    "profile": "development",
+    "patch": [{ "op": "set", "pointer": "/signing/separation/distinct", "value": false }],
+    "expect": { "pointer": "/signing/separation/distinct", "contains": "must be True" }
+  },
+  {
+    "name": "the signing job used a long-lived token",
+    "profile": "development",
+    "patch": [{ "op": "set", "pointer": "/signing/long_lived_token", "value": true }],
+    "expect": { "pointer": "/signing/long_lived_token", "contains": "must be False" }
+  },
+  {
+    "name": "the signing credential source is not a permitted one",
+    "profile": "development",
+    "patch": [{ "op": "set", "pointer": "/signing/credential_source", "value": "repository-secret" }],
+    "expect": { "pointer": "/signing/credential_source", "contains": "is not one of" }
+  },
+  {
+    "name": "the signing certificate is unidentified on a candidate",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/signing/certificate/sha256_fingerprint" }],
+    "expect": { "pointer": "/signing/certificate/sha256_fingerprint", "contains": "required for a \"candidate\" artifact" }
+  },
+  {
+    "name": "the artifact has no provenance",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/provenance" }],
+    "expect": { "pointer": "/provenance", "contains": "required and absent" }
+  },
+  {
+    "name": "provenance names no invocation revision",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/provenance/invocation/sha" }],
+    "expect": { "pointer": "/provenance/invocation/sha", "contains": "required and absent" }
+  },
+  {
+    "name": "16 KiB page alignment was never measured on a candidate",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/platform/sixteen_kb_alignment" }],
+    "expect": { "pointer": "/platform/sixteen_kb_alignment", "contains": "required for a \"candidate\" artifact" }
+  },
+  {
+    "name": "the drill record is absent from a drill artifact",
+    "profile": "drill",
+    "patch": [{ "op": "remove", "pointer": "/security_drill" }],
+    "expect": { "pointer": "/security_drill", "contains": "required for a \"drill\" artifact" }
+  },
+  {
+    "name": "the drill measured no detection-to-artifact interval",
+    "profile": "drill",
+    "patch": [{ "op": "remove", "pointer": "/security_drill/detection_to_artifact_seconds" }],
+    "expect": { "pointer": "/security_drill/detection_to_artifact_seconds", "contains": "required for a \"drill\" artifact" }
+  },
+  {
+    "name": "the drill cites a register entry that is not the one that owns it",
+    "profile": "drill",
+    "patch": [{ "op": "set", "pointer": "/security_drill/objective_register_entry", "value": "OD-062" }],
+    "expect": { "pointer": "/security_drill/objective_register_entry", "contains": "must be 'OD-052'" }
+  },
+  {
+    "name": "a field the schema does not define",
+    "profile": "development",
+    "patch": [{ "op": "set", "pointer": "/signing/key_password", "value": "anything" }],
+    "expect": { "pointer": "/signing/key_password", "contains": "not a field of this schema" }
+  },
+  {
+    "name": "an approval with no named identity",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/approvals/0/identity" }],
+    "expect": { "pointer": "/approvals/0/identity", "contains": "required and absent" }
+  },
+  {
+    "name": "the toolchain table is empty",
+    "profile": "development",
+    "patch": [{ "op": "set", "pointer": "/toolchain", "value": [] }],
+    "expect": { "pointer": "/toolchain", "contains": "at least 1 entry" }
+  },
+  {
+    "name": "a toolchain row names no machine owner file",
+    "profile": "development",
+    "patch": [{ "op": "remove", "pointer": "/toolchain/0/owner_file" }],
+    "expect": { "pointer": "/toolchain/0/owner_file", "contains": "required and absent" }
+  },
+  {
+    "name": "the benchmark corpus version is absent on a candidate",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/tests/corpus_version" }],
+    "expect": { "pointer": "/tests/corpus_version", "contains": "required for a \"candidate\" artifact" }
+  },
+  {
+    "name": "an unparseable timestamp",
+    "profile": "development",
+    "patch": [{ "op": "set", "pointer": "/generated_at", "value": "17 August 2026" }],
+    "expect": { "pointer": "/generated_at", "contains": "does not match" }
+  },
+  {
+    "name": "a version-one manifest cannot pass the hardened contract",
+    "profile": "candidate",
+    "patch": [{ "op": "set", "pointer": "/schema_version", "value": 1 }],
+    "expect": { "pointer": "/schema_version", "contains": "must be 2" }
+  },
+  {
+    "name": "candidate promotion intent is explicit",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/release/promotable" }],
+    "expect": { "pointer": "/release/promotable", "contains": "required for a \"candidate\"" }
+  },
+  {
+    "name": "benchmark evidence carries a digest",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/tests/benchmark_evidence_sha256" }],
+    "expect": { "pointer": "/tests/benchmark_evidence_sha256", "contains": "required for a \"candidate\"" }
+  },
+  {
+    "name": "benchmark approval is an explicit fact",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/tests/benchmark_approved" }],
+    "expect": { "pointer": "/tests/benchmark_approved", "contains": "required for a \"candidate\"" }
+  },
+  {
+    "name": "a candidate identifies its capability profile",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/identity/capability_profile/name" }],
+    "expect": { "pointer": "/identity/capability_profile/name", "contains": "required and absent" }
+  },
+  {
+    "name": "a capability fingerprint has one canonical form",
+    "profile": "candidate",
+    "patch": [{ "op": "set", "pointer": "/identity/capability_profile/configuration_fingerprint", "value": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd" }],
+    "expect": { "pointer": "/identity/capability_profile/configuration_fingerprint", "contains": "does not match" }
+  },
+  {
+    "name": "the delegated-task gate is part of capability identity",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/identity/capability_profile/delegated_task_start" }],
+    "expect": { "pointer": "/identity/capability_profile/delegated_task_start", "contains": "required and absent" }
+  },
+  {
+    "name": "the task milestone is part of capability identity",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/identity/capability_profile/task_milestone" }],
+    "expect": { "pointer": "/identity/capability_profile/task_milestone", "contains": "required and absent" }
+  },
+  {
+    "name": "the policy milestone is part of capability identity",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/identity/capability_profile/policy_milestone" }],
+    "expect": { "pointer": "/identity/capability_profile/policy_milestone", "contains": "required and absent" }
+  },
+  {
+    "name": "a candidate identifies the evidence index file",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/identity/evidence_index/path" }],
+    "expect": { "pointer": "/identity/evidence_index/path", "contains": "required and absent" }
+  },
+  {
+    "name": "the rollback record has a digest",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/rollback/record_sha256" }],
+    "expect": { "pointer": "/rollback/record_sha256", "contains": "required and absent" }
+  },
+  {
+    "name": "device evidence says whether the matrix approved it",
+    "profile": "candidate",
+    "patch": [{ "op": "remove", "pointer": "/tests/devices/0/approved" }],
+    "expect": { "pointer": "/tests/devices/0/approved", "contains": "required and absent" }
+  }
+]

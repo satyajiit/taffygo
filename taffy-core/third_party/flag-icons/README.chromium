@@ -1,0 +1,39 @@
+# For more information on these fields, see:
+# https://chromium.googlesource.com/chromium/src/+/HEAD/docs/adding_to_third_party.md#readme_chromium
+#
+# TaffyGo vendors the flag-icons *recipe* under //taffy rather than under
+# Chromium's own //third_party because the corpus is a TaffyGo product
+# decision, not an upstream one: decision 0047 records why the shipped set is
+# exactly ISO 3166-1 and why the licence travels inside the pack. No artwork is
+# committed here. The pin in tools/manifest.json names the npm tarball and its
+# SHA-256, and tools/build_flag_pack.py rasterises and packages it.
+
+Name: flag-icons
+Short Name: flag-icons
+URL: https://registry.npmjs.org/flag-icons/-/flag-icons-7.5.0.tgz
+Version: 7.5.0
+Update Mechanism: Manual
+License: MIT
+License File: vendor/flag-icons.MIT.txt
+Shipped: yes
+Security Critical: no
+
+Description:
+The country-flag artwork screens SCR-001, SCR-006 and SCR-407 draw. Built from
+the pinned tarball into one zip of 249 WebP members plus LICENSE, catalogued
+for the delivery plane as asset `country-flags` revision `7.5.0-taffy.1`. The
+recipe lives here; the built zip is committed at
+taffy-core/components/delivery/bundled/flags-4x3-webp.zip.
+
+Shipped is "yes" because the APK carries the pack (decision 0202):
+//taffy/components/delivery:bundled_delivery_assets packages that zip, and it
+is seeded into the delivery store on first run. Nothing fetches it from a
+host. Decision 0206 needs this field to be true: the credits page is generated
+from it, and a part recorded as not shipped is left out of the notice the
+package carries.
+
+Local Modifications:
+None to the upstream artwork. The build keeps only the ISO 3166-1 alpha-2
+intersection of the 4x3 set, rasterises through a pinned librsvg/cairo pair,
+and encodes with a pinned cwebp. tools/iso-country-codes.tsv is first-party
+and is the list decision 0047 named.

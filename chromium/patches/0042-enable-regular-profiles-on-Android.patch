@@ -1,0 +1,292 @@
+From acd20f6250fa3d1fe439176f925d340cf36656c5 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Tue, 1 Sep 2026 06:43:57 +0530
+Subject: enable regular profiles on Android
+
+Use Chromium profile lifecycle on the TaffyGo Android surface instead of duplicating profile directory allocation and deletion downstream.
+
+Specified by chromium/patches/0042-enable-regular-profiles-on-android.md.
+
+Taffy-Patch: 0042
+
+diff --git a/chrome/browser/profiles/profile_manager.cc b/chrome/browser/profiles/profile_manager.cc
+index afd1085d96404..2d4c9e746cd5c 100644
+--- a/chrome/browser/profiles/profile_manager.cc
++++ b/chrome/browser/profiles/profile_manager.cc
+@@ -55,6 +55,7 @@
+ #include "chrome/browser/prefs/incognito_mode_prefs.h"
+ #include "chrome/browser/profiles/delete_profile_helper.h"
+ #include "chrome/browser/profiles/keep_alive/profile_keep_alive_types.h"
++#include "chrome/browser/profiles/nuke_profile_directory_utils.h"
+ #include "chrome/browser/profiles/profile_attributes_entry.h"
+ #include "chrome/browser/profiles/profile_attributes_init_params.h"
+ #include "chrome/browser/profiles/profile_attributes_storage.h"
+@@ -130,7 +131,6 @@
+ #include "chrome/browser/accessibility/live_caption/live_caption_controller_factory.h"
+ #include "chrome/browser/lifetime/application_lifetime_desktop.h"
+ #include "chrome/browser/profiles/keep_alive/scoped_profile_keep_alive.h"
+-#include "chrome/browser/profiles/nuke_profile_directory_utils.h"
+ #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"  // nogncheck
+ #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"  // nogncheck
+ #include "components/live_caption/live_caption_controller.h"
+@@ -447,6 +447,66 @@ bool ShouldGoOffTheRecord(Profile* profile) {
+   return profile->IsGuestSession() || profile->IsSystemProfile();
+ }
+ 
++#if BUILDFLAG(IS_ANDROID)
++void FinishProfileDeletionOnAndroid(base::Value profile_path_value,
++                                    base::OnceClosure completion) {
++  if (g_browser_process && !g_browser_process->IsShuttingDown()) {
++    ScopedListPrefUpdate deleted_profiles(g_browser_process->local_state(),
++                                          prefs::kProfilesDeleted);
++    deleted_profiles->EraseValue(profile_path_value);
++  }
++  if (completion) {
++    std::move(completion).Run();
++  }
++}
++
++void PostProfileDeletionOnAndroid(const base::FilePath& profile_path,
++                                  base::Value profile_path_value,
++                                  base::OnceClosure completion) {
++  base::ThreadPool::PostTask(
++      FROM_HERE,
++      {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
++       base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN},
++      base::BindOnce(&NukeProfileFromDisk, profile_path,
++                     base::BindOnce(&FinishProfileDeletionOnAndroid,
++                                    std::move(profile_path_value),
++                                    std::move(completion))));
++}
++
++void CleanUpDeletedProfilesOnAndroid(ProfileManager& manager) {
++  PrefService* local_state = g_browser_process->local_state();
++  ProfileAttributesStorage& storage = manager.GetProfileAttributesStorage();
++  base::ListValue deleted_profiles =
++      local_state->GetList(prefs::kProfilesDeleted).Clone();
++  for (base::Value& value : deleted_profiles) {
++    std::optional<base::FilePath> relative_path = base::ValueToFilePath(value);
++    const bool safe_name = relative_path && !relative_path->empty() &&
++                           !relative_path->IsAbsolute() &&
++                           relative_path->BaseName() == *relative_path &&
++                           relative_path->value() != FILE_PATH_LITERAL(".") &&
++                           relative_path->value() != FILE_PATH_LITERAL("..");
++    if (safe_name) {
++      const base::FilePath profile_path =
++          manager.user_data_dir().Append(*relative_path);
++      ProfileAttributesEntry* entry =
++          storage.GetProfileAttributesWithPath(profile_path);
++      const bool interrupted_deletion =
++          !entry || (entry->IsEphemeral() && entry->IsOmitted());
++      if (profile_path.DirName() == manager.user_data_dir() &&
++          interrupted_deletion) {
++        if (entry) {
++          storage.RemoveProfile(profile_path);
++        }
++        PostProfileDeletionOnAndroid(profile_path, std::move(value),
++                                     base::OnceClosure());
++        continue;
++      }
++    }
++    FinishProfileDeletionOnAndroid(std::move(value), base::OnceClosure());
++  }
++}
++#endif  // BUILDFLAG(IS_ANDROID)
++
+ }  // namespace
+ 
+ BASE_FEATURE(kProfileManagerDeferAsyncLoading,
+@@ -465,6 +525,7 @@ ProfileManager::ProfileManager(const base::FilePath& user_data_dir)
+                           base::Unretained(this)));
+ #else
+   profile_manager_android_ = std::make_unique<ProfileManagerAndroid>(this);
++  CleanUpDeletedProfilesOnAndroid(*this);
+ #endif
+ 
+   if (ProfileShortcutManager::IsFeatureEnabled() && !user_data_dir_.empty())
+@@ -1001,10 +1062,8 @@ bool ProfileManager::CanCreateProfileAtPath(const base::FilePath& path) const {
+     return false;
+   }
+ 
+-#if !BUILDFLAG(IS_ANDROID)
+   if (IsProfileDirectoryMarkedForDeletion(path))
+     return false;
+-#endif
+ 
+   return true;
+ }
+@@ -1164,6 +1223,60 @@ ProfileAttributesStorage& ProfileManager::GetProfileAttributesStorage() {
+   return *profile_attributes_storage_.get();
+ }
+ 
++#if BUILDFLAG(IS_ANDROID)
++bool ProfileManager::DeleteProfileOnAndroid(
++    const base::FilePath& profile_path,
++    base::OnceClosure completion,
++    ProfileMetrics::ProfileDelete deletion_source) {
++  DCHECK_CURRENTLY_ON(BrowserThread::UI);
++
++  ProfileAttributesStorage& storage = GetProfileAttributesStorage();
++  ProfileAttributesEntry* entry =
++      storage.GetProfileAttributesWithPath(profile_path);
++  if (!entry || !IsAllowedProfilePath(profile_path) ||
++      profile_path == GetGuestProfilePath() || entry->IsOmitted() ||
++      entry->IsEphemeral() || profile_path == GetLastUsedProfileDir() ||
++      IsProfileDirectoryMarkedForDeletion(profile_path)) {
++    return false;
++  }
++
++  size_t regular_profile_count = 0;
++  for (ProfileAttributesEntry* candidate : storage.GetAllProfilesAttributes()) {
++    if (candidate && IsAllowedProfilePath(candidate->GetPath()) &&
++        candidate->GetPath() != GetGuestProfilePath() &&
++        !candidate->IsOmitted() && !candidate->IsEphemeral() &&
++        !IsProfileDirectoryMarkedForDeletion(candidate->GetPath())) {
++      ++regular_profile_count;
++    }
++  }
++  ProfileInfo* info = GetProfileInfoByPath(profile_path);
++  if (regular_profile_count <= 1 || (info && !info->GetCreatedProfile()) ||
++      !ScheduleProfileDirectoryForDeletion(profile_path)) {
++    return false;
++  }
++
++  ProfileMetrics::LogProfileDeleteUser(deletion_source);
++  MarkProfileDirectoryForDeletion(profile_path);
++
++  auto nuke_profile = base::BindOnce(
++      &PostProfileDeletionOnAndroid, profile_path,
++      base::FilePathToValue(profile_path.BaseName()), std::move(completion));
++
++  if (Profile* profile = GetProfileByPath(profile_path)) {
++    NotifyOnProfileMarkedForPermanentDeletion(profile);
++    profile->GetPrefs()->OnStoreDeletionFromDisk();
++    profiles_pending_destruction_[profile_path].push_back(
++        std::move(nuke_profile));
++    storage.RemoveProfile(profile_path);
++    profiles_info_.erase(profile_path);
++  } else {
++    storage.RemoveProfile(profile_path);
++    std::move(nuke_profile).Run();
++  }
++  return true;
++}
++#endif  // BUILDFLAG(IS_ANDROID)
++
+ ProfileShortcutManager* ProfileManager::profile_shortcut_manager() {
+   return profile_shortcut_manager_.get();
+ }
+@@ -2191,13 +2304,11 @@ void ProfileManager::OnProfileDestructionComplete(
+ }
+ 
+ void ProfileManager::SetProfileAsLastUsed(Profile* last_active) {
+-#if !BUILDFLAG(IS_ANDROID)
+   // The profile may incorrectly become "active" during its destruction, caused
+   // by the UI teardown. See https://crbug.com/40686320
+   if (IsProfileDirectoryMarkedForDeletion(last_active->GetPath())) {
+     return;
+   }
+-#endif
+ 
+   // If there is a primary account, mark it as used "just now".
+   signin::IdentityManager* identity_manager =
+diff --git a/chrome/browser/profiles/profile_manager.h b/chrome/browser/profiles/profile_manager.h
+index 91a1f852482a5..730a66f5f79e9 100644
+--- a/chrome/browser/profiles/profile_manager.h
++++ b/chrome/browser/profiles/profile_manager.h
+@@ -319,6 +319,16 @@ class ProfileManager : public Profile::Delegate {
+   // information about profiles without having to load them from disk.
+   ProfileAttributesStorage& GetProfileAttributesStorage();
+ 
++#if BUILDFLAG(IS_ANDROID)
++  // Deletes a durable regular profile after the Android caller has closed all
++  // windows that use it. The active or last remaining profile is never
++  // deleted. Returns whether deletion was accepted; `completion` runs after
++  // the profile has been destroyed and its directory deletion was attempted.
++  bool DeleteProfileOnAndroid(const base::FilePath& profile_path,
++                              base::OnceClosure completion,
++                              ProfileMetrics::ProfileDelete deletion_source);
++#endif  // BUILDFLAG(IS_ANDROID)
++
+   // Returns a ProfileShortcut Manager that enables the caller to create
+   // profile specfic desktop shortcuts.
+   ProfileShortcutManager* profile_shortcut_manager();
+diff --git a/chrome/browser/profiles/profile_manager_unittest.cc b/chrome/browser/profiles/profile_manager_unittest.cc
+index 2f54f7236a311..c8b5b6ca8c25a 100644
+--- a/chrome/browser/profiles/profile_manager_unittest.cc
++++ b/chrome/browser/profiles/profile_manager_unittest.cc
+@@ -434,6 +434,41 @@ TEST_P(ProfileManagerTest, DefaultProfileDir) {
+             ProfileManager::GetInitialProfileDir().value());
+ }
+ 
++#if BUILDFLAG(IS_ANDROID)
++TEST_P(ProfileManagerTest, DeletesOnlyInactiveRegularProfileOnAndroid) {
++  ProfileManager* profile_manager = g_browser_process->profile_manager();
++  Profile* active_profile =
++      AddProfileToStorage(profile_manager, "Active", u"Active");
++  Profile* inactive_profile =
++      AddProfileToStorage(profile_manager, "Inactive", u"Inactive");
++  ASSERT_TRUE(active_profile);
++  ASSERT_TRUE(inactive_profile);
++  profile_manager->SetProfileAsLastUsed(active_profile);
++
++  bool rejected_completion_called = false;
++  EXPECT_FALSE(profile_manager->DeleteProfileOnAndroid(
++      active_profile->GetPath(),
++      base::BindLambdaForTesting(
++          [&rejected_completion_called] { rejected_completion_called = true; }),
++      ProfileMetrics::DELETE_PROFILE_SETTINGS));
++  content::RunAllTasksUntilIdle();
++  EXPECT_FALSE(rejected_completion_called);
++
++  const base::FilePath inactive_path = inactive_profile->GetPath();
++  base::RunLoop deletion;
++  ASSERT_TRUE(profile_manager->DeleteProfileOnAndroid(
++      inactive_path, deletion.QuitClosure(),
++      ProfileMetrics::DELETE_PROFILE_SETTINGS));
++  deletion.Run();
++
++  EXPECT_EQ(nullptr, profile_manager->GetProfileByPath(inactive_path));
++  EXPECT_EQ(nullptr, profile_manager->GetProfileAttributesStorage()
++                         .GetProfileAttributesWithPath(inactive_path));
++  EXPECT_FALSE(base::PathExists(inactive_path));
++  EXPECT_TRUE(profile_manager->IsValidProfile(active_profile));
++}
++#endif  // BUILDFLAG(IS_ANDROID)
++
+ MATCHER(SameNotNull, "The same non-NULL value for all calls.") {
+   if (!g_created_profile && arg)
+     g_created_profile = arg;
+diff --git a/chrome/browser/profiles/profiles_state.cc b/chrome/browser/profiles/profiles_state.cc
+index f7e623e42ac67..64767bc2d587f 100644
+--- a/chrome/browser/profiles/profiles_state.cc
++++ b/chrome/browser/profiles/profiles_state.cc
+@@ -57,11 +57,7 @@
+ namespace profiles {
+ 
+ bool IsMultipleProfilesEnabled() {
+-#if BUILDFLAG(IS_ANDROID)
+-  return false;
+-#else
+   return true;
+-#endif
+ }
+ 
+ base::FilePath GetDefaultProfileDir(const base::FilePath& user_data_dir) {
+diff --git a/chrome/browser/profiles/profiles_state_unittest.cc b/chrome/browser/profiles/profiles_state_unittest.cc
+index e42fe7cba5142..a1ea5039d25ce 100644
+--- a/chrome/browser/profiles/profiles_state_unittest.cc
++++ b/chrome/browser/profiles/profiles_state_unittest.cc
+@@ -51,6 +51,12 @@ const IsGuestModeRequestedTestParams kIsGuestModeRequestedParams[] {
+ 
+ }  // namespace
+ 
++#if BUILDFLAG(IS_ANDROID)
++TEST(ProfilesStateTest, MultipleProfilesEnabled) {
++  EXPECT_TRUE(profiles::IsMultipleProfilesEnabled());
++}
++#endif  // BUILDFLAG(IS_ANDROID)
++
+ #if !BUILDFLAG(IS_ANDROID)
+ class IsGuestModeRequestedTest
+     : public testing::TestWithParam<IsGuestModeRequestedTestParams> {};

@@ -1,0 +1,15 @@
+[package]
+name = "asset-plane"
+description = "Portable delivery policy for TaffyGo's own artifacts: the pinned catalog, the install plan, and the transfer state machine (decision 0045)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+
+[dev-dependencies]
+proptest = { workspace = true }

@@ -1,0 +1,20 @@
+{
+  "provider_id": "my-gateway",
+  "display_name": "My gateway",
+  "endpoint": "https://gateway.example/v1",
+  "wire_api": 2,
+  "credential_handle": "fixture-custom-provider-handle",
+  "models": [
+    {
+      "model_id": "gateway-large",
+      "display_name": "Gateway Large",
+      "context_window": 131072,
+      "max_output_tokens": 8192,
+      "reasoning": false,
+      "tool_calling": true
+    }
+  ],
+  "detected_server": {
+    "server_kind": 0
+  }
+}

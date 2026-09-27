@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- What is painted before Compose exists. The in-app palette lives in :core:designsystem. -->
+<resources>
+    <!--
+      The near-neutral black the dark theme uses for `surface`, restated here
+      because a launcher composites the adaptive icon before any Compose theme
+      exists, so this layer cannot read a token. It is the same value as the
+      dark `surface` in :core:designsystem, and the two move together — it was
+      a warm black until that ground was re-derived to stop reading brown.
+
+      The icon artwork itself is a stand-in. The palette, the app icon and the
+      wider icon set are open decision OD-071, and nothing here invents a brand
+      colour ahead of it.
+    -->
+    <color name="ic_launcher_background">#FF0E0D0C</color>
+    <!--
+      The two grounds, restated for the same reason: they are painted before
+      Compose exists — by the platform, and by the activity in onCreate — and
+      neither painter can read a token. Light is the paper `surface`, dark the
+      near-neutral black one, and both move with :core:designsystem.
+
+      Unqualified on purpose. Which ground the window stands on is a question
+      about the Appearance setting, which screen SCR-407 allows to disagree
+      with the device, so the browser Activity picks between these two by the theme it
+      resolved rather than letting the night qualifier answer for it.
+    -->
+    <color name="window_ground_light">#FFFBF8F3</color>
+    <color name="window_ground_dark">#FF0E0D0C</color>
+
+    <!--
+      What is painted before this app is running to be asked: the system
+      splash, and the window until the browser Activity levels it. This one alone is
+      night-qualified, because the device is the only thing the platform has
+      to go on at that point — nothing has read the stored Appearance yet, and
+      on a cold start nothing has reached the disk it is on.
+    -->
+    <color name="splash_background">@color/window_ground_light</color>
+</resources>

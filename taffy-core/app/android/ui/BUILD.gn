@@ -1,0 +1,456 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//build/config/android/rules.gni")
+import("//taffy/app/android/kotlin_sources.gni")
+import("//taffy/app/android/taffy_android_deps.gni")
+import("//taffy/app/android/taffy_dagger_library.gni")
+import("//taffy/app/android/ui/core_ui_assets.gni")
+import("//taffy/app/android/ui/feature_settings_assets.gni")
+
+_kotlin = taffy_kotlin_deps
+_coroutines = taffy_kotlin_coroutines_deps
+_compose = taffy_androidx_compose_deps
+_lifecycle = taffy_androidx_lifecycle_deps
+_inject = [ "//third_party/android_deps:javax_inject_javax_inject_java" ]
+_annotations = [ "//third_party/androidx:androidx_annotation_annotation_java" ]
+
+android_library("core_model_java") {
+  sources = taffy_core_model_sources
+  chromium_code = false
+  deps = _kotlin
+}
+
+taffy_dagger_library("core_common_java") {
+  sources = taffy_core_common_sources
+  chromium_code = false
+  deps = _annotations + _coroutines + _inject + _kotlin
+}
+
+android_library("core_api_java") {
+  sources = taffy_taffy_core_api_sources + taffy_core_api_sources
+  chromium_code = false
+  deps = [ ":core_common_java", ":core_model_java" ] + _coroutines + _kotlin
+}
+
+android_resources("core_designsystem_resources") {
+  sources = taffy_core_designsystem_resources
+  custom_package = "com.taffygo.browser.ui.core.designsystem"
+  chromium_code = false
+}
+
+android_library("core_designsystem_java") {
+  sources = taffy_core_designsystem_sources + [ "//taffy/resources/tokens/generated/kotlin/com/taffygo/browser/ui/core/designsystem/internal/GeneratedTaffyPalette.kt" ]
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.core.designsystem"
+  deps = [
+           ":core_common_java",
+           ":core_designsystem_resources",
+         ] + _compose + _coroutines + _kotlin
+}
+
+taffy_dagger_library("core_browser_java") {
+  sources = taffy_core_browser_sources
+  chromium_code = false
+  deps = [
+           ":core_common_java",
+           ":core_model_java",
+         ] + _annotations + _coroutines + _inject + _kotlin
+}
+
+taffy_dagger_library("core_page_intelligence_java") {
+  sources = taffy_core_page_intelligence_sources
+  chromium_code = false
+  deps = [
+           ":core_api_java",
+           ":core_common_java",
+         ] + _annotations + _coroutines + _inject + _kotlin
+}
+
+taffy_dagger_library("core_analytics_java") {
+  sources = taffy_core_analytics_sources
+  chromium_code = false
+  deps = [
+           ":core_common_java",
+           ":core_model_java",
+         ] + _coroutines + _inject + _kotlin
+}
+
+android_library("core_credentials_java") {
+  sources = taffy_core_credentials_sources
+  chromium_code = false
+  deps = _coroutines + _kotlin
+}
+
+android_library("core_preferences_java") {
+  sources = taffy_core_preferences_sources
+  chromium_code = false
+  deps = [ ":core_model_java" ] + _coroutines + _kotlin
+}
+
+taffy_dagger_library("core_task_java") {
+  sources = taffy_core_task_sources
+  chromium_code = false
+  deps = [
+           ":core_analytics_java",
+           ":core_api_java",
+           ":core_common_java",
+           ":core_model_java",
+         ] + _annotations + _coroutines + _inject + _kotlin
+}
+
+taffy_dagger_library("core_assets_java") {
+  sources = taffy_core_assets_sources
+  chromium_code = false
+  deps = [
+           ":core_api_java",
+           ":core_common_java",
+           ":core_model_java",
+         ] + _annotations + _coroutines + _inject + _kotlin
+}
+
+taffy_dagger_library("core_providerauth_java") {
+  sources = taffy_core_providerauth_sources
+  chromium_code = false
+  deps = [
+           ":core_api_java",
+           ":core_common_java",
+         ] + _annotations + _coroutines + _inject + _kotlin
+}
+
+taffy_dagger_library("core_providers_java") {
+  sources = taffy_core_providers_sources
+  chromium_code = false
+  deps = [
+           ":core_api_java",
+           ":core_common_java",
+           ":core_model_java",
+         ] + _annotations + _coroutines + _inject + _kotlin
+}
+
+taffy_dagger_library("core_workspace_java") {
+  sources = taffy_core_workspace_sources
+  chromium_code = false
+  deps = [
+           ":core_api_java",
+           ":core_common_java",
+           ":core_model_java",
+         ] + _annotations + _coroutines + _inject + _kotlin
+}
+
+android_resources("core_ui_resources") {
+  sources = taffy_core_ui_resources
+  custom_package = "com.taffygo.browser.ui.core.ui"
+  chromium_code = false
+}
+
+# OpenAlly profile tiles. `TaffyProfileAvatar` reads
+# assets/profile-banners/{id}.webp; disable_compression so BitmapFactory can
+# mmap them.
+android_assets("core_ui_profile_banner_assets") {
+  sources = taffy_core_ui_profile_banner_asset_sources
+  renaming_sources = sources
+  renaming_destinations = taffy_core_ui_profile_banner_asset_destinations
+  disable_compression = true
+}
+
+taffy_dagger_library("core_ui_java") {
+  sources = taffy_core_ui_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.core.ui"
+  deps = [
+           ":core_browser_java",
+           ":core_common_java",
+           ":core_designsystem_java",
+           ":core_model_java",
+           ":core_ui_profile_banner_assets",
+           ":core_ui_resources",
+           "//third_party/androidx:androidx_activity_activity_compose_java",
+           "//third_party/androidx:androidx_lifecycle_lifecycle_viewmodel_compose_java",
+         ] + _compose + _coroutines + _inject + _kotlin + _lifecycle
+}
+
+_feature_platform_deps = [ "//third_party/androidx:androidx_lifecycle_lifecycle_viewmodel_compose_java" ] + _compose + _coroutines + _inject + _kotlin + _lifecycle
+
+android_resources("feature_browsing_resources") {
+  sources = taffy_feature_browsing_resources
+  custom_package = "com.taffygo.browser.ui.feature.browsing"
+  chromium_code = false
+}
+
+taffy_dagger_library("feature_browsing_java") {
+  sources = taffy_feature_browsing_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.browsing"
+  deps = [
+           ":core_analytics_java",
+           ":core_api_java",
+           ":core_assets_java",
+           ":core_browser_java",
+           ":core_common_java",
+           ":core_designsystem_java",
+           ":core_model_java",
+           ":core_page_intelligence_java",
+           ":core_task_java",
+           ":core_ui_java",
+           ":feature_browsing_resources",
+           "//third_party/androidx:androidx_activity_activity_compose_java",
+         ] + _feature_platform_deps
+}
+
+android_resources("feature_downloads_resources") {
+  sources = taffy_feature_downloads_resources
+  custom_package = "com.taffygo.browser.ui.feature.downloads"
+  chromium_code = false
+}
+
+taffy_dagger_library("feature_downloads_java") {
+  sources = taffy_feature_downloads_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.downloads"
+  deps = [
+           ":core_analytics_java",
+           ":core_assets_java",
+           ":core_common_java",
+           ":core_designsystem_java",
+           ":core_model_java",
+           ":core_ui_java",
+           ":feature_downloads_resources",
+           "//third_party/androidx:androidx_activity_activity_compose_java",
+         ] + _feature_platform_deps
+}
+
+android_resources("feature_assistant_resources") {
+  sources = taffy_feature_assistant_resources
+  custom_package = "com.taffygo.browser.ui.feature.assistant"
+  chromium_code = false
+}
+
+taffy_dagger_library("feature_assistant_java") {
+  sources = taffy_feature_assistant_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.assistant"
+  deps = [
+           ":core_analytics_java",
+           ":core_api_java",
+           ":core_browser_java",
+           ":core_common_java",
+           ":core_designsystem_java",
+           ":core_model_java",
+           ":core_page_intelligence_java",
+           ":core_preferences_java",
+           ":core_task_java",
+           ":core_ui_java",
+           ":feature_assistant_resources",
+           "//taffy/third_party/commonmark:commonmark_java",
+           "//third_party/androidx:androidx_activity_activity_compose_java",
+           "//third_party/androidx:androidx_core_core_java",
+         ] + _feature_platform_deps
+}
+
+android_resources("feature_workspaces_resources") {
+  sources = taffy_feature_workspaces_resources
+  custom_package = "com.taffygo.browser.ui.feature.workspaces"
+  chromium_code = false
+}
+
+taffy_dagger_library("feature_workspaces_java") {
+  sources = taffy_feature_workspaces_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.workspaces"
+  deps = [
+           ":core_analytics_java",
+           ":core_api_java",
+           ":core_browser_java",
+           ":core_common_java",
+           ":core_designsystem_java",
+           ":core_model_java",
+           ":core_ui_java",
+           ":core_workspace_java",
+           ":feature_workspaces_resources",
+           "//third_party/androidx:androidx_activity_activity_compose_java",
+         ] + _feature_platform_deps
+}
+
+android_resources("feature_providers_resources") {
+  sources = taffy_feature_providers_resources
+  custom_package = "com.taffygo.browser.ui.feature.providers"
+  chromium_code = false
+}
+
+taffy_dagger_library("feature_providers_java") {
+  sources = taffy_feature_providers_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.providers"
+  deps = [
+           ":core_analytics_java",
+           ":core_api_java",
+           ":core_browser_java",
+           ":core_credentials_java",
+           ":core_designsystem_java",
+           ":core_model_java",
+           ":core_preferences_java",
+           ":core_providerauth_java",
+           ":core_providers_java",
+           ":core_ui_java",
+           ":feature_providers_resources",
+         ] + _feature_platform_deps
+}
+
+android_resources("feature_settings_resources") {
+  sources = taffy_feature_settings_resources
+  custom_package = "com.taffygo.browser.ui.feature.settings"
+  chromium_code = false
+}
+
+android_assets("feature_settings_search_engine_assets") {
+  sources = taffy_feature_settings_search_engine_asset_sources
+  disable_compression = true
+}
+
+taffy_dagger_library("feature_settings_java") {
+  sources = taffy_feature_settings_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.settings"
+  deps = [
+           ":core_analytics_java",
+           ":core_api_java",
+           ":core_assets_java",
+           ":core_browser_java",
+           ":core_common_java",
+           ":core_designsystem_java",
+           ":core_model_java",
+           ":core_preferences_java",
+           ":core_ui_java",
+           ":core_workspace_java",
+           ":feature_settings_resources",
+           ":feature_settings_search_engine_assets",
+           "//third_party/androidx:androidx_activity_activity_compose_java",
+         ] + _feature_platform_deps
+}
+
+android_resources("feature_onboarding_resources") {
+  sources = taffy_feature_onboarding_resources
+  custom_package = "com.taffygo.browser.ui.feature.onboarding"
+  chromium_code = false
+}
+
+android_resources("task_continuation_resources") {
+  sources = [
+    "//taffy/ui/android/app/src/taskContinuation/res/values-hi/strings_tasks.xml",
+    "//taffy/ui/android/app/src/taskContinuation/res/values/strings_tasks.xml",
+    "//taffy/ui/android/app/src/taskContinuation/res/xml/taffy_data_extraction_rules.xml",
+    "//taffy/ui/android/app/src/taskContinuation/res/xml/taffy_full_backup_content.xml",
+  ]
+  custom_package = "com.taffygo.browser.ui.app"
+  chromium_code = false
+}
+
+taffy_dagger_library("feature_onboarding_java") {
+  sources = taffy_feature_onboarding_sources
+  chromium_code = false
+
+  # OD-076. This waiver is `HorizontalPager`'s, not TaffyGo's, and it cannot be
+  # paid off by changing our own code — which was tried on 2026-08-23 and is
+  # why this comment exists. Every first-party use of
+  # `androidx.compose.animation.core` was removed from this module that day:
+  # the showcase prompt's two `Animatable`s became one `taffyRunOnce`, and the
+  # carousel's `animateScrollToPage(animationSpec = tween(...))` became the
+  # default overload. Two references remain in the compiled bytecode and both
+  # come from `PagerDefaults.flingBehavior`, whose descriptor names
+  # `DecayAnimationSpec` and `AnimationSpec`:
+  #
+  #   PagerDefaults.flingBehavior:(...Landroidx/compose/animation/core/
+  #     DecayAnimationSpec;Landroidx/compose/animation/core/AnimationSpec;...)
+  #
+  # `androidx.compose.animation.core`'s target and its alias both restrict
+  # visibility to `//third_party/androidx:*` at the pinned milestone, so there
+  # is no consumable form to add to `deps`. The only ways out are to stop using
+  # the pager or for upstream to widen that list; neither is a downstream edit,
+  # which makes this the one instance of OD-076 that is genuinely not ours.
+  enable_bytecode_checks = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.onboarding"
+  deps = [
+           ":core_analytics_java",
+           ":core_api_java",
+           ":core_designsystem_java",
+           ":core_model_java",
+           ":core_preferences_java",
+           ":core_ui_java",
+           ":feature_onboarding_resources",
+         ] + _feature_platform_deps
+}
+
+android_resources("backup_key_resources") {
+  sources = [
+    "//taffy/ui/android/app/src/backup/res/values-hi/strings_backup.xml",
+    "//taffy/ui/android/app/src/backup/res/values-hi/strings_backup_cleanup.xml",
+    "//taffy/ui/android/app/src/backup/res/values-hi/strings_backup_restore.xml",
+    "//taffy/ui/android/app/src/backup/res/values/strings_backup.xml",
+    "//taffy/ui/android/app/src/backup/res/values/strings_backup_cleanup.xml",
+    "//taffy/ui/android/app/src/backup/res/values/strings_backup_restore.xml",
+  ]
+  custom_package = "com.taffygo.browser.ui.app"
+  chromium_code = false
+}
+
+taffy_dagger_library("app_java") {
+  sources = taffy_app_sources
+  chromium_code = false
+  enable_bytecode_checks = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.app"
+  deps = [
+           ":backup_key_resources",
+           ":core_analytics_java",
+           ":core_api_java",
+           ":core_assets_java",
+           ":core_browser_java",
+           ":core_common_java",
+           ":core_credentials_java",
+           ":core_designsystem_java",
+           ":core_model_java",
+           ":core_page_intelligence_java",
+           ":core_preferences_java",
+           ":core_providerauth_java",
+           ":core_providers_java",
+           ":core_task_java",
+           ":core_ui_java",
+           ":core_workspace_java",
+           ":feature_assistant_java",
+           ":feature_browsing_java",
+           ":feature_downloads_java",
+           ":feature_onboarding_java",
+           ":feature_providers_java",
+           ":feature_settings_java",
+           ":feature_workspaces_java",
+           ":task_continuation_resources",
+           "//third_party/android_deps:com_google_android_libraries_identity_googleid_googleid_java",
+           "//third_party/android_deps:guava_java",
+           "//third_party/androidx:androidx_activity_activity_compose_java",
+           "//third_party/androidx:androidx_activity_activity_java",
+           "//third_party/androidx:androidx_appcompat_appcompat_java",
+           "//third_party/androidx:androidx_browser_browser_java",
+           "//third_party/androidx:androidx_core_core_java",
+           "//third_party/androidx:androidx_credentials_credentials_java",
+           "//third_party/androidx:androidx_credentials_credentials_play_services_auth_java",
+           "//third_party/androidx:androidx_lifecycle_lifecycle_viewmodel_compose_java",
+           "//third_party/androidx:androidx_savedstate_savedstate_java",
+         ] + _compose + _coroutines + _inject + _kotlin + _lifecycle
+}
+
+java_group("android_ui_java") {
+  public_deps = [ ":app_java" ]
+}

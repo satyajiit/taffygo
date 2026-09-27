@@ -1,0 +1,661 @@
+From 8fab35ceb8c1f6250e77d6340f04ab9b1c1ec69a Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sun, 6 Sep 2026 19:07:28 +0530
+Subject: witness the physical deletion of a profile directory
+
+Chromium's profile deletion is fire-and-forget: NukeProfileFromDisk reports
+nothing, and the kProfilesDeleted marker it leaves says a deletion was
+accepted, never that one finished. A restore that adopts a target profile
+needs the stronger fact, because publishing a target whose predecessor is
+still on the disk is the failure the whole restart-recovery path exists to
+refuse.
+
+Add NukeProfileFromDiskWithResult, which reports true only after the exact
+profile and derived cache paths are absent and their surviving parent
+directory entries have been synchronized, and a read-only witness for a
+deletion that already finished. Both are physical checks: absence is proved by
+lstat and durability by fsync on the parent, so an answer survives a crash
+rather than describing a page cache.
+
+Also carry a dedicated deletion marker that names the exact path it belongs
+to, so recovery can tell its own interrupted deletion from an unrelated one.
+A malformed marker is conservative evidence, never authority to delete.
+
+Specified by chromium/patches/0048-witness-physical-profile-deletion.md.
+
+Taffy-Patch: 0048
+
+diff --git a/chrome/browser/profiles/nuke_profile_directory_utils.cc b/chrome/browser/profiles/nuke_profile_directory_utils.cc
+index 5c46d57e88a51..ea22edf1f5116 100644
+--- a/chrome/browser/profiles/nuke_profile_directory_utils.cc
++++ b/chrome/browser/profiles/nuke_profile_directory_utils.cc
+@@ -4,26 +4,45 @@
+ 
+ #include "chrome/browser/profiles/nuke_profile_directory_utils.h"
+ 
++#include <algorithm>
++#include <cerrno>
+ #include <map>
++#include <optional>
++#include <string>
++#include <string_view>
++#include <utility>
+ 
++#include "base/base_paths.h"
+ #include "base/check_op.h"
++#include "base/files/file.h"
+ #include "base/files/file_path.h"
+ #include "base/files/file_util.h"
+ #include "base/json/values_util.h"
+ #include "base/metrics/histogram_functions.h"
+ #include "base/no_destructor.h"
++#include "base/path_service.h"
++#include "base/strings/string_number_conversions.h"
+ #include "base/task/thread_pool.h"
++#include "build/build_config.h"
+ #include "chrome/browser/browser_process.h"
+ #include "chrome/browser/profiles/profile_attributes_entry.h"
+ #include "chrome/browser/profiles/profile_attributes_storage.h"
+ #include "chrome/browser/profiles/profile_manager.h"
+ #include "chrome/browser/profiles/profile_metrics.h"
++#include "chrome/common/chrome_constants.h"
++#include "chrome/common/chrome_paths.h"
+ #include "chrome/common/chrome_paths_internal.h"
+ #include "chrome/common/pref_names.h"
+ #include "components/prefs/scoped_user_pref_update.h"
+ #include "content/public/browser/browser_task_traits.h"
+ #include "content/public/browser/browser_thread.h"
+ 
++#if BUILDFLAG(IS_POSIX)
++#include <unistd.h>
++
++#include "base/posix/eintr_wrapper.h"
++#endif
++
+ namespace {
+ 
+ // Used in metrics for NukeProfileFromDisk(). Keep in sync with enums.xml.
+@@ -46,17 +65,61 @@ enum class NukeProfileResult {
+ 
+ const size_t kNukeProfileMaxRetryCount = 3;
+ 
+-// Profile deletion can pass through two stages:
++// Profile deletion can pass through three stages:
+ enum class ProfileDeletionStage {
+   // At SCHEDULING stage some actions are made before profile deletion,
+   // where one of them is the closure of browser windows. Deletion is cancelled
+   // if the user choose explicitly not to close any of the tabs.
+   SCHEDULING,
+   // At MARKED stage profile can be safely removed from disk.
+-  MARKED
++  MARKED,
++  // A caller has durably authorized deletion only with the exact per-profile
++  // cache mapping. It names one in-process attempt; shutdown drops it without
++  // replay and preserves only the dedicated durable custody marker.
++  MARKED_WITH_DEDICATED_CACHE,
+ };
+ 
+ using ProfileDeletionMap = std::map<base::FilePath, ProfileDeletionStage>;
++
++constexpr char kDedicatedDeletionMarkerVersionKey[] =
++    "taffy_restore_deletion_version";
++constexpr char kDedicatedDeletionMarkerPathKey[] = "taffy_restore_profile_path";
++constexpr int kDedicatedDeletionMarkerVersion = 1;
++
++bool IsGeneratedRegularProfileBaseName(const base::FilePath& value) {
++  if (value.empty() || value.IsAbsolute() || value.BaseName() != value) {
++    return false;
++  }
++  const std::string encoded = value.AsUTF8Unsafe();
++  const std::string_view prefix = chrome::kMultiProfileDirPrefix;
++  if (!encoded.starts_with(prefix)) {
++    return false;
++  }
++  const std::string_view suffix =
++      std::string_view(encoded).substr(prefix.size());
++  int number = 0;
++  return !suffix.empty() && suffix.size() <= 10u &&
++         base::StringToInt(suffix, &number) && number > 0 &&
++         base::NumberToString(number) == suffix;
++}
++
++base::Value DedicatedDeletionMarker(const base::FilePath& path) {
++  base::DictValue marker;
++  marker.Set(kDedicatedDeletionMarkerVersionKey,
++             kDedicatedDeletionMarkerVersion);
++  marker.Set(kDedicatedDeletionMarkerPathKey,
++             base::FilePathToValue(path.BaseName()));
++  return base::Value(std::move(marker));
++}
++
++bool IsExactDedicatedDeletionMarker(const base::Value& marker,
++                                    const base::FilePath& path) {
++  base::FilePath relative_path;
++  return GetDedicatedProfileDirectoryDeletionMarkerPath(marker,
++                                                        &relative_path) &&
++         relative_path == path.BaseName();
++}
++
+ ProfileDeletionMap& ProfilesToDelete() {
+   static base::NoDestructor<ProfileDeletionMap> profiles_to_delete;
+   return *profiles_to_delete;
+@@ -72,13 +135,137 @@ NukeProfileResult GetNukeProfileResult(size_t retry_count, bool success) {
+   return static_cast<NukeProfileResult>(value);
+ }
+ 
++base::File OpenDirectory(const base::FilePath& path) {
++  return base::File(path, base::File::FLAG_OPEN | base::File::FLAG_READ |
++                              base::File::FLAG_NO_FOLLOW);
++}
++
++bool SyncOpenedDirectory(const base::File& directory,
++                         const base::FilePath& path) {
++#if BUILDFLAG(IS_POSIX)
++  base::stat_wrapper_t held = {};
++  base::stat_wrapper_t named = {};
++  if (!directory.IsValid() ||
++      base::File::Fstat(directory.GetPlatformFile(), &held) != 0 ||
++      base::File::Lstat(path, &named) != 0 || !S_ISDIR(held.st_mode) ||
++      !S_ISDIR(named.st_mode) || held.st_dev != named.st_dev ||
++      held.st_ino != named.st_ino || held.st_nlink == 0 ||
++      named.st_nlink == 0 ||
++      HANDLE_EINTR(fsync(directory.GetPlatformFile())) != 0) {
++    return false;
++  }
++  named = {};
++  return base::File::Lstat(path, &named) == 0 && S_ISDIR(named.st_mode) &&
++         held.st_dev == named.st_dev && held.st_ino == named.st_ino &&
++         named.st_nlink > 0;
++#else
++  return true;
++#endif
++}
++
++bool SyncDirectory(const base::FilePath& path) {
++  return SyncOpenedDirectory(OpenDirectory(path), path);
++}
++
++bool PathIsAbsent(const base::FilePath& path) {
++  if (path.empty()) {
++    return false;
++  }
++#if BUILDFLAG(IS_POSIX)
++  base::stat_wrapper_t info = {};
++  if (base::File::Lstat(path, &info) == 0) {
++    return false;
++  }
++  return errno == ENOENT;
++#else
++  return !base::PathExists(path) && !base::IsLink(path);
++#endif
++}
++
++bool GetDedicatedCachePath(const base::FilePath& profile_path,
++                           base::FilePath* cache_path) {
++  if (profile_path.empty() || !cache_path) {
++    return false;
++  }
++#if BUILDFLAG(IS_ANDROID)
++  base::FilePath user_data_dir;
++  base::FilePath shared_cache_root;
++  if (!base::PathService::Get(chrome::DIR_USER_DATA, &user_data_dir) ||
++      !base::PathService::Get(base::DIR_CACHE, &shared_cache_root)) {
++    return false;
++  }
++  if (profile_path.DirName() != user_data_dir ||
++      !IsGeneratedRegularProfileBaseName(profile_path.BaseName())) {
++    // Never infer exact cache custody for redirected paths, and never
++    // substitute Android's shared cache root for Default.
++    return false;
++  }
++  const base::FilePath expected_cache_path =
++      shared_cache_root.Append(profile_path.BaseName());
++  chrome::GetUserCacheDirectory(profile_path, cache_path);
++  // A disabled or changed cache-isolation mapping must fail closed rather
++  // than turn the shared application cache directory into deletion custody.
++  return *cache_path == expected_cache_path &&
++         *cache_path != shared_cache_root && *cache_path != profile_path;
++#else
++  chrome::GetUserCacheDirectory(profile_path, cache_path);
++  return !cache_path->empty() &&
++         (*cache_path == profile_path ||
++          cache_path->BaseName() == profile_path.BaseName());
++#endif
++}
++
++void RunClosureAfterNuke(base::OnceClosure callback, bool) {
++  if (callback) {
++    std::move(callback).Run();
++  }
++}
++
++void FinishResultBearingNuke(const base::FilePath& profile_path,
++                             base::OnceCallback<void(bool)> callback,
++                             bool success) {
++  // The callback settles this physical attempt regardless of its outcome.
++  // Keeping a volatile strict mark after false would let shutdown replay the
++  // operation without fresh authority. Its durable marker remains untouched.
++  const auto marked = ProfilesToDelete().find(profile_path);
++  if (marked != ProfilesToDelete().end() &&
++      marked->second == ProfileDeletionStage::MARKED_WITH_DEDICATED_CACHE) {
++    ProfilesToDelete().erase(marked);
++  }
++  if (callback) {
++    std::move(callback).Run(success);
++  }
++}
++
++bool VerifyProfileAndCacheDirectoryDeletionImpl(
++    const base::FilePath& profile_path,
++    bool require_dedicated_cache) {
++  base::FilePath cache_path;
++  if (require_dedicated_cache) {
++    if (!GetDedicatedCachePath(profile_path, &cache_path)) {
++      return false;
++    }
++  } else {
++    chrome::GetUserCacheDirectory(profile_path, &cache_path);
++  }
++  if (cache_path.empty() || !PathIsAbsent(profile_path) ||
++      !PathIsAbsent(cache_path) || !SyncDirectory(profile_path.DirName()) ||
++      (cache_path != profile_path &&
++       cache_path.DirName() != profile_path.DirName() &&
++       !SyncDirectory(cache_path.DirName()))) {
++    return false;
++  }
++  return PathIsAbsent(profile_path) && PathIsAbsent(cache_path);
++}
++
+ // Implementation of NukeProfileFromDisk(), retrying at most |max_retry_count|
+ // times on failure. |retry_count| (initially 0) keeps track of the
+ // number of attempts so far.
+ void NukeProfileFromDiskImpl(const base::FilePath& profile_path,
+                              size_t retry_count,
+                              size_t max_retry_count,
+-                             base::OnceClosure done_callback) {
++                             bool require_dedicated_cache,
++                             base::OnceCallback<void(bool)> done_callback) {
+   // TODO(crbug.com/40756611): Make FileSystemProxy/FileSystemImpl expose its
+   // LockTable, and/or fire events when locks are released. That way we could
+   // wait for all the locks in |profile_path| to be released, rather than having
+@@ -87,10 +274,49 @@ void NukeProfileFromDiskImpl(const base::FilePath& profile_path,
+ 
+   // Delete both the profile directory and its corresponding cache.
+   base::FilePath cache_path;
+-  chrome::GetUserCacheDirectory(profile_path, &cache_path);
++  bool cache_path_is_safe = true;
++  if (require_dedicated_cache) {
++    cache_path_is_safe = GetDedicatedCachePath(profile_path, &cache_path);
++  } else {
++    chrome::GetUserCacheDirectory(profile_path, &cache_path);
++  }
+ 
+-  bool success = base::DeletePathRecursively(profile_path);
+-  success = base::DeletePathRecursively(cache_path) && success;
++  bool success = false;
++  if (cache_path_is_safe && !cache_path.empty()) {
++    base::File held_profile_parent;
++    base::File held_cache_parent;
++    bool exact_parents_held = true;
++    if (require_dedicated_cache) {
++      held_profile_parent = OpenDirectory(profile_path.DirName());
++      exact_parents_held =
++          SyncOpenedDirectory(held_profile_parent, profile_path.DirName());
++      if (cache_path != profile_path &&
++          cache_path.DirName() != profile_path.DirName()) {
++        held_cache_parent = OpenDirectory(cache_path.DirName());
++        exact_parents_held =
++            exact_parents_held &&
++            SyncOpenedDirectory(held_cache_parent, cache_path.DirName());
++      }
++    }
++    // Dedicated deletion must own and synchronize every surviving parent
++    // before either recursive removal begins. A missing/replaced cache parent
++    // may not turn a failed custody check into partial profile deletion.
++    const bool may_delete = !require_dedicated_cache || exact_parents_held;
++    const bool profile_deleted =
++        may_delete && base::DeletePathRecursively(profile_path);
++    const bool cache_deleted =
++        may_delete &&
++        (cache_path == profile_path || base::DeletePathRecursively(cache_path));
++    const bool exact_parents_synced =
++        !require_dedicated_cache ||
++        (exact_parents_held &&
++         SyncOpenedDirectory(held_profile_parent, profile_path.DirName()) &&
++         (!held_cache_parent.IsValid() ||
++          SyncOpenedDirectory(held_cache_parent, cache_path.DirName())));
++    success = profile_deleted && cache_deleted && exact_parents_synced &&
++              VerifyProfileAndCacheDirectoryDeletionImpl(
++                  profile_path, require_dedicated_cache);
++  }
+ 
+   base::UmaHistogramEnumeration("Profile.NukeFromDisk.Result",
+                                 GetNukeProfileResult(retry_count, success));
+@@ -102,14 +328,15 @@ void NukeProfileFromDiskImpl(const base::FilePath& profile_path,
+         {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
+          base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN},
+         base::BindOnce(&NukeProfileFromDiskImpl, profile_path, retry_count + 1,
+-                       max_retry_count, std::move(done_callback)),
++                       max_retry_count, require_dedicated_cache,
++                       std::move(done_callback)),
+         kRetryDelay);
+     return;
+   }
+ 
+   if (done_callback) {
+-    content::GetUIThreadTaskRunner({})->PostTask(FROM_HERE,
+-                                                 std::move(done_callback));
++    content::GetUIThreadTaskRunner({})->PostTask(
++        FROM_HERE, base::BindOnce(std::move(done_callback), success));
+   }
+ }
+ 
+@@ -119,22 +346,53 @@ void NukeDeletedProfilesFromDisk() {
+   for (const auto& item : ProfilesToDelete()) {
+     if (item.second == ProfileDeletionStage::MARKED) {
+       NukeProfileFromDiskImpl(item.first, /*retry_count=*/0,
+-                              /*max_retry_count=*/1, base::OnceClosure());
++                              /*max_retry_count=*/1,
++                              /*require_dedicated_cache=*/false,
++                              base::OnceCallback<void(bool)>());
+     }
+   }
++  // Dedicated marks are physical-attempt state, not authority. Shutdown may
++  // drop them from memory but must leave their durable custody evidence for
++  // read-only recovery and a future fresh decision.
+   ProfilesToDelete().clear();
+ }
+ 
+ void NukeProfileFromDisk(const base::FilePath& profile_path,
+                          base::OnceClosure done_callback) {
++  NukeProfileFromDiskImpl(
++      profile_path, /*retry_count=*/0, kNukeProfileMaxRetryCount,
++      /*require_dedicated_cache=*/false,
++      base::BindOnce(&RunClosureAfterNuke, std::move(done_callback)));
++}
++
++void NukeProfileFromDiskWithResult(
++    const base::FilePath& profile_path,
++    base::OnceCallback<void(bool)> done_callback) {
+   NukeProfileFromDiskImpl(profile_path, /*retry_count=*/0,
+-                          kNukeProfileMaxRetryCount, std::move(done_callback));
++                          kNukeProfileMaxRetryCount,
++                          /*require_dedicated_cache=*/true,
++                          base::BindOnce(&FinishResultBearingNuke, profile_path,
++                                         std::move(done_callback)));
++}
++
++bool VerifyProfileAndCacheDirectoryDeletion(
++    const base::FilePath& profile_path) {
++  return VerifyProfileAndCacheDirectoryDeletionImpl(
++      profile_path, /*require_dedicated_cache=*/true);
+ }
+ 
+ bool IsProfileDirectoryMarkedForDeletion(const base::FilePath& profile_path) {
+   const auto it = ProfilesToDelete().find(profile_path);
+   return it != ProfilesToDelete().end() &&
+-         it->second == ProfileDeletionStage::MARKED;
++         (it->second == ProfileDeletionStage::MARKED ||
++          it->second == ProfileDeletionStage::MARKED_WITH_DEDICATED_CACHE);
++}
++
++bool IsProfileDirectoryMarkedForDedicatedDeletion(
++    const base::FilePath& profile_path) {
++  const auto it = ProfilesToDelete().find(profile_path);
++  return it != ProfilesToDelete().end() &&
++         it->second == ProfileDeletionStage::MARKED_WITH_DEDICATED_CACHE;
+ }
+ 
+ void CancelProfileDeletion(const base::FilePath& path) {
+@@ -154,22 +412,165 @@ bool ScheduleProfileDirectoryForDeletion(const base::FilePath& path) {
+   return true;
+ }
+ 
+-void MarkProfileDirectoryForDeletion(const base::FilePath& path) {
+-  DCHECK(!ProfilesToDelete().contains(path) ||
+-         ProfilesToDelete()[path] == ProfileDeletionStage::SCHEDULING);
+-  ProfilesToDelete()[path] = ProfileDeletionStage::MARKED;
+-  // Remember that this profile was deleted and files should have been deleted
+-  // on shutdown. In case of a crash remaining files are removed on next start.
+-  ScopedListPrefUpdate deleted_profiles(g_browser_process->local_state(),
+-                                        prefs::kProfilesDeleted);
+-  deleted_profiles->Append(base::FilePathToValue(path.BaseName()));
++namespace {
+ 
+-  // Set profile as ephemeral.
++bool PersistProfileDirectoryDeletionMarkerWithStage(
++    const base::FilePath& path,
++    ProfileDeletionStage marked_stage) {
++  if (!g_browser_process || g_browser_process->IsShuttingDown() ||
++      !g_browser_process->profile_manager()->IsAllowedProfilePath(path) ||
++      (marked_stage == ProfileDeletionStage::MARKED_WITH_DEDICATED_CACHE &&
++       !IsGeneratedRegularProfileBaseName(path.BaseName()))) {
++    return false;
++  }
+   ProfileAttributesEntry* entry = g_browser_process->profile_manager()
+                                       ->GetProfileAttributesStorage()
+                                       .GetProfileAttributesWithPath(path);
++  if (!entry) {
++    return false;
++  }
++  ScopedListPrefUpdate deleted_profiles(g_browser_process->local_state(),
++                                        prefs::kProfilesDeleted);
++  const base::Value marker =
++      marked_stage == ProfileDeletionStage::MARKED_WITH_DEDICATED_CACHE
++          ? DedicatedDeletionMarker(path)
++          : base::FilePathToValue(path.BaseName());
++  if (marked_stage == ProfileDeletionStage::MARKED_WITH_DEDICATED_CACHE &&
++      std::ranges::any_of(*deleted_profiles, [&](const base::Value& value) {
++        return value == base::FilePathToValue(path.BaseName()) ||
++               (IsDedicatedProfileDirectoryDeletionMarker(value) &&
++                !IsExactDedicatedDeletionMarker(value, path));
++      })) {
++    // An unknown dedicated marker may be another quarantined candidate. Never
++    // overwrite or broaden it into a different physical deletion.
++    return false;
++  }
++  if (std::ranges::none_of(*deleted_profiles, [&](const base::Value& value) {
++        return value == marker;
++      })) {
++    deleted_profiles->Append(marker.Clone());
++  }
++
++  // Omission is process-local. The durable dedicated marker deliberately does
++  // not request startup cleanup; it remains evidence for Taffy's recovery
++  // reducer and a later fresh decision.
+   if (!entry->IsEphemeral()) {
+     entry->SetIsEphemeral(true);
++  }
++  if (!entry->IsOmitted()) {
+     entry->SetIsOmitted(true);
+   }
++  return entry->IsEphemeral() && entry->IsOmitted() &&
++         std::ranges::count(*deleted_profiles, marker) == 1;
++}
++
++bool ArmProfileDirectoryForDeletionWithStage(
++    const base::FilePath& path,
++    ProfileDeletionStage marked_stage) {
++  const auto scheduled = ProfilesToDelete().find(path);
++  if (scheduled == ProfilesToDelete().end() ||
++      scheduled->second != ProfileDeletionStage::SCHEDULING ||
++      !g_browser_process || g_browser_process->IsShuttingDown()) {
++    return false;
++  }
++  const base::Value marker =
++      marked_stage == ProfileDeletionStage::MARKED_WITH_DEDICATED_CACHE
++          ? DedicatedDeletionMarker(path)
++          : base::FilePathToValue(path.BaseName());
++  const auto& deleted_profiles =
++      g_browser_process->local_state()->GetList(prefs::kProfilesDeleted);
++  ProfileAttributesEntry* entry = g_browser_process->profile_manager()
++                                      ->GetProfileAttributesStorage()
++                                      .GetProfileAttributesWithPath(path);
++  if (!entry || !entry->IsEphemeral() || !entry->IsOmitted() ||
++      std::ranges::count(deleted_profiles, marker) != 1 ||
++      (marked_stage == ProfileDeletionStage::MARKED_WITH_DEDICATED_CACHE &&
++       std::ranges::any_of(deleted_profiles, [&](const base::Value& value) {
++         return value == base::FilePathToValue(path.BaseName()) ||
++                (IsDedicatedProfileDirectoryDeletionMarker(value) &&
++                 !IsExactDedicatedDeletionMarker(value, path));
++       }))) {
++    return false;
++  }
++  scheduled->second = marked_stage;
++  return true;
++}
++
++}  // namespace
++
++void MarkProfileDirectoryForDeletion(const base::FilePath& path) {
++  DCHECK(!ProfilesToDelete().contains(path) ||
++         ProfilesToDelete()[path] == ProfileDeletionStage::SCHEDULING);
++  if (!ProfilesToDelete().contains(path)) {
++    ProfilesToDelete()[path] = ProfileDeletionStage::SCHEDULING;
++  }
++  if (!PersistProfileDirectoryDeletionMarkerWithStage(
++          path, ProfileDeletionStage::MARKED) ||
++      !ArmProfileDirectoryForDeletionWithStage(path,
++                                               ProfileDeletionStage::MARKED)) {
++    if (ProfilesToDelete().contains(path) &&
++        ProfilesToDelete()[path] == ProfileDeletionStage::SCHEDULING) {
++      CancelProfileDeletion(path);
++    }
++  }
++}
++
++bool PersistProfileDirectoryDeletionMarker(const base::FilePath& path) {
++  return PersistProfileDirectoryDeletionMarkerWithStage(
++      path, ProfileDeletionStage::MARKED_WITH_DEDICATED_CACHE);
++}
++
++bool IsDedicatedProfileDirectoryDeletionMarker(const base::Value& marker) {
++  return marker.is_dict() &&
++         (marker.GetDict().Find(kDedicatedDeletionMarkerVersionKey) !=
++              nullptr ||
++          marker.GetDict().Find(kDedicatedDeletionMarkerPathKey) != nullptr);
++}
++
++bool GetDedicatedProfileDirectoryDeletionMarkerPath(
++    const base::Value& marker,
++    base::FilePath* relative_path) {
++  if (!relative_path || !IsDedicatedProfileDirectoryDeletionMarker(marker) ||
++      marker.GetDict().size() != 2u ||
++      marker.GetDict().FindInt(kDedicatedDeletionMarkerVersionKey) !=
++          kDedicatedDeletionMarkerVersion) {
++    return false;
++  }
++  const base::Value* encoded_path =
++      marker.GetDict().Find(kDedicatedDeletionMarkerPathKey);
++  const std::optional<base::FilePath> decoded =
++      encoded_path ? base::ValueToFilePath(*encoded_path) : std::nullopt;
++  if (!decoded || !IsGeneratedRegularProfileBaseName(*decoded)) {
++    return false;
++  }
++  *relative_path = *decoded;
++  return true;
++}
++
++bool CompleteProfileDirectoryDeletionMarker(const base::FilePath& path) {
++  if (!g_browser_process || g_browser_process->IsShuttingDown() ||
++      !g_browser_process->profile_manager()->IsAllowedProfilePath(path) ||
++      !IsGeneratedRegularProfileBaseName(path.BaseName())) {
++    return false;
++  }
++  ScopedListPrefUpdate deleted_profiles(g_browser_process->local_state(),
++                                        prefs::kProfilesDeleted);
++  const base::Value marker = DedicatedDeletionMarker(path);
++  const base::Value legacy_marker = base::FilePathToValue(path.BaseName());
++  if (std::ranges::any_of(*deleted_profiles, [&](const base::Value& value) {
++        return value == legacy_marker ||
++               (IsDedicatedProfileDirectoryDeletionMarker(value) &&
++                !IsExactDedicatedDeletionMarker(value, path));
++      })) {
++    return false;
++  }
++  deleted_profiles->EraseValue(marker);
++  return std::ranges::none_of(*deleted_profiles, [&](const base::Value& value) {
++    return IsDedicatedProfileDirectoryDeletionMarker(value);
++  });
++}
++
++bool ArmProfileDirectoryForDeletion(const base::FilePath& path) {
++  return ArmProfileDirectoryForDeletionWithStage(
++      path, ProfileDeletionStage::MARKED_WITH_DEDICATED_CACHE);
+ }
+diff --git a/chrome/browser/profiles/nuke_profile_directory_utils.h b/chrome/browser/profiles/nuke_profile_directory_utils.h
+index 3719ad67a5921..4abb3a549df78 100644
+--- a/chrome/browser/profiles/nuke_profile_directory_utils.h
++++ b/chrome/browser/profiles/nuke_profile_directory_utils.h
+@@ -9,7 +9,8 @@
+ 
+ namespace base {
+ class FilePath;
+-}
++class Value;
++}  // namespace base
+ 
+ // Physically remove deleted profile directories from disk.
+ void NukeDeletedProfilesFromDisk();
+@@ -19,9 +20,28 @@ void NukeDeletedProfilesFromDisk();
+ void NukeProfileFromDisk(const base::FilePath& profile_path,
+                          base::OnceClosure done_callback);
+ 
++// Physically removes the exact profile and derived cache directories. The
++// callback runs on the UI thread with true only after both paths are absent
++// and their surviving parent directory entries have been synchronized.
++void NukeProfileFromDiskWithResult(
++    const base::FilePath& profile_path,
++    base::OnceCallback<void(bool)> done_callback);
++
++// Read-only physical witness for an already-finished deletion. Returns true
++// only when the exact profile and derived cache paths are absent and their
++// surviving parent directory entries have been synchronized. This performs
++// blocking file I/O and must not run on the UI thread.
++bool VerifyProfileAndCacheDirectoryDeletion(const base::FilePath& profile_path);
++
+ // Returns if profile is marked for deletion.
+ bool IsProfileDirectoryMarkedForDeletion(const base::FilePath& profile_path);
+ 
++// Returns whether the path is armed specifically for result-bearing deletion
++// with the stable per-profile cache mapping. Generic marks are insufficient
++// for hidden restore candidates.
++bool IsProfileDirectoryMarkedForDedicatedDeletion(
++    const base::FilePath& profile_path);
++
+ // Cancel a scheduling deletion, so ScheduleProfileDirectoryForDeletion can be
+ // called again successfully.
+ void CancelProfileDeletion(const base::FilePath& path);
+@@ -30,6 +50,32 @@ void CancelProfileDeletion(const base::FilePath& path);
+ // Returns whether the profile has been newly scheduled.
+ bool ScheduleProfileDirectoryForDeletion(const base::FilePath& path);
+ 
++// Persists the exact deletion marker and hidden ephemeral metadata without
++// making shutdown eligible to delete the path. Callers that need a durability
++// barrier can synchronize Local State before arming physical deletion.
++bool PersistProfileDirectoryDeletionMarker(const base::FilePath& path);
++
++// Returns true for the dedicated result-bearing marker, including malformed
++// instances. Such a marker is durable custody evidence and must never be
++// interpreted as an instruction for automatic startup/shutdown deletion.
++bool IsDedicatedProfileDirectoryDeletionMarker(const base::Value& marker);
++
++// Decodes only the canonical dedicated-marker basename. False includes a
++// malformed dedicated marker, which callers must retain and treat as an
++// automatic-deletion fence rather than discard or act upon.
++bool GetDedicatedProfileDirectoryDeletionMarkerPath(
++    const base::Value& marker,
++    base::FilePath* relative_path);
++
++// Removes only the exact dedicated marker after physical absence has been
++// verified. Repeating after exact absence succeeds. The caller remains
++// responsible for synchronizing Local State.
++bool CompleteProfileDirectoryDeletionMarker(const base::FilePath& path);
++
++// Advances an already-scheduled path with an existing exact durable marker to
++// the process-local physical-deletion stage. It changes no preference value.
++bool ArmProfileDirectoryForDeletion(const base::FilePath& path);
++
+ // Marks the profile path for deletion. It will be deleted when
+ // `NukeDeletedProfilesFromDisk()` is called.
+ void MarkProfileDirectoryForDeletion(const base::FilePath& path);

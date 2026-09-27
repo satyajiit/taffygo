@@ -1,0 +1,158 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+module taffy.tool_runtime.mojom;
+
+import "mojo/public/mojom/base/file.mojom";
+import "mojo/public/mojom/base/shared_memory.mojom";
+import "sandbox/policy/mojom/sandbox.mojom";
+import "taffy/contracts/tool-runtime/generated/mojom/tool_runtime.mojom";
+
+// Everything a job needs that is a kernel object rather than a wire value.
+//
+// The generated ToolJob declares what the job runs against - a registered
+// model id and revision, a length, a digest, a transport - and this carries
+// the opened resources those declarations describe. The split is the point:
+// a name in a message is something a sender can write, and an open descriptor
+// is something only the browser can produce. A worker therefore cannot name an
+// artifact the browser did not resolve, cannot widen a read handle into a
+// write handle, and cannot reach a byte the browser did not deliberately map,
+// because it never receives a path and its sandbox denies it the filesystem.
+//
+// Every field is optional because which resources exist is decided by the
+// job's operation and by the transports its ToolPayloadInput and
+// ToolPayloadOutput declare. A resource present without its declaration, or
+// declared without its resource, is a refusal in the broker rather than
+// something a worker is left to interpret.
+struct ToolJobResources {
+  // The registered model artifact, opened read-only by the browser. Present
+  // exactly when the job's arguments carry a ToolModelArtifact. Its length and
+  // SHA-256 are declared in that record, so a worker that is handed something
+  // else can tell, and refuse.
+  mojo_base.mojom.ReadOnlyFile? model_artifact;
+
+  // The registered adapter, opened read-only. Present only when the artifact
+  // record names one.
+  mojo_base.mojom.ReadOnlyFile? model_adapter;
+
+  // Bounded job input, mapped read-only. Present exactly when
+  // ToolPayloadInput declares SHARED_MEMORY, and then the inline argument
+  // bytes are empty: the two are alternatives, never a fallback pair.
+  mojo_base.mojom.ReadOnlySharedMemoryRegion? bulk_input;
+
+  // The media input the job's opaque handle identifier names, resolved and
+  // opened by the browser handle broker. The identifier in the arguments is a
+  // correlation label the broker minted for this exact job; this is the only
+  // way its bytes are ever reachable.
+  mojo_base.mojom.ReadOnlyFile? media_input;
+
+  // The media output the job's opaque output handle identifier names, opened
+  // for writing by the same broker. It is the only writable resource any
+  // worker receives, it is created and owned by the browser, and it is revoked
+  // when the job ends however it ends.
+  mojo_base.mojom.File? media_output;
+
+  // The producer end of a browser-held pipe for bulk output. Present exactly
+  // when ToolPayloadOutput declares DATA_PIPE, and then the chunk stream
+  // carries no bytes of its own.
+  handle<data_pipe_producer>? bulk_output;
+
+  // The Python standard library, opened read-only by the browser. Present
+  // exactly when the job's ToolPythonLibrary names one, and its length and
+  // SHA-256 are declared in that record so a worker handed something else can
+  // tell, and refuse.
+  //
+  // It is a descriptor rather than a path because it could not be a path: the
+  // interpreter runs in a process that is denied the filesystem, so a path
+  // would be a claim it has no way to check and no way to open. And it is not
+  // optional in the way the others are: an interpreter that starts with an
+  // empty import path and no archive cannot import a single module, so a
+  // Python job without this is a process spawned to fail.
+  mojo_base.mojom.ReadOnlyFile? python_library;
+};
+
+// The worker can publish bounded progress, bounded ordered output chunks and
+// exactly one terminal completion. The browser rejects duplicate or
+// out-of-order sequences before returning data to the core reducer, and a
+// chunk that arrives after the one marked final is refused rather than
+// appended.
+interface ToolRuntimeClient {
+  Progress(ToolProgress progress);
+  OutputChunk(ToolOutputChunk chunk);
+  Completed(ToolCompletion completion);
+};
+
+// Python is fresh per job. The browser launches this root only for a bundled,
+// registered pure-Python module and kills the process on cancel or timeout.
+//
+// Sandbox: kService, unchanged. The runtime is a bundled interpreter running
+// reviewed pure-Python over bytes the browser supplied. It needs no operating
+// system resource beyond computation, which is the case kService documents at
+// //sandbox/policy/mojom/sandbox.mojom:14-17.
+[ServiceSandbox=sandbox.mojom.Sandbox.kService]
+interface PythonToolService {
+  Start(ToolJob job,
+        ToolJobResources resources,
+        pending_remote<ToolRuntimeClient> client)
+      => (ToolAdmission admission);
+  Cancel(string job_id);
+};
+
+// A local model process may remain warm for its profile, but every
+// conversation is disposable and every stream is bounded by the submitted
+// ResourceBudget.
+//
+// Sandbox: kOnDeviceModelExecution, and this is a correction rather than a
+// preference. Under kService - "computation only", per
+// //sandbox/policy/mojom/sandbox.mojom:14-17 - the accelerator delegates an
+// on-device model needs cannot initialise, and every one of them fails soft:
+// the runtime falls back to the processor and reports a result, so the defect
+// shows up as latency rather than as an error. Chromium's own on-device model
+// service pins kOnDeviceModelExecution at
+// //services/on_device_model/public/mojom/on_device_model_service.mojom:135,
+// and //sandbox/policy/mojom/sandbox.mojom:42-45 describes it as equivalent to
+// the GPU process's sandbox, for service processes hosting trustworthy models
+// that may process untrustworthy inputs. That is exactly this seam: the
+// artifact is registered and opened by the browser, and the prompt is not.
+// Chromium's embedding service makes the same choice at
+// //services/passage_embeddings/public/mojom/passage_embeddings.mojom:29 and
+// :74, which is the operation added to this contract beside generation.
+//
+// kWebNNModelCompilation was considered and does not apply here. It is
+// declared [EnableIf=is_win] at //sandbox/policy/mojom/sandbox.mojom:51 for
+// ORT graph compilation that needs accelerator drivers incompatible with
+// AppContainer; TaffyGo has no Windows target, and graph compilation is not an
+// operation this contract exposes.
+[ServiceSandbox=sandbox.mojom.Sandbox.kOnDeviceModelExecution]
+interface LocalModelService {
+  Start(ToolJob job,
+        ToolJobResources resources,
+        pending_remote<ToolRuntimeClient> client)
+      => (ToolAdmission admission);
+  Cancel(string job_id);
+};
+
+// Media parsing and transforms run one job per process and accept only the
+// closed ToolOperation enum, never a command line, URL, codec, or filter name.
+//
+// Sandbox: kService, re-examined and kept. The comparable upstream service is
+// the media gallery parser, which parses container metadata and samples frames
+// with the same pinned FFmpeg and libyuv this contract reuses, and which pins
+// kService at
+// //chrome/services/media_gallery_util/public/mojom/media_parser.mojom:63.
+// The stronger media sandboxes upstream are for cases this contract does not
+// have: kGpu or kHardwareVideoDecoding for accelerator-backed decode, and kCdm
+// or kMediaFoundationCdm for protected content. Every operation here is
+// software over a file descriptor the browser opened, so widening the sandbox
+// would grant driver access no operation uses.
+[ServiceSandbox=sandbox.mojom.Sandbox.kService]
+interface MediaToolService {
+  Start(ToolJob job,
+        ToolJobResources resources,
+        pending_remote<ToolRuntimeClient> client)
+      => (ToolAdmission admission);
+  Cancel(string job_id);
+};

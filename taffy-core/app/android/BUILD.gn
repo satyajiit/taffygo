@@ -1,0 +1,94 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//build/config/android/rules.gni")
+import("//taffy/app/android/taffy_android_deps.gni")
+
+android_library("content_host_java") {
+  sources = [
+    "java/src/org/chromium/taffy/content/TaffyNonEmptySurfaceCallback.java",
+    "java/src/org/chromium/taffy/content/TaffyPageHostView.java",
+    "java/src/org/chromium/taffy/content/TaffyPageRenderView.java",
+  ]
+  deps = [
+    "//components/embedder_support/android:view_java",
+    "//content/public/android:content_java",
+    "//third_party/androidx:androidx_annotation_annotation_java",
+    "//ui/android:ui_java",
+  ]
+}
+
+# Compose host glue that names no //chrome type. The profile-specific lookup
+# stays in //taffy/app/android/shell, where the embedder dependency belongs.
+android_library("host_java") {
+  sources = [
+    "java/src/org/chromium/taffy/host/TaffyAppLanguage.kt",
+    "java/src/org/chromium/taffy/host/TaffyPageSurfaceBinding.kt",
+    "java/src/org/chromium/taffy/host/TaffyShellContent.kt",
+    "java/src/org/chromium/taffy/host/TaffyShellNavigation.kt",
+    "java/src/org/chromium/taffy/host/TaffyShellStoreOwner.kt",
+    "java/src/org/chromium/taffy/host/TaffyShellViews.kt",
+    "java/src/org/chromium/taffy/host/TaffyWindowBars.kt",
+  ]
+  enable_compose = true
+  deps = [
+           ":content_host_java",
+           "//base:base_java",
+           "//taffy/app/android/ui:app_java",
+           "//taffy/app/android/ui:core_browser_java",
+           "//taffy/app/android/ui:core_common_java",
+           "//taffy/app/android/ui:core_designsystem_java",
+           "//taffy/app/android/ui:core_model_java",
+           "//taffy/app/android/ui:core_ui_java",
+           "//third_party/androidx:androidx_activity_activity_java",
+           "//third_party/androidx:androidx_lifecycle_lifecycle_viewmodel_java",
+           "//third_party/androidx:androidx_lifecycle_lifecycle_viewmodel_compose_java",
+           "//third_party/androidx:androidx_savedstate_savedstate_java",
+         ] + taffy_androidx_compose_deps + taffy_androidx_lifecycle_deps +
+         taffy_kotlin_coroutines_deps + taffy_kotlin_deps
+}
+
+java_group("taffy_java") {
+  public_deps = [
+    "//taffy/app/android/shell:shell_java",
+    "//taffy/app/android/ui:android_ui_java",
+    "//taffy/resources/branding:branding_resources",
+    "//taffy/resources/branding:image_override_resources",
+    "//taffy/resources/catalog:taffy_android_strings_grd",
+  ]
+  if (is_android) {
+    public_deps += [
+      "//taffy/components/delivery:bundled_delivery_assets",
+      "//taffy/third_party/easylist:bundled_filter_list_assets",
+    ]
+  }
+}
+
+import("//taffy/app/android/product_targets.gni")
+
+if (is_android) {
+  taffy_android_product("taffy_public_apk") {
+  }
+
+  # The distribution artifact. Play accepts a bundle and not an APK, so this is
+  # what ./tools/play uploads; taffy_public_apk stays because it is what
+  # ./tools/chromium/run installs and what every device suite runs against.
+  #
+  # Neither target depends on the other and neither should: they are two
+  # packagings of one dependency graph, and an edge between them would make the
+  # dev loop pay for the release artifact on every build. What holds them equal
+  # is _taffy_product_shared in product_targets.gni, which both forward.
+  #
+  # Build it on release-arm64. A dev profile sets incremental_install = true,
+  # which is an APK-only flow; ./tools/chromium/build refuses the pair with a
+  # sentence rather than letting the packaging step fail late.
+  taffy_android_product_base_module("taffy_public_base_bundle_module") {
+  }
+
+  taffy_android_product_bundle("taffy_public_bundle") {
+    base_module_target = ":taffy_public_base_bundle_module"
+  }
+}

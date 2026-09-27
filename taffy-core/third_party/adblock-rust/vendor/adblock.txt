@@ -1,0 +1,28 @@
+adblock-rust (matching engine)
+==============================
+
+Vendored assets: the adblock-rust 0.13.3 crate and the crates.io
+                 dependencies cargo vendor resolved for it, under this
+                 directory. The EasyList family is not here; it stays
+                 in taffy-core/third_party/easylist/.
+Owners:          The adblock-rust authors (MPL-2.0); TaffyGo decides
+                 that this engine is the matcher (decision 0086)
+Licence:         MPL-2.0 for adblock-rust itself
+                 (vendor/adblock-v0_13/LICENSE). Transitive crates
+                 keep the terms they arrived with, each next to its
+                 sources — except two, whose published crate archives
+                 contain no licence file at all: flatbuffers, which
+                 declares Apache-2.0 in its Cargo.toml, and seahash,
+                 which declares MIT. Their texts were fetched from the
+                 repositories those manifests name and are here as
+                 flatbuffers.Apache-2.0.txt and seahash.MIT.txt. The
+                 Apache text is byte-identical to the copy already
+                 tracked at taffy-core/third_party/dagger/LICENSE, and
+                 seahash's upstream file carries no copyright line,
+                 which is how upstream ships it.
+Source:          https://github.com/brave/adblock-rust/
+Version:         0.13.3
+
+version=0.13.3
+crate=adblock
+url=https://github.com/brave/adblock-rust/

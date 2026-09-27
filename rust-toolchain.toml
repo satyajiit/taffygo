@@ -1,0 +1,9 @@
+# Machine owner file for the TOOLCHAIN.md "Rust toolchain (portable host loop)" row.
+#
+# Inside the Chromium build, Chromium's bundled Rust overrides this file — it
+# governs the portable Cargo workspace only. Shipping Android Rust uses
+# Chromium's toolchain; the Gradle UI loop has no native Rust target.
+[toolchain]
+channel = "1.96.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

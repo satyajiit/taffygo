@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest something TaffyGo should do, or do differently.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        TaffyGo keeps three rules: one product line with no editions or tiers,
+        one assistant (Taffy), and plain words for everything a person reads.
+        A request that fits them is easier to take on. For an open-ended idea,
+        start in Discussions: https://github.com/satyajiit/taffygo/discussions
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you are trying to do
+      description: >-
+        The situation and what gets in the way today. A real example helps
+        more than a general description.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like TaffyGo to do
+      description: >-
+        Describe what you would see and do. If Taffy is involved, say what it
+        should ask you before it acts, and what should leave the phone.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Other ways you considered
+  - type: dropdown
+    id: contribute
+    attributes:
+      label: Would you work on it?
+      options:
+        - "Yes, I would like to open a pull request"
+        - "Maybe, with some guidance"
+        - "No"

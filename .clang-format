@@ -1,0 +1,36 @@
+# TaffyGo's C++ style is Chromium's, because taffy-core/ is mounted into the
+# Chromium checkout at src/taffy and its code follows upstream OWNERS, DEPS and
+# //build/config conventions (AGENTS.md, "Code style guidelines").
+#
+# This file exists so the answer does not depend on where clang-format is run
+# from. Inside the checkout, //taffy resolves up to src/.clang-format and gets
+# Chromium's; from this repository root there is nothing above, and without
+# this file clang-format silently falls back to LLVM style — which is how
+# fifteen files came to carry pointer-right spacing and unindented access
+# specifiers while the other 128 carried Chromium's.
+#
+# Keep the two in agreement. src/.clang-format is the upstream authority; this
+# file inherits the same base style rather than restating its rules, so an
+# upstream change to Chromium's own formatting is picked up rather than pinned.
+#
+# Format changed lines, not whole files. 333 of the 533 non-generated C++ files
+# under taffy-core/ differ from this style today, almost all by an out-of-order
+# include or a wrapping nit, and reformatting them in bulk would rewrite the
+# blame of the entire product root for no behavioural gain. `git cl format`
+# touches only the lines a change touches, which is how the backlog gets paid
+# off: by the edits that were happening anyway. Nothing gates this yet.
+BasedOnStyle: Chromium
+Standard: Latest
+InsertBraces: true
+InsertNewlineAtEOF: true
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:           '^<.*\.h>'
+    Priority:        3
+  - Regex:           '^<.*>'
+    Priority:        4
+  - Regex:           '.*'
+    Priority:        5
+IncludeIsMainRegex: "\
+(_(android|apple|chromeos|linux|mac|posix|win))?\
+(_(unit|browser|perf|interactive_ui)?tests?)?$"

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  The one splash item that only exists from Android 13, kept in its own
+  qualifier rather than behind a lint suppression so the rest of the style
+  stays readable at every API level.
+-->
+<resources>
+    <!--
+      Ask for the icon. Left at its default the platform shows it only when
+      the launching app requested that style, and otherwise does whatever it
+      likes — which it is allowed to answer with an empty splash: the window
+      colour, full screen, and no mark on it. That is the frame between the
+      launcher and the first screen that carries no brand, and asking removes
+      the platform's licence to draw it.
+    -->
+    <style name="Theme.TaffyGo.Starting" parent="Base.Theme.TaffyGo.Starting">
+        <item name="android:windowSplashScreenBehavior">icon_preferred</item>
+    </style>
+</resources>

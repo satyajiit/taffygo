@@ -1,0 +1,135 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// Shared identity and lifecycle vocabulary for the Browser Intelligence
+// Protocol. The schema under taffy-core/contracts/bip/schema is authoritative;
+// generate.py --mojom checks this file together with page_intelligence.mojom.
+// Keeping this vocabulary in one imported module lets the main interface stay
+// readable without making consumers include a second generated header: Mojo's
+// generated page_intelligence header includes its imported dependency.
+
+module taffy.mojom;
+
+enum OriginKind {
+  kTuple,
+  kOpaque,
+};
+
+// A normalized security origin recorded by the broker at observation time. An
+// opaque origin stays opaque and is never broadened to a predecessor origin:
+// two opaque origins are equal only when their opaque_id values are equal.
+struct Origin {
+  OriginKind kind;
+  // Scheme, host and port for a tuple origin. Null for an opaque origin.
+  string? serialization;
+  // Session-local identifier distinguishing one opaque origin from another.
+  // Null for a tuple origin.
+  string? opaque_id;
+};
+
+// Browser-owned security context of an observed document.
+struct OriginMetadata {
+  Origin origin;
+  bool is_potentially_trustworthy;
+  bool is_incognito;
+};
+
+enum DocumentLifecycleState {
+  kActive,
+  kSpeculative,
+  kPendingCommit,
+  kPrerendering,
+  kFrozen,
+  kBackForwardCached,
+  kCrashed,
+  kDestroyed,
+};
+
+enum DigestAlgorithm {
+  kSha256,
+};
+
+// Proves that the action authorized is exactly the action proposed.
+struct ContentDigest {
+  DigestAlgorithm algorithm;
+  // Lowercase hexadecimal.
+  string value;
+};
+
+// Structural revalidation hint for one exact live node. It may improve the
+// surface offered to a person and may never grant authority or suppress
+// handover (decision 0088).
+enum ChallengeKind {
+  kNone,
+  kImage,
+  kInteractive,
+  kOneTimeCode,
+};
+
+// The full handle required to act on a node. A bare node identifier carries no
+// meaning and is never accepted on its own (protocol section 5.4).
+struct NodeHandle {
+  string tab_id;
+  string frame_id;
+  string page_epoch;
+  uint64 graph_revision;
+  string node_id;
+  Origin expected_origin;
+};
+
+// bip-transport-only: browser-only request for exact-node rendered geometry.
+// The request carries no selector or URL and returns no media bytes. It exists
+// solely so the browser can crop its own compositor surface after the renderer
+// revalidates the BIP identity.
+enum MediaTargetKind {
+  kImage,
+  kVideo,
+  // The visible viewport, used only by the separately authorized page
+  // screenshot fallback. An empty node_id is required for this member.
+  kPageScreenshot,
+};
+
+// bip-transport-only: exact live capture target to revalidate before a
+// browser-owned compositor capture. Image and video carry one BIP node;
+// PAGE_SCREENSHOT carries an empty node_id because viewport geometry is not
+// node identity and never becomes an action target.
+struct MediaTargetRequest {
+  string request_id;
+  string expected_page_epoch;
+  string node_id;
+  uint64 required_graph_revision;
+  MediaTargetKind expected_kind;
+  // False for the pre-capture geometry check. The browser asks for loaded
+  // cues only on the post-capture check, avoiding a duplicate bounded script
+  // run and duplicate renderer-to-browser text transfer.
+  bool include_loaded_caption_cues;
+};
+
+// bip-transport-only: closed terminal status for InspectMediaTarget.
+enum MediaTargetResultCode {
+  kOk,
+  kStalePageEpoch,
+  kStaleGraph,
+  kNodeGone,
+  kWrongType,
+  kDocumentInactive,
+  kEmptyBounds,
+  // A challenge is present, a prohibited secret lacks fresh geometry, or the
+  // bounded redaction list cannot name every prohibited region.
+  kUnsafeContent,
+};
+
+// bip-transport-only: one already-loaded HTML text-track cue. The renderer
+// never enables a disabled track or fetches a transcript for this request; it
+// exposes only cues the page has already made available. The browser rescans
+// and bounds the text again before it can become generated evidence.
+struct MediaCaptionCue {
+  uint32 track_index_plus_one;
+  uint32 cue_index_plus_one;
+  string text;
+  uint64 timestamp_start_ms;
+  uint64 timestamp_end_ms;
+};

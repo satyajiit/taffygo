@@ -1,0 +1,47 @@
+/* Shared presentation for the TaffyGo fixture corpus.
+   No external fonts, no imports, no network references. */
+:root {
+  color-scheme: light dark;
+  --ink: #16181d;
+  --paper: #ffffff;
+  --muted: #5b6270;
+  --line: #d6dae2;
+  --flag: #8a2b20;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0 auto;
+  padding: 1.5rem;
+  max-width: 52rem;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+header.fixture { border-bottom: 1px solid var(--line); padding-bottom: .75rem; margin-bottom: 1.25rem; }
+header.fixture p.who { color: var(--muted); font-size: .85rem; margin: .25rem 0 0; }
+h1 { font-size: 1.6rem; line-height: 1.2; margin: 0; }
+h2 { font-size: 1.15rem; margin: 1.5rem 0 .5rem; }
+table { border-collapse: collapse; width: 100%; margin: .75rem 0; }
+th, td { border: 1px solid var(--line); padding: .4rem .6rem; text-align: left; vertical-align: top; }
+th { background: rgba(0, 0, 0, .04); }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
+pre { background: rgba(0, 0, 0, .04); padding: .6rem; overflow-x: auto; }
+button, .button {
+  font: inherit; padding: .4rem .8rem; border: 1px solid var(--line);
+  background: rgba(0, 0, 0, .03); border-radius: .35rem; cursor: pointer;
+}
+label { display: block; margin: .6rem 0 .15rem; }
+input, select, textarea { font: inherit; padding: .35rem .5rem; border: 1px solid var(--line); border-radius: .3rem; }
+iframe { width: 100%; border: 1px solid var(--line); border-radius: .35rem; }
+.note { color: var(--muted); font-size: .9rem; }
+.flag { color: var(--flag); font-weight: 600; }
+.scroller { height: 18rem; overflow-y: auto; border: 1px solid var(--line); border-radius: .35rem; }
+.offscreen { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+.clipped { clip-path: inset(50%); position: absolute; width: 1px; height: 1px; overflow: hidden; }
+.invisible { visibility: hidden; }
+.zero { font-size: 0; }
+.overlay {
+  position: fixed; inset: 0; background: rgba(10, 12, 16, .55);
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+}
+.overlay .panel { background: var(--paper); border-radius: .5rem; padding: 1.25rem; max-width: 30rem; }

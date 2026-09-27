@@ -1,0 +1,21 @@
+{
+  "structs": [
+    {
+      "name": "DeviantTabView",
+      "description": "A deviant tab record that stores the surface's own observer beside its fields.",
+      "fields": [
+        {"name": "tab_id", "type": "string", "ordinal": 0, "description": "The identity this contract does expose."},
+        {"name": "observer", "type": "pending_remote<DeviantObserver>", "ordinal": 1, "description": "A live connection stored inside a snapshot that is copied and re-sent."}
+      ]
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "DeviantObserver",
+      "description": "The interface the deviant record tries to store a connection to.",
+      "methods": [
+        {"name": "OnBrowsingState", "ordinal": 0, "description": "One snapshot.", "params": []}
+      ]
+    }
+  ]
+}

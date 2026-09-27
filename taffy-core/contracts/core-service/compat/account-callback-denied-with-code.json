@@ -1,0 +1,7 @@
+{
+  "flow_id": "account-flow-fixture",
+  "redirect_binding_id": "taffygo.default",
+  "returned_state": "fixture-account-state",
+  "status": 1,
+  "authorization_code_handle": "fixture-authorization-code-handle"
+}

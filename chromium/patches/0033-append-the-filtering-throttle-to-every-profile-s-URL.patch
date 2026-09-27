@@ -1,0 +1,62 @@
+From 340e1e6c78a068e6e05e01ddf7cbf2f07a8e2eb2 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sat, 29 Aug 2026 13:58:51 +0530
+Subject: append the filtering throttle to every profile's URL loaders
+
+CreateURLLoaderThrottles is the one embedder funnel for blink
+URLLoaderThrottles. The filtering plane is compiled and unit-tested
+under //taffy, but nothing attached it, so every request loaded
+unjudged and every counter stayed at zero.
+
+One include and one call, after the signin throttle, so Safe Browsing
+and every other security throttle stay ahead of Ads and trackers.
+Policy lives in taffy::AppendFilteringThrottles: a profile with no
+core-service manager, blocking off, a site exception, an allowlisted
+document, or no compiled ruleset each cost one early return. A
+subresource request never constructs the manager
+(GetForProfileIfExists).
+
+CreateURLLoaderThrottlesForKeepAlive is not edited: keep-alives have
+left their page, have no wc_getter, and a block would be attribution
+with no tab.
+
+Rebase risk: low. One call at the end of an existing list.
+Needed by: CAP-BR-022, decision 0076.
+Retirement: permanent until TaffyGo owns the URL-loader funnel;
+reviewed at each milestone rebase.
+
+Taffy-Patch: 0033
+
+diff --git a/chrome/browser/DEPS b/chrome/browser/DEPS
+index 7ac91f42bcfb6..4e947f3626ddf 100644
+--- a/chrome/browser/DEPS
++++ b/chrome/browser/DEPS
+@@ -534,6 +534,7 @@ include_rules = [
+ 
+   "+storage/browser",
+   "+storage/common",
++  "+taffy/browser",
+ 
+   # Ensure flags are usable anywhere.
+   "+chrome/browser/flags",
+diff --git a/chrome/browser/chrome_content_browser_client.cc b/chrome/browser/chrome_content_browser_client.cc
+index 47fb8dbd0587c..184097d42827a 100644
+--- a/chrome/browser/chrome_content_browser_client.cc
++++ b/chrome/browser/chrome_content_browser_client.cc
+@@ -422,6 +422,7 @@
+ #include "services/network/public/mojom/url_loader_factory.mojom.h"
+ #include "services/network/public/mojom/web_transport.mojom.h"
+ #include "services/network/public/mojom/websocket.mojom.h"
++#include "taffy/browser/filtering_throttles.h"
+ #include "third_party/blink/public/common/chrome_debug_urls.h"
+ #include "third_party/blink/public/common/features.h"
+ #include "third_party/blink/public/common/loader/url_loader_throttle.h"
+@@ -6084,6 +6085,8 @@ ChromeContentBrowserClient::CreateURLLoaderThrottles(
+     result.push_back(std::move(signin_throttle));
+   }
+ 
++  taffy::AppendFilteringThrottles(request, browser_context, wc_getter, result);
++
+   return result;
+ }
+ 

@@ -1,0 +1,38 @@
+From 04912d008aa6dcde0c039041060d398ce5a7f16d Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sat, 12 Sep 2026 03:38:51 +0530
+Subject: Let a downstream manifest drop the package-query permission
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+QUERY_ALL_PACKAGES is declared for one purpose here — deciding whether an
+installed app should handle a web navigation — and on API 30 and above it
+switches package-visibility filtering off for the whole application, which
+is a complete inventory of the device.
+
+A product that extends this template has no way to decline it: there is no
+block around the declaration to override, and tools:node="remove" applies
+only to elements arriving from another manifest, so the marker is ignored
+once jinja has rendered both templates into one document.
+
+Wrap the declaration and its comment in a block. Every template that does
+not override it renders exactly what it rendered before.
+
+Taffy-Patch: 0051
+
+diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
+index 2932948b12918..23226acb007a5 100644
+--- a/chrome/android/java/AndroidManifest.xml
++++ b/chrome/android/java/AndroidManifest.xml
+@@ -90,8 +90,10 @@ by a child template that "extends" this file.
+     <uses-permission android:name="android.permission.NFC"/>
+     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+ 
++    {% block query_all_packages_permission %}
+     <!-- Needed to determine whether an app installed on the device should handle a web navigation.  -->
+     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
++    {% endblock %}
+ 
+     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+ 

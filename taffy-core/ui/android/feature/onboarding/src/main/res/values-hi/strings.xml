@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Machine-translated (hi), pending native review. -->
+<resources>
+
+    <!-- Screen SCR-001 — Welcome -->
+    <string name="taffy_welcome_badge">एआई-नेटिव ब्राउज़र</string>
+    <string name="taffy_welcome_headline">पूरा ब्राउज़र। Taffy सिर्फ़ तब, जब आप कहें।</string>
+    <string name="taffy_welcome_body">पहले पेज से ही विज्ञापन और ट्रैकर ब्लॉक। Taffy नीचे की पट्टी में चुपचाप बैठा रहता है जब तक आप न कहें — और जब कुछ करता है, तो हर स्रोत दिखाता है।</string>
+    <string name="taffy_welcome_promise">बिना पूछे आपके फ़ोन से कुछ नहीं जाता।</string>
+    <string name="taffy_welcome_start">ब्राउज़ करना शुरू करें</string>
+    <string name="taffy_welcome_footnote">आप Taffy से बाद में मिल सकते हैं, या कभी नहीं।</string>
+    <string name="taffy_welcome_theme_label">दिखावट</string>
+    <string name="taffy_welcome_theme_light">हल्का</string>
+    <string name="taffy_welcome_theme_dark">गहरा</string>
+
+    <!-- Screen SCR-002 — Meet Taffy. Titles and prompts stay native while
+         rendered films explain each feature. Three further films were
+         rendered and are not shipped; their strings leave with them. -->
+    <string name="taffy_showcase_sound_turn_on">शोकेस की आवाज़ चालू करें</string>
+    <string name="taffy_showcase_sound_turn_off">शोकेस की आवाज़ बंद करें</string>
+    <string name="taffy_showcase_sound_state_on">शोकेस की आवाज़ चालू है</string>
+    <string name="taffy_showcase_sound_state_off">शोकेस की आवाज़ बंद है</string>
+    <string name="taffy_showcase_form_title">फ़ॉर्म साथ में भरें</string>
+    <string name="taffy_showcase_form_question">यह सर्वे मेरे साथ भरें। सेव की गई जानकारी साझा करने से पहले पूछें</string>
+    <string name="taffy_showcase_form_video_description">मंज़ूरी माँगते, सर्वे भरते और जमा करने से पहले फिर पूछते Taffy का चरण-दर-चरण ऐनिमेशन</string>
+    <string name="taffy_showcase_weekly_review_title">आपके हफ़्ते की समीक्षा</string>
+    <string name="taffy_showcase_weekly_review_question">मेरे पिछले हफ़्ते की ब्राउज़िंग देखें और एक बेहतर सीमा सुझाएँ</string>
+    <string name="taffy_showcase_weekly_review_video_description">ब्लॉक किए गए विज्ञापनों, बिताए समय और सीमा तय करने से पहले पूछती AI साप्ताहिक समीक्षा का चरण-दर-चरण ऐनिमेशन</string>
+    <string name="taffy_showcase_task_title">Taffy को एक काम दें</string>
+    <string name="taffy_showcase_task_question">इन 12 टैब को पढ़ें और एक इन्फ़ोग्राफ़िक रिपोर्ट बनाएँ</string>
+    <string name="taffy_showcase_job_video_description">12 टैब पढ़ते, स्रोत रखते और इन्फ़ोग्राफ़िक को कई फ़ॉर्मैट में एक्सपोर्ट करते Taffy का चरण-दर-चरण ऐनिमेशन</string>
+    <string name="taffy_showcase_page_tools_title">पेज की अच्छी चीज़ें रखें</string>
+    <string name="taffy_showcase_page_tools_question">इस पेज की तस्वीरें और वीडियो निकालें। इसका सार लिखें, फिर “Hello” को कई भाषाओं में दिखाएँ</string>
+    <string name="taffy_showcase_page_tools_video_description">पेज का मीडिया निकालते, डाउनलोड से पहले पूछते, पेज का सार बनाते और “Hello” को कई भाषाओं में दिखाते Taffy का चरण-दर-चरण ऐनिमेशन</string>
+
+    <!-- Screen SCR-006 — Language and region -->
+    <string name="taffy_language_region_title">भाषा और क्षेत्र</string>
+    <string name="taffy_language_region_region_label">क्षेत्र</string>
+    <string name="taffy_language_region_region_note">खोज, कीमतें और इकाइयाँ इसके अनुसार होंगी।</string>
+    <string name="taffy_language_region_region_all">सभी देश और क्षेत्र</string>
+    <string name="taffy_language_region_region_all_note">English और हिन्दी हर देश में उपलब्ध रहते हैं।</string>
+    <string name="taffy_language_region_language_label">ऐप की भाषा</string>
+    <string name="taffy_language_region_system">सिस्टम के अनुसार</string>
+    <string name="taffy_language_region_system_note">आपका फ़ोन जिस भाषा में है। अगर TaffyGo के पास उस भाषा के शब्द नहीं हैं तो English।</string>
+    <string name="taffy_language_region_english">English</string>
+    <string name="taffy_language_region_english_note">TaffyGo के अपने शब्द English में</string>
+    <string name="taffy_language_region_hindi">हिन्दी</string>
+    <string name="taffy_language_region_hindi_note">TaffyGo के अपने शब्द हिन्दी में</string>
+    <string name="taffy_language_region_search">भाषाएँ खोजें</string>
+    <string name="taffy_language_region_no_matches">कोई मेल खाती भाषा नहीं</string>
+    <string name="taffy_language_region_picker_title">देश या क्षेत्र</string>
+    <string name="taffy_language_region_picker_body">English और हिन्दी हर देश में उपलब्ध रहते हैं। यह चुनाव खोज, कीमतों और इकाइयों के लिए है।</string>
+    <string name="taffy_language_region_picker_search">देश या कोड खोजें</string>
+    <string name="taffy_language_region_footnote">वेब पेजों का अनुवाद या रूप कभी नहीं बदला जाता — यह सिर्फ़ TaffyGo के अपने इंटरफ़ेस की बात है।</string>
+    <string name="taffy_language_region_done">हो गया</string>
+    <string name="taffy_language_chip_value">%1$s · %2$s</string>
+    <string name="taffy_language_chip_english">English</string>
+    <string name="taffy_language_chip_hindi">हिन्दी</string>
+    <string name="taffy_language_chip_description">क्षेत्र और भाषा: %1$s। इसे बदलें।</string>
+
+    <!-- Screen SCR-004 — AI setup. -->
+    <string name="taffy_ai_setup_title">Taffy कैसे सोचे?</string>
+    <string name="taffy_ai_setup_body">अभी अपना प्रदाता जोड़ें, या इसे बाद में सेट करें।</string>
+    <string name="taffy_ai_setup_routes_label">आपके अनुरोध कहाँ जाते हैं</string>
+    <plurals name="taffy_ai_setup_routes_count">
+        <item quantity="one">%1$d तरीका</item>
+        <item quantity="other">%1$d तरीके</item>
+    </plurals>
+    <string name="taffy_ai_setup_own_key_title">अपनी ही कुंजी इस्तेमाल करें</string>
+    <string name="taffy_ai_setup_own_key_cost">भुगतान आप अपने प्रदाता को करते हैं</string>
+    <string name="taffy_ai_setup_own_key_body">अगली स्क्रीन पर प्रदाता की कुंजी सहेजें। यह इसी फ़ोन पर रहती है।</string>
+    <string name="taffy_ai_setup_assure_compact">पासवर्ड, भुगतान विवरण और एक-बार वाले कोड कभी किसी मॉडल तक नहीं जाते।</string>
+    <string name="taffy_ai_setup_continue">आगे बढ़ें</string>
+    <string name="taffy_ai_setup_choose_provider">प्रदाता चुनें</string>
+    <string name="taffy_ai_setup_set_up_later">बाद में सेट करें</string>
+    <string name="taffy_ai_setup_change_later">आप इसे Settings में कभी भी बदल सकते हैं।</string>
+
+    <!-- Shared by the sequence -->
+    <string name="taffy_onboarding_continue">आगे बढ़ें</string>
+
+    <!-- Screen SCR-007 — Get started. -->
+    <string name="taffy_get_started_headline">इसे अपना बनाएँ</string>
+    <string name="taffy_get_started_body">नाम और तस्वीर, अगर आप चाहें। दोनों इसी फ़ोन पर रहते हैं।</string>
+    <string name="taffy_get_started_name_label">आपका नाम</string>
+    <string name="taffy_get_started_name_placeholder">वैकल्पिक</string>
+    <string name="taffy_get_started_face_label">तस्वीर</string>
+    <string name="taffy_get_started_face_choice">तस्वीर %1$d, कुल %2$d में से</string>
+    <string name="taffy_get_started_promise_account">कोई खाता नहीं, साइन इन करने को कुछ नहीं।</string>
+    <string name="taffy_get_started_promise_servers">TaffyGo अपना कोई सर्वर नहीं चलाता।</string>
+    <string name="taffy_get_started_promise_key">Taffy आपकी अपनी AI कुंजी से चलता है — या बिना किसी के।</string>
+    <string name="taffy_get_started_data_link">TaffyGo आपके डेटा के साथ क्या करता है</string>
+    <string name="taffy_get_started_data_title">TaffyGo आपके डेटा के साथ क्या करता है</string>
+    <string name="taffy_get_started_data_device">आपका नाम, तस्वीर, इतिहास, बुकमार्क और Taffy जो कुछ याद रखता है, सब इसी फ़ोन पर रहता है। न कोई खाता है, न भेजने के लिए कोई TaffyGo सर्वर।</string>
+    <string name="taffy_get_started_data_provider">Taffy किसी AI प्रदाता से तभी पूछता है जब आप उसे कुंजी दें, या ऐसे प्लान में साइन इन करें जिसका भुगतान आप पहले से करते हैं। वे अनुरोध उसी प्रदाता तक जाते हैं, और किसी तक नहीं।</string>
+    <string name="taffy_get_started_data_sites">वेबसाइटें वही देखती हैं जो कोई भी ब्राउज़र दिखाता है। विज्ञापन और ट्रैकर लोड होने से पहले ब्लॉक कर दिए जाते हैं।</string>
+    <string name="taffy_get_started_version">संस्करण %1$s</string>
+    <!-- A card read as one thing: its title, then its sentence. -->
+    <string name="taffy_onboarding_pair">%1$s। %2$s</string>
+
+</resources>

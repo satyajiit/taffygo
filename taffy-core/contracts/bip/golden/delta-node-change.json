@@ -1,0 +1,101 @@
+{
+  "schema_version": "0.1",
+  "subscription_id": "sub_01",
+  "tab_id": "tab_01",
+  "frame_id": "frame_main",
+  "page_epoch": "epoch_a1",
+  "from_revision": 11,
+  "to_revision": 12,
+  "event_sequence": 59,
+  "coalesced_mutation_count": 14,
+  "added_nodes": [
+    {
+      "node_id": "n_badge",
+      "frame_id": "frame_main",
+      "role": "AVAILABILITY",
+      "name": "Availability",
+      "text_runs": [
+        {
+          "text": "Back in stock",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.91
+    }
+  ],
+  "changed_nodes": [
+    {
+      "node": {
+        "node_id": "n_price_dom",
+        "frame_id": "frame_main",
+        "role": "PRICE",
+        "name": "Price",
+        "text_runs": [
+          {
+            "text": "21.50",
+            "source_kind": "DOM",
+            "sensitivity": "NOT_SENSITIVE",
+            "truncated": false
+          }
+        ],
+        "states": [
+          "VISIBLE"
+        ],
+        "value_descriptor": {
+          "kind": "PRICE",
+          "present": true,
+          "redacted": false,
+          "normalized_value": "21.50",
+          "currency_code": "EUR"
+        },
+        "sensitivity": "NOT_SENSITIVE",
+        "sources": [
+          "DOM"
+        ],
+        "confidence": 0.94,
+        "attributes": [
+          {
+            "name": "CURRENCY_CODE",
+            "value": "EUR"
+          }
+        ]
+      },
+      "changed_fields": [
+        "TEXT_RUNS",
+        "VALUE_DESCRIPTOR"
+      ]
+    }
+  ],
+  "removed_node_ids": [
+    "n_price_metadata"
+  ],
+  "changed_edges": [
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_badge",
+      "relationship": "CONTAINS",
+      "inferred": false
+    }
+  ],
+  "invalidations": [],
+  "truncation": {
+    "truncated": false,
+    "budgets_reached": [],
+    "omitted_node_count": 0,
+    "omitted_text_bytes": 0,
+    "omitted_frame_count": 0,
+    "may_change_answer": false
+  },
+  "observed_at_monotonic_ms": 1840
+}

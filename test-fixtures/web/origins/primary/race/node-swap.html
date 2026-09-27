@@ -1,0 +1,69 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="mutation-race">
+<title>Mutation race</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Mutation race</h1>
+  <p class="who">Targets are removed, replaced, or repurposed on a fixed schedule
+  after load. Anything observed before a swap must not be acted on afterwards.</p>
+</header>
+
+<p class="note">Swap schedule (deterministic, from load): 1500&nbsp;ms replace,
+3000&nbsp;ms remove, 4500&nbsp;ms repurpose. Elapsed:
+<span id="clock">0</span>&nbsp;ms.</p>
+
+<section id="targets">
+  <p><a id="stable-link" href="/redirect/arrived.html">Stable link — never mutates</a></p>
+  <p id="replaced-slot"><a id="replaced-link" href="/redirect/arrived.html">Replaced link — a new node takes this place</a></p>
+  <p id="removed-slot"><a id="removed-link" href="/redirect/arrived.html">Removed link — this node disappears</a></p>
+  <p id="repurposed-slot"><a id="repurposed-link" href="/redirect/arrived.html">Repurposed link — same node, different destination</a></p>
+</section>
+
+<p class="note" id="race-log">No mutation yet.</p>
+
+<script>
+  (function () {
+    "use strict";
+    var start = 0;
+    var log = document.getElementById("race-log");
+    var clock = document.getElementById("clock");
+
+    function tick(now) {
+      if (!start) { start = now; }
+      clock.textContent = String(Math.round(now - start));
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    setTimeout(function () {
+      var slot = document.getElementById("replaced-slot");
+      slot.textContent = "";
+      var fresh = document.createElement("a");
+      fresh.id = "replaced-link";
+      fresh.href = "/product/lumen-desk-lamp.html";
+      fresh.textContent = "Replacement link — a different node with the same id";
+      slot.appendChild(fresh);
+      log.textContent = "1500 ms: #replaced-link is a new node with a different destination.";
+    }, 1500);
+
+    setTimeout(function () {
+      var gone = document.getElementById("removed-link");
+      if (gone) { gone.parentNode.removeChild(gone); }
+      log.textContent = "3000 ms: #removed-link no longer exists.";
+    }, 3000);
+
+    setTimeout(function () {
+      var repurposed = document.getElementById("repurposed-link");
+      if (repurposed) {
+        repurposed.setAttribute("href", "/forms/checkout-sensitive.html");
+        repurposed.textContent = "Repurposed link — now points at the sensitive form";
+      }
+      log.textContent = "4500 ms: #repurposed-link kept its node identity and changed destination.";
+    }, 4500);
+  })();
+</script>

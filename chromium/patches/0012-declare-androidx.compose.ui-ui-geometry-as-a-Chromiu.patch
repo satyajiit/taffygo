@@ -1,0 +1,53 @@
+From ceea3065266d7c67a8ae3d6292531589a5e93e74 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Mon, 17 Aug 2026 20:46:41 +0530
+Subject: declare androidx.compose.ui:ui-geometry as a Chromium-consumable
+ dependency
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The bytecode dependency validator requires a direct edge for every directly
+referenced class, and composable drawing code references Size and Offset from
+ui-geometry directly. The artifact was reachable only transitively: it was
+absent from build.gradle.template, so the generator emitted its java_group
+with an androidx-only visibility constraint. The template entry is the real
+change — the next androidx roll regenerates the group without the constraint —
+and the BUILD.gn edit is that regeneration applied by hand, exactly as the
+generated file's own comment instructs.
+
+Taffy-Patch: 0012
+
+diff --git a/third_party/androidx/BUILD.gn b/third_party/androidx/BUILD.gn
+index 0675901a9c146..8d12b37e4c3f6 100644
+--- a/third_party/androidx/BUILD.gn
++++ b/third_party/androidx/BUILD.gn
+@@ -2507,13 +2507,10 @@ if (!limit_android_deps) {
+   }
+ 
+   # This is generated, do not edit. Update BuildConfigGenerator.groovy instead.
++  # Downstream (TaffyGo): ui-geometry is declared in build.gradle.template, so
++  # the next generator run drops this group's visibility constraint itself;
++  # this edit is that regeneration applied by hand, nothing more.
+   androidx_java_group("androidx_compose_ui_ui_geometry_java") {
+-    # To remove visibility constraint, add this dependency to
+-    # //third_party/androidx/build.gradle.template
+-    visibility = [
+-      ":*",
+-      "//third_party/android_deps:*",
+-    ]
+     deps = [ ":androidx_compose_ui_ui_geometry_android_java" ]
+   }
+ 
+diff --git a/third_party/androidx/build.gradle.template b/third_party/androidx/build.gradle.template
+index c66cd72647904..af6ae97d126a7 100644
+--- a/third_party/androidx/build.gradle.template
++++ b/third_party/androidx/build.gradle.template
+@@ -36,6 +36,7 @@ dependencies {
+     compileLatest 'androidx.compose.ui:ui:+'
+     compileLatest 'androidx.compose.ui:ui-text:+'
+     compileLatest 'androidx.compose.ui:ui-text-google-fonts:+'
++    compileLatest 'androidx.compose.ui:ui-geometry:+'
+     compileLatest 'androidx.compose.ui:ui-graphics:+'
+     compileLatest 'androidx.compose.ui:ui-unit:+'
+     compileLatest 'androidx.activity:activity-compose:+'

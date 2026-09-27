@@ -1,0 +1,17 @@
+# //taffy/common/public is the process-neutral boundary the isolated core and Android
+# facade mirror. It includes nothing outside itself, so that mirroring stays
+# mechanical and so that no Chromium type can leak across the cxx boundary of
+# decision 0004.
+#
+# Adding an entry here is a design change, not a convenience. In particular:
+# no +base (no callbacks, no time types, no raw_ptr), no +content (no
+# WebContents, no RenderFrameHost), no +url (origins cross as opaque tags,
+# see bip_identity.h), no +mojo (mojom types stay behind the browser broker).
+
+include_rules = [
+  "-base",
+  "-content",
+  "-mojo",
+  "-url",
+  "+taffy/common/public",
+]

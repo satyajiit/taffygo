@@ -1,0 +1,19 @@
+{
+  "job_id": "job_id-1",
+  "runtime": 0,
+  "tool_id": "tool_id-1",
+  "tool_version": "tool_version-1",
+  "operation_kind": 6,
+  "budget": {"max_input_bytes": 0, "max_output_bytes": 0, "max_memory_bytes": 0, "max_cpu_ms": 0, "max_temporary_bytes": 0, "max_output_chunks": 0},
+  "bundled_python": null,
+  "local_model": null,
+  "media_probe": null,
+  "audio_extract": null,
+  "frame_sample": null,
+  "transcode": null,
+  "signed_wasm": {
+    "entrypoint_id": "entrypoint_id-1",
+    "input": []
+  },
+  "local_embedding": null
+}

@@ -1,0 +1,28 @@
+From c611c5c8a07d89b1a6511e97ceac0d446f992c55 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Tue, 18 Aug 2026 03:46:07 +0530
+Subject: let the TaffyGo product target reach cwebp
+
+The official-build resource pipeline converts every Chrome Android
+product's PNGs through the cwebp executable, and its visibility list
+predates a product target mounted outside //chrome/android. One list
+entry; depending on the executable links no libwebp into the browser, as
+the list's own comment records.
+
+Taffy-Patch: 0018
+
+diff --git a/third_party/libwebp/visibility.gni b/third_party/libwebp/visibility.gni
+index 03012cc382eae..0eb664536f840 100644
+--- a/third_party/libwebp/visibility.gni
++++ b/third_party/libwebp/visibility.gni
+@@ -23,4 +23,10 @@ cwebp_exe_allowed_visibility = [
+   "//chrome/android/*",
+   "//clank/android_webview/*",
+   "//clank/java/*",
++
++  # Taffy: the product target is mounted under //taffy (decision
++  # 0012) and its official-build resources go through the same webp
++  # conversion as every Chrome Android product.
++  # chromium/patches/0018-let-components-taffy-reach-cwebp.md
++  "//taffy/*",
+ ]

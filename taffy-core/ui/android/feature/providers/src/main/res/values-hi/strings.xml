@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Machine-translated (hi), pending native review. -->
+<resources>
+    <!-- Screen SCR-404 — the hub -->
+    <string name="taffy_providers_hub_title">AI प्रदाता</string>
+    <string name="taffy_providers_hub_intro">यह ब्राउज़र जिन-जिन तरीकों से किसी मॉडल तक पहुँच सकता है, और हर तरीका कहाँ खड़ा है।</string>
+    <string name="taffy_providers_hub_loading">प्रदाता लोड हो रहे हैं</string>
+    <string name="taffy_providers_hub_empty_title">कोई प्रदाता उपलब्ध नहीं</string>
+    <string name="taffy_providers_hub_empty_body">यह ब्राउज़र जो प्रदाता सूची पढ़ता है वह अभी खाली है। आपके फ़ोन से कुछ गायब नहीं है — बस अभी सेट करने को कुछ नहीं है। आप फिर भी अपना पता देकर कोई प्रदाता जोड़ सकते हैं।</string>
+    <string name="taffy_providers_hub_all_connected_title">सब कुछ पहले से सेट है</string>
+    <string name="taffy_providers_hub_all_connected_body">यह ब्राउज़र जो प्रदाता सूची पढ़ता है, उसका हर प्रदाता जुड़ा हुआ है। हर एक किस पर सेट है यह देखने के लिए वापस जाएँ, या अपना पता देकर कोई प्रदाता जोड़ें।</string>
+    <string name="taffy_providers_hub_blocked_title">यहाँ कुछ भी सेट नहीं किया जा सकता</string>
+    <string name="taffy_providers_hub_blocked_body">नीचे का हर प्रदाता बंद है, उसका पता बदल गया है, या उसे ऐसी चीज़ चाहिए जो TaffyGo के इस संस्करण में नहीं है। हर पंक्ति बताती है कि कौन-सी बात है।</string>
+
+    <!-- The three categories, as the tabs name them -->
+    <string name="taffy_providers_group_subscription">सदस्यता</string>
+    <string name="taffy_providers_group_key">API कुंजियाँ</string>
+    <string name="taffy_providers_group_endpoint">आपके अपने</string>
+    <string name="taffy_providers_group_header">%1$s। %2$s।</string>
+    <plurals name="taffy_providers_group_count">
+        <item quantity="one">%1$s प्रदाता</item>
+        <item quantity="other">%1$s प्रदाता</item>
+    </plurals>
+
+    <!-- What a category says when it holds nothing -->
+    <string name="taffy_providers_group_empty_subscription_title">साइन इन करने लायक कोई प्लान नहीं</string>
+    <string name="taffy_providers_group_empty_subscription_body">यह ब्राउज़र जो प्रदाता सूची पढ़ता है, उसमें अभी ऐसा कोई प्लान नहीं है जिसमें आप साइन इन कर सकें।</string>
+    <string name="taffy_providers_group_empty_key_title">कोई प्रदाता कुंजी नहीं लेता</string>
+    <string name="taffy_providers_group_empty_key_body">यह ब्राउज़र जो प्रदाता सूची पढ़ता है, उसमें अभी कोई ऐसा प्रदाता नहीं है जो आपकी चिपकाई हुई कुंजी लेता हो।</string>
+    <string name="taffy_providers_group_empty_endpoint_title">आपने अभी तक कोई नहीं जोड़ा</string>
+    <string name="taffy_providers_group_empty_endpoint_body">आप जो मॉडल सर्वर खुद चलाते हैं, उसका पता जोड़ते ही वह यहाँ दिखने लगेगा। इस फ़ोन पर कुछ नहीं चलता।</string>
+
+    <!-- What a provider would take, when the vendor has said nothing about it -->
+    <string name="taffy_providers_way_key">API कुंजी</string>
+    <string name="taffy_providers_way_plan">प्लान साइन-इन</string>
+    <string name="taffy_providers_way_key_or_plan">API कुंजी या प्लान साइन-इन</string>
+    <string name="taffy_providers_way_endpoint">आपका दिया हुआ पता</string>
+    <string name="taffy_providers_way_none">यह प्रदाता कोई रास्ता नहीं बताता</string>
+    <string name="taffy_providers_label_pair">%1$s · %2$s</string>
+
+    <!-- Listed and explained, never offered -->
+    <string name="taffy_providers_block_not_actionable">इस संस्करण में नहीं</string>
+    <string name="taffy_providers_block_held_shut">बंद है</string>
+    <string name="taffy_providers_block_sign_in_not_built">साइन-इन इस संस्करण में नहीं</string>
+    <string name="taffy_providers_block_sign_in_not_cleared">साइन-इन अभी तैयार नहीं</string>
+    <string name="taffy_providers_block_no_method">कुछ नहीं दिया गया</string>
+
+    <!-- Where one row stands -->
+    <string name="taffy_providers_state_connected">जुड़ा हुआ</string>
+    <string name="taffy_providers_state_unconfirmed">पुष्टि नहीं हुई</string>
+    <string name="taffy_providers_state_signing_in">साइन इन हो रहा है…</string>
+    <string name="taffy_providers_state_default">डिफ़ॉल्ट</string>
+    <string name="taffy_providers_action_set_up">सेट करें</string>
+    <string name="taffy_providers_action_sign_in">साइन इन करें</string>
+    <string name="taffy_providers_action_edit">बदलें</string>
+    <string name="taffy_providers_row">%1$s. %2$s. %3$s</string>
+    <string name="taffy_providers_add_endpoint">अपना प्रदाता जोड़ें</string>
+
+    <!-- Screen SCR-415 -->
+    <string name="taffy_providers_config_title">प्रदाता</string>
+    <!-- Screen SCR-416 -->
+    <string name="taffy_providers_sign_in_title">साइन इन करें</string>
+    <!-- Screen SCR-417 -->
+    <string name="taffy_providers_models_all_title">सभी मॉडल</string>
+    <string name="taffy_providers_models_one_title">मॉडल</string>
+    <string name="taffy_providers_models_loading">मॉडल पढ़े जा रहे हैं</string>
+    <string name="taffy_providers_models_empty_title">कोई मॉडल उपलब्ध नहीं</string>
+    <string name="taffy_providers_models_empty_body">यह ब्राउज़र जो प्रदाता सूची पढ़ता है, उसमें अभी यहाँ कोई मॉडल नहीं है। आपके फ़ोन से कुछ भी गायब नहीं हुआ है।</string>
+    <string name="taffy_providers_models_in_use">इस्तेमाल में</string>
+    <string name="taffy_providers_models_asking">पूछा जा रहा है</string>
+    <string name="taffy_providers_models_needs_setup">सेट करें</string>
+    <string name="taffy_providers_models_search">मॉडल खोजें</string>
+    <string name="taffy_providers_models_no_match_title">इस नाम का यहाँ कुछ नहीं है</string>
+    <string name="taffy_providers_models_no_match_body">इस पन्ने पर कोई मॉडल या प्रदाता आपके लिखे से मेल नहीं खाता। कम अक्षर लिखकर देखें।</string>
+
+    <!-- Screen SCR-417 — the kind of work a model does, read off its catalog entry -->
+    <string name="taffy_providers_models_group_reasoning">जवाब से पहले सोचता है</string>
+    <string name="taffy_providers_models_group_pictures">तस्वीरें भी पढ़ता है</string>
+    <string name="taffy_providers_models_group_plain">सीधे जवाब</string>
+    <string name="taffy_providers_models_context">%1$s टोकन</string>
+    <string name="taffy_providers_models_badge_thinks">पहले सोचता है</string>
+    <string name="taffy_providers_models_badge_pictures">तस्वीरें पढ़ता है</string>
+
+    <!-- Screen SCR-417 — the two halves of the whole-catalog list -->
+    <string name="taffy_providers_models_ready_title">इस्तेमाल के लिए तैयार</string>
+    <string name="taffy_providers_models_locked_title">सेट करना बाकी है</string>
+    <string name="taffy_providers_models_locked_show">दिखाएँ</string>
+    <string name="taffy_providers_models_locked_hide">छिपाएँ</string>
+    <string name="taffy_providers_models_locked_key">इस प्रदाता के पन्ने पर कुंजी चिपकाएँ, फिर ये आपके चुनने के लिए हैं।</string>
+    <string name="taffy_providers_models_locked_plan">इस प्रदाता की योजना में साइन इन करें, फिर ये आपके चुनने के लिए हैं।</string>
+    <string name="taffy_providers_models_locked_endpoint">इस पते का सेटअप पूरा करें, फिर ये आपके चुनने के लिए हैं।</string>
+    <string name="taffy_providers_models_locked_blocked">TaffyGo इस प्रदाता को सेट नहीं कर सकता, इसलिए यहाँ कुछ भी नहीं चुना जा सकता।</string>
+    <string name="taffy_providers_models_showing_of">इस प्रदाता के %2$s मॉडलों में से %1$s दिखाए जा रहे हैं। TaffyGo हर प्रदाता की सूची का उचित हिस्सा रखता है।</string>
+
+    <!-- Screen SCR-417 — जवाब देने से पहले यह मॉडल कितना सोचता है -->
+    <string name="taffy_providers_thinking_title">सोचना</string>
+    <string name="taffy_providers_thinking_note">ऑटो में हर सवाल के लिए Taffy खुद तय करता है कि कितना सोचना है। बंद का मतलब है, यह मॉडल बिल्कुल न सोचे।</string>
+    <string name="taffy_providers_thinking_auto">ऑटो</string>
+    <string name="taffy_providers_thinking_off">बंद</string>
+    <string name="taffy_providers_thinking_minimal">सबसे कम</string>
+    <string name="taffy_providers_thinking_low">थोड़ा</string>
+    <string name="taffy_providers_thinking_medium">कुछ</string>
+    <string name="taffy_providers_thinking_high">काफ़ी</string>
+    <string name="taffy_providers_thinking_xhigh">और ज़्यादा</string>
+    <string name="taffy_providers_thinking_max">सबसे ज़्यादा</string>
+
+    <!-- Screen SCR-418 -->
+    <string name="taffy_providers_endpoint_add_title">प्रदाता जोड़ें</string>
+    <string name="taffy_providers_endpoint_edit_title">प्रदाता बदलें</string>
+    <!-- Screen SCR-419 -->
+    <string name="taffy_providers_connected_title">जुड़े हुए प्रदाता</string>
+
+    <!-- Screen SCR-418 — a model server the person runs themselves -->
+    <string name="taffy_providers_endpoint_intro">एक मॉडल सर्वर जो आप खुद चलाते हैं और TaffyGo नेटवर्क से जिस तक पहुँच सके — आपका लैपटॉप, या बगल के कमरे की कोई मशीन। इस फ़ोन पर कुछ नहीं चलता।</string>
+    <string name="taffy_providers_endpoint_presets">आम सर्वर</string>
+    <string name="taffy_providers_endpoint_preset_ollama">Ollama</string>
+    <string name="taffy_providers_endpoint_preset_lm_studio">LM Studio</string>
+    <string name="taffy_providers_endpoint_preset_llama_cpp">llama.cpp</string>
+    <string name="taffy_providers_endpoint_preset_vllm">vLLM</string>
+    <string name="taffy_providers_endpoint_kind_openai">OpenAI-संगत सर्वर</string>
+    <string name="taffy_providers_endpoint_address_label">पता</string>
+    <string name="taffy_providers_endpoint_address_placeholder">http://localhost:11434/v1</string>
+    <string name="taffy_providers_endpoint_address_hint">अपने सर्वर का पूरा पता दें — पोर्ट और संस्करण वाला हिस्सा भी। TaffyGo उसके आगे सिर्फ़ अनुरोध जोड़ता है और बाकी कुछ नहीं बदलता।</string>
+    <string name="taffy_providers_endpoint_current">अभी %1$s पर चल रहे सर्वर की ओर लगा है।</string>
+    <string name="taffy_providers_endpoint_current_note">नीचे का खाना उसी पते से शुरू होता है जिस पर TaffyGo ने यह प्रदाता दर्ज किया है। उसे बदलकर सहेजें तो प्रदाता वहाँ चला जाएगा; वैसे ही छोड़ दें तो पते में कुछ नहीं बदलेगा।</string>
+    <string name="taffy_providers_endpoint_cleartext">यह सादा http है, इसलिए TaffyGo जो भेजता है वह एन्क्रिप्ट नहीं होता और उसी नेटवर्क पर कोई और उसे पढ़ सकता है। TaffyGo इसे सिर्फ़ आपके अपने नेटवर्क की मशीन तक मानता है, और कहीं नहीं।</string>
+
+    <!-- Screen SCR-418 — why an address cannot be registered -->
+    <string name="taffy_providers_endpoint_refusal_long">यह पता उतना लंबा है जितना TaffyGo रख नहीं सकता।</string>
+    <string name="taffy_providers_endpoint_refusal_not_an_address">TaffyGo इसे पते की तरह नहीं पढ़ पाता। इसे http:// या https:// से शुरू होना चाहिए और किसी मशीन का नाम बताना चाहिए।</string>
+    <string name="taffy_providers_endpoint_refusal_cleartext">सादा http सिर्फ़ आपके अपने नेटवर्क की मशीन तक जाता है — अंकों में लिखा पता, या .local पर खत्म होने वाला नाम। बाकी हर जगह के लिए https इस्तेमाल करें।</string>
+    <string name="taffy_providers_endpoint_refusal_credentials">पते के आगे से उपयोगकर्ता नाम और पासवर्ड हटा दें। TaffyGo ऐसा पता नहीं रखेगा जो उन्हें साथ लाए।</string>
+    <string name="taffy_providers_endpoint_refusal_query">पते से प्रश्नचिह्न और उसके बाद का सब हटा दें।</string>
+    <string name="taffy_providers_endpoint_refusal_fragment">पते से हैश और उसके बाद का सब हटा दें।</string>
+
+    <!-- Screen SCR-418 — asking the address what is there -->
+    <string name="taffy_providers_endpoint_check">यह पता जाँचें</string>
+    <string name="taffy_providers_endpoint_checking">जाँच हो रही है…</string>
+    <string name="taffy_providers_endpoint_reached">पहुँच गया</string>
+    <string name="taffy_providers_endpoint_detected">पहचाना गया: %1$s</string>
+    <plurals name="taffy_providers_endpoint_found">
+        <item quantity="one">%1$s मॉडल मिला</item>
+        <item quantity="other">%1$s मॉडल मिले</item>
+    </plurals>
+    <string name="taffy_providers_endpoint_no_models">वहाँ अभी कोई मॉडल लोड नहीं है। पता सही है — बस उसके पीछे भेजने को कुछ नहीं है। सर्वर पर कोई मॉडल लोड करें, फिर Taffy उसे इस्तेमाल कर सकेगा।</string>
+    <string name="taffy_providers_endpoint_kept_models">इस सर्वर ने जो %2$s मॉडल गिनाए, उनमें से %1$s रखे जा रहे हैं। प्रदाता सहेजने के बाद आप चुन सकते हैं कि किसे इस्तेमाल करना है।</string>
+    <string name="taffy_providers_endpoint_problem_nothing">उस पते पर कुछ भी जवाब नहीं आया। देखें कि मशीन जगी हो, सर्वर चल रहा हो, और यह फ़ोन उसी नेटवर्क पर हो।</string>
+    <string name="taffy_providers_endpoint_problem_not_a_server">कुछ जवाब तो आया, पर TaffyGo उसमें से मॉडलों की सूची नहीं पढ़ पाया। पते का पोर्ट और संस्करण वाला हिस्सा देखें।</string>
+    <string name="taffy_providers_endpoint_problem_credential">सर्वर ने जवाब दिया, और बिना कुंजी वह अपने मॉडल नहीं गिनाएगा। Advanced खोलें, वह कुंजी चिपकाएँ जो यह सर्वर लेता है, और पता दोबारा जाँचें।</string>
+    <string name="taffy_providers_endpoint_problem_no_answer">कोई जवाब नहीं आया, इसलिए पते के बारे में कुछ पता नहीं चला। फिर से आज़माएँ।</string>
+
+    <!-- Screen SCR-418 — the corrected address, offered and never applied -->
+    <string name="taffy_providers_endpoint_proposal_title">पहले एक बात तय कर लें</string>
+    <string name="taffy_providers_endpoint_proposal_body">आपका सर्वर मॉडल के अनुरोध %1$s पर लेता है। TaffyGo आपके लिखे पते के आगे सिर्फ़ अनुरोध जोड़ता है, इसलिए यह पता जाँच में तो चल गया पर अनुरोध कहीं नहीं पहुँचेंगे। TaffyGo आपका लिखा हुआ नहीं बदलेगा — बताइए आपका मतलब कौन-सा था।</string>
+    <string name="taffy_providers_endpoint_proposal_take">%1$s इस्तेमाल करें</string>
+    <string name="taffy_providers_endpoint_proposal_keep">जैसा मैंने लिखा है वैसा ही रहने दें</string>
+    <string name="taffy_providers_endpoint_kept">पता वैसा ही रखा जा रहा है जैसा आपने लिखा। अगर अनुरोध बिना कुछ मिले लौटें, तो सबसे पहले यही बदलें।</string>
+
+    <!-- Screen SCR-418 — the key, for the servers that ask for one -->
+    <string name="taffy_providers_endpoint_advanced">Advanced</string>
+    <string name="taffy_providers_endpoint_key_hint">सिर्फ़ तब, जब आपका सर्वर कुंजी माँगता हो। लोग जो सर्वर खुद चलाते हैं वे ज़्यादातर कुछ नहीं माँगते, और इसे खाली छोड़ना ही आम जवाब है।</string>
+    <string name="taffy_providers_endpoint_key_stored">इस सर्वर के लिए एक कुंजी पहले से रखी है। उसे वैसा ही रखने के लिए इसे खाली छोड़ें, या बदलने के लिए नई कुंजी चिपकाएँ।</string>
+
+    <!-- Screen SCR-418 — what to call it, and what to send to -->
+    <string name="taffy_providers_endpoint_name_label">नाम</string>
+    <string name="taffy_providers_endpoint_name_placeholder">इसे क्या कहें</string>
+    <string name="taffy_providers_endpoint_name_hint">यह सिर्फ़ आपको दिखता है। आपकी प्रदाता सूची में सर्वर इसी नाम से आएगा।</string>
+    <string name="taffy_providers_endpoint_save">यह प्रदाता सहेजें</string>
+    <string name="taffy_providers_endpoint_saving">सहेजा जा रहा है…</string>
+    <string name="taffy_providers_endpoint_save_refused">TaffyGo ने यह प्रदाता नहीं सहेजा। पता देखकर फिर से आज़माएँ।</string>
+
+    <!-- Screen SCR-418 — removing one -->
+    <string name="taffy_providers_endpoint_delete">यह प्रदाता हटाएँ</string>
+    <string name="taffy_providers_endpoint_deleting">हटाया जा रहा है…</string>
+    <string name="taffy_providers_endpoint_delete_title">%1$s हटाएँ?</string>
+    <string name="taffy_providers_endpoint_delete_body">पता और उसके मॉडल इस फ़ोन से हट जाएँगे। आपके अपने सर्वर पर कुछ नहीं बदलेगा।</string>
+    <string name="taffy_providers_endpoint_delete_confirm">हटाएँ</string>
+
+    <!-- Screen SCR-419 — what is connected and what it is set to -->
+    <string name="taffy_providers_connected_add">प्रदाता जोड़ें</string>
+    <string name="taffy_providers_connected_intro">अभी TaffyGo जिन प्रदाताओं से किसी मॉडल तक पहुँच सकता है, और हर एक किस पर सेट है।</string>
+    <string name="taffy_providers_connected_empty_title">अभी कुछ भी जुड़ा नहीं है</string>
+    <string name="taffy_providers_connected_empty_body">इस फ़ोन पर किसी प्रदाता के पीछे न कोई क्रेडेंशियल है, न कोई पता। कोई एक सेट करें, वह यहाँ दिखने लगेगा।</string>
+    <string name="taffy_providers_connected_thinking">सोच: %1$s</string>
+
+    <!-- The vendor's last refusal, under a connected row and on the credential card -->
+    <string name="taffy_providers_refusal_rate_limit">%1$s अभी इस खाते पर अनुरोधों की गति सीमित कर रहा है। आपकी कुंजी ठीक है।</string>
+    <string name="taffy_providers_refusal_billing">इस क्रेडेंशियल के पीछे का खाता अभी अनुरोधों का भुगतान नहीं कर पा रहा है।</string>
+    <string name="taffy_providers_refusal_overloaded">पिछली बार जब Taffy ने पूछा, %1$s पर बहुत ज़्यादा भार था।</string>
+    <string name="taffy_providers_refusal_when">यह %1$s की बात है।</string>
+
+    <!-- Screen SCR-415 — one provider's own page -->
+    <string name="taffy_providers_config_loading">यह प्रदाता लोड हो रहा है</string>
+    <string name="taffy_providers_config_gone_title">यह प्रदाता अब सूची में नहीं है</string>
+    <string name="taffy_providers_config_gone_body">यह ब्राउज़र जो प्रदाता सूची पढ़ता है उसमें अब यह नहीं है। आपके फ़ोन से कुछ नहीं हटाया गया।</string>
+    <string name="taffy_providers_config_blocked_title">यह प्रदाता सेट नहीं किया जा सकता</string>
+    <string name="taffy_providers_config_block_not_actionable">TaffyGo का यह संस्करण इस प्रदाता को सेट नहीं कर सकता। कोई बाद का संस्करण कर सकता है।</string>
+    <string name="taffy_providers_config_block_held_shut">यह प्रदाता प्रदाता सूची में बंद है। यहाँ कुछ भी करने पर उस तक नहीं पहुँचा जाता।</string>
+    <string name="taffy_providers_config_block_not_cleared">TaffyGo में इस वेंडर का साइन-इन बना हुआ है, और वेंडर उसे किन कामों के लिए इस्तेमाल करने देता है यह जाँचना अभी पूरा नहीं हुआ है। जब तक वह पूरा नहीं होता, TaffyGo इसे शुरू नहीं करेगा। आपके फ़ोन में कोई गड़बड़ी नहीं है।</string>
+    <string name="taffy_providers_config_block_no_method">इस प्रदाता की प्रविष्टि जुड़ने का कोई तरीका नहीं बताती। यह सूची की खामी है, आपके फ़ोन की नहीं।</string>
+    <string name="taffy_providers_config_lead_key">अपनी चिपकाई गई कुंजी से सीधे इस प्रदाता को भुगतान करें।</string>
+    <string name="taffy_providers_config_lead_plan">जिस योजना का आप पहले से भुगतान करते हैं, उसका उपयोग करें।</string>
+    <string name="taffy_providers_config_lead_both">पहले से ली गई योजना का उपयोग करें, या कुंजी चिपकाकर प्रति उपयोग भुगतान करें।</string>
+    <string name="taffy_providers_config_lead_blocked">यहाँ अभी कुछ भी सेट नहीं किया जा सकता।</string>
+
+    <!-- The card over a stored credential -->
+    <string name="taffy_providers_managed_title">जुड़ा हुआ</string>
+    <string name="taffy_providers_managed_unconfirmed">जुड़ा हुआ — देखने की ज़रूरत है</string>
+    <string name="taffy_providers_managed_unconfirmed_body">पिछली जाँच पूरी नहीं हुई। कुछ हटाया नहीं गया। बार-बार हो तो फिर से साइन इन करें।</string>
+    <string name="taffy_providers_managed_body_plan">इसके पीछे वह योजना है जिसमें आपने साइन इन किया।</string>
+    <string name="taffy_providers_managed_body_key">इसके पीछे आपकी सहेजी कुंजी है। वह इसी फ़ोन में सील है और दोबारा कभी नहीं दिखाई जाती।</string>
+    <string name="taffy_providers_managed_model">मॉडल: %1$s</string>
+    <string name="taffy_providers_managed_model_provider_order">यह प्रदाता जो पहले देता है</string>
+    <string name="taffy_providers_managed_change_model">मॉडल बदलें</string>
+    <string name="taffy_providers_managed_reauthenticate">फिर से साइन इन करें</string>
+    <string name="taffy_providers_managed_sign_out">साइन आउट करें</string>
+    <string name="taffy_providers_managed_signing_out">साइन आउट हो रहा है…</string>
+    <string name="taffy_providers_signout_title">%1$s से साइन आउट करें?</string>
+    <string name="taffy_providers_signout_body">क्रेडेंशियल इस फ़ोन से हटा दिया जाएगा। जब तक आप इसे फिर से जोड़ते नहीं, Taffy इस प्रदाता तक नहीं पहुँच सकेगा।</string>
+    <string name="taffy_providers_signout_confirm">साइन आउट करें</string>
+    <string name="taffy_providers_signout_cancel">रहने दें</string>
+
+    <!-- The two ways in, and the rule between them -->
+    <string name="taffy_providers_signin_blurb">विक्रेता के साथ साइन इन करें। TaffyGo आपका पासवर्ड कभी नहीं देखता।</string>
+    <string name="taffy_providers_signin_cta">%1$s में साइन इन करें</string>
+    <string name="taffy_providers_signin_not_built_title">साइन-इन इस संस्करण में नहीं है</string>
+    <string name="taffy_providers_signin_not_built_body">%1$s योजना साइन-इन देता है और TaffyGo का यह संस्करण उसे नहीं रखता, इसलिए इसे यहाँ शुरू नहीं किया जा सकता। उसकी जगह कुंजी काम नहीं करेगी।</string>
+    <string name="taffy_providers_signin_not_cleared_title">साइन-इन अभी तैयार नहीं</string>
+    <string name="taffy_providers_signin_not_cleared_body">TaffyGo में %1$s का साइन-इन बना हुआ है, और वेंडर उसे किन कामों के लिए इस्तेमाल करने देता है यह जाँचना अभी पूरा नहीं हुआ है। जब तक वह पूरा नहीं होता, TaffyGo इसे शुरू नहीं करेगा। ऐप अपडेट करने से यह नहीं बदलेगा, और इसकी जगह कोई कुंजी काम नहीं करेगी।</string>
+    <string name="taffy_providers_or_paste_key">या कुंजी चिपकाएँ</string>
+
+    <!-- The key form -->
+    <string name="taffy_providers_key_label">API कुंजी</string>
+    <string name="taffy_providers_key_placeholder">यहाँ चिपकाएँ</string>
+    <string name="taffy_providers_key_show">दिखाएँ</string>
+    <string name="taffy_providers_key_hide">छिपाएँ</string>
+    <string name="taffy_providers_key_get">कुंजी लें</string>
+    <string name="taffy_providers_key_docs">प्रदाता के निर्देश पढ़ें</string>
+    <string name="taffy_providers_key_prefix_hint">इस प्रदाता की कुंजियाँ %1$s से शुरू होती हैं।</string>
+    <string name="taffy_providers_key_save">आगे बढ़ें</string>
+    <string name="taffy_providers_key_replace">कुंजी बदलें</string>
+    <string name="taffy_providers_key_testing">जाँच हो रही है…</string>
+    <string name="taffy_providers_key_connected">जुड़ गया</string>
+    <string name="taffy_providers_key_save_anyway">बिना जाँच के सहेजें</string>
+    <string name="taffy_providers_key_security">कुंजी इस फ़ोन के कीस्टोर से सील की जाती है। TaffyGo उसे दोबारा नहीं दिखाता और इस प्रदाता के अलावा कहीं नहीं भेजता।</string>
+    <string name="taffy_providers_key_problem_empty">पहले कोई कुंजी चिपकाएँ।</string>
+    <string name="taffy_providers_key_problem_prefix">यह इस प्रदाता की कुंजी जैसी नहीं लगती।</string>
+    <string name="taffy_providers_key_problem_store">इस फ़ोन के सुरक्षित संग्रह ने कुंजी नहीं रखी। कुछ सहेजा नहीं गया।</string>
+    <string name="taffy_providers_key_problem_refused">प्रदाता ने यह कुंजी अस्वीकार कर दी। देखें कि आपने पूरी कॉपी की है।</string>
+    <string name="taffy_providers_key_problem_billing">इस कुंजी के पीछे का खाता अभी अनुरोधों का भुगतान नहीं कर सकता।</string>
+    <string name="taffy_providers_key_problem_model">प्रदाता उस मॉडल को नहीं जानता जिससे TaffyGo ने जाँच की। यह प्रदाता सूची की खामी है, आपकी कुंजी की नहीं।</string>
+    <string name="taffy_providers_key_problem_rate_limited">प्रदाता अभी दर सीमित कर रहा है, इसलिए आपकी कुंजी परखी नहीं गई।</string>
+    <string name="taffy_providers_key_problem_overloaded">प्रदाता अभी अत्यधिक व्यस्त है, इसलिए आपकी कुंजी परखी नहीं गई।</string>
+    <string name="taffy_providers_key_problem_timed_out">उत्तर आने से पहले जाँच का समय समाप्त हो गया।</string>
+    <string name="taffy_providers_key_problem_unreachable">प्रदाता तक पहुँचा ही नहीं जा सका।</string>
+    <string name="taffy_providers_key_problem_unsettled">उत्तर किसी ऐसी श्रेणी में नहीं आया जिसे TaffyGo नाम दे सके।</string>
+    <string name="taffy_providers_key_problem_unavailable">जाँच अभी चल नहीं सकी।</string>
+    <string name="taffy_providers_key_problem_no_model_listed">यह प्रदाता अपने मॉडलों की सूची कुंजी सहेजने के बाद ही देता है। इसे सहेजें, फिर Taffy उन्हें ले आएगा।</string>
+
+    <!-- Where Taffy's own requests go -->
+    <string name="taffy_providers_default_title">Taffy के अपने अनुरोध</string>
+    <string name="taffy_providers_default_cta">Taffy के लिए अपना प्रदाता उपयोग करें</string>
+    <string name="taffy_providers_default_note">Taffy अपने सवाल और कार्य-चरण आपके क्रेडेंशियल से भेजता है।</string>
+    <string name="taffy_providers_default_in_force">Taffy अपने अनुरोध यहीं भेजता है।</string>
+    <string name="taffy_providers_default_shared">Taffy आपका अपना प्रदाता उपयोग करता है। एक से अधिक जुड़े हैं, और TaffyGo अभी नहीं बता सकता कि अनुरोध किसके पास जाता है।</string>
+
+    <!-- Screen SCR-416 — one vendor's sign-in -->
+    <string name="taffy_providers_signin_loading">यह साइन-इन लोड हो रहा है</string>
+    <string name="taffy_providers_signin_connected_note">आप %1$s में साइन इन हैं। फिर से साइन इन करने पर इस फ़ोन का क्रेडेंशियल बदल जाएगा।</string>
+    <string name="taffy_providers_signin_starting">%1$s खोला जा रहा है…</string>
+    <string name="taffy_providers_signin_waiting_title">आपकी मंज़ूरी का इंतज़ार है</string>
+    <string name="taffy_providers_signin_waiting_body">विक्रेता के पन्ने पर इसे पूरा करें। यह स्क्रीन अपने आप अपडेट होती रहती है।</string>
+    <string name="taffy_providers_signin_exchanging">साइन-इन पूरा हो रहा है…</string>
+    <string name="taffy_providers_signin_exchanging_body">विक्रेता ने हाँ कहा और TaffyGo क्रेडेंशियल को इस फ़ोन में सील कर रहा है।</string>
+    <string name="taffy_providers_signin_code_hint">विक्रेता के पन्ने पर यह कोड दर्ज करें:</string>
+    <string name="taffy_providers_signin_code_open">पन्ना खोलें</string>
+    <string name="taffy_providers_signin_code_copy">कोड कॉपी करें</string>
+    <string name="taffy_providers_signin_code_clip_label">साइन-इन कोड</string>
+    <string name="taffy_providers_signin_clock">%1$d:%2$02d</string>
+    <string name="taffy_providers_signin_window">यह स्क्रीन %1$s और इंतज़ार करेगी।</string>
+    <string name="taffy_providers_signin_window_note">कोड की अपनी समय-सीमा विक्रेता के पास है, जिसे TaffyGo नहीं देख सकता। यह समय ख़त्म होने पर TaffyGo इस साइन-इन को रद्द कर देता है।</string>
+    <string name="taffy_providers_signin_cancel">साइन-इन रद्द करें</string>
+    <string name="taffy_providers_signin_cancelled_title">साइन-इन रद्द हो गया</string>
+    <string name="taffy_providers_signin_cancelled_body">TaffyGo ने यह साइन-इन रोक दिया और इसकी लंबित प्रक्रिया हटा दी। जब चाहें, फिर से शुरू कर सकते हैं।</string>
+    <string name="taffy_providers_signin_done_title">साइन इन हो गया</string>
+    <string name="taffy_providers_signin_done_body">%1$s जुड़ गया। उसके पन्ने पर मॉडल चुनें।</string>
+    <string name="taffy_providers_signin_done_cta">इस प्रदाता पर जाएँ</string>
+    <string name="taffy_providers_signin_failed_title">साइन-इन पूरा नहीं हुआ</string>
+    <string name="taffy_providers_signin_failed_denied">विक्रेता के पन्ने पर साइन-इन अस्वीकार कर दिया गया।</string>
+    <string name="taffy_providers_signin_failed_provider">विक्रेता ने त्रुटि के साथ उत्तर दिया।</string>
+    <string name="taffy_providers_signin_failed_timeout">साइन-इन का समय समाप्त हो गया।</string>
+    <string name="taffy_providers_signin_failed_unavailable">साइन-इन चल नहीं सका।</string>
+    <string name="taffy_providers_signin_failed_refused">TaffyGo अभी इस प्रदाता के लिए साइन-इन शुरू नहीं करेगा।</string>
+    <string name="taffy_providers_signin_try_again">फिर से कोशिश करें</string>
+
+    <!-- The manual-code fallback under a redirect wait (decision 0095 section 2) -->
+    <string name="taffy_providers_signin_code_entry_title">TaffyGo में वापस नहीं आए?</string>
+    <string name="taffy_providers_signin_code_entry_body">अगर विक्रेता के पन्ने ने कोई कोड दिखाया, या ऐसे पते पर पहुँचा जो खुला नहीं, तो उसे यहाँ चिपकाएँ। TaffyGo उसे सिर्फ़ इसी साइन-इन से मिलाकर देखता है, और किसी से नहीं।</string>
+    <string name="taffy_providers_signin_code_entry_label">विक्रेता के पन्ने से कोड या पता</string>
+    <string name="taffy_providers_signin_code_entry_submit">यह कोड इस्तेमाल करें</string>
+    <string name="taffy_providers_signin_code_entry_submitting">जाँच हो रही है…</string>
+    <string name="taffy_providers_signin_code_entry_rejected">यह कोड काम नहीं आया। देख लें कि पूरा कॉपी हुआ है, फिर दोबारा कोशिश करें।</string>
+</resources>

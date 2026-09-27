@@ -1,0 +1,8 @@
+include_rules = [
+  "-base",
+  "-chrome",
+  "-content",
+  "-taffy/app",
+  "-taffy/browser",
+  "-taffy/ui",
+]

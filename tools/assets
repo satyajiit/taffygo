@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/assets — say where the catalog claims an artifact is, and check
+# whether it is there.
+#
+#   ./tools/assets plan <file> --asset <id> --platform <p> [--key <path>]
+#   ./tools/assets verify [--asset <id>] [--platform <p>]
+#   ./tools/assets bundle [--check]
+#   ./tools/assets self-test
+#
+# --key is for a first publication only. A published row's path is authority
+# and an override may only agree with it; an unpublished row names none, which
+# is why the key has to come from the builder that printed it.
+#
+# Authority: docs/decisions/0045-taffy-assets-are-a-delivery-plane.md for the
+# plane, and the catalog at
+# taffy-core/components/delivery/core/rust/asset-plane/catalog/source/assets.json
+# for every fact about a variant. This command derives the key from that row and
+# never takes one as an argument, because a key typed by hand is a key the
+# device will not ask for.
+#
+# **It no longer publishes, and there is no longer an origin to ask.** TaffyGo
+# operates no origin (decision 0200) and the parts a person needs ship inside
+# the app (decision 0202), so `taffy_asset_origin` is empty in every build of
+# this tree. `publish` and the Cloudflare credential it needed are gone.
+#
+# `plan` and `verify` stay rather than going with it, and what they do is
+# unchanged: they answer questions about a committed row against a host that
+# serves it. With no origin configured they refuse and say so. The rule
+# `verify` exists for survives its origin — a catalog that says published while
+# the object answers 404 generates cleanly, passes every lane, and fails on a
+# phone, which is the state this repository was in when this command was
+# written and what `verify` found — and the day a build points the argument at
+# a release page, that rule is live again.
+#
+# `bundle` is what answers the question that replaced it. It reports what the
+# package carries, from the catalog's own `bundled` block. `bundle --check`
+# holds those bytes to the catalog and to the two projections generated from
+# it, by running the generator that owns those rules rather than repeating
+# them here; `./tools/check fast --only catalog` runs the same check.
+#
+# Exit codes: 0 = the command succeeded, 1 = it found a problem, 2 = it could
+# not run.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
+
+HELPER="$TAFFY_ROOT/tools/lib/asset_publish.py"
+
+usage() {
+  # Read by content, never by line number. This block used to be extracted as
+  # a fixed line range, and the licence notice above it moved every line down
+  # five -- so `--help` printed the licence and half the summary, silently,
+  # because a range is always a valid range. The rule instead: print from the
+  # line that names this command, through the indented invocation lines, and
+  # stop at the first line after them that is not one.
+  awk -v cmd="./tools/assets" '
+    index($0, "# " cmd " ") == 1 { p = 1 }
+    !p { next }
+    index($0, "#   " cmd " ") == 1 { seen = 1; print; next }
+    seen { exit }
+    { print }
+  ' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+}
+
+command_plan() {
+  # The file is positional here and a flag to the helper, so that the command
+  # reads the way a person would type it.
+  local file="${1:-}"
+  if [ $# -gt 0 ]; then shift; fi
+  case "$file" in
+    ""|--*)
+      printf 'taffy: plan needs the built artifact as its first argument\n' >&2
+      return 2 ;;
+  esac
+  python3 "$HELPER" plan --file "$file" "$@"
+}
+
+command_verify() {
+  python3 "$HELPER" verify "$@"
+}
+
+BUNDLE_GENERATOR="$TAFFY_ROOT/taffy-core/components/delivery/core/rust/asset-plane/catalog/tools/generate_bundled_assets.py"
+
+command_bundle() {
+  # `--check` is deliberately a hand-off and not an implementation. The rules
+  # that hold a bundled file to its catalogue row live with the row, in
+  # bundled_rows.py, and a second copy here would be a second answer.
+  case "${1:-}" in
+    --check) python3 "$BUNDLE_GENERATOR" --check ;;
+    "")      python3 "$HELPER" bundle ;;
+    *)       printf 'taffy: bundle takes --check or nothing, not %s\n' "$1" >&2
+             return 2 ;;
+  esac
+}
+
+main() {
+  local command="${1:-}"
+  if [ $# -gt 0 ]; then shift; fi
+  case "$command" in
+    plan)      command_plan "$@" ;;
+    verify)    command_verify "$@" ;;
+    bundle)    command_bundle "$@" ;;
+    self-test) python3 "$HELPER" self-test ;;
+    ""|-h|--help|help) usage ;;
+    *) printf 'taffy: unknown command %s\n\n' "$command" >&2; usage >&2; return 2 ;;
+  esac
+}
+
+main "$@"

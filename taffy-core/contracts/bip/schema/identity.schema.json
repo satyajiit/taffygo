@@ -1,0 +1,292 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "identity.schema.json",
+  "title": "BIP identity and lifetime values",
+  "description": "Identifiers, origins, and lifetime values shared by every BIP message family. Identifiers are opaque domain values: they are never database row numbers, Chromium pointers, renderer routing identifiers, URLs, titles, accessible names, CSS selectors, or array indexes. See the protocol specification section 5 and the domain model section 6.",
+  "x-bip-module": "identity",
+  "$defs": {
+    "ProtocolVersion": {
+      "title": "ProtocolVersion",
+      "description": "Wire protocol version in major.minor form. The current value lives only in bip.version.json; this schema constrains the shape, never the number.",
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "ProfileId": {
+      "title": "ProfileId",
+      "description": "Opaque browser profile identifier. An incognito profile identifier exists only in memory and is destroyed with its context.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "BrowserWindowId": {
+      "title": "BrowserWindowId",
+      "description": "Opaque browser window identifier, unique within a profile.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "TabId": {
+      "title": "TabId",
+      "description": "Opaque tab identifier, unique within a profile. A closed tab's identifier is never reassigned.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "FrameId": {
+      "title": "FrameId",
+      "description": "Opaque frame identifier, unique within a tab. Every local and out-of-process frame has its own identifier, origin, epoch, revision, and node namespace.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "PageEpoch": {
+      "title": "PageEpoch",
+      "description": "Opaque page epoch assigned by the browser broker. It changes whenever previously issued semantic handles must not be used for action: committed cross-document navigation, frame or renderer replacement, prerender activation, security-origin transition, broker reconciliation after a crash, an explicit broker invalidation, and back/forward cache restore unless the validation spike proves an equally safe alternative. Compare epochs for equality only; ordering across frames or sessions carries no meaning. Whether back/forward cache restore always allocates a new epoch is [Open (OD-029)].",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "GraphRevision": {
+      "title": "GraphRevision",
+      "description": "Monotonically increasing revision within one active page epoch. It advances whenever a mutation can invalidate a previously observed node, relationship, action precondition, or relevant value. Revisions from different epochs or frames are not comparable.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "SemanticNodeId": {
+      "title": "SemanticNodeId",
+      "description": "Opaque semantic node identifier, unique and non-reused within one FrameId plus PageEpoch. Removing a node permanently retires its identifier for that epoch; a replacement element receives a new identifier even when its selector, text, role, and bounds are unchanged.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "SubscriptionId": {
+      "title": "SubscriptionId",
+      "description": "Opaque delta subscription identifier, valid only for one frame endpoint and page epoch.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "RequestId": {
+      "title": "RequestId",
+      "description": "Opaque observation request identifier. Exactly one terminal response is delivered per request.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "CommandId": {
+      "title": "CommandId",
+      "description": "Opaque one-use renderer command identifier. It is a correlation value, not a capability secret: holding it grants no authority.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "DispatchId": {
+      "title": "DispatchId",
+      "description": "Opaque browser-process dispatch identifier, unique per authorized action envelope.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "SnapshotId": {
+      "title": "SnapshotId",
+      "description": "Opaque snapshot identifier, unique within a profile session.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "TaskId": {
+      "title": "TaskId",
+      "description": "Opaque task identifier owned by the task runtime (domain model section 9).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "ActionId": {
+      "title": "ActionId",
+      "description": "Opaque action identifier owned by the task runtime (domain model section 12.1).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "SkillVersionId": {
+      "title": "SkillVersionId",
+      "description": "Opaque identifier of the skill version acting as principal (domain model section 10.3).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "CapabilityReference": {
+      "title": "CapabilityReference",
+      "description": "Reference to a capability record held by the policy broker. The browser process consumes or marks the capability in flight and never forwards this value to a renderer. It is a reference to a decision record, not a transferable authority token.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "ValueReference": {
+      "title": "ValueReference",
+      "description": "Reference to a value the browser holds, for an action that writes into a field. It is never the value and never carries any part of it, so a proposal naming one discloses nothing about what will be typed — not its length, not its shape, not whether the person has one. Minted by the browser from something a person supplied or confirmed, resolved and spent inside the browser process at dispatch, and never forwarded to a renderer: what reaches a renderer is the resolved text on a one-use command. Page text and model text can never mint one, and a reference the browser does not hold is VALUE_REFERENCE_UNKNOWN rather than an empty field.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "ApprovalReceiptReference": {
+      "title": "ApprovalReceiptReference",
+      "description": "Reference to the approval record that authorized an action. Page text and model text can never mint one.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "SensitivityPolicyId": {
+      "title": "SensitivityPolicyId",
+      "description": "Reference to the sensitivity and redaction policy in force for a request. The broker clamps the request to the policy already granted to the task; a request cannot widen it.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "EventSequence": {
+      "title": "EventSequence",
+      "description": "Strictly increasing per-epoch sequence number emitted by a frame endpoint. The broker discards duplicates and out-of-order events; a detected gap invalidates delta state and forces a fresh snapshot.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "MonotonicMillis": {
+      "title": "MonotonicMillis",
+      "description": "A reading of a monotonic clock in milliseconds. BIP carries no wall-clock timestamps, so a message cannot leak browsing time across a trust boundary.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "DurationMillis": {
+      "title": "DurationMillis",
+      "description": "A duration in milliseconds.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "ByteCount": {
+      "title": "ByteCount",
+      "description": "A count of bytes.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "Count": {
+      "title": "Count",
+      "description": "A non-negative count of items.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "OriginKind": {
+      "title": "OriginKind",
+      "description": "Whether an origin is a scheme/host/port tuple or an opaque origin. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": ["TUPLE", "OPAQUE"]
+    },
+    "Origin": {
+      "title": "Origin",
+      "description": "A normalized security origin recorded by the browser broker at observation time. An opaque origin stays opaque and is never broadened to a predecessor origin; two opaque origins are equal only when their identifiers are equal.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "kind": { "$ref": "#/$defs/OriginKind" },
+        "serialization": {
+          "description": "Serialized scheme/host/port for a tuple origin, for example \"https://example.test\". Absent for an opaque origin.",
+          "type": "string",
+          "maxLength": 512
+        },
+        "opaque_id": {
+          "description": "Opaque, session-local identifier distinguishing one opaque origin from another. Present only for an opaque origin, and never a cross-site identifier.",
+          "type": "string",
+          "maxLength": 128
+        }
+      },
+      "required": ["kind"],
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "TUPLE" } }, "required": ["kind"] },
+          "then": { "required": ["serialization"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "OPAQUE" } }, "required": ["kind"] },
+          "then": { "not": { "required": ["serialization"] } }
+        }
+      ]
+    },
+    "OriginMetadata": {
+      "title": "OriginMetadata",
+      "description": "Browser-owned security context of an observed document. The renderer never supplies these values.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "origin": { "$ref": "#/$defs/Origin" },
+        "is_potentially_trustworthy": {
+          "description": "Whether Chromium classifies the origin as potentially trustworthy.",
+          "type": "boolean"
+        },
+        "is_incognito": {
+          "description": "Whether the owning profile context is incognito. An incognito observation creates no durable record.",
+          "type": "boolean"
+        }
+      },
+      "required": ["origin", "is_potentially_trustworthy", "is_incognito"]
+    },
+    "DocumentLifecycleState": {
+      "title": "DocumentLifecycleState",
+      "description": "Browser-owned lifecycle state of the observed document. Only ACTIVE is eligible for action. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "ACTIVE",
+        "SPECULATIVE",
+        "PENDING_COMMIT",
+        "PRERENDERING",
+        "FROZEN",
+        "BACK_FORWARD_CACHED",
+        "CRASHED",
+        "DESTROYED"
+      ]
+    },
+    "DigestAlgorithm": {
+      "title": "DigestAlgorithm",
+      "description": "Digest algorithm used to bind an action proposal to its authorization. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": ["SHA_256"]
+    },
+    "ContentDigest": {
+      "title": "ContentDigest",
+      "description": "A digest over a canonical encoding of a message. Used to prove that the action authorized is exactly the action proposed.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "algorithm": { "$ref": "#/$defs/DigestAlgorithm" },
+        "value": {
+          "description": "Lowercase hexadecimal digest.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": ["algorithm", "value"]
+    },
+    "NodeHandle": {
+      "title": "NodeHandle",
+      "description": "The complete reference to one observed semantic node. A node identifier is meaningless without this handle. A handle is ephemeral action input: it may appear in a redacted diagnostic event, but it is unusable once its epoch or document lifecycle ends and it is never a durable reference inside stored evidence.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "tab_id": { "$ref": "#/$defs/TabId" },
+        "frame_id": { "$ref": "#/$defs/FrameId" },
+        "page_epoch": { "$ref": "#/$defs/PageEpoch" },
+        "graph_revision": { "$ref": "#/$defs/GraphRevision" },
+        "node_id": { "$ref": "#/$defs/SemanticNodeId" },
+        "expected_origin": { "$ref": "#/$defs/Origin" }
+      },
+      "required": [
+        "tab_id",
+        "frame_id",
+        "page_epoch",
+        "graph_revision",
+        "node_id",
+        "expected_origin"
+      ]
+    }
+  }
+}

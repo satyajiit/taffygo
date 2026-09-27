@@ -1,0 +1,9 @@
+# Renderer-to-browser filtering seams. They name only wire types: generated
+# C++ is consumed by filtering.browser and filtering.renderer.
+
+include_rules = [
+  "+services/network/public/mojom",
+  "+taffy/components/filtering/mojom",
+  "+third_party/blink/public/mojom/tokens",
+  "+url/mojom",
+]

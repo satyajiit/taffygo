@@ -1,0 +1,17 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+package org.chromium.taffy.host
+
+import androidx.annotation.VisibleForTesting
+import java.io.Closeable
+
+/** One window's revocable profile-platform surface registration. */
+@VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
+interface ProfilePlatformSurfaceRegistration : Closeable {
+    fun activate()
+    fun deactivate()
+}

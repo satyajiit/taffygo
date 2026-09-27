@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- You hub, Memory, saved sign-ins, saved details, time on sites, and What happened. -->
+<resources>
+    <!-- Screen SCR-410 -->
+    <string name="taffy_you_pane_empty_title">Choose a section</string>
+    <string name="taffy_you_pane_empty_body">Pick something from the list. It opens here.</string>
+    <string name="taffy_you_header_description">%1$s. %2$s</string>
+    <string name="taffy_you_profile_title">Profile</string>
+    <string name="taffy_you_profile_summary">Your name and picture</string>
+    <string name="taffy_you_profile_note">Your name and picture stay on this phone. Nothing is sent anywhere.</string>
+    <string name="taffy_you_hero_body">Taffy is your guide in this browser. Ads and trackers stay blocked.</string>
+    <string name="taffy_you_banner_label">Picture</string>
+    <string name="taffy_you_banner_choice">Picture %1$d of %2$d</string>
+    <string name="taffy_you_name_label">Name</string>
+    <string name="taffy_you_name_empty">No name on this phone</string>
+    <string name="taffy_you_name_placeholder">Add a name</string>
+    <string name="taffy_you_ads_note">Ads and trackers stay blocked on every site.</string>
+    <string name="taffy_you_more_title">Also on this phone</string>
+    <string name="taffy_you_time_summary_unavailable">Not measured on this phone yet</string>
+    <string name="taffy_you_time_summary_week">This week</string>
+    <string name="taffy_you_time_summary_empty">No time counted yet</string>
+    <string name="taffy_you_memory_empty_summary">Taffy hasn\'t remembered anything yet</string>
+    <string name="taffy_you_memory_unavailable_summary">Not available on this phone yet</string>
+    <string name="taffy_you_sign_ins_empty_summary">None saved yet</string>
+    <string name="taffy_you_sign_ins_unavailable_summary">Aren\'t available on this phone yet</string>
+    <string name="taffy_you_details_summary">Name, address, email</string>
+    <string name="taffy_you_details_empty_summary">None saved yet</string>
+    <string name="taffy_you_details_unavailable_summary">Aren\'t available on this phone yet</string>
+    <string name="taffy_you_banner_unavailable">Pictures aren\'t on this phone yet.</string>
+    <string name="taffy_you_happened_summary">Latest task workspace results</string>
+    <string name="taffy_you_library_summary">Things you asked Taffy to keep</string>
+    <string name="taffy_you_private_unavailable">Not available in a private tab. Taffy forgets everything from private tabs when they close.</string>
+    <plurals name="taffy_you_memory_notes">
+        <item quantity="one">%1$d note</item>
+        <item quantity="other">%1$d notes</item>
+    </plurals>
+
+    <!-- Shared promise on saved sign-ins and saved details. -->
+    <string name="taffy_saved_never_sends">Taffy never sends passwords, card numbers, or saved details to an AI provider. Filling a form still needs your OK, with the exact values shown first.</string>
+
+    <!-- Screen SCR-411 -->
+    <string name="taffy_time_today">Today</string>
+    <string name="taffy_time_this_week">This week</string>
+    <string name="taffy_time_hours_minutes">%1$d h %2$d min</string>
+    <string name="taffy_time_minutes">%1$d min</string>
+    <string name="taffy_time_less_than_minute">Less than 1 min</string>
+    <string name="taffy_time_zero">0 min</string>
+    <plurals name="taffy_time_across_today">
+        <item quantity="one">across %1$d site today</item>
+        <item quantity="other">across %1$d sites today</item>
+    </plurals>
+    <plurals name="taffy_time_across_week">
+        <item quantity="one">across %1$d site this week</item>
+        <item quantity="other">across %1$d sites this week</item>
+    </plurals>
+    <plurals name="taffy_time_across_today_at_least">
+        <item quantity="one">across at least %1$d site today</item>
+        <item quantity="other">across at least %1$d sites today</item>
+    </plurals>
+    <plurals name="taffy_time_across_week_at_least">
+        <item quantity="one">across at least %1$d site this week</item>
+        <item quantity="other">across at least %1$d sites this week</item>
+    </plurals>
+    <string name="taffy_time_other_sites">Other sites</string>
+    <string name="taffy_time_grouped_note">Additional sites are combined under Other sites to keep this on-device list bounded. Their measured time is still included.</string>
+    <string name="taffy_time_retention_note">This browser keeps nine local days for this seven-day view. Older visits are combined by day.</string>
+    <string name="taffy_time_recovered_note">Some older measured time could not be read and was left out.</string>
+    <string name="taffy_time_caption_private">Private tabs are not counted.</string>
+    <string name="taffy_time_caption_taffy">Taffy\'s tabs are not counted.</string>
+    <string name="taffy_time_cleared">Time on sites was cleared with your history.</string>
+    <string name="taffy_time_empty_title">No time counted yet.</string>
+    <string name="taffy_time_empty_body">When you browse in your tabs, today and this week will show here.</string>
+    <string name="taffy_time_unavailable_title">Time on sites isn\'t available right now.</string>
+    <string name="taffy_time_unavailable_body">TaffyGo cannot read the measured time. Try again in a moment. Nothing is being guessed.</string>
+    <string name="taffy_time_not_counted">Not counted</string>
+    <string name="taffy_time_counts_eyebrow">Time</string>
+    <string name="taffy_time_counts_title">Today and this week</string>
+    <string name="taffy_time_sites_title">Sites</string>
+    <string name="taffy_time_loading">Loading time on sites</string>
+    <string name="taffy_time_row_description">%1$s, %2$s</string>
+
+    <!-- Screen SCR-412 -->
+    <string name="taffy_happened_intro">Latest saved result for each finished task workspace, plus this week\'s blocking total. This is not a complete activity history.</string>
+    <string name="taffy_happened_today">Today</string>
+    <string name="taffy_happened_yesterday">Yesterday</string>
+    <string name="taffy_happened_empty_title">No finished task workspaces yet.</string>
+    <string name="taffy_happened_empty_body">Finished, partly done, stopped, or failed workspaces show here. Other browser activity does not.</string>
+    <string name="taffy_happened_unavailable_title">What happened isn\'t available right now.</string>
+    <string name="taffy_happened_unavailable_body">TaffyGo has not loaded this list. Try again in a moment.</string>
+    <string name="taffy_happened_loading">Loading what happened</string>
+    <string name="taffy_happened_workspace_deleted">Workspace deleted</string>
+    <plurals name="taffy_happened_requests_blocked">
+        <item quantity="one">%1$d request blocked</item>
+        <item quantity="other">%1$d requests blocked</item>
+    </plurals>
+    <plurals name="taffy_happened_workspace_sources">
+        <item quantity="one">Workspace result · %1$d source</item>
+        <item quantity="other">Workspace result · %1$d sources</item>
+    </plurals>
+    <string name="taffy_happened_updated">Updated %1$s</string>
+    <string name="taffy_happened_summary">%1$s · %2$s</string>
+    <string name="taffy_happened_stopped">You stopped Taffy</string>
+    <string name="taffy_happened_failed">Taffy couldn\'t finish</string>
+    <string name="taffy_happened_row_description">%1$s. %2$s</string>
+
+    <!-- Screen SCR-413 -->
+    <string name="taffy_sign_ins_search">Search sign-ins</string>
+    <string name="taffy_sign_ins_empty_title">No sign-ins saved in TaffyGo yet.</string>
+    <string name="taffy_sign_ins_empty_body">When you sign in, TaffyGo can ask to save the password — never to an AI provider.</string>
+    <string name="taffy_sign_ins_unavailable_title">Saved sign-ins aren\'t available on this phone yet.</string>
+    <string name="taffy_sign_ins_unavailable_body">When they are, sites you signed in to will show here. Nothing is being guessed.</string>
+    <string name="taffy_sign_ins_loading">Loading saved sign-ins</string>
+    <string name="taffy_sign_ins_username">Username</string>
+    <string name="taffy_sign_ins_delete">Delete</string>
+    <string name="taffy_sign_ins_delete_title">Delete the saved sign-in for %1$s?</string>
+    <string name="taffy_sign_ins_delete_body">You will need to sign in again next time.</string>
+    <string name="taffy_sign_ins_delete_confirm">Delete</string>
+    <string name="taffy_sign_ins_delete_keep">Keep</string>
+    <string name="taffy_sign_ins_row_description">%1$s. %2$s</string>
+    <string name="taffy_sign_ins_last_used_label">Last used</string>
+    <string name="taffy_sign_ins_last_used">Last used %1$s</string>
+
+    <!-- Screen SCR-414 -->
+    <string name="taffy_details_empty_title">No saved details yet.</string>
+    <string name="taffy_details_empty_body">Add a name or address TaffyGo can offer when a site asks — you still approve every fill.</string>
+    <string name="taffy_details_unavailable_title">Saved details aren\'t available right now.</string>
+    <string name="taffy_details_unavailable_body">TaffyGo has not loaded this list. Try again in a moment.</string>
+    <string name="taffy_details_loading">Loading saved details</string>
+    <string name="taffy_details_add">Add details</string>
+    <string name="taffy_details_edit">Edit</string>
+    <string name="taffy_details_given_name">Given name</string>
+    <string name="taffy_details_family_name">Family name</string>
+    <string name="taffy_details_email">Email</string>
+    <string name="taffy_details_phone">Phone</string>
+    <string name="taffy_details_address">Address</string>
+    <string name="taffy_details_postcode">Postcode</string>
+    <string name="taffy_details_country">Country</string>
+    <string name="taffy_details_save">Save</string>
+    <string name="taffy_details_cancel">Cancel</string>
+    <string name="taffy_details_delete">Delete</string>
+    <string name="taffy_details_delete_title">Delete these details?</string>
+    <string name="taffy_details_delete_body">TaffyGo will not offer them the next time a site asks.</string>
+    <string name="taffy_details_delete_confirm">Delete</string>
+    <string name="taffy_details_delete_keep">Keep</string>
+    <string name="taffy_details_editor_add_title">Add details</string>
+    <string name="taffy_details_editor_edit_title">Edit details</string>
+    <string name="taffy_details_row_description">%1$s. %2$s</string>
+
+    <!-- Screen SCR-505 -->
+    <string name="taffy_memory_promise">Taffy only remembers what you can see here.</string>
+    <string name="taffy_memory_you_wrote">You wrote</string>
+    <string name="taffy_memory_taffy_noticed">Taffy noticed</string>
+    <string name="taffy_memory_add">Add a note</string>
+    <string name="taffy_memory_empty_title">Taffy hasn\'t remembered anything yet.</string>
+    <string name="taffy_memory_empty_body">Add a note about how you like to work — window seats, short answers, no red-eye flights.</string>
+    <string name="taffy_memory_unavailable_title">Memory isn\'t available right now.</string>
+    <string name="taffy_memory_unavailable_body">Taffy has not loaded what it remembers. Try again in a moment.</string>
+    <string name="taffy_memory_loading">Loading Memory</string>
+    <string name="taffy_memory_search">Search Memory</string>
+    <string name="taffy_memory_process_caption">Notes last until TaffyGo closes.</string>
+    <string name="taffy_memory_field_label">What should Taffy remember?</string>
+    <string name="taffy_memory_field_caption">Taffy will use this on later tasks. You can change or delete it.</string>
+    <string name="taffy_memory_save">Save</string>
+    <string name="taffy_memory_cancel">Cancel</string>
+    <string name="taffy_memory_delete">Delete</string>
+    <string name="taffy_memory_delete_title">Delete this from Memory?</string>
+    <string name="taffy_memory_delete_body">Taffy will forget it on this phone. Tasks already finished stay as they were.</string>
+    <string name="taffy_memory_delete_confirm">Delete</string>
+    <string name="taffy_memory_delete_keep">Keep</string>
+    <string name="taffy_memory_editor_add_title">Add a note</string>
+    <string name="taffy_memory_editor_edit_title">Edit note</string>
+    <string name="taffy_memory_save_out_of_date">This note changed before it could be saved. Your draft is still here. Close and reopen it, then try again.</string>
+    <string name="taffy_memory_save_failed">TaffyGo couldn\'t save this note. Your draft is still here. Try again.</string>
+    <string name="taffy_memory_delete_out_of_date">This note changed before it could be deleted. It is still in Memory. Close and reopen it, then try again.</string>
+    <string name="taffy_memory_delete_failed">TaffyGo couldn\'t delete this note. It is still in Memory. Try again.</string>
+    <string name="taffy_memory_why_added">You added this · %1$s</string>
+    <string name="taffy_memory_why_yes">You said yes · %1$s</string>
+    <string name="taffy_memory_until">Until %1$s</string>
+    <string name="taffy_memory_scope_all">Used for all later tasks</string>
+    <string name="taffy_memory_scope_workspace">Used only in %1$s</string>
+    <string name="taffy_memory_sensitive">Sensitive</string>
+    <string name="taffy_memory_row_description">%1$s. %2$s</string>
+    <string name="taffy_memory_group_heading">%1$s, %2$s</string>
+    <plurals name="taffy_memory_group_count">
+        <item quantity="one">%1$d note</item>
+        <item quantity="other">%1$d notes</item>
+    </plurals>
+</resources>

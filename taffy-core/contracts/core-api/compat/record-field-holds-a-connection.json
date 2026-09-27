@@ -1,0 +1,21 @@
+{
+  "structs": [
+    {
+      "name": "DeviantObserverRecord",
+      "description": "A deviant record that stores a live connection beside its own fields.",
+      "fields": [
+        {"name": "task_id", "type": "string", "ordinal": 0, "description": "The identity this record legitimately carries."},
+        {"name": "observer", "type": "pending_remote<DeviantObserverFactory>", "ordinal": 1, "description": "A live connection stored as though it were a value."}
+      ]
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "DeviantObserverFactory",
+      "description": "The interface the deviant record tries to store a connection to.",
+      "methods": [
+        {"name": "OnSnapshot", "ordinal": 0, "description": "One published state generation.", "params": []}
+      ]
+    }
+  ]
+}

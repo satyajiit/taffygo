@@ -1,0 +1,21 @@
+Taffy settings hero stills — xhdpi derivation
+==============================================
+
+Owner:            TaffyGo
+Licence:          Reserved media, not licensed with the code; see TRADEMARKS.md.
+Created:          2026-08-30
+Encoder:          cwebp -lossless -exact -z 9 -metadata none
+
+Density-correct derivatives of the first-party PNG masters in vendor/masters/.
+The dimensions are two thirds of the reviewed xxhdpi shipping artwork, rounded
+to the nearest whole pixel. This keeps Android from decoding the 3x bitmap on
+an xhdpi device.
+
+sha256_taffy_hero_ads_webp=18ab33a74f7554b763cbb063fcceec4cd50710c8e858e223ec1be47460071cd6
+bytes_taffy_hero_ads_webp=93766
+sha256_taffy_hero_privacy_webp=378241c423a9de1d87b13e325c9c4724009816bbeaa300d2feba546e7be334bb
+bytes_taffy_hero_privacy_webp=97400
+sha256_taffy_hero_time_webp=5d658d2ad1991ee3dd2ce25358e9758d30139c57b2f6321748da7d838cbcf67c
+bytes_taffy_hero_time_webp=84434
+sha256_taffy_hero_you_webp=5be942e2a2c5c3650c305de5f9ddd1c5b2556dc6a4ee3cff953209704c90dbab
+bytes_taffy_hero_you_webp=81540

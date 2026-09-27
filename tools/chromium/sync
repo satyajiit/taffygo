@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/chromium/sync — put the checkout at exactly chromium/REVISION, apply
+# the patch queue, and mount the Taffy product root.
+#
+# The checkout is reproducible from three inputs and nothing else:
+#   chromium/REVISION + chromium/patches/ + taffy-core/
+#
+# Authority: docs/development/chromium-fork-and-build.md sections 1 and 2.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/chromium.sh"
+
+NO_HISTORY=0
+SKIP_HOOKS=0
+# gclient defaults to max(8, NumLocalCpus()) parallel fetches. On a builder that
+# meets decision 0013's own hardware guidance (8+ cores; this was found on a
+# 32-thread host) that becomes 32 concurrent fetches against
+# chromium.googlesource.com, which throttles: SP-01 saw 97 retry warnings across
+# 54 repositories and one sub-repository exhaust its retries and fail the whole
+# sync. The failure gets *more* likely the closer a builder follows the spec.
+# 8 is gclient's own historical default and completed with zero hard errors.
+JOBS=8
+SKIP_BUILD_DEPS=0
+ALLOW_REBASE=0
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/chromium/sync [options]
+
+Sync the Chromium checkout to chromium/REVISION, checksum-mount the pinned
+CPython source, apply chromium/patches/ onto the taffy/patched branch, mount
+taffy-core/ at //taffy, and run gclient hooks.
+
+Options:
+  --no-history        shallow sync (ephemeral CI runners)
+  --jobs N            parallel gclient fetch jobs (default 8; raising this
+                      toward the host's core count risks googlesource
+                      throttling — see the note in this script)
+  --skip-hooks        do not run `gclient runhooks`
+  --skip-build-deps   do not offer to run Chromium's install-build-deps.sh
+  --allow-rebase      the checkout may move to a different pinned revision
+                      (the milestone-rebase procedure)
+  -h, --help          show this help
+
+Refuses to run until chromium/REVISION carries a real commit: an unpinned
+build is not reproducible.
+USAGE
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --no-history) NO_HISTORY=1 ;;
+    --jobs) JOBS=${2:-}; shift ;;
+    --jobs=*) JOBS=${1#*=} ;;
+    --skip-hooks) SKIP_HOOKS=1 ;;
+    --skip-build-deps) SKIP_BUILD_DEPS=1 ;;
+    --allow-rebase) ALLOW_REBASE=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage >&2; die "unknown option: $1" ;;
+  esac
+  shift
+done
+
+# Reject a bad --jobs before announcing any work or touching the checkout.
+case "$JOBS" in
+  ''|*[!0-9]*) die "--jobs takes a positive integer (got \"$JOBS\")" ;;
+  0) die "--jobs must be at least 1" ;;
+esac
+
+taffy_require_chromium_host
+chromium_add_depot_tools_to_path
+
+WORKSPACE=$(chromium_workspace)
+SRC="$WORKSPACE/src"
+COMMIT=$(chromium_require_pin)
+MILESTONE=$(taffy_chromium_pin milestone)
+CACHE_DIR=$(taffy_state_get git_cache "$WORKSPACE/.git-cache")
+
+step "syncing to milestone ${MILESTONE} @ ${COMMIT:0:12}"
+
+# --- .gclient ---------------------------------------------------------------
+# Written here rather than by `fetch android` so the shared git cache is in
+# place before the first (very large) clone. Equivalent solution definition.
+if [ ! -f "$WORKSPACE/.gclient" ]; then
+  step "writing $WORKSPACE/.gclient (android, cache_dir=$CACHE_DIR)"
+  mkdir -p "$CACHE_DIR"
+  cat > "$WORKSPACE/.gclient" <<GCLIENT
+solutions = [
+  {
+    "name": "src",
+    "url": "https://chromium.googlesource.com/chromium/src.git",
+    "managed": False,
+    "custom_deps": {},
+    # checkout_pgo_profiles gates the DEPS hook that downloads V8's
+    # builtins-PGO profiles (v8/tools/builtins-pgo/download_profiles.py) — a
+    # public artifact fetch, no Google account. The release profile's
+    # official build refuses to configure without them
+    # (gen/v8/embedded.S needs the per-arch .profile inputs); dev builds
+    # ignore them. The C++ profdata is separate and needs no variable — see
+    # chromium-fork-and-build.md section 6.
+    "custom_vars": {
+      "checkout_pgo_profiles": True,
+    },
+  },
+]
+target_os = ["android"]
+cache_dir = "$CACHE_DIR"
+GCLIENT
+fi
+
+# An existing .gclient predating the checkout_pgo_profiles variable leaves
+# the release lane unconfigurable while every dev build passes — say so
+# rather than letting `gn gen` discover it.
+if [ -f "$WORKSPACE/.gclient" ] && ! grep -q "checkout_pgo_profiles" "$WORKSPACE/.gclient"; then
+  warn ".gclient predates the checkout_pgo_profiles variable (release lane needs it)"
+  note "Add \"checkout_pgo_profiles\": True to custom_vars and re-run ./tools/chromium/sync,"
+  note "or delete $WORKSPACE/.gclient and let sync rewrite it."
+fi
+
+# --- guard against silently moving an existing checkout ---------------------
+if [ -d "$SRC/.git" ] && [ "$ALLOW_REBASE" = 0 ]; then
+  CURRENT_BASE=$(git -C "$SRC" merge-base HEAD "$COMMIT" 2>/dev/null || printf '')
+  if [ -n "$CURRENT_BASE" ] && [ "$CURRENT_BASE" != "$COMMIT" ]; then
+    die "the checkout is not based on the pinned revision" \
+      "This is a milestone rebase: it moves every patch in the queue." \
+      "Re-run with --allow-rebase and follow chromium/README.md."
+  fi
+fi
+
+# --- sync -------------------------------------------------------------------
+SYNC_ARGS="--jobs $JOBS --nohooks --reset --delete_unversioned_trees --revision src@$COMMIT"
+[ "$NO_HISTORY" = 1 ] && SYNC_ARGS="$SYNC_ARGS --no-history"
+
+step "gclient sync ${SYNC_ARGS}"
+( cd "$WORKSPACE" && eval "gclient sync $SYNC_ARGS" )
+
+# --- Linux build dependencies (first sync only) -----------------------------
+DEPS_MARKER="$WORKSPACE/.taffy-build-deps-installed"
+if [ "$SKIP_BUILD_DEPS" = 0 ] && [ ! -f "$DEPS_MARKER" ] && [ -f "$SRC/build/install-build-deps.sh" ]; then
+  if [ -t 0 ]; then
+    printf 'Run Chromium'"'"'s install-build-deps.sh --android now (needs sudo)? [y/N] ' >&2
+    read -r reply
+    case "$reply" in
+      y|Y|yes|YES)
+        "$SRC/build/install-build-deps.sh" --android && : > "$DEPS_MARKER"
+        ;;
+      *) warn "skipped install-build-deps.sh — the build will fail until it runs" ;;
+    esac
+  else
+    warn "install-build-deps.sh has not run on this host (non-interactive session)"
+    note "Run it once: $SRC/build/install-build-deps.sh --android"
+  fi
+fi
+
+# --- patch queue and product root -------------------------------------------
+step "verifying the pinned CPython source mount"
+python3 "$TAFFY_ROOT/tools/chromium/lib/cpython_source.py" \
+  --manifest "$TAFFY_ROOT/taffy-core/third_party/cpython/tools/manifest.json" \
+  --destination "$TAFFY_ROOT/taffy-core/third_party/cpython/src"
+
+chromium_apply_patches "$SRC" "$COMMIT"
+chromium_mount_taffy_core "$SRC"
+chromium_mount_taffy_fixtures
+
+# --- hooks ------------------------------------------------------------------
+if [ "$SKIP_HOOKS" = 0 ]; then
+  step "gclient runhooks"
+  ( cd "$WORKSPACE" && gclient runhooks )
+else
+  note "skipped gclient runhooks (--skip-hooks)"
+fi
+
+taffy_state_set chromium_workspace "$WORKSPACE"
+taffy_state_set synced_commit "$COMMIT"
+
+info ""
+ok "checkout ready at $SRC (branch $TAFFY_PATCH_BRANCH)"
+info "Next: ./tools/chromium/build --profile dev-x64"

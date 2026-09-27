@@ -1,0 +1,21 @@
+[package]
+name = "task-engine"
+description = "Pure durable task reducer, plan/step machine, journal, budgets, and cancellation."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+bip-types = { workspace = true }
+
+[dev-dependencies]
+audit-engine = { workspace = true }
+model-router = { workspace = true }
+policy-engine = { workspace = true }
+proptest = { workspace = true }
+serde_json = { workspace = true }
+taffy-storage = { workspace = true }

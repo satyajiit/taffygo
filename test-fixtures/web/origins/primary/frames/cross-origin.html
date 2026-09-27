@@ -1,0 +1,26 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="iframe-cross-origin">
+<title>Cross-origin iframe</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Cross-origin iframe</h1>
+  <p class="who">The frame below is served by the partner origin, so it is a
+  separate security context with its own epoch and its own sensitive content.</p>
+</header>
+
+<p id="parent-fact">Parent document fact: this listing is on the primary origin.</p>
+
+<iframe id="cross-origin-frame" title="Partner account panel" height="300"
+        data-taffy-origin="partner" data-taffy-path="/frames/partner-panel.html"></iframe>
+
+<iframe id="hidden-third-party-frame" title="Hidden third-party frame"
+        hidden height="0" width="0"
+        data-taffy-origin="embed" data-taffy-path="/frames/embed-leaf.html"></iframe>
+
+<p class="note">The second frame is hidden and zero-sized. Existing is not a
+reason to include it in an observation.</p>

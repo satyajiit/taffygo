@@ -1,0 +1,26 @@
+# The frozen entrypoint registry is a table and one decision over it. The narrow
+# list below is how it stays that way rather than being remembered.
+#
+# `base/containers` is the single allowance, for `base::span` over a row's
+# ports; the pointer-and-count form it replaced is what Chromium's unsafe-buffer
+# diagnostic exists to refuse. Everything else is denied by name. In particular
+# there is no reader of any kind here and no dependency that owns one: a
+# registry that could deserialize is a registry that could be handed a second
+# one, and the whole argument for compiling the rows in rests on there being no
+# such path.
+
+include_rules = [
+  "+base/containers",
+  "-base",
+  "-content",
+  "-mojo",
+  "-url",
+  "+taffy/components/tools/entrypoints",
+]
+
+specific_include_rules = {
+  ".*_unittest\\.(cc|h)": [
+    "+base/test",
+    "+testing/gtest",
+  ],
+}

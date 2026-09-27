@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+What a person reads when the download and external-application seam refuses.
+
+The set is derived one-for-one from the decision enums that already exist in
+//taffy/common/public/taffy_download_intent.h: `DownloadDecision` and
+`ExternalIntentDecision`. That is deliberate. A refusal the browser process
+can return and cannot explain is a refusal a person experiences as a bug, so
+the catalogue is complete against the enum rather than against a screen that
+does not exist yet. `kAllowOrdinaryPath` needs no string in either enum: it is
+Chromium's ordinary path, prompts and all.
+
+Wording rules, from docs/voice-and-naming.md and docs/product/brand.md: the
+product is TaffyGo and the assistant is Taffy, never interchangeably; the
+assistant is "it"; a refusal says what happened and what the person can do
+next; nothing here claims to be security UI.
+-->
+<grit-part>
+  <message name="IDS_TAFFY_DOWNLOAD_REFUSED_UNATTRIBUTED"
+           desc="Shown when a download was stopped because the browser could not attribute what started it. This is a fail-closed refusal: the person did nothing wrong and can start the download themselves.">
+    TaffyGo could not tell what started this download, so it stopped it. Tap the download link again to start it yourself.
+  </message>
+  <message name="IDS_TAFFY_DOWNLOAD_REFUSED_ASSISTANT"
+           desc="Shown when the assistant tried to start a download. The assistant has no download capability at all, so this states a rule rather than reporting a failure.">
+    Taffy cannot start downloads. Download the file yourself if you want it.
+  </message>
+  <message name="IDS_TAFFY_DOWNLOAD_REFUSED_NO_LEASE"
+           desc="Shown when a download was attributed to an assistant task that is not currently working in this tab.">
+    Taffy is not working in this tab, so this download did not start.
+  </message>
+  <message name="IDS_TAFFY_EXTERNAL_INTENT_KEPT_IN_BROWSER"
+           desc="Shown when a link that would normally open a different app was opened in the browser instead, because no installed app handles it. Information, not a refusal.">
+    No app on this device opens that link, so TaffyGo opened it here.
+  </message>
+  <message name="IDS_TAFFY_EXTERNAL_INTENT_REFUSED_UNATTRIBUTED"
+           desc="Shown when handing a link to another app was stopped because the browser could not attribute what asked for it.">
+    TaffyGo could not tell what asked to open another app, so it stopped. Tap the link again to open it yourself.
+  </message>
+  <message name="IDS_TAFFY_EXTERNAL_INTENT_REFUSED_ASSISTANT"
+           desc="Shown when the assistant tried to hand a link to another app. The assistant has no capability to leave the browser.">
+    Taffy cannot open other apps. Tap the link yourself if you want to leave TaffyGo.
+  </message>
+</grit-part>

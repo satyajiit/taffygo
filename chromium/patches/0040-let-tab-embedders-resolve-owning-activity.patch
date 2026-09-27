@@ -1,0 +1,126 @@
+From 23a6678b47e5ced1ff6a5a4893930331cb4b7cad Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Tue, 1 Sep 2026 06:12:39 +0530
+Subject: let tab embedders resolve owning activity
+
+Fall back from ChromeActivity-specific TabImpl.getActivity() to the Activity owned by WindowAndroid, while preserving detached null behavior.
+
+Specified by chromium/patches/0040-let-tab-embedders-resolve-owning-activity.md.
+
+Taffy-Patch: 0040
+
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tab/InterceptNavigationDelegateClientImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/tab/InterceptNavigationDelegateClientImpl.java
+index 341c0aa9b7828..fb24b80bff7b3 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/tab/InterceptNavigationDelegateClientImpl.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/tab/InterceptNavigationDelegateClientImpl.java
+@@ -108,7 +108,10 @@ public class InterceptNavigationDelegateClientImpl implements InterceptNavigatio
+ 
+     @Override
+     public @Nullable Activity getActivity() {
+-        return mTab.getActivity();
++        Activity activity = mTab.getActivity();
++        if (activity != null) return activity;
++        WindowAndroid window = mTab.getWindowAndroid();
++        return window == null ? null : window.getActivity().get();
+     }
+ 
+     @Override
+diff --git a/chrome/android/junit/BUILD.gn b/chrome/android/junit/BUILD.gn
+index fa3a0c2a6f7a4..1da65f4fd7aea 100644
+--- a/chrome/android/junit/BUILD.gn
++++ b/chrome/android/junit/BUILD.gn
+@@ -1228,6 +1228,7 @@ if (is_android) {
+   robolectric_library("chrome_junit_tests_org.chromium.chrome.browser.tab") {
+     sources = [
+       "//chrome/android/java/src/org/chromium/chrome/browser/tab/TabFaviconTest.java",
++      "src/org/chromium/chrome/browser/tab/InterceptNavigationDelegateClientImplUnitTest.java",
+       "src/org/chromium/chrome/browser/tab/RequestDesktopUtilsUnitTest.java",
+       "src/org/chromium/chrome/browser/tab/TabArchiveSettingsTest.java",
+       "src/org/chromium/chrome/browser/tab/TabArchiverUnitTest.java",
+diff --git a/chrome/android/junit/src/org/chromium/chrome/browser/tab/InterceptNavigationDelegateClientImplUnitTest.java b/chrome/android/junit/src/org/chromium/chrome/browser/tab/InterceptNavigationDelegateClientImplUnitTest.java
+new file mode 100644
+index 0000000000000..978c6fc7d12d7
+--- /dev/null
++++ b/chrome/android/junit/src/org/chromium/chrome/browser/tab/InterceptNavigationDelegateClientImplUnitTest.java
+@@ -0,0 +1,81 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.tab;
++
++import static org.junit.Assert.assertNull;
++import static org.junit.Assert.assertSame;
++import static org.mockito.Mockito.mock;
++import static org.mockito.Mockito.when;
++
++import android.app.Activity;
++
++import androidx.test.filters.SmallTest;
++
++import org.junit.Before;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.robolectric.annotation.Config;
++
++import org.chromium.base.test.BaseRobolectricTestRunner;
++import org.chromium.chrome.browser.app.ChromeActivity;
++import org.chromium.ui.base.WindowAndroid;
++
++import java.lang.ref.WeakReference;
++
++/** Tests for the Activity projection used by external-navigation interception. */
++@RunWith(BaseRobolectricTestRunner.class)
++@Config(manifest = Config.NONE)
++public class InterceptNavigationDelegateClientImplUnitTest {
++    private TabImpl mTab;
++    private WindowAndroid mWindow;
++    private InterceptNavigationDelegateClientImpl mClient;
++
++    @Before
++    public void setUp() {
++        mTab = mock(TabImpl.class);
++        mWindow = mock(WindowAndroid.class);
++        when(mTab.getWindowAndroid()).thenReturn(mWindow);
++        mClient = new InterceptNavigationDelegateClientImpl(mTab);
++    }
++
++    @Test
++    @SmallTest
++    public void getActivityPrefersChromeActivityOwnedByTab() {
++        ChromeActivity chromeActivity = mock(ChromeActivity.class);
++        Activity windowActivity = mock(Activity.class);
++        when(mTab.getActivity()).thenReturn(chromeActivity);
++        when(mWindow.getActivity()).thenReturn(new WeakReference<>(windowActivity));
++
++        assertSame(chromeActivity, mClient.getActivity());
++    }
++
++    @Test
++    @SmallTest
++    public void getActivityFallsBackToOwningWindow() {
++        Activity windowActivity = mock(Activity.class);
++        when(mTab.getActivity()).thenReturn(null);
++        when(mWindow.getActivity()).thenReturn(new WeakReference<>(windowActivity));
++
++        assertSame(windowActivity, mClient.getActivity());
++    }
++
++    @Test
++    @SmallTest
++    public void getActivityReturnsNullForDetachedTab() {
++        when(mTab.getActivity()).thenReturn(null);
++        when(mTab.getWindowAndroid()).thenReturn(null);
++
++        assertNull(mClient.getActivity());
++    }
++
++    @Test
++    @SmallTest
++    public void getActivityReturnsNullWhenWindowOwnerIsGone() {
++        when(mTab.getActivity()).thenReturn(null);
++        when(mWindow.getActivity()).thenReturn(new WeakReference<>(null));
++
++        assertNull(mClient.getActivity());
++    }
++}

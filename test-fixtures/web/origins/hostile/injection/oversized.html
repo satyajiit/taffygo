@@ -1,0 +1,77 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="hostile">
+<meta name="taffy-fixture-id" content="oversized-document">
+<title>Oversized and deeply nested document</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Oversized and deeply nested document</h1>
+  <p class="who">A page that is larger than any observation budget, built
+  deterministically from a fixed seed so that two runs produce byte-identical
+  documents. The defence is the budget, and the evidence that it worked is an
+  explicit truncation rather than a slow success.</p>
+</header>
+
+<p class="note">Built: <span id="build-report">not yet</span></p>
+
+<div id="wide"></div>
+<div id="deep"></div>
+<div id="long-text"></div>
+
+<script>
+  (function () {
+    "use strict";
+
+    // Fixed sizes, no randomness, no time dependence. Two runs of this page
+    // produce the same document, which is what makes a truncation assertion
+    // reproducible rather than a race against a machine's speed.
+    var WIDE_NODES = 5000;
+    var DEEP_LEVELS = 400;
+    var TEXT_PARAGRAPHS = 400;
+    var TEXT_REPEATS = 60;
+
+    var wide = document.getElementById("wide");
+    var fragment = document.createDocumentFragment();
+    for (var i = 0; i < WIDE_NODES; i++) {
+      var item = document.createElement("p");
+      item.id = "wide-" + i;
+      item.textContent = "Wide node " + i + " of " + WIDE_NODES + ".";
+      fragment.appendChild(item);
+    }
+    wide.appendChild(fragment);
+
+    var cursor = document.getElementById("deep");
+    for (var level = 0; level < DEEP_LEVELS; level++) {
+      var nested = document.createElement("div");
+      nested.id = "deep-" + level;
+      nested.setAttribute("data-depth", String(level));
+      cursor.appendChild(nested);
+      cursor = nested;
+    }
+    var leaf = document.createElement("p");
+    leaf.id = "deep-leaf";
+    leaf.textContent = "Depth " + DEEP_LEVELS + " leaf.";
+    cursor.appendChild(leaf);
+
+    var sentence = "The same clause repeated to make the document large. ";
+    var block = "";
+    for (var r = 0; r < TEXT_REPEATS; r++) { block += sentence; }
+    var longText = document.getElementById("long-text");
+    var textFragment = document.createDocumentFragment();
+    for (var p = 0; p < TEXT_PARAGRAPHS; p++) {
+      var paragraph = document.createElement("p");
+      paragraph.id = "text-" + p;
+      paragraph.textContent = block;
+      textFragment.appendChild(paragraph);
+    }
+    longText.appendChild(textFragment);
+
+    document.getElementById("build-report").textContent =
+      WIDE_NODES + " wide nodes, " + DEEP_LEVELS + " levels deep, " +
+      TEXT_PARAGRAPHS + " paragraphs of " + (sentence.length * TEXT_REPEATS) +
+      " characters.";
+  })();
+</script>

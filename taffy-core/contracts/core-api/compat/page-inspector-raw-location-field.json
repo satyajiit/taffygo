@@ -1,0 +1,12 @@
+{
+  "structs": [
+    {
+      "name": "PageInspectorDocumentLocation",
+      "description": "A deviant record that hands the platform UI a page location verbatim.",
+      "fields": [
+        {"name": "document_id", "type": "string", "ordinal": 0, "description": "The freshly allocated identifier this contract does expose."},
+        {"name": "raw_url", "type": "string", "ordinal": 1, "description": "The full location of the document, which terminates in the browser layer."}
+      ]
+    }
+  ]
+}

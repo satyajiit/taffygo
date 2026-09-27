@@ -1,0 +1,52 @@
+{
+  "manifest_version": 1,
+  "upstream": {
+    "easylist": {
+      "url": "https://easylist.to/easylist/easylist.txt",
+      "version": "202608272347",
+      "commit": "7d32b4e454fcfd143af380ae2132bb418e95c719",
+      "snapshot": "taffy-core/third_party/easylist/snapshots/easylist-202608272347.txt",
+      "sha256": "1ae4280769e07779d4686fae9b562cafc55f3cf0f787d76ae9da2c719360dabf",
+      "bytes": 2095505
+    },
+    "easyprivacy": {
+      "url": "https://easylist.to/easylist/easyprivacy.txt",
+      "version": "202608272349",
+      "commit": "db6ba1a88fd55fc863b851e9f7310a98e68aafa3",
+      "snapshot": "taffy-core/third_party/easylist/snapshots/easyprivacy-202608272349.txt",
+      "sha256": "9f101ef2046f6cacbf2a3156c0562d7318a1ac1d9ced194db7a04fb419b22a66",
+      "bytes": 1498992
+    },
+    "licence": "GPL-3.0 (elected from the GPL-3.0 / CC BY-SA 3.0 dual offer)",
+    "licence_file": "taffy-core/third_party/easylist/vendor/easylist.GPL3.txt"
+  },
+  "asset": {
+    "id": "easylist-base",
+    "revision": "202608272347-taffy.1",
+    "kind": "filter-list",
+    "container": "zip",
+    "necessity": "required",
+    "path": "filter-lists/202608272347-taffy.1/easylist-base.zip",
+    "members": ["LICENSE", "lists/easylist.txt", "lists/easyprivacy.txt"]
+  },
+  "notes": [
+    "Paths are relative to the repository root, not to this file.",
+    "",
+    "WHY THE SNAPSHOTS ARE COMMITTED. easylist.to serves only the current",
+    "list and expires it in four days, so a digest pin with no bytes behind",
+    "it would stop being reproducible the day upstream rolls. The tree is",
+    "the durable pin; the digests above say these committed bytes are the",
+    "ones taken from upstream, and the builder refuses to package anything",
+    "else.",
+    "",
+    "WHY ONE PACK AND NOT TWO ASSETS. The two lists are enabled together or",
+    "not at all - EasyPrivacy without EasyList is not a posture the product",
+    "offers - and one artifact is one digest to verify and one download to",
+    "resume. Regional lists, which ARE independently enabled by locale, get",
+    "their own rows (decision 0076).",
+    "",
+    "THE REVISION anchors on the EasyList version because the two lists roll",
+    "together at upstream and EasyList is the larger half; a refresh of",
+    "either produces a new snapshot pair, a new revision, and a new row."
+  ]
+}

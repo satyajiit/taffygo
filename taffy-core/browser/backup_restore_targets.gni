@@ -1,0 +1,74 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# Browser-owned physical restore boundaries, separate from the portable Core
+# protocol and from the Android UI/profile surface that calls them.
+template("taffy_backup_restore_preference_readback") {
+  not_needed(invoker, "*")
+  source_set(target_name) {
+    sources = [
+      "backup_restore_preference_readback.cc",
+      "backup_restore_preference_readback.h",
+    ]
+    public_deps = [ "//base" ]
+  }
+}
+
+template("taffy_backup_restore_dormant_target_owner") {
+  not_needed(invoker, "*")
+  assert(is_android)
+  source_set(target_name) {
+    sources = [
+      "android/browser_profiles_restore_discovery.h",
+      "android/browser_profiles_restore_discovery_android.cc",
+      "android/browser_profiles_restore_discovery_android_helpers.cc",
+      "android/browser_profiles_restore_discovery_android_internal.h",
+      "android/browser_profiles_restore_discovery_android_lifecycle.cc",
+      "android/browser_profiles_restore_discovery_android_observation.cc",
+      "android/browser_profiles_restore_discovery_android_retirement.cc",
+      "android/browser_profiles_restore_lifecycle.h",
+      "android/browser_profiles_restore_lifecycle_dormant_target.cc",
+      "android/browser_profiles_restore_lifecycle_internal.h",
+      "android/browser_profiles_restore_lifecycle_presentation.cc",
+      "android/browser_profiles_restore_precommit_cleanup.cc",
+      "android/browser_profiles_restore_precommit_cleanup.h",
+      "android/browser_profiles_restore_precommit_cleanup_helpers.cc",
+      "android/browser_profiles_restore_precommit_cleanup_internal.h",
+      "android/browser_profiles_restore_precommit_cleanup_receipt.cc",
+      "android/browser_profiles_restore_precommit_cleanup_storage.cc",
+      "android/browser_profiles_restore_reconciliation_android.cc",
+      "android/browser_profiles_restore_reconciliation_android_outcome.cc",
+      "android/browser_profiles_restore_reconciliation_android_storage.cc",
+      "android/browser_profiles_restore_resolution_android.cc",
+      "android/browser_profiles_restore_resolution_android_discard.cc",
+      "android/browser_profiles_restore_resolution_android_dispatch.cc",
+      "android/browser_profiles_restore_resolution_android_helpers.cc",
+      "android/browser_profiles_restore_resolution_android_internal.h",
+      "android/browser_profiles_restore_resolution_android_outcome.cc",
+      "android/browser_profiles_restore_resolution_android_retirement.cc",
+      "android/browser_profiles_restore_resolution_android_storage.cc",
+      "android/browser_profiles_restore_target_android.cc",
+      "android/browser_profiles_restore_target_android.h",
+      "android/browser_profiles_restore_target_android_commit.cc",
+      "android/browser_profiles_restore_target_android_internal.h",
+      "android/browser_profiles_restore_target_android_storage.cc",
+    ]
+    public_deps = [
+      "//base",
+      "//taffy/contracts/core-service",
+    ]
+    deps = [
+      ":backup_restore_preference_readback",
+      ":browser_shared",
+      "//chrome/browser/profiles",
+      "//chrome/browser/profiles:profile_util",
+      "//chrome/common",
+      "//components/prefs",
+      "//content/public/browser",
+      "//taffy/components/storage/browser:storage",
+    ]
+  }
+}

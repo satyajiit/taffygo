@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  Unlocking a saved password confirms the phone's own screen lock
+  (DeviceCredential.kt), and the permission that gates that prompt is declared
+  here, beside the only code that makes the call. The manifest merger carries
+  it into the Gradle debug APK; the shipping permission set remains owned by
+  the Chromium-side manifest, which must declare the same permission when this
+  surface ships.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+</manifest>

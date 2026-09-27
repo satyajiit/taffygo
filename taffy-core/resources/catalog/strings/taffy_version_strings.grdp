@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+The labels on the version surface (PAR-SEC-002, an M1 Required row: the build
+reports the Chromium version, the patch delta, and the known lag).
+
+Derived one-for-one from `UpstreamProvenance` in
+//taffy/resources/branding/taffy_upstream_provenance.h. Each label names a
+field; the values themselves are generated from chromium/REVISION,
+chromium/SECURITY_PATCH_LEVEL and chromium/patches/ and never appear here.
+
+These are the pak half of the catalogue: they are read by browser-process C++
+on the version surface, not by Java. Nothing here is duplicated in the Android
+string set, and nothing in the Android set is duplicated here.
+
+Two wordings are load-bearing:
+
+  * "Downstream changes" and "Downstream changed lines" say what the fork has
+    actually done to files Chromium owns. A person reading a browser built by
+    someone other than Chromium is entitled to that number.
+  * The lag row states the date the revision was pinned rather than a number
+    of days, because the binary does not know today's date at build time. A
+    build with no recorded pin date says so instead of showing a lag it cannot
+    support.
+-->
+<grit-part>
+  <message name="IDS_TAFFY_VERSION_SECTION_TITLE"
+           desc="Heading of the section on the version page that describes the upstream Chromium revision this build was made from and how far it has been changed.">
+    Upstream Chromium
+  </message>
+  <message name="IDS_TAFFY_VERSION_UPSTREAM_MILESTONE"
+           desc="Label for the Chromium milestone number this build was made from, for example 152.">
+    Chromium milestone
+  </message>
+  <message name="IDS_TAFFY_VERSION_UPSTREAM_TAG"
+           desc="Label for the full Chromium stable release tag this build was made from, for example 152.0.7977.42.">
+    Chromium version
+  </message>
+  <message name="IDS_TAFFY_VERSION_UPSTREAM_COMMIT"
+           desc="Label for the exact upstream Chromium commit this build was made from.">
+    Chromium revision
+  </message>
+  <message name="IDS_TAFFY_VERSION_PIN_RECORDED"
+           desc="Label for the date on which this Chromium revision was pinned. A reader compares it with today to judge how far behind upstream this build is.">
+    Revision pinned on
+  </message>
+  <message name="IDS_TAFFY_VERSION_PIN_RECORDED_UNKNOWN"
+           desc="Shown in place of the pin date when the build was made outside a source checkout, so the date could not be recorded. Says what is missing rather than showing a lag that cannot be supported.">
+    Not recorded in this build
+  </message>
+  <message name="IDS_TAFFY_VERSION_DOWNSTREAM_PATCHES"
+           desc="Label for how many changes TaffyGo applies to files that Chromium owns.">
+    Downstream changes
+  </message>
+  <message name="IDS_TAFFY_VERSION_DOWNSTREAM_PATCH_LINES"
+           desc="Label for how many lines of Chromium-owned source TaffyGo changes in total.">
+    Downstream changed lines
+  </message>
+  <message name="IDS_TAFFY_VERSION_SECURITY_PATCH_LEVEL"
+           desc="Label for how many urgent upstream security fixes have been applied on top of the pinned revision. Resets to zero each time the build moves to a newer Chromium milestone.">
+    Security fixes applied on top
+  </message>
+  <message name="IDS_TAFFY_VERSION_SECURITY_ADVISORIES"
+           desc="Label for the upstream advisory references covered by the security fixes applied on top of the pinned revision.">
+    Security references
+  </message>
+</grit-part>

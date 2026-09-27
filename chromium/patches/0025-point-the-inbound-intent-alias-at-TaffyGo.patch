@@ -1,0 +1,74 @@
+From 05161bec4d06be58fc0f9cac20e8bc43a947797e Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Fri, 21 Aug 2026 23:48:43 +0530
+Subject: point the inbound-intent alias at TaffyGo
+
+Every manifest entry point was enumerated before this change was shaped, and
+the inbound VIEW surface funnels through one activity-alias
+(com.google.android.apps.chrome.IntentDispatcher). The alias is retargeted
+at TaffyInboundIntentActivity, declared immediately above it because Android
+requires an alias to name a target declared before it; the WEB_SEARCH filter
+moves off SearchActivity for the same reason. Both Chrome activities keep
+their declarations, which is what makes the transfer reversible. A manifest
+merger cannot retarget an existing alias, so this is a patch rather than an
+overlay.
+
+Rebase risk: low-medium. Manifest blocks move; the alias name is stable.
+
+Needed by: WP-M1-04.
+Retirement: permanent, reviewed at each milestone rebase.
+
+Taffy-Patch: 0025
+
+diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
+index bc03777611088..2932948b12918 100644
+--- a/chrome/android/java/AndroidManifest.xml
++++ b/chrome/android/java/AndroidManifest.xml
+@@ -250,8 +250,18 @@ by a child template that "extends" this file.
+             android:excludeFromRecents="true"
+             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|mcc|mnc|screenLayout|smallestScreenSize|uiMode|density">
+         </activity>
++        <!-- TaffyGo: every intent the alias below carries enters here, not
++             ChromeLauncherActivity. An alias may only name a target declared
++             before it, so this block sits here and nowhere else. -->
++        <activity android:name="org.chromium.taffy.shell.TaffyInboundIntentActivity"
++            android:theme="@style/LauncherTheme"
++            android:exported="false"
++            android:relinquishTaskIdentity="true"
++            android:taskAffinity=""
++            android:excludeFromRecents="true"
++            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|mcc|mnc|screenLayout|smallestScreenSize|uiMode|density" />
+         <activity-alias android:name="com.google.android.apps.chrome.IntentDispatcher"
+-            android:targetActivity="org.chromium.chrome.browser.document.ChromeLauncherActivity"
++            android:targetActivity="org.chromium.taffy.shell.TaffyInboundIntentActivity"
+             android:exported="true">
+             <intent-filter>
+                 <action android:name="android.intent.action.MAIN" />
+@@ -358,6 +368,12 @@ by a child template that "extends" this file.
+                 <data android:mimeType="application/webbundle" />
+             </intent-filter>
+             {% endif %}
++            <!-- TaffyGo: moved off SearchActivity, which is Chrome's own
++                 search surface. See chromium/patches/0025. -->
++            <intent-filter>
++                <action android:name="android.intent.action.WEB_SEARCH" />
++                <category android:name="android.intent.category.DEFAULT" />
++            </intent-filter>
+             <intent-filter>
+                 <action android:name="android.intent.action.MEDIA_SEARCH" />
+                 <category android:name="android.intent.category.DEFAULT" />
+@@ -1068,11 +1084,9 @@ by a child template that "extends" this file.
+             android:windowSoftInputMode="adjustResize"
+             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|mcc|mnc|screenLayout|smallestScreenSize|uiMode"
+             android:hardwareAccelerated="false">
+-            <intent-filter>
+-                <action android:name="android.intent.action.WEB_SEARCH" />
+-                <!-- Permits Chrome to act as a default handler for WEB_SEARCH intents. -->
+-                <category android:name="android.intent.category.DEFAULT" />
+-            </intent-filter>
++            <!-- TaffyGo: the WEB_SEARCH filter that was here is on the inbound
++                 alias above. This activity is Chrome's search widget surface and
++                 nothing downstream starts it. -->
+       </activity>
+ 
+         <!-- GcmListenerService for messages from GCM. -->

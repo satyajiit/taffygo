@@ -1,0 +1,19 @@
+# //taffy/resources/branding holds one committed header of compile-time
+# constants, the generated translation unit that fills it in, and the Android
+# resources that carry the product's name and icon.
+#
+# It includes nothing. Not //base, not //content, not //url. The provenance
+# struct is std::string_view and int; a dependency here would put the identity
+# of the build behind someone else's initialization order, and this is the one
+# thing that has to be readable the moment the process starts.
+#
+# The Android resources have no include rules to state: they are XML and PNG,
+# and their layering is enforced by the build graph in BUILD.gn instead.
+
+include_rules = [
+  "-base",
+  "-content",
+  "-mojo",
+  "-url",
+  "+taffy/branding",
+]

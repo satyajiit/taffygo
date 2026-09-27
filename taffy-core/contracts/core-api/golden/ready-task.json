@@ -1,0 +1,88 @@
+{
+  "availability": 1,
+  "generation": 7,
+  "auth_state": null,
+  "active_tasks": [
+    {
+      "task_id": "task-41",
+      "revision": 12,
+      "phase": 3,
+      "progress_basis_points": 2500,
+      "status_message_key": "task.researching",
+      "failure": null,
+      "goal": "Compare the shortlisted devices",
+      "template_id": 0,
+      "workspace_id": null,
+      "pending_action": null,
+      "pending_ask_prompt": null,
+      "pending_field_value_request": null,
+      "allowed_controls": [
+        0,
+        2,
+        3
+      ],
+      "artifacts": [],
+      "activity": []
+    }
+  ],
+  "workspaces": [],
+  "workspace_export": null,
+  "asset_delivery": null,
+  "provider_roster": [],
+  "provider_probes": [],
+  "provider_models": [],
+  "assistant_configuration": {
+    "revision": 0,
+    "disabled_abilities": [],
+    "preset": 0,
+    "pace": 0,
+    "length": 1,
+    "check_in": 0
+  },
+  "library": {
+    "availability": 0,
+    "revision": 0,
+    "entries": [],
+    "search": null,
+    "refresh_previews": [],
+    "refresh_results": []
+  },
+  "library_export": null,
+  "memory": {
+    "availability": 0,
+    "revision": 0,
+    "records": [],
+    "search": null
+  },
+  "saved_sign_ins": {
+    "availability": 0,
+    "revision": 0,
+    "records": []
+  },
+  "saved_details": {
+    "availability": 0,
+    "revision": 0,
+    "people": []
+  },
+  "site_skills": [],
+  "builtin_skills": [
+    { "reference": { "skill_id": 0, "version": 1 }, "required_ability": 0, "enabled": true, "availability": 0, "required_tool_count": 12, "available_tool_count": 12, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 1, "version": 1 }, "required_ability": 11, "enabled": true, "availability": 0, "required_tool_count": 14, "available_tool_count": 14, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 2, "version": 1 }, "required_ability": 4, "enabled": true, "availability": 0, "required_tool_count": 13, "available_tool_count": 13, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 3, "version": 1 }, "required_ability": 1, "enabled": true, "availability": 0, "required_tool_count": 8, "available_tool_count": 8, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 4, "version": 1 }, "required_ability": 2, "enabled": true, "availability": 0, "required_tool_count": 7, "available_tool_count": 7, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 5, "version": 1 }, "required_ability": 8, "enabled": true, "availability": 0, "required_tool_count": 7, "available_tool_count": 7, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 6, "version": 1 }, "required_ability": 3, "enabled": true, "availability": 0, "required_tool_count": 7, "available_tool_count": 7, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 7, "version": 1 }, "required_ability": 6, "enabled": true, "availability": 0, "required_tool_count": 12, "available_tool_count": 12, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 8, "version": 1 }, "required_ability": 5, "enabled": true, "availability": 0, "required_tool_count": 12, "available_tool_count": 12, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 9, "version": 1 }, "required_ability": 7, "enabled": true, "availability": 1, "required_tool_count": 9, "available_tool_count": 5, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 10, "version": 1 }, "required_ability": 12, "enabled": true, "availability": 0, "required_tool_count": 14, "available_tool_count": 14, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 11, "version": 1 }, "required_ability": 14, "enabled": true, "availability": 0, "required_tool_count": 9, "available_tool_count": 9, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 12, "version": 1 }, "required_ability": 13, "enabled": true, "availability": 0, "required_tool_count": 6, "available_tool_count": 6, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 13, "version": 1 }, "required_ability": 15, "enabled": true, "availability": 0, "required_tool_count": 6, "available_tool_count": 6, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 14, "version": 1 }, "required_ability": 9, "enabled": true, "availability": 0, "required_tool_count": 6, "available_tool_count": 6, "required_part_count": 0, "installed_part_count": 0 },
+    { "reference": { "skill_id": 15, "version": 1 }, "required_ability": 10, "enabled": true, "availability": 0, "required_tool_count": 8, "available_tool_count": 8, "required_part_count": 0, "installed_part_count": 0 }
+  ],
+  "projection_mode": 0,
+  "projection_omissions": []
+}

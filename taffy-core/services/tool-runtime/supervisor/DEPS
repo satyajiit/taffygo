@@ -1,0 +1,22 @@
+# The supervisor is browser-process infrastructure, but it deliberately takes
+# no dependency on //chrome, //content, a worker implementation, or a runtime
+# library. Profile ownership and ServiceProcessHost launch remain injected at
+# the product composition edge.
+
+include_rules = [
+  "+base",
+  "+crypto",
+  "+mojo/public/cpp/bindings",
+  "+mojo/public/cpp/system",
+  "+taffy/contracts/core-service",
+  "+taffy/contracts/tool-runtime",
+  "+taffy/services/tool-runtime/supervisor",
+]
+
+specific_include_rules = {
+  ".*_unittest\.cc": [
+    "+base/test",
+    "+testing/gmock",
+    "+testing/gtest",
+  ],
+}

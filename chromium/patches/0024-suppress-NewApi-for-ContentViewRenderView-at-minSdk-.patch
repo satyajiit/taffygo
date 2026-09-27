@@ -1,0 +1,37 @@
+From 7bc00580b2abff666d437c553911f9d3a80b6cbe Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Fri, 21 Aug 2026 23:48:43 +0530
+Subject: suppress NewApi for ContentViewRenderView at minSdk 29
+
+Lint's file set is the product APK's Java graph, and TaffyGo put
+embedder_support's view_java into it: ContentViewRenderView calls an API
+gated above this tree's minSdk floor without an annotation saying so, which
+upstream never sees because nothing upstream links the class into a linted
+APK at this floor. One suppression row, in the file upstream keeps for
+exactly this purpose.
+
+Rebase risk: low. One entry in lint-suppressions.xml.
+
+Retirement: upstream the annotation fix; the row leaves with it.
+
+Taffy-Patch: 0024
+
+diff --git a/chrome/android/expectations/lint-suppressions.xml b/chrome/android/expectations/lint-suppressions.xml
+index e9c2812472b1c..722c46962556d 100644
+--- a/chrome/android/expectations/lint-suppressions.xml
++++ b/chrome/android/expectations/lint-suppressions.xml
+@@ -84,6 +84,14 @@ https://chromium.googlesource.com/chromium/src/+/main/build/android/docs/lint.md
+     <ignore regexp="Static interface  method requires API level 24"/>
+     <!-- 1: TaskInfo is refactored at API 29. -->
+     <ignore regexp="Field requires API level .*`android.app.TaskInfo"/>
++    <!-- 1: TaffyGo is the only consumer of ContentViewRenderView that runs
++         lint (upstream's are content_shell and chromecast, which build no lint
++         target). Its API 31/35 calls are guarded: InputUtils
++         .isTransferInputToVizSupported() is a JNI call that returns false below
++         SDK_VERSION_V (components/input/utils.cc), and the remaining three sites
++         are reached only through the token and surface id that branch assigns.
++         Lint sees through neither. chromium/patches/0024-*.md -->
++    <ignore regexp="components/embedder_support/android/java/src/org/chromium/components/embedder_support/view/ContentViewRenderView\.java"/>
+     <!-- Endnote: Please specify number of suppressions when adding more -->
+   </issue>
+   <!-- This check doesn't tend to catch new violations except when we increase

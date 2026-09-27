@@ -1,0 +1,22 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//build/rust/rust_static_library.gni")
+import("//taffy/services/core/crate_sources.gni")
+
+rust_static_library("model_router") {
+  crate_name = "model_router"
+  crate_root = taffy_model_router_crate_root
+  sources = taffy_model_router_sources
+  inputs = taffy_model_router_inputs
+  edition = "2021"
+  deps = [ "//third_party/rust/serde/v1:lib" ]
+  visibility = [
+    "//taffy/components/intelligence/core/rust/core-runtime:*",
+    "//taffy/components/intelligence/core/rust/loop-kernel:*",
+    "//taffy/components/intelligence/core/rust/task-engine:*",
+  ]
+}

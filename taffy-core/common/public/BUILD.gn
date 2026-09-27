@@ -1,0 +1,39 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The trusted API surface of //taffy.
+#
+# Two embedders consume it: the sandboxed core service through generated
+# contracts, and the Java and Kotlin facade in //taffy/app/android. Both need
+# a surface that is cheap to project, so
+# this target is header-only and depends on nothing at all — not //base, not
+# //content, not //url, not //mojo. That is the whole design constraint, and
+# the empty deps list below is how it is enforced: adding a dependency here
+# is a visible change in review, not an accident.
+#
+# Definitions live in //taffy/browser. This target declares
+# interfaces and owned value types.
+source_set("public") {
+  sources = [
+    "bip_action.h",
+    "bip_budget.h",
+    "bip_delta.h",
+    "bip_identity.h",
+    "bip_observation.h",
+    "bip_protocol_support.h",
+    "bip_result.h",
+    "bip_subscription.h",
+    "page_inspector_projection.h",
+    "page_intelligence_service.h",
+    "taffy_download_facts.h",
+    "taffy_download_intent.h",
+    "taffy_product_identity.h",
+  ]
+
+  # Intentionally empty. See above.
+  deps = []
+  public_deps = []
+}

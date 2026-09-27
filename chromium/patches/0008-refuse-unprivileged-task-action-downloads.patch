@@ -1,0 +1,41 @@
+From 523f7516d5329c31e51c5ad2e72b2b9130634cde Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sat, 5 Sep 2026 00:08:33 +0530
+Subject: refuse unprivileged task-action downloads
+
+Route direct renderer download requests through the Taffy download authority seam while an assistant dispatch is open. Navigation downloads remain bound at NavigationHandle creation so response timing cannot relabel an earlier human request.
+
+Specified by chromium/patches/0008-route-downloads-and-external-intents.md.
+
+Taffy-Patch: 0008
+
+diff --git a/chrome/browser/download/chrome_download_manager_delegate.cc b/chrome/browser/download/chrome_download_manager_delegate.cc
+index 27be7a3c72f69..6d136f36b2480 100644
+--- a/chrome/browser/download/chrome_download_manager_delegate.cc
++++ b/chrome/browser/download/chrome_download_manager_delegate.cc
+@@ -99,6 +99,7 @@
+ #include "net/base/filename_util.h"
+ #include "net/base/mime_util.h"
+ #include "net/base/network_change_notifier.h"
++#include "taffy/browser/taffy_download_intent_router.h"
+ #include "ui/base/l10n/l10n_util.h"
+ 
+ #if BUILDFLAG(IS_ANDROID)
+@@ -2314,6 +2315,17 @@ void ChromeDownloadManagerDelegate::CheckDownloadAllowed(
+     return;
+   }
+ 
++  // Navigation downloads are attributed when their NavigationHandle is
++  // created, before response timing can confuse an earlier human navigation
++  // with a later assistant action. This hook covers the other renderer entry
++  // point: a direct content-initiated download requested while an assistant
++  // dispatch is open has no StartDownload authority and must not begin.
++  if (content_initiated &&
++      taffy::ShouldRefuseContentInitiatedDownload(web_contents)) {
++    OnCheckDownloadAllowedFailed(std::move(check_download_allowed_cb));
++    return;
++  }
++
+   // Check whether download is restricted for saved tab groups.
+   if (tab_groups::RestrictDownloadOnSyncedTabs() &&
+       TabGroupSyncTabState::FromWebContents(web_contents)) {

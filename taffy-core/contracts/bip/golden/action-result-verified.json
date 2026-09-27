@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.1",
+  "action_id": "act_01",
+  "dispatch_id": "disp_01",
+  "result_code": "VERIFIED",
+  "dispatched": true,
+  "terminal": true,
+  "verified_by": [
+    "RENDERER_ACKNOWLEDGEMENT",
+    "BROWSER_NAVIGATION_EVENT",
+    "FRESH_SNAPSHOT"
+  ],
+  "postcondition_outcomes": [
+    {
+      "postcondition": {
+        "kind": "COMMITTED_NAVIGATION",
+        "expected_destination": {
+          "url_metadata": {
+            "origin": {
+              "kind": "TUPLE",
+              "serialization": "https://docs.example.test"
+            },
+            "disclosure": "ORIGIN_AND_PATH",
+            "has_query": false,
+            "has_fragment": false,
+            "path": "/deletion-request"
+          },
+          "is_cross_origin": false,
+          "opens_new_tab": false,
+          "is_download": false
+        },
+        "allowed_origins": [
+          {
+            "kind": "TUPLE",
+            "serialization": "https://docs.example.test"
+          }
+        ],
+        "timeout_ms": 8000
+      },
+      "satisfied": true,
+      "verifier": "BROWSER_NAVIGATION_EVENT",
+      "detail_code": "same_origin_commit"
+    }
+  ],
+  "observed_page_epoch": "epoch_b2",
+  "observed_graph_revision": 1,
+  "completed_at_monotonic_ms": 12640
+}

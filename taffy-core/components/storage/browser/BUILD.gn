@@ -1,0 +1,180 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+source_set("storage") {
+  sources = [
+    "account_session_expiry.cc",
+    "account_session_expiry.h",
+    "backup_archive_stage_store.cc",
+    "backup_archive_stage_store.h",
+    "backup_archive_stage_store_lease.cc",
+    "backup_archive_stage_store_lease.h",
+    "backup_bookmark_record_codec.cc",
+    "backup_browser_preference_record_codec.cc",
+    "backup_browser_record_codec.h",
+    "backup_library_record_codec.cc",
+    "backup_memory_record_codec.cc",
+    "backup_record_codec.cc",
+    "backup_record_codec.h",
+    "backup_record_codec_internal.cc",
+    "backup_record_codec_internal.h",
+    "backup_recovery_key_codec.cc",
+    "backup_recovery_key_codec.h",
+    "backup_restore_stage.cc",
+    "backup_restore_stage.h",
+    "backup_restore_stage_extended_records.cc",
+    "backup_restore_stage_internal.h",
+    "backup_restore_stage_records.cc",
+    "backup_restore_stage_skills.cc",
+    "backup_skill_projection.cc",
+    "backup_skill_projection.h",
+    "backup_skill_record_codec.cc",
+    "backup_storage_snapshot.cc",
+    "backup_storage_snapshot.h",
+    "backup_storage_snapshot_extended.cc",
+    "backup_storage_snapshot_internal.h",
+    "backup_workspace_record_codec.cc",
+    "core_storage_account_transactions.cc",
+    "core_storage_account_transactions.h",
+    "core_storage_assistant_configuration.cc",
+    "core_storage_assistant_configuration.h",
+    "core_storage_backend.cc",
+    "core_storage_backend.h",
+    "core_storage_backup_restore.cc",
+    "core_storage_backup_snapshot.cc",
+    "core_storage_broker.cc",
+    "core_storage_broker.h",
+    "core_storage_library.cc",
+    "core_storage_library.h",
+    "core_storage_library_validation.cc",
+    "core_storage_library_validation.h",
+    "core_storage_memory.cc",
+    "core_storage_memory.h",
+    "core_storage_memory_validation.cc",
+    "core_storage_memory_validation.h",
+    "core_storage_skill_commits.cc",
+    "core_storage_skill_shape.cc",
+    "core_storage_skill_shape.h",
+    "core_storage_skills.cc",
+    "core_storage_skills.h",
+    "core_storage_task_action_journal.cc",
+    "core_storage_task_action_lookup.cc",
+    "core_storage_task_seed.h",
+    "core_storage_transactions.cc",
+    "core_storage_workspace.cc",
+    "core_storage_workspace.h",
+    "core_storage_workspace_delete.cc",
+    "core_storage_workspace_snapshot.cc",
+    "dormant_backup_restore_target.cc",
+    "dormant_backup_restore_target.h",
+    "dormant_backup_restore_target_commit.cc",
+    "dormant_backup_restore_target_lease.cc",
+    "dormant_backup_restore_target_lease.h",
+    "dormant_backup_restore_target_projection.cc",
+    "dormant_backup_restore_target_projection.h",
+    "dormant_backup_restore_target_projection_extended_sql.cc",
+    "dormant_backup_restore_target_projection_internal.h",
+    "dormant_backup_restore_target_projection_sql.cc",
+    "dormant_backup_restore_target_reconciler.cc",
+    "dormant_backup_restore_target_reconciler.h",
+    "dormant_backup_restore_target_resolution.cc",
+    "dormant_backup_restore_target_resolution.h",
+    "dormant_backup_restore_target_resolution_discard.cc",
+    "dormant_backup_restore_target_resolution_internal.cc",
+    "dormant_backup_restore_target_resolution_internal.h",
+    "dormant_backup_restore_target_resolution_published.cc",
+    "dormant_backup_restore_target_staging.cc",
+    "encrypted_backup_archive.cc",
+    "encrypted_backup_archive.h",
+    "encrypted_backup_archive_open.cc",
+    "encrypted_backup_crypto.cc",
+    "encrypted_backup_crypto.h",
+    "generated/core_service_journal_schema.h",
+  ]
+
+  inputs = [ "../core/schema/core_service_journal.json" ]
+
+  public_deps = [
+    "//taffy/common/public",
+    "//taffy/contracts/core-service",
+  ]
+  deps = [
+    "//base",
+    "//crypto",
+    "//sql",
+    "//url",
+  ]
+
+  visibility = [
+    ":unit_tests",
+    "//taffy/browser:*",
+
+    # The Android restore lifecycle reads and reconciles the dormant target
+    # this plane owns. It is browser-process code in a subdirectory, so
+    # "//taffy/browser:*" does not reach it.
+    "//taffy/browser/android:*",
+    "//taffy/test:benchmark_audit_support",
+    "//taffy/test:workspace_snapshot_compat_unit_tests",
+
+    # The core-recovery browser test drives a real profile through the dormant
+    # target's own SQL. No product target depends back on the test.
+    "//taffy/test/recovery:*",
+  ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+  inputs = [ "../core/schema/aib_v1_public_header_golden.inc" ]
+  sources = [
+    "backup_archive_stage_store_unittest.cc",
+    "backup_browser_record_codec_unittest.cc",
+    "backup_extended_record_codec_unittest.cc",
+    "backup_extended_record_test_support.cc",
+    "backup_extended_record_test_support.h",
+    "backup_record_codec_unittest.cc",
+    "backup_recovery_key_codec_unittest.cc",
+    "backup_saved_flow_record_codec_unittest.cc",
+    "backup_restore_stage_extended_unittest.cc",
+    "backup_restore_stage_unittest.cc",
+    "backup_storage_snapshot_extended_unittest.cc",
+    "backup_storage_snapshot_unittest.cc",
+    "core_storage_account_unittest.cc",
+    "core_storage_assistant_configuration_unittest.cc",
+    "core_storage_backup_restore_unittest.cc",
+    "core_storage_broker_unittest.cc",
+    "core_storage_library_unittest.cc",
+    "core_storage_memory_unittest.cc",
+    "core_storage_migration_unittest.cc",
+    "core_storage_reconciliation_unittest.cc",
+    "core_storage_schema_test_util.cc",
+    "core_storage_schema_test_util.h",
+    "core_storage_skills_unittest.cc",
+    "core_storage_task_action_journal_unittest.cc",
+    "core_storage_task_action_lookup_unittest.cc",
+    "core_storage_workspace_codec_unittest.cc",
+    "core_storage_workspace_delete_unittest.cc",
+    "core_storage_workspace_unittest.cc",
+    "dormant_backup_restore_target_commit_unittest.cc",
+    "dormant_backup_restore_target_custody_unittest.cc",
+    "dormant_backup_restore_target_extended_projection_unittest.cc",
+    "dormant_backup_restore_target_projection_unittest.cc",
+    "dormant_backup_restore_target_reconciler_unittest.cc",
+    "dormant_backup_restore_target_resolution_unittest.cc",
+    "dormant_backup_restore_target_staging_unittest.cc",
+    "dormant_backup_restore_target_test_support.cc",
+    "dormant_backup_restore_target_test_support.h",
+    "dormant_backup_restore_target_unittest.cc",
+    "encrypted_backup_archive_unittest.cc",
+    "encrypted_backup_crypto_unittest.cc",
+  ]
+  deps = [
+    ":storage",
+    "//base/test:test_support",
+    "//crypto",
+    "//sql:test_support",
+    "//testing/gtest",
+  ]
+}

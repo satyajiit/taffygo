@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+<resources>
+  <string name="taffy_download_channel_name">डाउनलोड</string>
+  <string name="taffy_download_channel_description">आपके डाउनलोड की प्रगति और नतीजे।</string>
+  <string name="taffy_download_hidden">डाउनलोड की जानकारी</string>
+  <string name="taffy_download_share">डाउनलोड साझा करें</string>
+
+  <string name="taffy_download_running">%1$s डाउनलोड हो रहा है</string>
+  <string name="taffy_download_paused">%1$s रुका हुआ है</string>
+  <string name="taffy_download_complete">%1$s डाउनलोड हो गया</string>
+  <string name="taffy_download_failed">%1$s डाउनलोड नहीं हो सका</string>
+
+  <string name="taffy_download_pause">रोकें</string>
+  <string name="taffy_download_resume">फिर शुरू करें</string>
+  <string name="taffy_download_cancel">रद्द करें</string>
+</resources>

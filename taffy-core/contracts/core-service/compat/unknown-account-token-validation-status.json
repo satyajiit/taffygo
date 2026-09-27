@@ -1,0 +1,13 @@
+{
+  "status": 88,
+  "operation_id": "operation_id-1",
+  "operation_kind": 0,
+  "auth_method": 0,
+  "account_subject": "account_subject-1",
+  "expires_in_seconds": 0,
+  "target_rotation": 0,
+  "access_token": [],
+  "refresh_token": [],
+  "email": null,
+  "display_name": null
+}

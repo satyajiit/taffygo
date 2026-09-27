@@ -1,0 +1,92 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//mojo/public/tools/bindings/mojom.gni")
+import("//taffy/browser/account_plane_configuration.gni")
+import("//taffy/browser/asset_delivery_configuration.gni")
+import("//taffy/browser/managed_route_configuration.gni")
+import("//taffy/utility/python_runtime_configuration.gni")
+
+# Browser-owned platform seams and their compile-time configuration. Keeping
+# these declarations together makes the browser's platform boundary visible
+# without burying its implementation targets in one oversized BUILD.gn.
+
+# The profile-owned platform seam: entropy, one-shot secrets, an authorization
+# surface and the sealed account session. Every argument it takes is a Core
+# Service effect type, because it is the far end of a Core Service effect —
+# the core asks, the browser relays the same record outward, the platform
+# answers.
+#
+# It is hand-written rather than generated, and decision 0042 section 4 is the
+# record of why: it carries no vocabulary of its own, so a fifth generated
+# contract would duplicate two enumerations and eight records to describe a
+# relay that copies nothing. `generate_java` is honoured only on Android
+# (//mojo/public/tools/bindings/mojom.gni), so this target is portable and the
+# Java half simply does not exist elsewhere.
+template("taffy_profile_platform_mojom") {
+  not_needed(invoker, "*")
+  mojom(target_name) {
+    sources = [ "account/profile_platform_adapter.mojom" ]
+    generate_java = true
+    deps = [ "//taffy/contracts/core-service:core_service_types_mojom" ]
+  }
+}
+
+# The one seam a value a person typed into a form crosses (decision 0088).
+#
+# Hand-written for the same reason the adapter above is, and separate from
+# every generated contract for a reason the .mojom file states in full: the
+# Core API is the projected, journalled status plane, and an interface that
+# could carry a person's typed value must not be on it. It names no contract
+# type at all — every argument is a string, a byte array or an enumeration
+# declared beside it — so it depends on nothing.
+template("taffy_field_value_surface_mojom") {
+  not_needed(invoker, "*")
+  mojom(target_name) {
+    sources = [ "field_values/field_value_surface.mojom" ]
+    generate_java = true
+  }
+}
+
+template("taffy_account_plane_config") {
+  not_needed(invoker, "*")
+  config(target_name) {
+    defines = [
+      "TAFFY_ACCOUNT_API_ORIGIN=\"$taffy_account_api_origin\"",
+      "TAFFY_ACCOUNT_PUBLISHABLE_KEY=\"$taffy_account_publishable_key\"",
+      "TAFFY_ACCOUNT_GOOGLE_SERVER_CLIENT_ID=\"$taffy_account_google_server_client_id\"",
+    ]
+  }
+}
+
+# The delivery origin the product's own artifacts are fetched from. Empty is
+# the default and is a working configuration: the plane refuses every fetch
+# with a reason a person can read, and nothing else changes.
+template("taffy_asset_delivery_config") {
+  not_needed(invoker, "*")
+  config(target_name) {
+    defines = [ "TAFFY_ASSET_ORIGIN=\"$taffy_asset_origin\"" ]
+  }
+}
+
+# The managed route's one origin (decision 0082). Empty is the default and
+# disables the route whole; the browser repeats the validation at runtime as
+# defense in depth, exactly as the account plane's is repeated.
+template("taffy_managed_route_config") {
+  not_needed(invoker, "*")
+  config(target_name) {
+    defines = [ "TAFFY_MANAGED_WORKER_ORIGIN=\"$taffy_managed_worker_origin\"" ]
+  }
+}
+
+template("taffy_python_runtime_config") {
+  not_needed(invoker, "*")
+  config(target_name) {
+    if (taffy_python_runtime_in_current_toolchain) {
+      defines = [ "TAFFY_ENABLE_PYTHON_RUNTIME" ]
+    }
+  }
+}

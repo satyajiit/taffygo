@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Search-engine names and the picker on General (SCR-402). -->
+<resources>
+    <string name="taffy_search_engine_title">खोज इंजन</string>
+    <string name="taffy_search_engine_google">Google</string>
+    <string name="taffy_search_engine_bing">Bing</string>
+    <string name="taffy_search_engine_duckduckgo">DuckDuckGo</string>
+    <string name="taffy_search_engine_duckduckgo_de">DuckDuckGo (Germany)</string>
+    <string name="taffy_search_engine_duckduckgo_au_nz_ie">DuckDuckGo (Australia, New Zealand, Ireland)</string>
+    <string name="taffy_search_engine_yahoo">Yahoo</string>
+    <string name="taffy_search_engine_yahoo_jp">Yahoo! JAPAN</string>
+    <string name="taffy_search_engine_qwant">Qwant</string>
+    <string name="taffy_search_engine_startpage">Startpage</string>
+    <string name="taffy_search_engine_ecosia">Ecosia</string>
+    <string name="taffy_search_engine_yandex">Yandex</string>
+    <string name="taffy_search_engine_brave_search">Brave Search</string>
+    <string name="taffy_search_engine_choice">%1$s</string>
+    <string name="taffy_search_engine_choice_selected">%1$s. चुना हुआ</string>
+    <string name="taffy_general_search_engine_description">खोज इंजन. %1$s</string>
+</resources>

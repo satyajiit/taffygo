@@ -1,0 +1,28 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="captive-portal">
+<title>Network sign-in required</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Network sign-in required</h1>
+  <p class="who">A captive-portal shape: the requested page was replaced by an
+  interstitial from the network, not by the site.</p>
+</header>
+
+<p id="portal-note">You asked for a page on this origin. This document was served
+in its place. Nothing on the requested page has loaded.</p>
+
+<form id="portal-form" action="/net/portal" method="post">
+  <label for="room">Room number</label>
+  <input id="room" name="room" type="text" autocomplete="off">
+  <label><input type="checkbox" id="portal-terms" name="terms"> I accept the network terms</label>
+  <p><button type="submit" id="portal-continue">Connect</button></p>
+</form>
+
+<p class="note">The content behind this interstitial is not merely slow: it is
+absent. A result built from this page would be built from the wrong document.</p>
+<p><a id="probe-link" href="/net/probe">Trigger the interception again</a></p>

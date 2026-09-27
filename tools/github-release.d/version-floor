@@ -1,0 +1,16 @@
+# The highest version code Google Play has accepted for com.taffygo.browser.
+# Format: `key=value`, `#` comments. Read by tools/github-release.d/prepare.py.
+#
+# `./tools/github-release prepare` refuses an APK or a bundle whose version code
+# is not above this number (decision 0252, point 3). The APK a GitHub release
+# carries comes from the same build as the bundle Play receives, and Play
+# refuses a version code it has already accepted, so an artifact at or below
+# this number cannot be the build Play will carry.
+#
+# Raise it by hand when Play accepts an upload, in the change that records the
+# upload. `--min-version-code N` raises the bar for one run without editing
+# this file.
+#
+# 797704204 is the code Chromium derives from 152.0.7977.42. The first upload
+# to the internal track took it on 2026-09-11.
+play_accepted_version_code=797704204

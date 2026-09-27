@@ -1,0 +1,260 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The BIP renderer endpoint and its adapters.
+#
+# Everything in this target runs inside the renderer sandbox and is trusted
+# for nothing. The deps list is the first place that shows: there is no
+# //content/public/browser, no //taffy/browser, no //net, no
+# //services/network, and no way to add one without this file changing in
+# review. DEPS states the same rules for the include checker.
+
+import("//build/config/features.gni")
+
+# Every provisional numeric bound this component enforces lives in
+# observation_limits.json and is compiled from there. The generated header is
+# NOT committed: committing it would create the second copy the whole design
+# exists to prevent, and a second copy is a copy that drifts.
+#
+# The generator also refuses to run when observation_limits.json and the
+# ObservationLimitsValues struct in observation_limits.h disagree, so adding a
+# field to one of them is a build failure rather than a silently defaulted
+# zero. `--check` runs the same comparison on any host, including one that
+# cannot compile anything:
+#
+#   python3 tools/generate_observation_limits.py --check
+#   python3 tools/generate_observation_limits.py --selftest
+action("observation_limits_generated") {
+  script = "tools/generate_observation_limits.py"
+  inputs = [
+    "observation_limits.json",
+    "observation_limits.h",
+  ]
+  outputs = [ "$target_gen_dir/observation_limits_generated.h" ]
+  args = [
+    "--input",
+    rebase_path("observation_limits.json", root_build_dir),
+    "--header",
+    rebase_path("observation_limits.h", root_build_dir),
+    "--output",
+    rebase_path("$target_gen_dir/observation_limits_generated.h",
+                root_build_dir),
+  ]
+}
+
+source_set("renderer") {
+  sources = [
+    "action_accessibility_mapping.cc",
+    "action_accessibility_mapping.h",
+    "action_accessibility_target.cc",
+    "action_accessibility_target.h",
+    "action_command_translator.cc",
+    "action_command_translator.h",
+    "adapters/accessibility_adapter.cc",
+    "adapters/accessibility_adapter.h",
+    "adapters/accessibility_relationships.cc",
+    "adapters/accessibility_relationships.h",
+    "adapters/adapter.cc",
+    "adapters/adapter.h",
+    "adapters/adapter_registry.cc",
+    "adapters/adapter_registry.h",
+    "adapters/bounded_web_text.cc",
+    "adapters/bounded_web_text.h",
+    "adapters/document_metadata_adapter.cc",
+    "adapters/document_metadata_adapter.h",
+    "adapters/dom_adapter.cc",
+    "adapters/dom_adapter.h",
+    "adapters/dom_content_metadata.cc",
+    "adapters/dom_content_metadata.h",
+    "adapters/dom_role_mapping.cc",
+    "adapters/dom_role_mapping.h",
+    "adapters/dom_table_relationships.cc",
+    "adapters/dom_table_relationships.h",
+    "adapters/form_challenge_signals.cc",
+    "adapters/form_control_identity.cc",
+    "adapters/form_control_identity.h",
+    "adapters/form_control_type_names.cc",
+    "adapters/form_control_type_names.h",
+    "adapters/form_schema_adapter.cc",
+    "adapters/form_schema_adapter.h",
+    "adapters/form_schema_control.cc",
+    "adapters/form_schema_control.h",
+    "adapters/layout_visibility_adapter.cc",
+    "adapters/layout_visibility_adapter.h",
+    "adapters/layout_visibility_probe.cc",
+    "adapters/layout_visibility_probe.h",
+    "adapters/selection_adapter.cc",
+    "adapters/selection_adapter.h",
+    "adapters/structured_data_adapter.cc",
+    "adapters/structured_data_adapter.h",
+    "adapters/structured_data_claims.cc",
+    "adapters/structured_data_claims.h",
+    "adapters/structured_data_corroboration.cc",
+    "adapters/structured_data_corroboration.h",
+    "adapters/structured_data_vocabulary.cc",
+    "adapters/structured_data_vocabulary.h",
+    "challenge_classifier.cc",
+    "challenge_classifier.h",
+    "content_metadata.cc",
+    "content_metadata.h",
+    "delta_coalescer.cc",
+    "delta_coalescer.h",
+    "delta_publisher.cc",
+    "delta_publisher.h",
+    "dom_mutation_signal_source.cc",
+    "dom_mutation_signal_source.h",
+    "field_redaction.cc",
+    "field_redaction.h",
+    "field_redaction_signals.cc",
+    "field_redaction_signals.h",
+    "high_risk_pattern_detector.cc",
+    "high_risk_pattern_detector.h",
+    "node_precondition_checker.cc",
+    "node_precondition_checker.h",
+    "observation_limits.cc",
+    "observation_limits.h",
+    "observed_link_limits.h",
+    "page_capabilities.cc",
+    "page_capabilities.h",
+    "page_intelligence_endpoint.cc",
+    "page_intelligence_endpoint.h",
+    "page_intelligence_endpoint_action.cc",
+    "page_intelligence_endpoint_media.cc",
+    "page_intelligence_endpoint_node.cc",
+    "page_media_caption_cues.cc",
+    "page_media_caption_cues.h",
+    "renderer_action_executor.cc",
+    "renderer_action_executor.h",
+    "semantic_graph.cc",
+    "semantic_graph.h",
+    "semantic_graph_store.cc",
+    "semantic_graph_store.h",
+    "semantic_graph_store_annotations.cc",
+    "semantic_graph_store_live_nodes.cc",
+    "snapshot_adapter_collection.cc",
+    "snapshot_adapter_collection.h",
+    "snapshot_builder.cc",
+    "snapshot_builder.h",
+    "snapshot_capability_signals.cc",
+    "snapshot_capability_signals.h",
+    "snapshot_form_observation_root.cc",
+    "snapshot_form_observation_root.h",
+    "snapshot_graph_projection.cc",
+    "snapshot_graph_projection.h",
+    "taffy_render_frame_observer.cc",
+    "taffy_render_frame_observer.h",
+    "wire_action_enum_conversions.cc",
+    "wire_conversions.h",
+    "wire_enum_conversions.cc",
+    "wire_graph_enum_conversions.cc",
+    "wire_struct_conversions.cc",
+  ]
+
+  # Only the embedder that builds a renderer process needs this target, and
+  # nothing may pull it into the browser process by accident.
+  #
+  # //taffy/test:browser_test_launcher is the fourth entry and it is
+  # the same kind of thing as the first: it is a test binary's embedder half —
+  # the ContentRendererClient that runs in taffy_browsertests' renderer
+  # processes. It is NOT permission for tests generally, which is why the entry
+  # names one target rather than the directory: //taffy/test's own
+  # DEPS lets any file there include this header, and the visibility list is
+  # what keeps that from meaning any of them may link it.
+  visibility = [
+    "//chrome/renderer/*",
+    "//taffy:*",
+    "//taffy/renderer/*",
+    "//taffy/test:browser_test_launcher",
+  ]
+
+  deps = [
+    ":observation_limits_generated",
+    "//base",
+    "//content/public/common",
+    "//content/public/renderer",
+    "//mojo/public/cpp/bindings",
+    "//third_party/blink/public:blink_headers",
+    "//ui/accessibility",
+    "//ui/accessibility:ax_base",
+    "//ui/gfx/geometry",
+    "//url",
+    "//v8",
+  ]
+
+  public_deps = [ "//taffy/contracts/bip/mojom" ]
+
+  configs += [ "//build/config/compiler:wexit_time_destructors" ]
+}
+
+# The invariant tests that need no renderer at all.
+#
+# Splitting these out is deliberate. Node identity, redaction classification,
+# capability honesty, action-command decoding, and delta drop order are the
+# properties a security review asks about, and every one of them is provable
+# without Blink - no document, no frame, no accessibility tree. They are the
+# cheapest tests in the component and the ones that must never be skipped.
+#
+# Two of them still need the generated mojom bindings, so they are a Chromium
+# build rather than a bare gtest: action_command_translator_unittest.cc
+# decodes wire commands, and page_capabilities_unittest.cc asserts the wire
+# identity gap. The rest depend on nothing generated at all.
+#
+# The adapter tests that do need Blink are the render-view tests in test/, and
+# the end-to-end assertions against the fixture corpus are browser tests, also
+# in test/.
+source_set("unit_tests") {
+  testonly = true
+
+  sources = [
+    "action_accessibility_mapping_unittest.cc",
+    "action_command_translator_unittest.cc",
+    "budget_ledger_unittest.cc",
+    "content_metadata_unittest.cc",
+    "delta_coalescer_unittest.cc",
+    "dom_mutation_signal_source_unittest.cc",
+    "field_redaction_unittest.cc",
+    "high_risk_pattern_detector_unittest.cc",
+    "node_precondition_checker_unittest.cc",
+    "observation_limits_unittest.cc",
+    "page_capabilities_unittest.cc",
+    "semantic_graph_store_identity_unittest.cc",
+    "semantic_graph_store_security_unittest.cc",
+    "semantic_graph_store_unittest.cc",
+    "snapshot_graph_projection_unittest.cc",
+  ]
+
+  deps = [
+    ":renderer",
+    "//base",
+    "//base/test:test_support",
+    "//taffy/contracts/bip/mojom",
+    "//testing/gtest",
+
+    # dom_mutation_signal_source_unittest.cc classifies blink::WebDomMutation
+    # records, which are a plain struct: the translation is decided without a
+    # document, a frame, or an accessibility tree, so it belongs in this
+    # target rather than in the render-view tests. The headers are all it
+    # needs; nothing here links or starts Blink.
+    "//third_party/blink/public:blink_headers",
+  ]
+}
+
+# The render-view tests, by reference. `//taffy:taffy_browsertests` is the
+# binary that carries this, and it has to be that one rather than
+# `:taffy_unittests`: content::RenderViewTest initializes Blink per test, and a
+# unit-test launcher has already initialized it for the process, so those cases
+# abort on `DCHECK failed: !did_initialize_blink_`. Upstream reaches the same
+# answer for the same reason — its own RenderViewTest suites under
+# //components run out of `components_browsertests`.
+#
+# AUDITED on 2026-08-19: before that date `gn refs` answered "Nothing
+# references this." here, so all twenty cases behind it, the redaction canary
+# sweep included, were in no binary at all. `./tools/chromium/orphan-targets`
+# is the check that now says so.
+group("test_support") {
+  testonly = true
+  public_deps = [ "//taffy/renderer/test:tests" ]
+}

@@ -1,0 +1,40 @@
+{
+  "release": {
+    "kind": "development",
+    "environment": "local",
+    "promotable": false
+  },
+  "build": {
+    "hermetic": false,
+    "caches": {
+      "siso": {
+        "enabled": false
+      },
+      "ccache": {
+        "enabled": false
+      },
+      "sccache": {
+        "enabled": false
+      }
+    }
+  },
+  "signing": {
+    "separation": {
+      "build_job": "build",
+      "signing_job": "none (the artifact is unsigned; a release identity is resolved outside the repository, decision 0203)",
+      "distinct": true
+    },
+    "credential_source": "none",
+    "long_lived_token": false
+  },
+  "tests": {
+    "suites": []
+  },
+  "approvals": [],
+  "dependencies": {
+    "vulnerability_scan": {
+      "tool": "none",
+      "status": "not-run"
+    }
+  }
+}

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Machine-translated (hi), pending native review. -->
+<resources>
+    <string name="taffy_task_state_running">चल रहा है</string>
+    <string name="taffy_task_state_waiting_for_you">आपकी प्रतीक्षा में</string>
+    <string name="taffy_task_state_paused">रोका गया</string>
+    <string name="taffy_task_state_done">पूरा हुआ</string>
+    <string name="taffy_task_state_partly_done">कुछ हद तक पूरा</string>
+    <string name="taffy_task_state_stopped">बंद किया गया</string>
+    <string name="taffy_task_state_failed">विफल</string>
+
+    <string name="taffy_download_state_running">डाउनलोड हो रहा है</string>
+    <string name="taffy_download_state_paused">रोका गया</string>
+    <string name="taffy_download_state_complete">सहेजा गया</string>
+    <string name="taffy_download_state_failed">पूरा नहीं हुआ</string>
+
+    <string name="taffy_mode_you_browse">आप ब्राउज़ करते हैं</string>
+    <string name="taffy_mode_browse_together">साथ में ब्राउज़ करें</string>
+    <string name="taffy_mode_taffy_browses">Taffy ब्राउज़ करता है</string>
+
+    <string name="taffy_control_pause">रोकें</string>
+    <string name="taffy_control_resume">फिर शुरू करें</string>
+    <string name="taffy_control_stop">बंद करें</string>
+    <string name="taffy_control_take_over">खुद संभालें</string>
+
+    <string name="taffy_action_back">वापस</string>
+
+    <string name="taffy_address_pill_secure">सुरक्षित कनेक्शन</string>
+    <string name="taffy_address_pill_insecure">निजी कनेक्शन नहीं</string>
+    <string name="taffy_address_pill_reload">पेज फिर से लोड करें</string>
+    <string name="taffy_address_pill_stop">लोड करना रोकें</string>
+    <string name="taffy_address_field_confirm">यह अर्थ अपनाएँ</string>
+    <plurals name="taffy_blocked_trackers">
+        <item quantity="one">%1$d ट्रैकर ब्लॉक किया गया</item>
+        <item quantity="other">%1$d ट्रैकर ब्लॉक किए गए</item>
+    </plurals>
+
+    <string name="taffy_assistant_ask_taffy">Taffy से पूछें</string>
+    <string name="taffy_assistant_review">समीक्षा करें</string>
+    <string name="taffy_assistant_resume">फिर शुरू करें</string>
+
+    <string name="taffy_accessible_pair">%1$s, %2$s</string>
+
+    <!--
+      How a fact was established. One vocabulary, rendered by a task view and by
+      a workspace table alike, so it lives beside the controls that draw it
+      rather than once per feature — see FactKindLabel.kt.
+    -->
+    <string name="taffy_fact_kind_from_the_page">पेज से</string>
+    <string name="taffy_fact_kind_summarized">सारांशित</string>
+    <string name="taffy_fact_kind_inference">Taffy का अनुमान</string>
+    <string name="taffy_fact_kind_you_entered">आपने डाला</string>
+    <string name="taffy_fact_kind_conflict">स्रोतों में मतभेद</string>
+    <string name="taffy_fact_kind_needs_a_new_source">नए स्रोत की ज़रूरत</string>
+
+    <string name="taffy_search_clear">खोज साफ़ करें</string>
+
+
+    <!-- Review of an explicitly accepted recorded web flow. -->
+    <string name="taffy_flow_review_origin">%1$s से</string>
+    <string name="taffy_flow_review_start">शुरुआती पेज</string>
+    <string name="taffy_flow_review_steps">याद रखने के चरण</string>
+    <string name="taffy_flow_review_privacy">केवल ये चरण सहेजे जाते हैं। निजी जानकारी, एक बार इस्तेमाल होने वाले कोड और पुष्टि के जवाब आप हर बार भरते हैं।</string>
+    <string name="taffy_flow_review_named_action">%1$s · %2$s</string>
+    <string name="taffy_flow_open">पेज खोलें</string>
+    <string name="taffy_flow_read">पेज पढ़ें</string>
+    <string name="taffy_flow_find">पेज पर नियंत्रण ढूँढें</string>
+    <string name="taffy_flow_choose">पेज का नियंत्रण चुनें</string>
+    <string name="taffy_flow_scroll">पेज स्क्रॉल करें</string>
+    <string name="taffy_flow_handover">पेज आपको सौंपें, फिर आपके आगे बढ़ने का इंतज़ार करें</string>
+    <string name="taffy_flow_inspect_form">फ़ॉर्म जाँचें</string>
+    <string name="taffy_flow_fill_form">इस बार दी गई जानकारी से फ़ॉर्म भरें</string>
+    <string name="taffy_flow_submit_form">अनुमति मिलने पर फ़ॉर्म भेजें</string>
+    <string name="taffy_flow_download">अनुमति मिलने पर फ़ाइल डाउनलोड करें</string>
+    <string name="taffy_flow_downloads">डाउनलोड जाँचें</string>
+    <string name="taffy_flow_pdf">PDF पढ़ें</string>
+    <string name="taffy_flow_back">पीछे जाएँ</string>
+    <string name="taffy_flow_forward">आगे जाएँ</string>
+    <string name="taffy_flow_reload">पेज फिर लोड करें</string>
+    <string name="taffy_flow_stop_loading">पेज लोड करना रोकें</string>
+    <string name="taffy_flow_open_tab">टैब खोलें</string>
+    <string name="taffy_flow_target_sign_in">साइन इन</string>
+    <string name="taffy_flow_target_sign_out">साइन आउट</string>
+    <string name="taffy_flow_target_search">खोजें</string>
+    <string name="taffy_flow_target_add_to_cart">कार्ट में जोड़ें</string>
+    <string name="taffy_flow_target_view_cart">कार्ट देखें</string>
+    <string name="taffy_flow_target_checkout">भुगतान करें</string>
+    <string name="taffy_flow_target_continue">जारी रखें</string>
+    <string name="taffy_flow_target_confirm">पुष्टि करें</string>
+    <string name="taffy_flow_target_cancel">रद्द करें</string>
+    <string name="taffy_flow_target_next_page">अगला पेज</string>
+    <string name="taffy_flow_target_download">डाउनलोड</string>
+    <string name="taffy_flow_person_identity">आप अपनी पहचान संख्या भरते हैं।</string>
+    <string name="taffy_flow_person_verification">आप पुष्टि पूरी करते हैं।</string>
+    <string name="taffy_flow_person_code">आप एक बार इस्तेमाल होने वाला कोड भरते हैं।</string>
+    <string name="taffy_flow_person_details">आप फ़ॉर्म की माँगी गई जानकारी देते हैं।</string>
+    <string name="taffy_flow_focus">पेज के नियंत्रण पर ध्यान दें</string>
+    <string name="taffy_flow_link">लिंक खोलें</string>
+</resources>

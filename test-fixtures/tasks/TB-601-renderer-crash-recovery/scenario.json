@@ -1,0 +1,86 @@
+{
+  "scenario": "TB-601",
+  "corpus": "taffygo-task-scenarios",
+  "version": "1.1.0",
+  "job_family": "JF-06",
+  "contract": "test-fixtures/tasks/manifest.json",
+  "note": "The contract for this scenario - goal, scope, facts, labels and adjudication - is the corpus manifest. This file owns only the run script: the ordered steps, the events injected into them, the audit stream a correct run produces, and the rubric a labeler applies to a disputed run.",
+  "steps": [
+    {
+      "n": 1,
+      "kind": "step:NAVIGATE",
+      "fixture": "renderer-crash",
+      "detail": "Open the page.",
+      "produces": [],
+      "expect": []
+    },
+    {
+      "n": 2,
+      "kind": "step:OBSERVE",
+      "fixture": "renderer-crash",
+      "detail": "Record the total before anything else happens.",
+      "produces": [
+        "F-601-pre-crash-fact"
+      ],
+      "expect": []
+    },
+    {
+      "n": 3,
+      "kind": "action:ACTIVATE",
+      "fixture": "renderer-crash",
+      "detail": "Dispatch the action that leads to the next page; the renderer ends before the postcondition can be verified.",
+      "produces": [
+        "F-601-not-verified"
+      ],
+      "expect": [
+        "an unresolved outcome, not a verified one"
+      ]
+    },
+    {
+      "n": 4,
+      "kind": "step:OBSERVE",
+      "fixture": "static-product",
+      "detail": "After the process swap, re-establish state from the journal rather than from memory.",
+      "produces": [
+        "F-601-handles-invalidated",
+        "F-601-no-duplicate"
+      ],
+      "expect": [
+        "no side effect repeated"
+      ]
+    },
+    {
+      "n": 5,
+      "kind": "step:EXTRACT",
+      "fixture": null,
+      "detail": "Tell the user what happened.",
+      "produces": [
+        "F-601-interruption-reported"
+      ],
+      "expect": []
+    }
+  ],
+  "injected_events": [
+    {
+      "before_step": 4,
+      "event": "renderer-crash",
+      "detail": "The page ends its own renderer while the action's postcondition is still unresolved."
+    }
+  ],
+  "expected_audit_events": [
+    "TaskCreated",
+    "TaskStarted",
+    "ActorLeaseIssued",
+    "ObservationCaptured",
+    "ActionProposed",
+    "ActionDispatchStarted",
+    "ActionVerificationCompleted",
+    "TaskFailed"
+  ],
+  "adjudication_rubric": [
+    {
+      "dispute": "A reviewer asks why the audit stream ends in a failure event when the label is interrupted.",
+      "resolution": "The journal records the terminal state of the task instance; the benchmark label records what happened to the run. A run that recovered without duplicating anything is interrupted even when the instance it was recovering from ended badly."
+    }
+  ]
+}

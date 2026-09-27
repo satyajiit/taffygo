@@ -1,0 +1,39 @@
+# The shipping destination-class table (threat model section 10.5).
+#
+# Columns, tab-separated:  host <TAB> class <TAB> reason
+#
+# One host per row, lowercase, no scheme and no port. This is the single
+# committed authority read by both the sandboxed Rust policy engine and the
+# browser-process dispatch guard. A row's class must name a SiteClass member,
+# or either consumer's build refuses the whole table.
+#
+# This file is compiled in and is never fetched, patched, or overlaid at run
+# time. Decision 0015 forbids catalog data from changing security policy, and
+# this is security policy: a removable row would widen what the assistant may
+# do.
+#
+# Membership, ownership, review cadence, and locale coverage are [Open
+# (OD-081)]. The rows below are deliberately few and deliberately
+# uncontroversial: this table ships as a mechanism with a small, honest seed,
+# not as a claim to have enumerated the web.
+#
+# No host in this file may end in .test — that suffix belongs to the policy
+# engine's fixture corpus table, and a test asserts the two never overlap.
+
+mail.google.com	email	Webmail, reached inside a live session.
+outlook.office.com	email	Webmail, reached inside a live session.
+outlook.live.com	email	Webmail, reached inside a live session.
+mail.proton.me	email	Webmail, reached inside a live session.
+drive.google.com	cloud_storage	File storage, reached inside a live session.
+www.dropbox.com	cloud_storage	File storage, reached inside a live session.
+onedrive.live.com	cloud_storage	File storage, reached inside a live session.
+vault.bitwarden.com	password_manager	A credential vault.
+app.1password.com	password_manager	A credential vault.
+lastpass.com	password_manager	A credential vault.
+www.paypal.com	payments	Money movement.
+dashboard.stripe.com	payments	Money movement and merchant administration.
+www.coinbase.com	crypto	An exchange holding transferable value.
+console.aws.amazon.com	admin_console	Fleet administration under a live session.
+console.cloud.google.com	admin_console	Fleet administration under a live session.
+portal.azure.com	admin_console	Fleet administration under a live session.
+admin.google.com	admin_console	Tenant administration under a live session.

@@ -1,0 +1,7 @@
+{
+  "flow_id": "provider-flow-fixture",
+  "redirect_binding_id": "taffygo.default",
+  "returned_state": "fixture-provider-state",
+  "status": 0,
+  "authorization_code_handle": "fixture-authorization-code-handle"
+}

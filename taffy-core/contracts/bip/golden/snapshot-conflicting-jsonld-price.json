@@ -1,0 +1,273 @@
+{
+  "schema_version": "0.1",
+  "snapshot_id": "snap_conflict_01",
+  "request_id": "req_001",
+  "profile_id": "prof_default",
+  "browser_window_id": "win_01",
+  "tab_id": "tab_01",
+  "root_frame_id": "frame_main",
+  "page_epoch": "epoch_a1",
+  "graph_revision": 11,
+  "event_sequence": 58,
+  "lifecycle_state": "ACTIVE",
+  "committed_url_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://shop.example.test"
+    },
+    "disclosure": "ORIGIN_AND_PATH",
+    "has_query": false,
+    "has_fragment": false,
+    "path": "/"
+  },
+  "origin_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://shop.example.test"
+    },
+    "is_potentially_trustworthy": true,
+    "is_incognito": false
+  },
+  "capture_time_monotonic_ms": 1000,
+  "scope": "DOCUMENT",
+  "adapters": [
+    {
+      "adapter": "BROWSER",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    },
+    {
+      "adapter": "DOM",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    },
+    {
+      "adapter": "ACCESSIBILITY",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    },
+    {
+      "adapter": "METADATA",
+      "status": "CONFLICTED",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "n_doc",
+      "frame_id": "frame_main",
+      "role": "DOCUMENT",
+      "name": "Desk lamp",
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "node_id": "n_title",
+      "frame_id": "frame_main",
+      "role": "HEADING",
+      "name": "Desk lamp",
+      "text_runs": [
+        {
+          "text": "Desk lamp",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.95,
+      "attributes": [
+        {
+          "name": "HEADING_LEVEL",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "node_id": "n_price_dom",
+      "frame_id": "frame_main",
+      "role": "PRICE",
+      "name": "Price",
+      "text_runs": [
+        {
+          "text": "24.00",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "value_descriptor": {
+        "kind": "PRICE",
+        "present": true,
+        "redacted": false,
+        "normalized_value": "24.00",
+        "currency_code": "EUR"
+      },
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.94,
+      "attributes": [
+        {
+          "name": "CURRENCY_CODE",
+          "value": "EUR"
+        }
+      ],
+      "evidence": [
+        {
+          "field": "VALUE_DESCRIPTOR",
+          "source_kind": "DOM",
+          "source_locator": "dom:/main/span[@data-price]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NORMALIZED",
+          "confidence": 0.94
+        }
+      ]
+    },
+    {
+      "node_id": "n_price_metadata",
+      "frame_id": "frame_main",
+      "role": "PRICE",
+      "name": "Price",
+      "value_descriptor": {
+        "kind": "PRICE",
+        "present": true,
+        "redacted": false,
+        "normalized_value": "19.00",
+        "currency_code": "EUR"
+      },
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "JSON_LD"
+      ],
+      "confidence": 0.61,
+      "attributes": [
+        {
+          "name": "CURRENCY_CODE",
+          "value": "EUR"
+        }
+      ],
+      "evidence": [
+        {
+          "field": "VALUE_DESCRIPTOR",
+          "source_kind": "JSON_LD",
+          "source_locator": "jsonld:/offers/0/price",
+          "extraction_rule_version": "metadata-1.0.0",
+          "transformation": "NORMALIZED",
+          "confidence": 0.61
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_title",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_price_dom",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_title",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_price_dom",
+      "relationship": "DESCRIBES",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_price_dom",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_price_metadata",
+      "relationship": "SAME_ENTITY_AS",
+      "inferred": true,
+      "confidence": 0.72
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_price_metadata",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_price_dom",
+      "relationship": "SOURCE_FOR",
+      "inferred": true,
+      "confidence": 0.72
+    }
+  ],
+  "frames": [
+    {
+      "frame_id": "frame_main",
+      "is_main_frame": true,
+      "is_out_of_process": false,
+      "is_cross_origin_to_parent": false,
+      "origin_metadata": {
+        "origin": {
+          "kind": "TUPLE",
+          "serialization": "https://shop.example.test"
+        },
+        "is_potentially_trustworthy": true,
+        "is_incognito": false
+      },
+      "page_epoch": "epoch_a1",
+      "graph_revision": 11,
+      "lifecycle_state": "ACTIVE",
+      "included": true
+    }
+  ],
+  "truncation": {
+    "truncated": false,
+    "budgets_reached": [],
+    "omitted_node_count": 0,
+    "omitted_text_bytes": 0,
+    "omitted_frame_count": 0,
+    "may_change_answer": false
+  },
+  "redaction_summary": {
+    "applied_features": [
+      "SECRET_VALUE_SUPPRESSION",
+      "SENSITIVE_ZONE_CLASSIFICATION",
+      "URL_MINIMIZATION"
+    ],
+    "redacted_field_count": 0,
+    "suppressed_secret_value_count": 0,
+    "sensitive_zone_count": 0,
+    "policy_filtered_frame_count": 0
+  },
+  "warnings": [
+    {
+      "code": "CONFLICTING_EVIDENCE",
+      "frame_id": "frame_main",
+      "node_id": "n_price_metadata",
+      "detail_code": "price_candidates_disagree"
+    }
+  ]
+}

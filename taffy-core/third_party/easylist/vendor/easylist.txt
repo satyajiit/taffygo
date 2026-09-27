@@ -1,0 +1,48 @@
+easylist (base filter-list pack)
+================================
+
+Vendored assets: the two pinned rule-set snapshots in `../snapshots/`. Unlike
+                 the flag-icons recipe, the upstream bytes ARE committed:
+                 easylist.to serves only the current list and expires it in
+                 days, so the tree is the only durable pin. The pack built
+                 from them is published to the delivery plane and is not
+                 committed.
+Owners:          The EasyList authors (https://easylist.to); TaffyGo decides
+                 which lists ship and how they are packaged (decision 0076,
+                 which also resolves OD-070)
+Licence:         GPL-3.0, elected from the GPL-3.0 / CC BY-SA 3.0 dual offer
+                 the EasyList authors make
+                 (https://easylist.to/pages/licence.html). The text is
+                 vendor/easylist.GPL3.txt, next to this file, and travels
+                 verbatim as the pack's own LICENSE member so a device that
+                 has the rules has the terms beside them. The lists are data
+                 the browser reads, never code it links.
+Source:          https://easylist.to/easylist/easylist.txt and
+                 https://easylist.to/easylist/easyprivacy.txt
+Downloaded:      2026-08-27 (UTC), the versions and digests below
+
+sha256_easylist_202608272347_txt=1ae4280769e07779d4686fae9b562cafc55f3cf0f787d76ae9da2c719360dabf
+bytes_easylist_202608272347_txt=2095505
+sha256_easyprivacy_202608272349_txt=9f101ef2046f6cacbf2a3156c0562d7318a1ac1d9ced194db7a04fb419b22a66
+bytes_easyprivacy_202608272349_txt=1498992
+version_easylist=202608272347
+version_easyprivacy=202608272349
+pack_sha256=c1ea235b7eb1de2efa7b6fd6f5af802fa548e779b9e008efe98ff629a16eef10
+pack_bytes=1183665
+
+The pack is one zip of three members — lists/easylist.txt,
+lists/easyprivacy.txt and LICENSE — built by `../tools/build_filter_pack.py`,
+which refuses to package bytes whose digests differ from the pins in
+`../tools/manifest.json` and rebuilds byte-identically (its `--self-test`
+proves both). The pack digest above is what this builder reproduced; the
+catalog row stays unpublished until `./tools/assets publish` has uploaded the
+pack and verified the origin serves exactly these bytes back.
+
+Permitted use:   the compiled rule sets behind ad and tracker blocking
+                 (CAP-BR-022), loaded by `filtering.browser` from the asset
+                 store and matched by `filtering.core`. The lists never enter
+                 the AI data plane and never leave the device.
+
+Removal trigger: these snapshots leave the tree when a newer pair replaces
+                 them under a new revision, when decision 0076 is superseded,
+                 or the moment the upstream licence offer changes.

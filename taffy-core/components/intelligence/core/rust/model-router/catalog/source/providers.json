@@ -1,0 +1,739 @@
+[
+  {
+    "provider_id": "ant-ling",
+    "display_name": "Ant Ling",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.ant-ling.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "anthropic",
+    "display_name": "Anthropic",
+    "wire_api": "ANTHROPIC_MESSAGES",
+    "default_endpoint": "https://api.anthropic.com",
+    "auth_methods": [
+      "API_KEY",
+      "OAUTH"
+    ],
+    "subscription": true,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "key_prefix": "sk-ant-",
+      "get_key_url": "https://platform.claude.com/settings/keys",
+      "docs_url": "https://platform.claude.com/docs/en/about-claude/models/overview"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0029-launch-provider-set.md",
+      "note": "Row one of decision 0029's table. One descriptor for the vendor, with both ways in on it: decision 0029 section 2 derives the class from the credential in use rather than from a second row. OAUTH was absent while the binary already carried this vendor's PKCE flow, which made a complete flow unreachable rather than gated - decision 0081 gates a vendor by its dated terms review and its client identity in the browser's own table, never by a missing catalog method. The subscription speaks the same family at the same origin as a key, so this row needs neither oauth_wire_api nor oauth_endpoint."
+    }
+  },
+  {
+    "provider_id": "baseten",
+    "display_name": "Baseten",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://inference.baseten.co",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://app.baseten.co/settings/api_keys",
+      "docs_url": "https://docs.baseten.co/inference/model-apis/overview"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 section 1: https://inference.baseten.co/v1 is this vendor's own documented base URL, and its chat path /v1/chat/completions is exactly the origin recorded here plus the path the OPEN_AI_COMPLETIONS family already compiles, so the row needs no per-provider path. One descriptor for the vendor, as decision 0029 section 2 requires; no subscription method is offered, so a plan-backed credential is refused by AuthMethodUnsupported rather than silently accepted."
+    }
+  },
+  {
+    "provider_id": "cerebras",
+    "display_name": "Cerebras",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.cerebras.ai",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://cloud.cerebras.ai",
+      "docs_url": "https://inference-docs.cerebras.ai/"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 section 1: https://api.cerebras.ai/v1 is this vendor's own documented base URL, and its chat path /v1/chat/completions is exactly the origin recorded here plus the path the OPEN_AI_COMPLETIONS family already compiles, so the row needs no per-provider path. One descriptor for the vendor, as decision 0029 section 2 requires; no subscription method is offered, so a plan-backed credential is refused by AuthMethodUnsupported rather than silently accepted."
+    }
+  },
+  {
+    "provider_id": "chutes",
+    "display_name": "Chutes",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://llm.chutes.ai",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "DYNAMIC_LISTING",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://chutes.ai/app/api",
+      "docs_url": "https://docs.chutes.ai/"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0114-a-provider-list-is-read-in-the-dialect-it-is-published-in.md",
+      "note": "Added under decision 0114, which is why this row carries no models: the vendor serves its own list and the device reads it with the person's own key. Read on 2026-09-03: https://llm.chutes.ai/v1/models answers anonymously with an OpenAI-shaped envelope whose rows carry context_length, max_output_length, supported_features, input_modalities and a pricing object, and https://llm.chutes.ai/v1/chat/completions answers a credential-less POST with 429 rather than 404, so the family's own path is the address. This vendor is the reason decision 0114 dispatches its dialect by name: its pricing.prompt is spelled exactly as OpenRouter's and means dollars per million rather than per token, so reading it in the wrong dialect would price every model at a millionth of its cost. The row carries the bare origin only, because the core may name an origin and never a path (decision 0049). No key_prefix is recorded: no page read on that date states one, and a prefix nobody published would be a form refusing a valid key."
+    }
+  },
+  {
+    "provider_id": "deepinfra",
+    "display_name": "DeepInfra",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.deepinfra.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://deepinfra.com/dash/api_keys",
+      "docs_url": "https://docs.deepinfra.com/chat/overview"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 section 1. This vendor documents its OpenAI-shaped API at https://api.deepinfra.com/v1/openai, so the family's version segment for it is /v1/openai rather than /v1 and the row is paired with an entry in kProviderPathPrefixes in taffy-core/browser/model/profile_model_broker_routes.cc — the same shape the zai row uses for /api/paas/v4. Probed on 2026-09-03: both /v1/openai/chat/completions and /v1/chat/completions answer an unauthenticated POST with this vendor's own OpenAI-shaped invalid_api_key object while an invented path under /v1 answers 'Not Found', so the shorter address routes too — the documented one is recorded because an undocumented alias can be withdrawn without notice. One descriptor for the vendor, as decision 0029 section 2 requires; the vendor sells no subscription-backed inference credential, so no OAUTH method is declared. No key_prefix is recorded because the vendor publishes no documented prefix."
+    }
+  },
+  {
+    "provider_id": "deepseek",
+    "display_name": "DeepSeek",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.deepseek.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://platform.deepseek.com/api_keys",
+      "docs_url": "https://api-docs.deepseek.com/"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 section 1: https://api.deepseek.com is this vendor's own documented base URL, and its chat path /chat/completions is exactly the origin recorded here plus the path the OPEN_AI_COMPLETIONS family already compiles, so the row needs no per-provider path. One descriptor for the vendor, as decision 0029 section 2 requires; no subscription method is offered, so a plan-backed credential is refused by AuthMethodUnsupported rather than silently accepted."
+    }
+  },
+  {
+    "provider_id": "fireworks",
+    "display_name": "Fireworks AI",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.fireworks.ai",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://app.fireworks.ai/settings/users/api-keys",
+      "docs_url": "https://docs.fireworks.ai/api-reference/post-chatcompletions"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 once the browser gained a compiled prefix for this vendor, which is the order 0094's consequences require: the table first, then the row. Read on 2026-08-29: https://docs.fireworks.ai/api-reference/post-chatcompletions gives the server URL 'https://api.fireworks.ai/inference' with the path '/v1/chat/completions', and https://docs.fireworks.ai/getting-started/quickstart gives OpenAI clients the base_url 'https://api.fireworks.ai/inference/v1'. This row carries the bare origin only, because the core may name an origin and never a path (decision 0049); '/inference' is compiled in the browser beside the family path it is joined to. One descriptor for the vendor, as decision 0029 section 2 requires; no subscription method is offered, so a plan-backed credential is refused by AuthMethodUnsupported rather than silently accepted. No key_prefix is recorded: the quickstart names the dashboard page a key is created on and states nothing about the shape of the key itself, and a prefix nobody published would be a form refusing a valid key."
+    }
+  },
+  {
+    "provider_id": "github-copilot",
+    "display_name": "GitHub Copilot",
+    "wire_api": "ANTHROPIC_MESSAGES",
+    "default_endpoint": "https://githubcopilot.com",
+    "auth_methods": [
+      "OAUTH"
+    ],
+    "subscription": true,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "docs_url": "https://docs.github.com/en/copilot/reference/ai-models/supported-models"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 as the row half of decision 0081's 'a registration, a review, and a catalog row, never a build': this binary already compiles the vendor's device-code flow, its Android flow shape and its browser configuration, and the catalog row was the only one of the four tables missing. Read on 2026-08-29. OAUTH is the only method because this vendor issues no pasteable key to a person: the device flow's token is exchanged a second time at copilot_internal/v2/token, and that second answer names the host the credential is good for, which is why the endpoint here is the parent domain rather than an API base. The browser's own row licenses '.githubcopilot.com' and substitutes the per-credential host inside it at send time, so this row names the one origin every issued host sits beneath - naming api.individual.githubcopilot.com instead would refuse every account whose exchange returns a different one. No path, because the core may name an origin and never a path (decision 0049), and no per-provider prefix is needed: this vendor serves the messages family at the origin plus the '/v1/messages' the family already compiles, which is decision 0094 section 1's whole test for whether a row is enough. No key_prefix and no get_key_url: there is no key to shape or to create."
+    }
+  },
+  {
+    "provider_id": "google-ai-studio",
+    "display_name": "Google AI Studio",
+    "wire_api": "GOOGLE_GENERATIVE_LANGUAGE",
+    "default_endpoint": "https://generativelanguage.googleapis.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "key_prefix": "AIza",
+      "get_key_url": "https://aistudio.google.com/apikey",
+      "docs_url": "https://ai.google.dev/gemini-api/docs/models"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0029-launch-provider-set.md",
+      "note": "Row three of decision 0029's table. The `/v1beta` this row used to carry is gone and nothing about the address changed: the browser composes that version segment itself for this family, and the join resolves against the origin, so the path was discarded before the request was built. It was left standing because the one assertion stating decision 0049's rule — an origin and never a path — read only the rows later decisions added, and this row predates them. Under a family whose prefix mattered the same row would have sent a request to somewhere nobody named."
+    }
+  },
+  {
+    "provider_id": "groq",
+    "display_name": "Groq",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.groq.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://console.groq.com/keys",
+      "docs_url": "https://console.groq.com/docs/api-reference"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 once the browser gained a compiled prefix for this vendor, which is the order 0094's consequences require: the table first, then the row. Read on 2026-08-29: https://console.groq.com/docs/api-reference prints the endpoint as 'POST https://api.groq.com/openai/v1/chat/completions'. This row carries the bare origin only, because the core may name an origin and never a path (decision 0049); '/openai' is compiled in the browser beside the family path it is joined to. One descriptor for the vendor, as decision 0029 section 2 requires; no subscription method is offered, so a plan-backed credential is refused by AuthMethodUnsupported rather than silently accepted. get_key_url is the console page https://console.groq.com/docs/quickstart links as '/keys'. No key_prefix is recorded: no Groq page read on that date states one, and a prefix nobody published would be a form refusing a valid key."
+    }
+  },
+  {
+    "provider_id": "huggingface",
+    "display_name": "Hugging Face",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://router.huggingface.co",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://huggingface.co/settings/tokens",
+      "docs_url": "https://huggingface.co/docs/inference-providers"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "kilocode",
+    "display_name": "Kilo",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.kilo.ai",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "DYNAMIC_LISTING",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://app.kilocode.ai/profile",
+      "docs_url": "https://kilocode.ai/docs"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0114-a-provider-list-is-read-in-the-dialect-it-is-published-in.md",
+      "note": "Added under decision 0114 and carries no models for the reason every listed row carries none. Read on 2026-09-03: https://api.kilo.ai/api/gateway/v1/models answers anonymously in the same shape OpenRouter publishes - data[], supported_parameters, pricing.prompt and pricing.completion quoted per token - so it needs no dialect of its own. The vendor also answers the same list one segment shorter, at /api/gateway/models, byte for byte; the versioned spelling is the one compiled, because it is the one the family composes and a row that reached a vendor by a path the family does not write would be a row nothing else in this table could be read against. A credential-less POST to /api/gateway/v1/chat/completions answers 401 while an invented sibling answers 405, which is the pair that distinguishes a route that exists from a host that answers everything. The row carries the bare origin only (decision 0049); '/api/gateway' is compiled in the browser beside the family path it is joined to. No key_prefix is recorded, for the reason the Groq row states."
+    }
+  },
+  {
+    "provider_id": "kimi-coding",
+    "display_name": "Kimi For Coding",
+    "wire_api": "ANTHROPIC_MESSAGES",
+    "default_endpoint": "https://api.kimi.com",
+    "auth_methods": [
+      "OAUTH"
+    ],
+    "subscription": true,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "docs_url": "https://platform.kimi.ai/docs/api/chat"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 as the row half of decision 0081's 'a registration, a review, and a catalog row, never a build': this binary already compiles the vendor's device-code flow against auth.kimi.com, its Android flow shape and its browser configuration, and the catalog row was the only one of the four tables missing. Read on 2026-08-29 from https://www.kimi.com/coding, which describes the coding subscription and states that Moderato and higher plans reach the K3 model. This is a separate identity from the 'moonshot' row and not a second descriptor for it: that row is the metered platform API at api.moonshot.ai, billed by the token, and this one is the plan-backed coding endpoint - different address, different billing, different credential, which is what makes them two vendors rather than decision 0029 section 2's forbidden second row for one. OAUTH only, because a plan is the way in. The endpoint is the bare origin: the '/coding' base path is compiled in the browser's kProviderPathPrefixes beside the '/v1/messages' the messages family joins to it, which is the order decision 0094's consequences require - table first, row second - and that table row already exists."
+    }
+  },
+  {
+    "provider_id": "minimax",
+    "display_name": "MiniMax",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.minimax.io",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://platform.minimax.io/user-center/basic-information/interface-key",
+      "docs_url": "https://platform.minimax.io/docs"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 section 1: https://api.minimax.io/v1 is this vendor's own documented base URL, and its chat path /v1/chat/completions is exactly the origin recorded here plus the path the OPEN_AI_COMPLETIONS family already compiles, so the row needs no per-provider path. One descriptor for the vendor, as decision 0029 section 2 requires; no subscription method is offered, so a plan-backed credential is refused by AuthMethodUnsupported rather than silently accepted."
+    }
+  },
+  {
+    "provider_id": "minimax-cn",
+    "display_name": "MiniMax (China)",
+    "wire_api": "ANTHROPIC_MESSAGES",
+    "default_endpoint": "https://api.minimaxi.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "docs_url": "https://platform.minimaxi.com/docs"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The vendor serves this family beneath '/anthropic/v1', so this row is paired with an entry in kProviderPathPrefixes in taffy-core/browser/model/profile_model_broker_routes.cc. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "mistral",
+    "display_name": "Mistral AI",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.mistral.ai",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://console.mistral.ai/api-keys",
+      "docs_url": "https://docs.mistral.ai/api/"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 section 1: this vendor's OpenAI-shaped API is served at https://api.mistral.ai/v1/chat/completions, which is exactly the origin recorded here plus the /v1 + /chat/completions the OPEN_AI_COMPLETIONS family already composes, so the row needs no entry in kProviderPathPrefixes. Reachability was checked on 2026-09-03 by posting an empty body to that address unauthenticated and reading the vendor's 401 rather than a 404. One descriptor for the vendor, as decision 0029 section 2 requires; the vendor offers no subscription-backed inference credential, so no OAUTH method is declared and a plan-backed credential is refused by AuthMethodUnsupported rather than silently accepted. No key_prefix is recorded because the vendor publishes no documented prefix for its API keys, which is the same finding the fireworks and groq rows carry."
+    }
+  },
+  {
+    "provider_id": "moonshot",
+    "display_name": "Moonshot AI",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.moonshot.ai",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://platform.kimi.ai/console/api-keys",
+      "docs_url": "https://platform.kimi.ai/docs"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0029-launch-provider-set.md",
+      "note": "Row five of decision 0029's table. The `/v1` this row used to carry is gone and nothing about the address changed: the browser composes that version segment itself for this family, and the join resolves against the origin, so the path was discarded before the request was built. It was left standing because the one assertion stating decision 0049's rule — an origin and never a path — read only the rows later decisions added, and this row predates them."
+    }
+  },
+  {
+    "provider_id": "moonshot-cn",
+    "display_name": "Moonshot AI (China)",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.moonshot.cn",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://platform.moonshot.cn/console/api-keys",
+      "docs_url": "https://platform.moonshot.cn/docs"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "novita",
+    "display_name": "Novita AI",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.novita.ai",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "DYNAMIC_LISTING",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://novita.ai/settings/key-management",
+      "docs_url": "https://novita.ai/docs/api-reference/model-apis-llm-create-chat-completion"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0114-a-provider-list-is-read-in-the-dialect-it-is-published-in.md",
+      "note": "Added under decision 0114 and carries no models for the reason every listed row carries none. Read on 2026-09-03: https://api.novita.ai/openai/v1/models answers anonymously with rows carrying model_type, context_size, max_output_tokens, features, input_modalities and a pricing object, and /openai/v1/chat/completions answers a credential-less POST with 403 rather than 404. Two facts about that list are decided in decision 0114 rather than here: the vendor serves image and speech models from the same address, so only its chat rows become models this product will route a turn to; and it quotes every rate twice, at a standing price and a discounted one, of which the dearer is recorded under decision 0094 section 2's rule for a conditional price. The row carries the bare origin only (decision 0049); '/openai' is compiled in the browser. No key_prefix is recorded, for the reason the Groq row states."
+    }
+  },
+  {
+    "provider_id": "nvidia",
+    "display_name": "NVIDIA",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://integrate.api.nvidia.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://build.nvidia.com/settings/api-keys",
+      "docs_url": "https://docs.api.nvidia.com/nim/reference/llm-apis"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "openai",
+    "display_name": "OpenAI",
+    "wire_api": "OPEN_AI_RESPONSES",
+    "default_endpoint": "https://api.openai.com",
+    "oauth_wire_api": "OPEN_AI_CODEX_RESPONSES",
+    "oauth_endpoint": "https://chatgpt.com",
+    "auth_methods": [
+      "API_KEY",
+      "OAUTH"
+    ],
+    "subscription": true,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "key_prefix": "sk-",
+      "get_key_url": "https://platform.openai.com/api-keys",
+      "docs_url": "https://developers.openai.com/api/docs/models"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0029-launch-provider-set.md",
+      "note": "Row two of decision 0029's table, and the vendor decision 0029 section 2's one-descriptor rule was written for: the subscription route is a different wire family at a different address from the key route, and both are carried on this one row because the class is derived from the credential in use. The binary already compiled this vendor's PKCE flow while OAUTH was absent here, which made that flow unreachable rather than gated. oauth_endpoint names an origin and nothing else, as decision 0049 requires of every address the sandboxed core hands out: the browser's compiled route table joins /backend-api/codex/responses beneath it, and a path in this column would be a served document moving a request. The `/v1` this row used to carry is gone and nothing about the address changed: the browser composes that version segment itself for this family, and the join resolves against the origin, so the path was discarded before the request was built. It was left standing because the one assertion stating decision 0049's rule — an origin and never a path — read only the rows later decisions added, and this row predates them."
+    }
+  },
+  {
+    "provider_id": "opencode",
+    "display_name": "OpenCode Zen",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://opencode.ai",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://opencode.ai/auth",
+      "docs_url": "https://opencode.ai/docs/zen"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The vendor serves this family beneath '/zen/v1', so this row is paired with an entry in kProviderPathPrefixes in taffy-core/browser/model/profile_model_broker_routes.cc. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "opencode-go",
+    "display_name": "OpenCode Go",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://opencode.ai",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://opencode.ai/auth",
+      "docs_url": "https://opencode.ai/docs/zen"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The vendor serves this family beneath '/zen/go/v1', so this row is paired with an entry in kProviderPathPrefixes in taffy-core/browser/model/profile_model_broker_routes.cc. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "openrouter",
+    "display_name": "OpenRouter",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://openrouter.ai",
+    "auth_methods": [
+      "API_KEY",
+      "OAUTH"
+    ],
+    "subscription": false,
+    "model_source": "DYNAMIC_LISTING",
+    "enabled": true,
+    "provenance": {
+      "decided_by": "docs/decisions/0029-launch-provider-set.md",
+      "note": "Row four of decision 0029's table. Its model list is an authenticated remote call refreshed into the same on-device cache under the same parsing rules, which is why this baseline carries none of its models. OAUTH is offered because the binary compiles this vendor's PKCE flow and the flow was unreachable without it. subscription stays false on purpose and is not an oversight: this vendor's exchange mints a permanent API key rather than a token pair, so what the flow produces is a metered key spent at the same address a pasted one is, and calling it plan-backed would put a subscription sentence in front of a person whose request is billed by the token."
+    }
+  },
+  {
+    "provider_id": "qwen",
+    "display_name": "Qwen",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://dashscope-intl.aliyuncs.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://www.alibabacloud.com/help/en/model-studio/get-api-key",
+      "docs_url": "https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 section 1. The vendor serves its OpenAI-shaped API beneath /compatible-mode, so this row is paired with an entry in kProviderPathPrefixes in taffy-core/browser/model/profile_model_broker_routes.cc carrying that prefix and the family's own /v1. Probed on 2026-09-03: an unauthenticated POST to https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions answers with the vendor's own OpenAI-shaped invalid_api_key object. The international (Singapore) host is the one recorded, and every price on this vendor's models is quoted at its international rate for that reason: the vendor publishes a second, lower Beijing rate, and recording the address of one region with the prices of the other would under-report every call. One descriptor for the vendor, as decision 0029 section 2 requires; the vendor's token plans are a different purchase at a different host and are not this row. No key_prefix is recorded because the vendor publishes no documented prefix."
+    }
+  },
+  {
+    "provider_id": "qwen-token-plan",
+    "display_name": "Qwen Token Plan",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://token-plan.ap-southeast-1.maas.aliyuncs.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://www.alibabacloud.com/help/en/model-studio/get-api-key",
+      "docs_url": "https://www.alibabacloud.com/help/en/model-studio/token-plan-personal-overview"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The vendor serves this family beneath '/compatible-mode/v1', so this row is paired with an entry in kProviderPathPrefixes in taffy-core/browser/model/profile_model_broker_routes.cc. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "qwen-token-plan-cn",
+    "display_name": "Qwen Token Plan (China)",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://token-plan.cn-beijing.maas.aliyuncs.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The vendor serves this family beneath '/compatible-mode/v1', so this row is paired with an entry in kProviderPathPrefixes in taffy-core/browser/model/profile_model_broker_routes.cc. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "together",
+    "display_name": "Together AI",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.together.ai",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://api.together.xyz/settings/api-keys",
+      "docs_url": "https://docs.together.ai"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 section 1: https://api.together.ai/v1 is this vendor's own documented base URL, and its chat path /v1/chat/completions is exactly the origin recorded here plus the path the OPEN_AI_COMPLETIONS family already compiles, so the row needs no per-provider path. One descriptor for the vendor, as decision 0029 section 2 requires; no subscription method is offered, so a plan-backed credential is refused by AuthMethodUnsupported rather than silently accepted."
+    }
+  },
+  {
+    "provider_id": "venice",
+    "display_name": "Venice AI",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.venice.ai",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "DYNAMIC_LISTING",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://venice.ai/settings/api",
+      "docs_url": "https://docs.venice.ai/api-reference/api-spec"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0114-a-provider-list-is-read-in-the-dialect-it-is-published-in.md",
+      "note": "Added under decision 0114 and carries no models for the reason every listed row carries none. Read on 2026-09-03: https://api.venice.ai/api/v1/models answers anonymously with rows whose facts sit under a model_spec of the vendor's own - availableContextTokens, maxCompletionTokens, a capabilities object stating supportsFunctionCalling, supportsReasoning and supportsVision, and a pricing object quoting usd per million - and /api/v1/chat/completions answers a credential-less POST with 402 rather than 404. The vendor serves image and speech models from the same list and says which is which in a type field, so only its text rows become models. The row carries the bare origin only (decision 0049); '/api' is compiled in the browser. No key_prefix is recorded, for the reason the Groq row states."
+    }
+  },
+  {
+    "provider_id": "vercel-ai-gateway",
+    "display_name": "Vercel AI Gateway",
+    "wire_api": "ANTHROPIC_MESSAGES",
+    "default_endpoint": "https://ai-gateway.vercel.sh",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://vercel.com/dashboard/ai-gateway/api-keys",
+      "docs_url": "https://vercel.com/docs/ai-gateway"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "xai",
+    "display_name": "SpaceXAI",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.x.ai",
+    "auth_methods": [
+      "API_KEY",
+      "OAUTH"
+    ],
+    "subscription": true,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://console.x.ai",
+      "docs_url": "https://docs.x.ai"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0029-launch-provider-set.md",
+      "note": "Row six of decision 0029's table, and the one vendor whose terms decision 0029 point 4 records as permitting plan-backed access, so it carries both auth methods. The provider class stays derived from the credential in use. The vendor merged into SpaceX on 2026-05-07 and its own pages now name it SpaceXAI, so display_name follows the vendor while provider_id does not: that identifier is the key the sealed credential store, the three compiled sign-in tables and the mark table are all written against, and moving it would strand every credential a person has already saved. The API host stays api.x.ai; the vendor states it will move to a differently branded address on a date it has not announced, and nothing here anticipates that move. No key_prefix: the vendor publishes no shape for its keys, the same finding the fireworks and groq rows record, and a prefix nobody published would be a form refusing a valid key. Four models the vendor's own list carries are deliberately not here, recorded so the omission is a decision rather than a gap: grok-4.5, which sits between the two rows this catalog already fills and would serve neither role better; and grok-4.20-0309-reasoning, grok-4.20-0309-non-reasoning and grok-4.20-multi-agent-0309, which are priced identically to grok-4.3 on the same 1M window and add three ways to say what one row already says. grok-imagine-image-2.0 is not omitted but staged: generated media is decision 0108's work and this catalog has no output-modality vocabulary yet. Re-read against the vendor's page on 2026-09-02; every number on this provider's three rows was unchanged. The `/v1` this row used to carry is gone and nothing about the address changed: the browser composes that version segment itself for this family, and the join resolves against the origin, so the path was discarded before the request was built. It was left standing because the one assertion stating decision 0049's rule — an origin and never a path — read only the rows later decisions added, and this row predates them."
+    }
+  },
+  {
+    "provider_id": "xiaomi",
+    "display_name": "Xiaomi MiMo",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.xiaomimimo.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "xiaomi-token-plan-ams",
+    "display_name": "Xiaomi MiMo Token Plan (Amsterdam)",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://token-plan-ams.xiaomimimo.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "xiaomi-token-plan-cn",
+    "display_name": "Xiaomi MiMo Token Plan (China)",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://token-plan-cn.xiaomimimo.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "xiaomi-token-plan-sgp",
+    "display_name": "Xiaomi MiMo Token Plan (Singapore)",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://token-plan-sgp.xiaomimimo.com",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  },
+  {
+    "provider_id": "zai",
+    "display_name": "Z.AI",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://api.z.ai",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "get_key_url": "https://z.ai/manage-apikey/apikey-list",
+      "docs_url": "https://docs.z.ai/api-reference/llm/chat-completion"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0094-the-provider-set-grows-by-catalog-row.md",
+      "note": "Added under decision 0094 once the browser gained a compiled prefix and a version override for this vendor, which is the order 0094's consequences require: the table first, then the row. Read on 2026-08-29: https://docs.z.ai/api-reference/llm/chat-completion gives the server 'https://api.z.ai/api' with the path '/paas/v4/chat/completions', and https://docs.z.ai/guides/develop/http/introduction prints the base URL as 'https://api.z.ai/api/paas/v4/'. This is the vendor 0094 section 1 named as unreachable, and it is the one whose version segment is not the family's: it serves the OpenAI-shaped chat path under /v4 rather than /v1. This row carries the bare origin only, because the core may name an origin and never a path (decision 0049); '/api/paas' and '/v4' are both compiled in the browser. One descriptor for the vendor, as decision 0029 section 2 requires; no subscription method is offered here, so a plan-backed credential is refused by AuthMethodUnsupported rather than silently accepted — the vendor does sell a coding plan, but no sign-in flow for it has been read or built. No key_prefix is recorded: the HTTP guide shows a key being split on '.' into an id and a secret and states no prefix, so there is nothing a form could check."
+    }
+  },
+  {
+    "provider_id": "zai-coding-cn",
+    "display_name": "Z.AI GLM Coding Plan (China)",
+    "wire_api": "OPEN_AI_COMPLETIONS",
+    "default_endpoint": "https://open.bigmodel.cn",
+    "auth_methods": [
+      "API_KEY"
+    ],
+    "subscription": false,
+    "model_source": "STATIC_CATALOG",
+    "enabled": true,
+    "presentation": {
+      "docs_url": "https://open.bigmodel.cn/dev/api"
+    },
+    "provenance": {
+      "decided_by": "docs/decisions/0118-the-model-catalog-is-imported-from-a-source-of-record.md",
+      "note": "Added by import_pi_catalog.py under decision 0118 from a pi catalog snapshot taken on 2026-09-03. The vendor serves this family beneath '/api/coding/paas/v4', so this row is paired with an entry in kProviderPathPrefixes in taffy-core/browser/model/profile_model_broker_routes.cc. The address was reached before the row was written: an unauthenticated POST to the address this family composes answered with the vendor's own error rather than a 404, which is what decision 0094 section 1 asks of a row before it ships. One descriptor for the vendor, as decision 0029 section 2 requires. No key_prefix is recorded, because the source states none and this catalog does not invent one."
+    }
+  }
+]

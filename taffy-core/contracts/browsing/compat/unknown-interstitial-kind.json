@@ -1,0 +1,12 @@
+{
+  "host": "example.test",
+  "title": "",
+  "can_go_back": false,
+  "can_go_forward": false,
+  "is_loading": false,
+  "failure": 0,
+  "interstitial": 200,
+  "http_status_code": 0,
+  "filtering_active": true,
+  "blocked_request_count": 0
+}

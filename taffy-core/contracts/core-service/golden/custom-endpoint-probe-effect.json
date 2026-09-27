@@ -1,0 +1,32 @@
+{
+  "operation": {
+    "operation_id": "custom-endpoint-probe-operation-1",
+    "service_generation": 4,
+    "task_revision": 0,
+    "deadline_monotonic_ms": 120000,
+    "idempotency_key": "custom-endpoint-probe-key-1"
+  },
+  "effect_id": "custom-endpoint-probe-my-gateway-1",
+  "kind": 13,
+  "retry_class": 0,
+  "storage_commit": null,
+  "page_observation": null,
+  "model_request": null,
+  "network_request": null,
+  "browser_action": null,
+  "tool_job": null,
+  "secure_store": null,
+  "auth_surface": null,
+  "permission_request": null,
+  "asset_delivery": null,
+  "catalog_fetch": null,
+  "provider_listing_fetch": null,
+  "composer_completion": null,
+  "custom_endpoint_probe": {
+    "provider_id": "my-gateway",
+    "endpoint": "http://workstation.local:11434",
+    "wire_api": 2,
+    "credential_handle": null,
+    "max_response_bytes": 262144
+  }
+}

@@ -1,0 +1,37 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The pinned EasyList + EasyPrivacy snapshots, concatenated into one APK
+# asset so Ads and trackers has rules before the catalog pack is published.
+# OpenApkAsset requires an uncompressed asset.
+
+import("//build/config/features.gni")
+
+if (is_android) {
+  import("//build/config/android/rules.gni")
+
+  action("bundled_filter_list_text") {
+    script = "concat_snapshots.py"
+    inputs = [
+      "snapshots/easylist-202608272347.txt",
+      "snapshots/easyprivacy-202608272349.txt",
+    ]
+    outputs = [ "$target_gen_dir/bundled_filter_lists.txt" ]
+    args = [
+      "--output",
+      rebase_path(outputs[0], root_build_dir),
+    ]
+    args += rebase_path(inputs, root_build_dir)
+  }
+
+  android_assets("bundled_filter_list_assets") {
+    deps = [ ":bundled_filter_list_text" ]
+    renaming_sources = [ "$target_gen_dir/bundled_filter_lists.txt" ]
+    renaming_destinations = [ "taffy-filter-lists/base.txt" ]
+    disable_compression = true
+    visibility = [ "//taffy/app/android:*" ]
+  }
+}

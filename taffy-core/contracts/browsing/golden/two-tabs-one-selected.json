@@ -1,0 +1,35 @@
+{
+  "tabs": [
+    {
+      "tab_id": "tab-1",
+      "title": "Example",
+      "host": "example.test",
+      "has_been_nowhere": false,
+      "owner": 1,
+      "privacy": 0,
+      "selected": true
+    },
+    {
+      "tab_id": "tab-2",
+      "title": "",
+      "host": "",
+      "has_been_nowhere": true,
+      "owner": 1,
+      "privacy": 1,
+      "selected": false
+    }
+  ],
+  "navigation": {
+    "host": "example.test",
+    "title": "Example",
+    "can_go_back": true,
+    "can_go_forward": false,
+    "is_loading": false,
+    "failure": 0,
+    "interstitial": 0,
+    "http_status_code": 200,
+    "filtering_active": true,
+    "blocked_request_count": 12
+  },
+  "downloads": []
+}

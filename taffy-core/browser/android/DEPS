@@ -1,0 +1,280 @@
+# The JNI edge of //taffy/browser: native entry points and nothing else.
+#
+# These are the only //taffy sources anywhere that may name a //chrome Android
+# object. They are built by //taffy/browser/android:jni_bridges, which nothing
+# but libchrome links, because jni_zero resolves the Java peer of every native
+# it registers at process start and two of those peers live in
+# //chrome/android:chrome_java — a test APK that linked them aborted before any
+# test body ran.
+#
+# The account plane, the Core API facade and the Core API command factory used
+# to live here too, and none of them named an Android type; decision 0042 moved
+# them to //taffy/browser/account and //taffy/browser/core_api, where they
+# build on every platform. What is left is the edge itself.
+#
+# The parent DEPS file allows three profile-ownership headers for the whole of
+# //taffy/browser. `-chrome` takes that back for this directory and the
+# specific rules below hand it out again, one file at a time, so that a new
+# source here cannot quietly acquire an embedder type and put the test binaries
+# back where they were: unlinkable, and aborting at startup on a Java class the
+# APK does not carry.
+include_rules = [
+  "-chrome",
+
+  "+base",
+  "+content/public/browser",
+  "+mojo/public/cpp/bindings",
+  "+taffy/browser",
+  "+taffy/contracts/core-api/generated/mojom",
+  "+taffy/contracts/core-service/generated/mojom",
+  "+taffy/resources/branding",
+]
+
+specific_include_rules = {
+  "backup_workflow_bridge\\.cc": [
+    "+chrome/browser/profiles/profile.h",
+  ],
+  "backup_workflow_bridge_internal\\.cc": [
+    "+chrome/browser/browser_process.h",
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+  ],
+  "backup_workflow_restore_android\\.cc": [
+    "+chrome/browser/profiles/profile.h",
+  ],
+  # Profile lifecycle stays behind one product-owned JNI seam. Java receives
+  # opaque identifiers and display names, never profile directory paths.
+  "browser_profiles_bridge\\.cc": [
+    "+chrome/browser/browser_process.h",
+    "+chrome/browser/profiles/delete_profile_helper.h",
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+    "+chrome/browser/profiles/profile_metrics.h",
+  ],
+  # Restart discovery reads the sole exact reservation from durable Local
+  # State and Chromium's own profile metadata. It never activates a profile;
+  # the only physical act it may reach is deleting a candidate it has already
+  # matched, through the same upstream helper the resolution path uses.
+  "browser_profiles_restore_discovery_android\\.cc": [
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+  ],
+  "browser_profiles_restore_discovery_android_helpers\\.cc": [
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+  ],
+  "browser_profiles_restore_discovery_android_observation\\.cc": [
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+chrome/browser/profiles/profile_manager.h",
+    "+taffy/components/storage/browser/dormant_backup_restore_target_lease.h",
+    "+taffy/components/storage/browser/dormant_backup_restore_target_reconciler.h",
+    "+taffy/components/storage/browser/dormant_backup_restore_target_resolution.h",
+  ],
+  # Retirement clears the reservation preference after physical verification.
+  # The pref name is upstream's, so naming the header makes an upstream rename
+  # a compile error rather than a silently orphaned reservation.
+  "browser_profiles_restore_discovery_android_retirement\\.cc": [
+    "+chrome/browser/profiles/profile_manager.h",
+    "+chrome/common/pref_names.h",
+  ],
+  # Backup restore reserves one omitted Android profile behind synchronized
+  # Local State quarantine before its directory exists. It never activates,
+  # publishes, or deletes that profile; the dormant-target source may create
+  # only its schema-and-identity storage owner.
+  "browser_profiles_restore_lifecycle\\.cc": [
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+  ],
+  "browser_profiles_restore_lifecycle_binding\\.cc": [
+    "+chrome/browser/profiles/profile_manager.h",
+    "+chrome/common/chrome_constants.h",
+  ],
+  "browser_profiles_restore_lifecycle_creation\\.cc": [
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_init_params.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+    "+chrome/common/chrome_constants.h",
+    "+chrome/common/pref_names.h",
+  ],
+  "browser_profiles_restore_lifecycle_dormant_target\\.cc": [
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+    "+chrome/common/chrome_constants.h",
+    "+chrome/common/pref_names.h",
+    "+taffy/components/storage/browser/dormant_backup_restore_target.h",
+  ],
+  "browser_profiles_restore_lifecycle_presentation\\.cc": [
+    "+chrome/browser/profiles/profile_manager.h",
+    "+chrome/common/chrome_constants.h",
+  ],
+  "browser_profiles_restore_precommit_cleanup\\.cc": [
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+chrome/browser/profiles/profile_manager.h",
+  ],
+  "browser_profiles_restore_precommit_cleanup_helpers\\.cc": [
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+    "+chrome/common/chrome_constants.h",
+    "+chrome/common/pref_names.h",
+  ],
+  "browser_profiles_restore_precommit_cleanup_storage\\.cc": [
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+taffy/components/storage/browser/dormant_backup_restore_target_lease.h",
+    "+taffy/components/storage/browser/dormant_backup_restore_target_resolution.h",
+    "+taffy/components/storage/browser/dormant_backup_restore_target_resolution_internal.h",
+  ],
+  "browser_profiles_restore_reconciliation_android\\.cc": [
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+  ],
+  "browser_profiles_restore_reconciliation_android_outcome\\.cc": [
+    "+chrome/browser/profiles/profile_manager.h",
+    "+chrome/common/chrome_constants.h",
+  ],
+  "browser_profiles_restore_reconciliation_android_storage\\.cc": [
+    "+taffy/components/storage/browser/dormant_backup_restore_target_reconciler.h",
+  ],
+  "browser_profiles_restore_resolution_android\\.cc": [
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+  ],
+  "browser_profiles_restore_resolution_android_discard\\.cc": [
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+chrome/browser/profiles/profile_manager.h",
+  ],
+  "browser_profiles_restore_resolution_android_dispatch\\.cc": [
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+  ],
+  "browser_profiles_restore_resolution_android_helpers\\.cc": [
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+    "+chrome/common/chrome_constants.h",
+    "+chrome/common/pref_names.h",
+  ],
+  "browser_profiles_restore_resolution_android_outcome\\.cc": [
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+  ],
+  "browser_profiles_restore_resolution_android_retirement\\.cc": [
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+    "+chrome/common/pref_names.h",
+  ],
+  "browser_profiles_restore_resolution_android_storage\\.cc": [
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+taffy/components/storage/browser/dormant_backup_restore_target_lease.h",
+    "+taffy/components/storage/browser/dormant_backup_restore_target_resolution.h",
+  ],
+  "browser_profiles_restore_target_android_commit\\.cc": [
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_manager.h",
+    "+chrome/common/chrome_constants.h",
+  ],
+  "browser_profiles_restore_target_android_storage\\.cc": [
+    "+taffy/components/storage/browser/dormant_backup_restore_target.h",
+  ],
+  # The download surface resolves one exact regular Profile to Chromium's
+  # profile-keyed offline-content aggregator. It returns only the existing
+  # Android provider bridge; download mechanics remain upstream-owned.
+  "download_provider_bridge\.cc": [
+    "+chrome/browser/offline_items_collection/offline_content_aggregator_factory.h",
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_key.h",
+    "+components/offline_items_collection/core/android/offline_content_aggregator_bridge.h",
+  ],
+  # Screen SCR-110's page is the one surface in the product that must never
+  # write history: it carries a vendor's authorization address, which carries
+  # the flow's `state`, its PKCE challenge and often the account being signed
+  # in as. The tab header resolves the Java peer to its WebContents; the
+  # history header is named only for `HistoryTabHelper::UserDataKey()`, so that
+  # an upstream rename of that helper is a compile error here rather than a
+  # surface that silently starts recording again.
+  "errand_page_bridge\\.cc": [
+    "+chrome/browser/android/tab_android.h",
+    "+chrome/browser/history/history_tab_helper.h",
+  ],
+  # The JNI entry points. Each one resolves the Java peer of a Profile before
+  # it may reach the profile-keyed service, which is what the header is for.
+  # The filtering bridge also resolves a Tab to its WebContents, for the
+  # per-tab blocked count — the same two-header embedder seam the selection
+  # bridge argues for below.
+  "filtering_bridge\\.cc": [
+    "+chrome/browser/android/tab_android.h",
+    "+chrome/browser/profiles/profile.h",
+  ],
+  "page_inspector_bridge\\.cc": [
+    "+chrome/browser/profiles/profile.h",
+  ],
+  # Android PDFs are native pages. This bridge resolves the exact Tab-owned
+  # WebContents to its Java peer; only bounded native text returns from the
+  # AndroidX document to the browser.
+  "pdf_intelligence_bridge\\.cc": [
+    "+chrome/browser/android/tab_android.h",
+  ],
+  "profile_core_api_bridge\\.cc": [
+    "+chrome/browser/profiles/profile.h",
+  ],
+  "profile_platform_bridge\\.cc": [
+    "+chrome/browser/profiles/profile.h",
+  ],
+  # Notification controls carry only Taffy's one-way profile digest. The
+  # loader matches that digest against durable regular-profile metadata and
+  # loads the exact path without exposing any path or Chromium token to Java.
+  "regular_profile_loader\\.cc": [
+    "+chrome/browser/browser_process.h",
+    "+chrome/browser/profiles/nuke_profile_directory_utils.h",
+    "+chrome/browser/profiles/profile.h",
+    "+chrome/browser/profiles/profile_attributes_entry.h",
+    "+chrome/browser/profiles/profile_attributes_storage.h",
+    "+chrome/browser/profiles/profile_manager.h",
+    "+chrome/common/chrome_paths.h",
+  ],
+  "regular_profile_token\\.cc": [
+    "+chrome/browser/android/proto/profile_token.pb.h",
+  ],
+  "regular_profile_token_unittest\\.cc": [
+    "+testing/gtest/include/gtest/gtest.h",
+  ],
+  # The trusted Android half resolves an upstream Tab object to its native
+  # WebContents and product-TabModel identity. These two headers are the whole
+  # embedder seam; selection intent never carries a tab or origin identifier.
+  "task_source_selection_bridge\\.cc": [
+    "+chrome/browser/android/tab_android.h",
+    "+chrome/browser/profiles/profile.h",
+  ],
+}

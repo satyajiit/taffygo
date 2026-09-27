@@ -1,0 +1,41 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//mojo/public/tools/bindings/mojom.gni")
+
+mojom("tool_runtime_mojom") {
+  sources = [
+    "generated/mojom/tool_runtime.mojom",
+    "tool_runtime_service.mojom",
+  ]
+  public_deps = [
+    "//mojo/public/mojom/base",
+    "//sandbox/policy/mojom",
+  ]
+}
+
+# The generated closed-enumeration decoders; see the same target under
+# //taffy/contracts/core-service for why C++ needs one and Rust does not.
+source_set("tool_runtime_enums") {
+  sources = [ "generated/cpp/tool_runtime_enums.h" ]
+  public_deps = [ ":tool_runtime_mojom" ]
+}
+
+# Stable contract edge for the browser supervisor and runtime-specific
+# workers. It carries the contract's own projections — the Mojo interfaces and
+# the generated Rust records — and never a worker implementation.
+#
+# The Rust view is named here rather than by a consumer because no Rust worker
+# exists yet. Without this edge GN never loads the crate's BUILD.gn, and 431
+# lines of generated Rust would sit in the tree having never been through a
+# compiler or the workspace's deny lints.
+group("tool-runtime") {
+  public_deps = [
+    ":tool_runtime_enums",
+    ":tool_runtime_mojom",
+    "//taffy/contracts/tool-runtime/rust/tool-runtime-types:tool_runtime_types",
+  ]
+}

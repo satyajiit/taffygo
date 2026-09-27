@@ -1,0 +1,160 @@
+{
+  "description": "Compatibility fixtures for the browsing seam. Each fixture is one deliberate deviation from a message that would otherwise be accepted, and states the verdict a conforming decoder must reach. The kind of each fixture says which artifact reaches that verdict, so no row claims more than was run. Run them with: python3 taffy-core/contracts/browsing/codegen/generate.py --verify",
+  "verdicts": {
+    "ACCEPT": "The message is valid at this version and is accepted.",
+    "REJECT_CLOSED_ENUM": "A closed enumeration carries a value outside the members this version defines. The message is unsupported and fails closed; the value is never coerced to a known member.",
+    "REJECT_MALFORMED": "The message breaks a shape rule: a missing or extra field, a wrong scalar type, or a presence combination the contract forbids.",
+    "REJECT_OVERSIZED": "The message is otherwise valid and is refused only because it exceeds a bound the contract declares.",
+    "REJECT_VERSION": "The declared contract version is one this build does not speak, so the required meaning may have changed. The message is refused on the version alone."
+  },
+  "kinds": {
+    "enum": "A committed document whose closed enumeration carries a value outside the contract. The generated Rust `from_wire` must answer that the value is unsupported.",
+    "bound": "A committed document measured against the generated limit constant the product compiles in. The generated Rust constant must answer that the measurement is over.",
+    "version": "A committed document at a declared contract version, answered against the version this build speaks.",
+    "record": "A committed document answered by this contract's own shape rules in the generator. No shipped decoder runs; these records cross the seam as Mojo, and no Mojo decoder can be driven from a stdlib-only Python generator.",
+    "declaration": "A committed schema fragment the schema validator must refuse. This is how a rule about what the contract may declare is executed rather than asserted.",
+    "unexecuted": "A rule this contract does not express and nothing here can run. It carries a written reason and is never counted as covered."
+  },
+  "fixtures": [
+    {
+      "case": "unknown-navigation-failure",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "NavigationView",
+      "enum": "NavigationFailure",
+      "path": "failure",
+      "file": "unknown-navigation-failure.json",
+      "rule": "Every enumeration is closed. A failure outside the set this version defines is unsupported and fails closed.",
+      "deviation": "A navigation carries a failure no member of NavigationFailure holds.",
+      "note": "NONE is the neighbour a lenient reader must never round to, and it is the one that reads as `the page loaded`. A surface that rounded here would let an assistant claim it read a page that never arrived, which is the exact failure this enumeration was written to prevent."
+    },
+    {
+      "case": "unknown-interstitial-kind",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "NavigationView",
+      "enum": "InterstitialKind",
+      "path": "interstitial",
+      "file": "unknown-interstitial-kind.json",
+      "rule": "Every enumeration is closed, including which trusted surface is standing in front of the content.",
+      "deviation": "A navigation names an interstitial no member of InterstitialKind holds.",
+      "note": "OTHER already exists for an interstitial this build does not recognise, so an unknown wire value is not that case: it is a peer speaking a vocabulary this build does not have. Rounding it to NONE would tell a surface the page is showing when a security interstitial is."
+    },
+    {
+      "case": "unknown-download-state",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "DownloadView",
+      "enum": "DownloadState",
+      "path": "state",
+      "file": "unknown-download-state.json",
+      "rule": "Every enumeration is closed, including where a download has got to.",
+      "deviation": "A download carries a state no member of DownloadState holds.",
+      "note": "The state decides which commands a surface offers. COMPLETE is the neighbour that matters: offering `open` for a file whose bytes are not all there asks the platform to open something that does not exist yet."
+    },
+    {
+      "case": "unknown-tab-owner",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "TabView",
+      "enum": "TabOwner",
+      "path": "owner",
+      "file": "unknown-tab-owner.json",
+      "rule": "Every enumeration is closed, including who a tab belongs to.",
+      "deviation": "A tab names an owner no member of TabOwner holds.",
+      "note": "UNKNOWN exists and means `treat it as the user's`, which is the strict answer. An unknown wire value must still refuse rather than fall into it, because falling into the strict answer silently is how a build stops noticing that its peer is describing a category it has never heard of."
+    },
+    {
+      "case": "oversized-tab-list",
+      "kind": "bound",
+      "verdict": "REJECT_OVERSIZED",
+      "limit": "MAX_TABS",
+      "path": "measured_tab_count",
+      "file": "oversized-tab-list.json",
+      "rule": "Every collection is bounded, and the bound is the one the product compiles in.",
+      "deviation": "A measured tab count one past MAX_TABS.",
+      "note": "This row measures a count rather than carrying two hundred and fifty-seven tab records. The bound has to be checked from the length before an element is read, or a four-byte count reserves as much memory as it likes."
+    },
+    {
+      "case": "oversized-host",
+      "kind": "bound",
+      "verdict": "REJECT_OVERSIZED",
+      "limit": "MAX_HOST_BYTES",
+      "path": "measured_host_bytes",
+      "file": "oversized-host.json",
+      "rule": "A host is bounded by MAX_HOST_BYTES, which is the longest a DNS name can be.",
+      "deviation": "A measured host length one byte past that bound.",
+      "note": "The bound is not a buffer size, it is a statement that the string is a host. Something longer is not a long host; it is something else, and a surface that drew it in an address bar would be drawing whatever it actually is."
+    },
+    {
+      "case": "navigation-missing-a-field",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "NavigationView",
+      "file": "navigation-missing-a-field.json",
+      "rule": "A record carries every field this version declares. Absence is not a default.",
+      "deviation": "A navigation with no http_status_code.",
+      "note": "The tempting reading is that an absent status means zero, which this contract does define as `nothing committed`. That is exactly why absence may not mean it: a peer that forgot the field and a peer that committed nothing would become indistinguishable."
+    },
+    {
+      "case": "download-size-as-a-string",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "DownloadView",
+      "file": "download-size-as-a-string.json",
+      "rule": "A scalar is the type the contract declares it to be.",
+      "deviation": "A download whose total size arrives as text.",
+      "note": "A reader that parsed it would be deciding what `4096` means — bytes, kilobytes, or a number some locale wrote differently — in a decoder. The field is a count of bytes and its type says so."
+    },
+    {
+      "case": "a-later-major-version",
+      "kind": "version",
+      "verdict": "REJECT_VERSION",
+      "type": "TabView",
+      "file": "a-later-major-version.json",
+      "rule": "A different major version changes required meaning. The message is refused on the version alone, without inspecting the body.",
+      "deviation": "A tab declared at major version 2, carrying a body this version happens to understand completely.",
+      "note": "The body being readable is the point. A build that accepted it because nothing looked wrong would be speaking a version it does not have, and the first field whose meaning changed rather than whose shape did would pass unnoticed."
+    },
+    {
+      "case": "next-minor-navigation-field",
+      "kind": "version",
+      "verdict": "ACCEPT",
+      "declares_next_minor": true,
+      "type": "NavigationView",
+      "file": "next-minor-navigation-field.json",
+      "rule": "A higher minor version of the same major is additive. A reader accepts the message and ignores the fields it does not define.",
+      "deviation": "A navigation declared at the next minor version of this major, carrying one field this build does not define.",
+      "note": "Accepting is not the same as understanding. The surface draws the fields this build knows; the one it does not know is ignored, which is only safe because a minor step may not change what an existing field means. The declared version must stay one past this contract's minor: raised in the same change that raises the schema, or the fixture quietly becomes a past minor and stops testing the boundary it exists for."
+    },
+    {
+      "case": "tab-carries-a-location",
+      "kind": "declaration",
+      "verdict": "REJECT_MALFORMED",
+      "refusal": "forbidden authority field",
+      "file": "tab-carries-a-location.json",
+      "rule": "This contract may not declare a field whose name carries an authority-bearing substring; raw_url and full_url are on that list.",
+      "deviation": "A tab record that hands a surface the whole location of the page it is showing.",
+      "note": "A host is what a person is shown and what a switcher needs. A full location is a credential-bearing string often enough that this seam refuses to be the thing that carries one — and a tab list is the most-copied record here, reaching every surface that draws a switcher."
+    },
+    {
+      "case": "tab-holds-the-observer",
+      "kind": "declaration",
+      "verdict": "REJECT_MALFORMED",
+      "refusal": "a record field cannot carry pending_remote",
+      "file": "tab-holds-the-observer.json",
+      "rule": "A record is a value. A field of one may not be a handle, however the interface it names is declared.",
+      "deviation": "A tab record that stores a connection to the surface's own observer.",
+      "note": "Snapshots here are whole, resent on every change, and copied on the way. A connection survives none of that, so the second snapshot would carry a field the first one closed."
+    },
+    {
+      "case": "a-selected-tab-that-is-not-in-the-list",
+      "kind": "unexecuted",
+      "verdict": "REJECT_MALFORMED",
+      "reason": "The rule is that exactly one tab in a snapshot carries selected, and that the navigation describes that tab. It is a relation between two fields of two different records in one message, and this contract's shape rules describe records one at a time. Expressing it would need a cross-record presence rule the schema does not have; until that exists the browser-side projection is the only thing that can hold it, and browsing_projection_unittest.cc is where it is asserted.",
+      "rule": "A snapshot has exactly one selected tab, and the navigation it carries is that tab's.",
+      "deviation": "A snapshot whose navigation names a host no tab in its own list is on.",
+      "note": "Counted separately and never as covered. A surface that met this message would draw an address bar for a tab that is not in its own switcher, and nothing in this corpus would have refused it."
+    }
+  ]
+}

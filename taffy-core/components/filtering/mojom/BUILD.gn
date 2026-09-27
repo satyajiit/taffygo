@@ -1,0 +1,28 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//mojo/public/tools/bindings/mojom.gni")
+
+# The renderer-to-browser filtering seams. The renderer holds the remotes; the
+# browser implements. No Java bindings: Ads and trackers never reaches the
+# Android UI through these contracts.
+mojom("mojom") {
+  sources = [
+    "cosmetic_filter.mojom",
+    "request_filter.mojom",
+  ]
+  public_deps = [
+    "//services/network/public/mojom",
+    "//third_party/blink/public/mojom/tokens",
+    "//url/mojom:url_mojom_gurl",
+  ]
+  visibility = [
+    "//taffy/browser:*",
+    "//taffy/components/filtering/browser:*",
+    "//taffy/components/filtering/renderer:*",
+    "//taffy/test:*",
+  ]
+}

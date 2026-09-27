@@ -1,0 +1,71 @@
+{
+  "manifest_version": 1,
+  "upstream": {
+    "package": "flag-icons",
+    "version": "7.5.0",
+    "tarball": "https://registry.npmjs.org/flag-icons/-/flag-icons-7.5.0.tgz",
+    "sha256": "c0b80bf0e08006a60f56621d6bc49f8c7131f4d1fef6737a165a673431f4b518",
+    "npm_shasum": "66462df3e8bc5ef3a283322a46bb9dde1b290505",
+    "licence": "MIT",
+    "licence_member": "package/LICENSE"
+  },
+  "rasteriser": {
+    "librsvg": "2.58.0",
+    "cairo": "1.18.0"
+  },
+  "encoder": {
+    "cwebp": "1.3.2",
+    "arguments": ["-lossless", "-exact", "-z", "9", "-metadata", "none"]
+  },
+  "raster": {
+    "width": 192,
+    "height": 144,
+    "set": "4x3"
+  },
+  "asset": {
+    "id": "country-flags",
+    "revision": "7.5.0-taffy.1",
+    "kind": "country-flags",
+    "container": "zip",
+    "necessity": "required",
+    "path": "country-flags/7.5.0-taffy.1/flags-4x3-webp.zip",
+    "member_prefix": "flags/",
+    "member_suffix": ".webp"
+  },
+  "codes": "iso-country-codes.tsv",
+  "notes": [
+    "Paths are relative to the repository root, not to this file.",
+    "",
+    "WHY 4x3 AND NOT THE PRODUCT'S OLD 3:2. flag-icons publishes two sets, 4x3",
+    "and 1x1, and normalises every flag into whichever box is asked for. A",
+    "third ratio would mean letterboxing the pack's own artwork inside a box",
+    "the pack did not draw, so the Compose side follows the corpus rather than",
+    "the corpus following a number that was chosen before the corpus was.",
+    "",
+    "WHY 192x144 AND ONE SIZE. The widest a flag is drawn is 36 dp, in the two",
+    "country pickers; the chip draws 24 dp. Thirty-six dp on the densest",
+    "shipping bucket, xxxhdpi at 4x, is 144 pixels, so 192 is a third more than",
+    "the product can currently ask for and every use downscales. One size",
+    "rather than a bucket per density because the pack is fetched once for the",
+    "whole device and a density-qualified pack would be several packs, each",
+    "needing its own row, its own digest and its own publication decision.",
+    "",
+    "WHY THE RASTERISER IS PINNED. A rasteriser's output is part of the",
+    "artifact's bytes. A different librsvg antialiases an edge differently and",
+    "the digest moves with no input having changed, which would make a catalog",
+    "row that was true yesterday false today. The pair is refused on mismatch",
+    "for the same reason the launcher-icon tool refuses an unpinned cwebp.",
+    "",
+    "WHY THE PATH CARRIES NO PLUS SIGN. The browser's own second check,",
+    "IsRelativePath in taffy-core/browser/core_asset_validation.cc, permits",
+    "only a-z, 0-9, '.', '-', '_' and the separator -- a strict subset of what",
+    "the catalog generator's PATH_SEGMENT regex accepts. A revision spelled",
+    "with a '+' would generate cleanly and be refused on the device, so the",
+    "revision here is spelled with a hyphen and the path embeds it verbatim.",
+    "",
+    "WHY THE LICENCE TRAVELS INSIDE THE ZIP. The pack reaches a device through",
+    "the delivery plane and is in no build graph, so nothing carries the MIT",
+    "notice onto the generated credits page for it. A LICENSE member is the",
+    "only copy that arrives with the bytes it covers."
+  ]
+}

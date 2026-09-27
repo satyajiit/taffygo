@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  The platform theme the window uses before Compose draws. Everything the user
+  sees after the splash comes from TaffyTheme in :core:designsystem. The
+  launch theme is Theme.TaffyGo.Starting (AndroidX SplashScreen); the
+  activity then switches to Theme.TaffyGo, which is AppCompat so the
+  language backport on API 29 to 32 can wrap it.
+-->
+<resources>
+    <!--
+      DayNight rather than the plain AppCompat parent, which is the dark one.
+      Under that parent isLightTheme resolved false and every ?android:
+      default with it, even on the paper theme; nothing platform-drawn appears
+      while Compose is up, so it stayed invisible, but the background below is
+      drawn before Compose exists and would not have.
+
+      That background is the ground the window stands on for every frame the
+      app has not painted yet. Only a cold start gets a system starting
+      window: a recreation for a stored language, a rotation, a font-size or
+      theme change all re-enter with no splash behind them, and the first of
+      those happens on the first run that stores a language. It was
+      transparent, so those frames showed the launcher, the outgoing
+      screenshot or black rather than this app.
+
+      It names splash_background because that colour already answers this
+      question — what the platform paints before Compose exists — and there is
+      no second answer to keep in step with the first.
+
+      What it cannot answer is which theme the person chose. It resolves
+      through the night qualifier, which is the device, and the Appearance
+      setting is allowed to disagree with the device (screen SCR-407); left to
+      itself this would stand a dark app on paper. It is not left to itself.
+      The browser-owned Activity levels the window from the stored preference,
+      before any frame exists, so this value stands only for the phase before
+      that runs — a cold start, where the preference has not come off disk yet,
+      the device is the best answer anyone has, and the held splash covers it.
+    -->
+    <style name="Theme.TaffyGo" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/splash_background</item>
+    </style>
+
+    <!--
+      The platform splash (androidx.core:core-splashscreen). The activity
+      launches in this theme; installSplashScreen() then switches to
+      Theme.TaffyGo. The background follows the system night bit because
+      stored appearance has not been read yet, and so does the icon: it is the
+      one brand asset picked by a resource qualifier instead of by TaffyTheme,
+      because the platform draws this window before any of this app is running
+      to be asked.
+
+      No icon background. The platform offers a disc for a mark that needs
+      contrast against the window, and this one does not — the ribbon ships in
+      two treatments and each is drawn for its own ground. Leaving the disc
+      off also widens the circle the platform masks the icon to from 160 dp to
+      192 dp, so the mark is both larger and drawn from a file authored for
+      that size rather than scaled up from the launcher's padded layer.
+
+      The icon is a raster set at five densities where the platform guide asks
+      for a vector. There is no vector form of the mark in brand/ — it is a
+      gradient ribbon — and the icon set is open decision OD-071, so deriving
+      one here would mean inventing artwork. The densities are the interim.
+    -->
+    <style name="Base.Theme.TaffyGo.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/taffy_splash_icon</item>
+        <!--
+          Nothing animates, so there is nothing to wait for. Said out loud
+          rather than left out: from API 31 the library maps the platform
+          attribute onto this one and stops supplying a default of its own, so
+          an absent value is an unresolved reference that merely happens to
+          read as zero.
+        -->
+        <item name="windowSplashScreenAnimationDuration">0</item>
+        <item name="postSplashScreenTheme">@style/Theme.TaffyGo</item>
+    </style>
+
+    <!--
+      Split from its own base so the API 33 qualifier can add one item without
+      restating the rest, which is the shape the splash library uses for its
+      own Base.vNN styles.
+    -->
+    <style name="Theme.TaffyGo.Starting" parent="Base.Theme.TaffyGo.Starting" />
+</resources>

@@ -1,0 +1,35 @@
+From 6fbf74f51b6ef7f89c2677422db42fad2f60a6c4 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sun, 6 Sep 2026 19:07:11 +0530
+Subject: register TaffyGo's Local State preferences
+
+The backup-restore profile registry and its quarantine markers live in Local
+State, so they have to be registered where Chromium registers every other
+Local State preference. A preference read before its registration aborts the
+process, and the registry is read during profile-manager construction.
+
+Specified by
+chromium/patches/0047-register-taffygo-local-state-preferences.md.
+
+Taffy-Patch: 0047
+
+diff --git a/chrome/browser/prefs/browser_prefs.cc b/chrome/browser/prefs/browser_prefs.cc
+index 1317d71ce1812..ec8dd83bb45a5 100644
+--- a/chrome/browser/prefs/browser_prefs.cc
++++ b/chrome/browser/prefs/browser_prefs.cc
+@@ -227,6 +227,7 @@
+ #include "pdf/buildflags.h"
+ #include "printing/buildflags/buildflags.h"
+ #include "rlz/buildflags/buildflags.h"
++#include "taffy/browser/application_preferences.h"
+ #include "ui/webui/buildflags.h"
+ 
+ #if BUILDFLAG(ENABLE_WEBUI_NTP)
+@@ -1482,6 +1483,7 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
+   subresource_filter::IndexedRulesetVersion::RegisterPrefs(
+       registry, subresource_filter::kSafeBrowsingRulesetConfig.filter_tag);
+   SystemNetworkContextManager::RegisterPrefs(registry);
++  taffy::application_preferences::RegisterLocalStatePreferences(registry);
+   tracing::RegisterPrefs(registry);
+   update_client::RegisterPrefs(registry);
+   variations::VariationsService::RegisterPrefs(registry);

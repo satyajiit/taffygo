@@ -1,0 +1,121 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+declare_args() {
+  # The account plane's identity, compiled into trusted browser code and never
+  # accepted from a runtime or UI value. All three are empty, and empty is the
+  # shipped state (decision 0252, point 5): TaffyGo operates no account service
+  # (decision 0200), so the dormant account code has nothing to call. It stays
+  # compiled, inert, until a later change removes it.
+  #
+  # Empty is a defined state, not a broken one. An empty origin fails
+  # `ValidateAccountPlaneConfiguration`, so the core is offered no sign-in
+  # method at launch and every account effect is refused as unavailable before
+  # a request is built. An empty server client id is `kDisabled`, so native
+  # sign-in is never offered either. The assertions below only run on a value
+  # that is set.
+  taffy_account_api_origin = ""
+  taffy_account_publishable_key = ""
+  taffy_account_google_server_client_id = ""
+}
+
+# Empty intentionally disables native Google sign-in. Any configured identity
+# must be valid before GN creates a product graph; the browser repeats this
+# check at runtime as defense in depth.
+if (taffy_account_google_server_client_id != "") {
+  assert(len(taffy_account_google_server_client_id) <= 512,
+         "taffy_account_google_server_client_id exceeds 512 bytes")
+
+  _google_client_suffix = ".apps.googleusercontent.com"
+  _google_client_parts =
+      string_split(taffy_account_google_server_client_id, _google_client_suffix)
+  assert(len(_google_client_parts) == 2 && _google_client_parts[1] == "",
+         "taffy_account_google_server_client_id must be an exact Google " +
+             "web/server client ID")
+  _google_client_prefix = _google_client_parts[0]
+  assert(
+      _google_client_prefix != "" && filter_include([ _google_client_prefix ],
+                                                    [
+                                                      "-*",
+                                                      "*-",
+                                                    ]) == [] &&
+          string_replace(_google_client_prefix, "-", "") !=
+              _google_client_prefix,
+      "taffy_account_google_server_client_id has a malformed prefix")
+
+  _google_client_invalid = _google_client_prefix
+  foreach(_character,
+          [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f",
+            "g",
+            "h",
+            "i",
+            "j",
+            "k",
+            "l",
+            "m",
+            "n",
+            "o",
+            "p",
+            "q",
+            "r",
+            "s",
+            "t",
+            "u",
+            "v",
+            "w",
+            "x",
+            "y",
+            "z",
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "H",
+            "I",
+            "J",
+            "K",
+            "L",
+            "M",
+            "N",
+            "O",
+            "P",
+            "Q",
+            "R",
+            "S",
+            "T",
+            "U",
+            "V",
+            "W",
+            "X",
+            "Y",
+            "Z",
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "-",
+          ]) {
+    _google_client_invalid =
+        string_replace(_google_client_invalid, _character, "")
+  }
+  assert(_google_client_invalid == "",
+         "taffy_account_google_server_client_id contains invalid characters")
+}

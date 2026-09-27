@@ -1,0 +1,12 @@
+{
+  "structs": [
+    {
+      "name": "ProcessLaunchArguments",
+      "description": "A deviant argument record that would hand a worker a command line.",
+      "fields": [
+        {"name": "entrypoint_id", "type": "string", "ordinal": 0, "description": "The reviewed entrypoint this contract does name."},
+        {"name": "argv", "type": "list<string>", "ordinal": 1, "description": "The command line the worker would be launched with."}
+      ]
+    }
+  ]
+}

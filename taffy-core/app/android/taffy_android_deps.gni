@@ -1,0 +1,68 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# Shared Android dependency sets for the retained Compose UI and its tests.
+# Every label is provided by the pinned Chromium checkout; TaffyGo does not roll
+# a second AndroidX or coroutines dependency tree. Keeping the lists here makes
+# product and test targets compile against the same exact closure.
+#
+# Coroutines are autorolled Android dependencies, not part of
+# //third_party/kotlin_stdlib. That directory provides only Kotlin's standard
+# library; the two coroutines labels below are Chromium's public consumable
+# targets.
+#
+# `taffy_kotlin_deps` is separate and non-optional: java_library_impl asserts
+# that every target carrying a .kt source depends on the Kotlin standard library
+# (build/config/android/internal_rules.gni:4023), so it is appended to every
+# Kotlin target rather than left to each to remember.
+taffy_kotlin_deps = [ "//third_party/kotlin_stdlib:kotlin_stdlib_java" ]
+
+taffy_androidx_compose_deps = [
+  "//third_party/androidx:androidx_compose_foundation_foundation_java",
+  "//third_party/androidx:androidx_compose_material3_material3_java",
+  "//third_party/androidx:androidx_compose_runtime_runtime_java",
+  "//third_party/androidx:androidx_compose_ui_ui_graphics_java",
+  "//third_party/androidx:androidx_compose_ui_ui_java",
+
+  # RESOLVED at first arm64 build: bytecode dependency validation requires a
+  # *direct* edge for every directly-referenced class, and Compose splits
+  # these into their own androidx targets — layout arithmetic (SizeKt),
+  # geometry (Size, Offset) and units (Dp) are all reached straight from
+  # composable code, not only through the umbrella ui/foundation jars.
+  # The validator's hint names the internal `*_android_java` targets, whose
+  # visibility is androidx-only; these public aliases are the consumable form.
+  "//third_party/androidx:androidx_compose_foundation_foundation_layout_java",
+  "//third_party/androidx:androidx_compose_ui_ui_geometry_java",
+  "//third_party/androidx:androidx_compose_ui_ui_text_java",
+  "//third_party/androidx:androidx_compose_ui_ui_unit_java",
+
+  # Not listed, on purpose: the Compose animation library. Neither its core nor
+  # its umbrella group is exposed to a downstream target by Chromium's AndroidX
+  # build, and declaring the artifact there is an upstream patch. The dock
+  # sheet moves on the frame clock instead (`TaffyDockSheet.animatedSheetHeight`).
+]
+
+taffy_androidx_lifecycle_deps = [
+  "//third_party/androidx:androidx_activity_activity_java",
+  "//third_party/androidx:androidx_lifecycle_lifecycle_common_java",
+  "//third_party/androidx:androidx_lifecycle_lifecycle_runtime_compose_java",
+  "//third_party/androidx:androidx_lifecycle_lifecycle_runtime_java",
+  "//third_party/androidx:androidx_lifecycle_lifecycle_viewmodel_java",
+  "//third_party/androidx:androidx_lifecycle_lifecycle_viewmodel_savedstate_java",
+  "//third_party/androidx:androidx_savedstate_savedstate_java",
+]
+
+# `_core_jvm_java`, not `_core_java`. The `_core_java` group restricts its
+# visibility to `//third_party/android_deps:*` and `//third_party/androidx:*`,
+# so depending on it fails with "Dependency not allowed". The `_jvm` prebuilt
+# behind it carries no such restriction. This is the pair Chromium's own Kotlin
+# uses — see chrome/browser/ui/android/bricks/internal/BUILD.gn, which is the
+# other non-third_party entry on the Kotlin allowlist and therefore the only
+# in-tree reference implementation for a downstream Kotlin target.
+taffy_kotlin_coroutines_deps = [
+  "//third_party/android_deps:org_jetbrains_kotlinx_kotlinx_coroutines_android_java",
+  "//third_party/android_deps:org_jetbrains_kotlinx_kotlinx_coroutines_core_jvm_java",
+]

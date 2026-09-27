@@ -1,0 +1,11 @@
+# This directory holds the last authority before anything touches a page: the
+# capability ledger, the actor leases, the stale-node algorithm, and the
+# postcondition verifier. A change to identity lifetime, capability
+# consumption, verifier rules, stale handling, or origin and frame scope is
+# security sensitive and requires the review named in
+# docs/architecture/browser-intelligence-protocol.md section 21.
+#
+# The Page Intelligence lead and the browser/release lead named at M0
+# (decisions 0001 and 0002) replace this rule. Until then the file is
+# deliberately unowned rather than falsely attributed.
+*

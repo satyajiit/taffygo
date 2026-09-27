@@ -1,0 +1,69 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="infinite-scroll">
+<title>Infinite scroll listing</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Infinite scroll listing</h1>
+  <p class="who">Twenty items per batch, appended on scroll, up to a fixed total.
+  Content is derived from the item index, so every run produces the same list.</p>
+</header>
+
+<p class="note">Loaded <span id="loaded">0</span> of <span id="total">120</span>
+items &middot; batches appended: <span id="batches">0</span></p>
+
+<div class="scroller" id="scroller" tabindex="0">
+  <ol id="items"></ol>
+  <p id="sentinel" class="note">Scroll for more…</p>
+</div>
+
+<p class="note" id="end-note">The end marker only appears after the last batch.</p>
+
+<script>
+  (function () {
+    "use strict";
+    var TOTAL = 120;
+    var BATCH = 20;
+    var loaded = 0;
+    var batches = 0;
+    var items = document.getElementById("items");
+    var scroller = document.getElementById("scroller");
+    var sentinel = document.getElementById("sentinel");
+
+    function priceFor(index) {
+      return (100 + ((index * 37) % 90)) + "." + String((index * 7) % 100 + 100).slice(1);
+    }
+
+    function appendBatch() {
+      if (loaded >= TOTAL) { return; }
+      batches += 1;
+      var end = Math.min(loaded + BATCH, TOTAL);
+      for (var i = loaded; i < end; i++) {
+        var li = document.createElement("li");
+        li.id = "item-" + i;
+        li.textContent = "Fixture item " + i + " — $" + priceFor(i);
+        items.appendChild(li);
+      }
+      loaded = end;
+      document.getElementById("loaded").textContent = String(loaded);
+      document.getElementById("batches").textContent = String(batches);
+      if (loaded >= TOTAL) {
+        sentinel.id = "end-marker";
+        sentinel.textContent = "End of listing: " + TOTAL + " items.";
+      }
+    }
+
+    scroller.addEventListener("scroll", function () {
+      if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 24) {
+        appendBatch();
+      }
+    });
+
+    document.getElementById("total").textContent = String(TOTAL);
+    appendBatch();
+  })();
+</script>

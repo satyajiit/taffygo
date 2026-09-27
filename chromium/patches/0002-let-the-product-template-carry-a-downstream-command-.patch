@@ -1,0 +1,45 @@
+From 8137383425be9aba7b61cb3139cf4423454a0311 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Tue, 18 Aug 2026 02:26:30 +0530
+Subject: let the product template carry a downstream command-line flags file
+
+The template already forwards manifest_package and apk_name, so the one
+identity value still hard-coded is the flags file name, and two products
+sharing chrome-command-line on one device is a real collision. The added
+argument defaults to the previous value, so upstream callers are untouched.
+
+Taffy-Patch: 0002
+
+diff --git a/chrome/android/chrome_public_apk_tmpl.gni b/chrome/android/chrome_public_apk_tmpl.gni
+index d53e82f026ac7..3c160ade471c3 100644
+--- a/chrome/android/chrome_public_apk_tmpl.gni
++++ b/chrome/android/chrome_public_apk_tmpl.gni
+@@ -263,7 +263,13 @@ template("chrome_common_apk_or_module_tmpl") {
+     }
+ 
+     if (_target_type == "android_apk") {
++      # Taffy: a downstream product supplies its own flags file; the default
++      # is the value this template hard-coded before the argument existed.
++      # chromium/patches/0002-downstream-branding-hooks.md
+       command_line_flags_file = "chrome-command-line"
++      if (defined(invoker.command_line_flags_file)) {
++        command_line_flags_file = invoker.command_line_flags_file
++      }
+     }
+ 
+     if (_is_bundle) {
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/base/SplitCompatApplication.java b/chrome/android/java/src/org/chromium/chrome/browser/base/SplitCompatApplication.java
+index ce98255aea2f3..995bd8c02b0cd 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/base/SplitCompatApplication.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/base/SplitCompatApplication.java
+@@ -65,7 +65,9 @@ public class SplitCompatApplication extends Application {
+     public static final String CHROME_SPLIT_NAME = "chrome";
+     public static final String ON_DEMAND_SPLIT_NAME = "on_demand";
+     private static final String TAG = "SplitCompatApp";
+-    private static final String COMMAND_LINE_FILE = "chrome-command-line";
++    // Taffy: TaffyGo reads its own flags file so two products on one device
++    // never share flags. chromium/patches/0002-downstream-branding-hooks.md
++    private static final String COMMAND_LINE_FILE = "taffy-command-line";
+     private static final String ATTACH_BASE_CONTEXT_EVENT = "ChromeApplication.attachBaseContext";
+     // Public to allow use in ChromeBackupAgent
+     public static final String PRIVATE_DATA_DIRECTORY_SUFFIX = "chrome";

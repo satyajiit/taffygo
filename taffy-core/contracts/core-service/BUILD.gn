@@ -1,0 +1,40 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//mojo/public/tools/bindings/mojom.gni")
+
+mojom("core_service_types_mojom") {
+  sources = [ "generated/mojom/core_service.mojom" ]
+  generate_java = true
+}
+
+mojom("core_service_mojom") {
+  sources = [ "core_service.mojom" ]
+  deps = [ ":core_service_types_mojom" ]
+  public_deps = [ "//sandbox/policy/mojom" ]
+}
+
+# The generated closed-enumeration decoders. Rust and Kotlin get `from_wire`
+# and `fromWire` from the same generator; this is the C++ view of the same
+# function, and it exists because C++ is the only one of the three where the
+# unchecked conversion compiles. `static_cast<Enum>(integer)` for a value that
+# names no enumerator is undefined behaviour, and at a trust seam it is a
+# fail-open, so a caller holding an integer comes through here instead.
+source_set("core_service_enums") {
+  sources = [ "generated/cpp/core_service_enums.h" ]
+  public_deps = [ ":core_service_types_mojom" ]
+}
+
+# The directory label is the public contract edge used by browser, storage,
+# utility, and service targets. Keep the generator target private so there is
+# one stable dependency label even if the generator implementation changes.
+group("core-service") {
+  public_deps = [
+    ":core_service_enums",
+    ":core_service_mojom",
+    ":core_service_types_mojom",
+  ]
+}

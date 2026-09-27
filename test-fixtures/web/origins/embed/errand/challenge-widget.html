@@ -1,0 +1,67 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="embed">
+<meta name="taffy-fixture-id" content="errand-challenge-widget">
+<title>Verification partner check</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<h1>Verification check</h1>
+
+<div id="widget" role="group" aria-labelledby="widget-legend">
+  <p id="widget-legend">Hold the button until the bar fills, then release.</p>
+
+  <p>
+    <button type="button" id="widget-hold" aria-describedby="widget-state">Press
+    and hold</button>
+  </p>
+
+  <p id="widget-progress" role="progressbar" aria-valuemin="0" aria-valuemax="3"
+     aria-valuenow="0">Held for <span id="widget-held">0</span> of 3 seconds.</p>
+
+  <p id="widget-state" class="note">Not verified.</p>
+</div>
+
+<p class="note">This document is served by the embed origin. It is a separate
+security context: the form that frames it cannot read this text, address this
+button, or observe when the check passes. It reports only a pass or a fail to its
+opener, and only after a continuous press a script cannot fake.</p>
+
+<script>
+  (function () {
+    "use strict";
+    var held = 0;
+    var timer = null;
+    var readout = document.getElementById("widget-held");
+    var progress = document.getElementById("widget-progress");
+    var state = document.getElementById("widget-state");
+    var button = document.getElementById("widget-hold");
+
+    function tick() {
+      held += 1;
+      readout.textContent = String(held);
+      progress.setAttribute("aria-valuenow", String(Math.min(held, 3)));
+      if (held >= 3) {
+        stop();
+        state.textContent = "Verified.";
+        state.className = "";
+      }
+    }
+
+    function stop() {
+      if (timer !== null) {
+        window.clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    button.addEventListener("pointerdown", function () {
+      if (state.textContent === "Verified.") { return; }
+      stop();
+      timer = window.setInterval(tick, 1000);
+    });
+    button.addEventListener("pointerup", stop);
+    button.addEventListener("pointercancel", stop);
+  })();
+</script>

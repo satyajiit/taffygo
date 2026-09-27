@@ -1,0 +1,27 @@
+From eb9c61896bf648e058104f77460a85ab92533787 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sat, 22 Aug 2026 10:06:37 +0530
+Subject: register the core recovery browser test
+
+Taffy-Patch: 0030
+
+diff --git a/chrome/test/BUILD.gn b/chrome/test/BUILD.gn
+index cbd501366c801..7e86f28d155c7 100644
+--- a/chrome/test/BUILD.gn
++++ b/chrome/test/BUILD.gn
+@@ -1638,6 +1638,7 @@ if (is_android) {
+       "//components/webapps/browser:test_support",
+       "//components/webui/chrome_urls",
+       "//content/test:android_test_message_pump_support",
++      "//taffy/test/recovery:core_service_recovery_browser_tests",
+       "//testing/android/native_test:native_test_support",
+       "//third_party/crashpad/crashpad/handler:crashpad_handler_trampoline",
+       "//third_party/federated_compute:confidential_compute",
+@@ -2828,6 +2829,7 @@ if (!is_android) {
+       "//services/test/echo/public/mojom",
+       "//skia",
+       "//storage/browser:test_support",
++      "//taffy/test/recovery:core_service_recovery_browser_tests",
+       "//testing/data_driven_testing",
+       "//testing/gmock",
+       "//testing/gtest",

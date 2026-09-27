@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  The splash window on a dark system. The value itself is unqualified and sits
+  beside its light twin in values/colors.xml; only which of the two the platform
+  is handed is a question about the device.
+-->
+<resources>
+    <color name="splash_background">@color/window_ground_dark</color>
+</resources>

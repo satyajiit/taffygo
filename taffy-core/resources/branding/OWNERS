@@ -1,0 +1,12 @@
+# This directory decides what the product is called and what it looks like on
+# a launcher, and it is the build's only report of which upstream revision a
+# binary actually is (PAR-SEC-002). A change to the application id, the
+# product name, the launcher icon set, or the provenance generator is a
+# release-identity change and needs the browser/release lead named at M0
+# (decision 0001).
+#
+# The final product name is [Open (OD-001)] and the palette and iconography
+# are [Open (OD-071)]. Until those land and the owner roles are filled, this
+# file is deliberately unowned rather than falsely attributed: review falls
+# through to //taffy/OWNERS and then to //components/OWNERS.
+*

@@ -1,0 +1,13 @@
+{
+  "operation_kind": 0,
+  "oauth": {
+    "flow_id": "flow-fixture",
+    "auth_method": 2,
+    "redirect_binding_id": "taffygo.default",
+    "pkce_challenge": "fixture-challenge",
+    "pkce_verifier_handle": "fixture-verifier-handle",
+    "state": "fixture-state",
+    "scopes": [0, 1]
+  },
+  "native_credential": null
+}

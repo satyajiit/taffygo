@@ -1,0 +1,9 @@
+# The BIP wire contract is security-significant: a change to identity
+# lifetime, redaction, supported action semantics, stale handling, origin or
+# frame scope, capability consumption, verifier rules, protocol compatibility,
+# or telemetry content requires the review listed in
+# docs/architecture/browser-intelligence-protocol.md section 21.
+#
+# The Page Intelligence lead named at M0 (decision 0002) replaces this rule.
+# Until then the file is deliberately unowned rather than falsely attributed.
+*

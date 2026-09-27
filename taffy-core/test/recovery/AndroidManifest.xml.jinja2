@@ -1,0 +1,37 @@
+{% extends "chrome/test/android/browsertests_apk/AndroidManifest.xml.jinja2" %}
+{#
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#}
+
+{% block extra_uses_permissions %}
+{{ super() }}
+<queries>
+    <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="content" android:mimeType="application/pdf" />
+    </intent>
+</queries>
+{% endblock %}
+
+{% block extra_application_definitions %}
+{{ super() }}
+<!-- The same file providers and roots as the product; neither is exported. -->
+<provider android:name="org.chromium.chrome.browser.util.ChromeFileProvider"
+    android:authorities="{{ manifest_package }}.FileProvider"
+    android:exported="false"
+    android:grantUriPermissions="true">
+    <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/file_paths" />
+</provider>
+<provider android:name="org.chromium.chrome.browser.download.DownloadFileProvider"
+    android:authorities="{{ manifest_package }}.DownloadFileProvider"
+    android:exported="false"
+    android:grantUriPermissions="true">
+    <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/file_paths" />
+</provider>
+{% endblock %}

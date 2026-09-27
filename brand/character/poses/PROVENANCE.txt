@@ -1,0 +1,12 @@
+Taffy character poses derived from brand/character/taffy-character-master.webp.
+
+The generator overlayed a Grok wordmark in the bottom-right of every
+JPEG. That mark is forbidden in product art. Each file here was rewritten
+by covering the mark region with neighbouring background pixels so no
+generator word, icon, or watermark remains.
+
+These PNGs are exploration frames (often opaque / checkerboard), not
+shipping Android UI. The app no longer packages a welcome cutout.
+
+Do not ship a Grok watermark. If a later render carries one, strip it
+before it touches src/main/res.

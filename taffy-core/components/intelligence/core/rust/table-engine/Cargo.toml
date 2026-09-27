@@ -1,0 +1,12 @@
+[package]
+name = "table-engine"
+description = "Deterministic, bounded table reshaping with exact decimals and cell lineage."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]

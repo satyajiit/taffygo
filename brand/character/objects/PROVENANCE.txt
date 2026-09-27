@@ -1,0 +1,9 @@
+Decorative object tiles for settings/You chapter cards.
+
+Palette: ivory, navy, gold, amber — Taffy colours, not OpenAlly mint.
+Same Grok-wordmark strip as brand/character/poses/: the bottom-right
+generator mark was covered with the neighbouring paper fill. No
+watermark remains in these PNGs.
+
+Not Phosphor. Chapter art, not chrome icons. Chrome icons stay Phosphor
+(decision 0030).

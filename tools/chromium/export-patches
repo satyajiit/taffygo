@@ -1,0 +1,207 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/chromium/export-patches — regenerate chromium/patches/ from the
+# commits on taffy/patched.
+#
+# Patch files are never hand-edited: the editing surface is the branch, and this
+# command is the only writer of the queue.
+# Authority: docs/development/chromium-fork-and-build.md section 1.1.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/chromium.sh"
+
+INCLUDE_SECURITY=0
+DRY_RUN=0
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/chromium/export-patches [--include-security] [--dry-run]
+
+Exports every commit between chromium/REVISION and taffy/patched into
+chromium/patches/, one file per commit, in order.
+
+A commit whose subject starts with "security:" belongs in
+chromium/patches/security/ — the urgent-security fast path. Those are only
+rewritten with --include-security, so an ordinary export cannot quietly drop
+a cherry-pick that is holding a fix in place.
+
+Options:
+  --include-security  also rewrite chromium/patches/security/
+  --dry-run           show what would change, write nothing
+  -h, --help          show this help
+
+Refuses to run on a dirty checkout, on another branch, or when the branch is
+not rooted at the pinned revision: all three make the queue unreproducible.
+USAGE
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --include-security) INCLUDE_SECURITY=1 ;;
+    --dry-run) DRY_RUN=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage >&2; die "unknown option: $1" ;;
+  esac
+  shift
+done
+
+SRC=$(chromium_require_checkout)
+COMMIT=$(chromium_require_pin)
+QUEUE="$TAFFY_ROOT/chromium/patches"
+
+BRANCH=$(git -C "$SRC" rev-parse --abbrev-ref HEAD)
+[ "$BRANCH" = "$TAFFY_PATCH_BRANCH" ] || die \
+  "the checkout is on '$BRANCH', not $TAFFY_PATCH_BRANCH" \
+  "Upstream edits are commits on $TAFFY_PATCH_BRANCH. Run ./tools/chromium/sync."
+
+if [ -n "$(git -C "$SRC" status --porcelain --untracked-files=no)" ]; then
+  die "the checkout has uncommitted changes" \
+    "Commit them on $TAFFY_PATCH_BRANCH first — one logical change per commit," \
+    "with an owner and a reason in the message. Only commits become patches."
+fi
+
+BASE=$(git -C "$SRC" merge-base HEAD "$COMMIT" 2>/dev/null || printf '')
+[ "$BASE" = "$COMMIT" ] || die \
+  "$TAFFY_PATCH_BRANCH is not rooted at the pinned revision ${COMMIT:0:12}" \
+  "The queue must apply to the pin and nothing else. Re-sync, or finish the" \
+  "milestone rebase and update chromium/REVISION in the same PR."
+
+COUNT=$(git -C "$SRC" rev-list --count "$COMMIT..HEAD")
+if [ "$COUNT" -eq 0 ]; then
+  ok "no commits on $TAFFY_PATCH_BRANCH — the queue stays empty"
+  exit 0
+fi
+
+# The queue number a commit claims, or empty. `git format-patch` numbers by
+# position on the branch; this queue numbers by logical change, and the commit
+# states which in a `Taffy-Patch:` trailer.
+patch_number() { # <patch file>
+  sed -n 's/^Taffy-Patch:[[:space:]]*\([0-9]\{4\}\)[[:space:]]*$/\1/p' "$1" | head -1
+}
+
+# normalise_author <patch-file> — rewrite the `From:` line in place.
+# Only the first one: a patch body can legitimately contain a line beginning
+# `From: ` (a quoted mail header inside a test fixture, say), and rewriting
+# that would corrupt the diff. `git format-patch` puts the real header on
+# line 2, but this finds it by content rather than by position -- see decision
+# 0212, which was written about exactly this temptation.
+normalise_author() {
+  local file=$1 tmp="$1.author"
+  awk -v want="From: $TAFFY_PATCH_AUTHOR" '
+    !done && index($0, "From: ") == 1 { print want; done = 1; next }
+    { print }
+  ' "$file" > "$tmp"
+  mv "$tmp" "$file"
+}
+
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/taffy-patches.XXXXXX")
+trap 'rm -rf "$TMP"' EXIT
+
+step "exporting $COUNT commit(s) from ${COMMIT:0:12}..$TAFFY_PATCH_BRANCH"
+git -C "$SRC" format-patch --no-signature --no-stat --keep-subject \
+  --output-directory "$TMP" "$COMMIT..HEAD" >/dev/null
+
+NORMAL=0
+SECURITY=0
+for patch in "$TMP"/*.patch; do
+  [ -f "$patch" ] || continue
+  if grep -qE '^Subject: .*security:' "$patch"; then
+    SECURITY=$((SECURITY + 1))
+  else
+    NORMAL=$((NORMAL + 1))
+  fi
+done
+
+if [ "$SECURITY" -gt 0 ] && [ "$INCLUDE_SECURITY" = 0 ]; then
+  die "$SECURITY security cherry-pick(s) are on the branch" \
+    "Re-run with --include-security to rewrite chromium/patches/security/," \
+    "or drop them from the branch if the rebase folded them into the pin."
+fi
+
+if [ "$DRY_RUN" = 1 ]; then
+  note "would write $NORMAL patch(es) to chromium/patches/"
+  [ "$SECURITY" -gt 0 ] && note "would write $SECURITY patch(es) to chromium/patches/security/"
+  # Report the names this command would write, not the positional ones
+  # `git format-patch` just produced: the rename below is the whole point of
+  # the queue's numbering, and printing the pre-rename names describes an
+  # export that never happens.
+  for patch in "$TMP"/*.patch; do
+    name=$(basename "$patch")
+    number=$(patch_number "$patch")
+    if [ -n "$number" ]; then
+      note "  $number-${name#*-}"
+    else
+      note "  $name — NO Taffy-Patch trailer; the export would refuse this commit"
+    fi
+  done
+  exit 0
+fi
+
+rm -f "$QUEUE"/*.patch
+[ "$INCLUDE_SECURITY" = 1 ] && rm -f "$QUEUE"/security/*.patch
+mkdir -p "$QUEUE/security"
+
+# `git format-patch` numbers by position on the branch, which is the wrong
+# numbering for this queue. A patch number here names one logical change for its
+# whole life (chromium/patches/README.md), and the specifications reserve
+# 0001-0009 — so a positional export gives the first commit 0001 no matter which
+# change it is, and collides with whatever specification already owns that
+# number. The commit therefore states its own number in a `Taffy-Patch:` trailer,
+# and this loop renames the file to match. Position on the branch stays free to
+# be the apply order.
+seen_numbers=""
+for patch in "$TMP"/*.patch; do
+  [ -f "$patch" ] || continue
+  name=$(basename "$patch")
+  subject=$(sed -n 's/^Subject: //p' "$patch" | head -1)
+
+  number=$(patch_number "$patch")
+  if [ -z "$number" ]; then
+    die "a commit on $TAFFY_PATCH_BRANCH carries no Taffy-Patch trailer: $subject" \
+      "Every patch names its own queue number, because a number names one logical" \
+      "change for its whole life and git format-patch would number by position." \
+      "Add a trailer to the commit message and re-run:" \
+      "  Taffy-Patch: 0010" \
+      "Use the number of the specification this patch implements, or the next free" \
+      "number if it implements none. chromium/patches/README.md owns the sequence."
+  fi
+
+  case " $seen_numbers " in
+    *" $number "*)
+      die "two commits on $TAFFY_PATCH_BRANCH both claim Taffy-Patch: $number" \
+        "A number names one change. Renumber one of them." ;;
+  esac
+  seen_numbers="$seen_numbers $number"
+
+  # Every exported patch carries the project identity, never whoever happened
+  # to have the checkout. `git format-patch` writes the commit author, and the
+  # commit author is whatever `git am` set on the last sync -- so leaving this
+  # to the checkout means the queue's identity depends on who ran sync last.
+  # Rewritten here, at the one place every patch file is written.
+  normalise_author "$patch"
+
+  # Keep format-patch's slug, replace only its positional prefix.
+  renamed="$number-${name#*-}"
+  if grep -qE '^Subject: .*security:' "$patch"; then
+    cp "$patch" "$QUEUE/security/$renamed"
+  else
+    cp "$patch" "$QUEUE/$renamed"
+    if [ -f "$QUEUE/$number-${name#*-}" ] && ! ls "$QUEUE/$number"-*.md >/dev/null 2>&1; then
+      note "$renamed implements no specification — $number is a new number"
+    fi
+  fi
+done
+
+ok "wrote $NORMAL patch(es) to chromium/patches/"
+[ "$SECURITY" -gt 0 ] && ok "wrote $SECURITY patch(es) to chromium/patches/security/"
+
+info ""
+info "Review the delta, then commit the patch files in this repository:"
+info "  ./tools/check fast    # reports the fork-debt budget"
+info "  git add chromium/patches && git commit"

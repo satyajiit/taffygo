@@ -1,0 +1,4 @@
+# Test-only reflection over the Kotlin DownloadId value-class entry point.
+-keepclassmembers class org.chromium.taffy.shell.ChromiumDownloadController {
+    public java.lang.Object openForTask-*(java.lang.String, java.lang.String, kotlin.coroutines.Continuation);
+}

@@ -1,0 +1,85 @@
+{
+  "operation": {
+    "operation_id": "inspect-recovery-1",
+    "service_generation": 7,
+    "task_revision": 0,
+    "deadline_monotonic_ms": 41000,
+    "idempotency_key": "inspect-recovery-1"
+  },
+  "records": [
+    {
+      "format_version": 1,
+      "sequence": 1,
+      "binding": {
+        "reservation_id": "reservation-1",
+        "owner_profile_id": "source-profile",
+        "target_kind": 0,
+        "target_profile_id": "target-profile",
+        "backup_id": "backup-1",
+        "snapshot_sha256": [
+          17, 17, 17, 17, 17, 17, 17, 17,
+          17, 17, 17, 17, 17, 17, 17, 17,
+          17, 17, 17, 17, 17, 17, 17, 17,
+          17, 17, 17, 17, 17, 17, 17, 17
+        ],
+        "confirmation_sha256": [
+          18, 18, 18, 18, 18, 18, 18, 18,
+          18, 18, 18, 18, 18, 18, 18, 18,
+          18, 18, 18, 18, 18, 18, 18, 18,
+          18, 18, 18, 18, 18, 18, 18, 18
+        ],
+        "selection": [0, 2],
+        "record_count": 2,
+        "candidate_records_sha256": [
+          19, 19, 19, 19, 19, 19, 19, 19,
+          19, 19, 19, 19, 19, 19, 19, 19,
+          19, 19, 19, 19, 19, 19, 19, 19,
+          19, 19, 19, 19, 19, 19, 19, 19
+        ]
+      },
+      "fact_kind": 0,
+      "intent": {
+        "intent_id": "commit-1",
+        "intent": 0
+      },
+      "outcome": null
+    },
+    {
+      "format_version": 1,
+      "sequence": 2,
+      "binding": {
+        "reservation_id": "reservation-1",
+        "owner_profile_id": "source-profile",
+        "target_kind": 0,
+        "target_profile_id": "target-profile",
+        "backup_id": "backup-1",
+        "snapshot_sha256": [
+          17, 17, 17, 17, 17, 17, 17, 17,
+          17, 17, 17, 17, 17, 17, 17, 17,
+          17, 17, 17, 17, 17, 17, 17, 17,
+          17, 17, 17, 17, 17, 17, 17, 17
+        ],
+        "confirmation_sha256": [
+          18, 18, 18, 18, 18, 18, 18, 18,
+          18, 18, 18, 18, 18, 18, 18, 18,
+          18, 18, 18, 18, 18, 18, 18, 18,
+          18, 18, 18, 18, 18, 18, 18, 18
+        ],
+        "selection": [0, 2],
+        "record_count": 2,
+        "candidate_records_sha256": [
+          19, 19, 19, 19, 19, 19, 19, 19,
+          19, 19, 19, 19, 19, 19, 19, 19,
+          19, 19, 19, 19, 19, 19, 19, 19,
+          19, 19, 19, 19, 19, 19, 19, 19
+        ]
+      },
+      "fact_kind": 1,
+      "intent": null,
+      "outcome": {
+        "intent_id": "commit-1",
+        "outcome": 0
+      }
+    }
+  ]
+}

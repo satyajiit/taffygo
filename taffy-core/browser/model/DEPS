@@ -1,0 +1,31 @@
+# The model plane: the browser-process half of one profile's model calls.
+#
+# The core service is sandboxed and holds no socket, so a model call leaves it
+# as a typed effect and this directory performs the HTTPS request. Decision
+# `docs/decisions/0052-the-assistant-loop-is-a-reducer.md` section 2 is the
+# record.
+#
+# The parent directory's rules carry almost all of it. Two grants are local
+# because this subsystem makes an outbound request, and the grant should say so
+# where it is used rather than at a level that would hand it to every seam in
+# //taffy/browser. The other two directories that send anything — account/ and
+# assets/ — carry their own copies for the same reason:
+#
+#   net/traffic_annotation          required of every request Chromium sends
+#   services/network/public/mojom   the typed shape a response head arrives in
+include_rules = [
+  "+net/traffic_annotation",
+  "+services/network/public/mojom",
+]
+
+specific_include_rules = {
+  # A fake loader factory rather than an embedded test server, because these
+  # tests are about answers a real provider cannot be asked for on demand: a
+  # `401` on a credential that is genuinely configured, a connection that is
+  # refused, a request that is still open when a task is cancelled. Each is a
+  # path through the status mapping, and each has to be dictated to be
+  # exercised.
+  ".*unittest\.(cc|h)": [
+    "+services/network/test",
+  ],
+}

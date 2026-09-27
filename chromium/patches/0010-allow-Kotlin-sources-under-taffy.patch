@@ -1,0 +1,45 @@
+From 4e9a8975a4d35dd5f90369420c817b814c4bd4f2 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Mon, 17 Aug 2026 16:16:14 +0530
+Subject: allow Kotlin sources under //taffy
+
+Chromium gates Kotlin behind an allowlist in build/config/android/rules.gni's
+java_library_impl (build/config/android/internal_rules.gni), and asserts on any
+.kt file outside it. TaffyGo's Compose status island and the Kotlin app layer
+beneath it are 71 files under //taffy, so every android_library in
+the overlay fails `gn gen` without this entry.
+
+The overlay cannot host this edit: the assert reads a list defined in an
+upstream .gni, and a downstream file cannot append to a variable in a scope it
+does not participate in.
+
+One added path, chosen so the downstream delta does not grow with the number of
+Kotlin files: the entry names the overlay root, not any file inside it.
+
+Rebase risk: low. The list is data, appended to by several teams, and a
+conflict here is a one-line reapply.
+
+Needed by: WP-M1-04 (Compose island), and by every android_library target in
+//taffy/app/android before it.
+Found by: the first `gn gen --root-target=//taffy`, which is also
+the run that established no numbered specification owned this edit.
+
+Taffy-Patch: 0010
+
+diff --git a/build/config/android/internal_rules.gni b/build/config/android/internal_rules.gni
+index c297eec55c6ca..0523f0c27d31c 100644
+--- a/build/config/android/internal_rules.gni
++++ b/build/config/android/internal_rules.gni
+@@ -4005,6 +4005,12 @@ if (enable_java_templates) {
+           "//third_party/androidx/*",
+           "*/webengine_shell_apk/*",
+           "//chrome/browser/ui/android/bricks/internal/*",
++
++          # TaffyGo: the Compose status island and the Kotlin app layer it sits
++          # on (decisions 0003 and 0014). All of it lives under the overlay at
++          # //taffy, so this one line is the whole downstream cost of
++          # Kotlin support and it moves only if that path moves.
++          "//taffy/*",
+         ]
+         _found_kt = filter_exclude(_abs_kt_files, _kt_allowlist)
+         assert(

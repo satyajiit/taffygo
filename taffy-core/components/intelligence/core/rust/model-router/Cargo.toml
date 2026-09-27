@@ -1,0 +1,17 @@
+[package]
+name = "model-router"
+description = "Provider-neutral model request/response contracts and route selection (decision 0005)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+

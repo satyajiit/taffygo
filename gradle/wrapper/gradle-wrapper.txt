@@ -1,0 +1,28 @@
+Gradle wrapper bootstrap jar
+============================
+
+Vendored asset: gradle-wrapper.jar (beside this file)
+Owner:          Gradle Inc. and the Gradle contributors
+Licence:        Apache License 2.0
+Licence source: https://github.com/gradle/gradle/blob/master/LICENSE
+Source:         committed by Gradle's own `gradle wrapper` task, which copies
+                the jar out of the distribution named in
+                gradle-wrapper.properties
+Distribution:   gradle-9.7.0-bin.zip, whose SHA-256 the wrapper verifies on
+                download through `distributionSha256Sum` in
+                gradle-wrapper.properties
+Recorded:       2026-08-19
+
+sha256=7a9ce74cff467ca1bf60a4fcd9f05185acceda4d0f382434d393e17864262c5d
+
+This jar is build tooling and never reaches a shipped artifact, so it carries
+no attribution duty in the product's credits page. It is recorded anyway for
+one reason: it is executable third-party code that runs on every developer's
+machine and on any builder, committed as bytes rather than resolved from a
+lockfile. A checksum is the only thing that distinguishes the jar Gradle wrote
+from one somebody swapped, and the Gradle version pin in TOOLCHAIN.md covers
+the distribution rather than this bootstrapper.
+
+Replacing it is Gradle's job, not a person's: bump the Gradle row in
+TOOLCHAIN.md and gradle-wrapper.properties together, run `./gradlew wrapper`,
+and update the `sha256` above in the same change.

@@ -1,0 +1,15 @@
+# //taffy/resources/catalog contains no code. It is grit catalogues, the
+# two host-runnable Python tools that gate them, and the build rules that turn
+# them into a pak and an Android resource set.
+#
+# There is nothing to include and nothing that may include from here except
+# through the generated headers grit writes, so the rule below is the whole
+# policy: a source file that wanted to reach into this directory directly
+# would be reading a catalogue instead of a resource id, and that is the bug.
+
+include_rules = [
+  "-base",
+  "-content",
+  "-mojo",
+  "-url",
+]

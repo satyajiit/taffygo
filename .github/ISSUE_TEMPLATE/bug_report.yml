@@ -1,0 +1,89 @@
+name: Bug report
+description: Something in TaffyGo does not work the way it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. A security problem does not belong here:
+        report it privately at
+        https://github.com/satyajiit/taffygo/security/advisories/new instead.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a page on ...
+        2. Ask Taffy to ...
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: TaffyGo version
+      description: Settings, then About and help, then About. Or the APK file name.
+      placeholder: "152.0.7977.42"
+    validations:
+      required: true
+  - type: dropdown
+    id: source
+    attributes:
+      label: Where it came from
+      options:
+        - Google Play
+        - A GitHub release APK
+        - My own build
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Phone model and Android version
+      placeholder: "Pixel 9, Android 16"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of TaffyGo
+      options:
+        - Browsing, tabs or downloads
+        - Ads and trackers
+        - Asking Taffy about a page
+        - A task Taffy ran
+        - AI providers and keys
+        - Backup
+        - Settings and privacy
+        - Something else
+    validations:
+      required: true
+  - type: input
+    id: provider
+    attributes:
+      label: AI provider and model, if Taffy was involved
+      description: The names only. Never paste an API key.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or logs
+      description: >-
+        Drag screenshots in, or paste log lines. Remove anything personal
+        first: account names, addresses, keys, and page content you would not
+        publish.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you send it
+      options:
+        - label: I searched the open issues and this is not already there.
+          required: true
+        - label: This report contains no API key, password or other secret.
+          required: true

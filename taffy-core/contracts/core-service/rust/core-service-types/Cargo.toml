@@ -1,0 +1,11 @@
+[package]
+name = "core-service-types"
+description = "Generated Rust types for the browser-to-core service contract."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+

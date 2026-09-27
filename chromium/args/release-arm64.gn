@@ -1,0 +1,94 @@
+# TaffyGo GN args profile: release-arm64 — the releasable artifact shape
+# (decision 0013, docs/development/chromium-fork-and-build.md §3).
+#
+# Committed profile. This is the only profile whose output is ever signed, so
+# it is the only one where the answer to "would a corrupted cache change this
+# binary?" has to be no.
+#
+# The release lane builds hermetically with **no compiler cache by design**,
+# so cache corruption can never reach a signed artifact. Symbols are retained
+# as build artifacts and never shipped inside the package.
+
+target_os = "android"
+target_cpu = "arm64"
+taffy_enable_python_runtime = true
+taffy_capability_profile = "candidate"
+
+# The de-Google and size posture shared by every profile (decision 0019).
+# See dev-x64.gn and the fragment itself for the reasoning and citations.
+import("//taffy/build/args/common.gni")
+
+is_debug = false
+is_component_build = false
+
+# What `is_official_build = true` already implies at the pinned milestone
+# (confirmed by reading the checkout, 2026-08-18) — recorded so nobody adds
+# redundant flags or assumes a fork cannot have them:
+#
+#   - ThinLTO on (build/config/compiler/compiler.gni ties use_thin_lto to
+#     official Android builds);
+#   - PGO phase 2: with dcheck off, build/config/compiler/pgo/pgo.gni sets
+#     chrome_pgo_phase = 2 for official high-end Android (arm64), and the
+#     arm64 profile data arrives as a CIPD dependency of a plain public
+#     checkout (DEPS: src/chrome/android/orderfiles/arm64) — no Google
+#     account or gclient variable involved, so release PGO works for a fork;
+#   - resource-allowlist generation on for the target toolchain
+#     (build/toolchain/gcc_toolchain.gni), which strips unreferenced pak
+#     entries from the APK; it requires strip_debug_info to stay at its
+#     default, which is compatible with symbol_level = 2 below.
+is_official_build = true
+symbol_level = 2
+
+# --- Static analysis: the argument is deliberately absent -------------------
+#
+# Both dev profiles carry `android_static_analysis = "on"`, and this one must
+# not, for a reason that is easy to get backwards.
+#
+# `is_official_build = true` already resolves the unset argument to `"off"`
+# (build/config/android/config.gni), so there is no lint or Error Prone in this
+# lane either way. Writing `"off"` here to say so out loud would **change** the
+# build: `enable_r8_tracerefs` is declared from the raw argument, before that
+# resolution, so the sentinel value is what keeps TraceReferences on for an
+# official build. Upstream says as much in a comment at the declaration. An
+# explicit `"off"` would silently drop an R8 check from the only profile whose
+# output is ever signed.
+#
+# Nothing is lost by the analysis not running here. Lint and Error Prone read
+# sources, resources and the manifest, and this profile compiles the same ones
+# the dev profiles do; what `is_official_build` changes — ThinLTO, PGO, R8 — is
+# downstream of both. Under decision 0023 the person making a change runs
+# `./tools/chromium/build --profile dev-arm64`, which now fails on a lint
+# error, so the analysis has a place it actually runs. `./tools/chromium/build`
+# prints the mode it resolved for whichever profile it was given, so a release
+# build is never read as a linted one.
+
+# --- Caching: deliberately absent -------------------------------------------
+#
+# No `cc_wrapper`. `./tools/check fast` fails this profile if one appears,
+# because a compiler cache in a signing lane is exactly the thing the periodic
+# clean-builder run exists to catch and would rather not have to.
+#
+# No `use_siso` either, and that is a narrower statement than it looks: Siso
+# is how the build runs, but its *local cache* has to be off for this lane,
+# and that is a Siso setting rather than a GN argument. `./tools/chromium/build`
+# is where the release lane turns it off.
+#
+# VERIFY AT SP-01: the flag or environment variable that disables Siso's local
+# cache for one invocation, and that `./tools/chromium/build --profile
+# release-arm64` passes it. Until that is confirmed, this lane is hermetic in
+# its compiler layer and not yet proven hermetic in its build-system layer —
+# which is a real gap, is recorded here rather than in a comment claiming
+# otherwise, and is the reason the periodic clean-builder comparison in
+# decision 0013 is not optional.
+
+# Google's remote execution is not available to forks, and a signing lane
+# would not use someone else's executors even if it were.
+use_remoteexec = false
+
+# --- Version code: forced, and only the code (decision 0252, point 3) --------
+#
+# Set in //taffy/build/args/common.gni, not here, so a dev-arm64 build and this
+# one carry the same code and the phone can move between them without an
+# uninstall. The fragment carries the derivation and the rule for raising it.
+
+import("//taffy/build/args/credits.gni")

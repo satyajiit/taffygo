@@ -1,0 +1,21 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# No addresses yet: review falls through to ../OWNERS and then to
+# //components/OWNERS. See ../OWNERS for why, and for what closing M0 changes.
+#
+# What must not fall through is the redaction layer. field_redaction.cc is the
+# only thing standing between a page's password field and a model's context
+# window (spec section 9.1), and a change to it that nobody with security
+# review reads is exactly the change that will not look dangerous.
+#
+# VERIFY AT SP-01: that file:// OWNERS references resolve from a symlinked
+# overlay directory, and that //ipc/SECURITY_OWNERS is still the right file to
+# point at for a renderer-to-browser trust boundary at the pinned milestone.
+per-file field_redaction.*=file://ipc/SECURITY_OWNERS
+per-file node_precondition_checker.*=file://ipc/SECURITY_OWNERS
+per-file page_intelligence_endpoint.*=file://ipc/SECURITY_OWNERS
+per-file renderer_action_executor.*=file://ipc/SECURITY_OWNERS

@@ -1,0 +1,15 @@
+[package]
+name = "procedure-engine"
+description = "One record family for an authored skill and a learned procedure: steps, structural rules, catalogued matching, and narrowing."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+bip-types = { workspace = true }
+policy-engine = { workspace = true }
+task-engine = { workspace = true }

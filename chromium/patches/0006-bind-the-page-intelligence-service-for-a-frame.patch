@@ -1,0 +1,37 @@
+From 1677bf762543151622894db2856aa0fb93428924 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Mon, 17 Aug 2026 16:43:59 +0530
+Subject: bind the page intelligence service for a frame
+
+GN half only. This is the dependency edge that links TaffyGo's browser-process
+code into //chrome/browser; the call-site edit in
+chrome_browser_interface_binders.cc that this patch's specification describes
+lands in this same commit when it is written.
+
+The edge is what makes the C++ compile and link at all, and it is also how
+TaffyGo's native code reaches the APK: an Android APK's Java side carries
+assert_no_native_deps, so native code arrives through libchrome rather than
+through the product target's deps.
+
+The specification did not mention this half. Every .cc-editing specification in
+the queue names its call site and omits the deps edge that resolves the symbol,
+because they were written without a checkout to compile against.
+
+Rebase risk: low. One line in a long sorted list.
+
+Needed by: WP-M2-02.
+
+Taffy-Patch: 0006
+
+diff --git a/chrome/browser/BUILD.gn b/chrome/browser/BUILD.gn
+index e1d0017fc823e..01eeda29e78ad 100644
+--- a/chrome/browser/BUILD.gn
++++ b/chrome/browser/BUILD.gn
+@@ -2469,6 +2469,7 @@ source_set("browser") {
+     "//components/page_content_annotations/core",
+     "//components/supervised_user/core/browser:device_parental_controls",
+     "//components/supervised_user/core/browser:synthetic_field_trial_delegate",
++    "//taffy/browser",
+     "//components/visibility_timer",
+ 
+     # TODO(crbug.com/369436587): Remove this dependency when

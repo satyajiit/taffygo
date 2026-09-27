@@ -1,0 +1,28 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# GENERATED FILE — DO NOT EDIT.
+#
+# Written by taffy-core/components/delivery/core/rust/asset-plane/
+# catalog/tools/generate_bundled_assets.py from that catalog's source
+# `bundled` block. The two lists are positional: entry N of one names
+# the same artifact as entry N of the other, which is what
+# `android_assets` requires of renaming_sources and
+# renaming_destinations.
+
+taffy_bundled_asset_sources = [
+  "bundled/easylist-base.zip",
+  "bundled/flags-4x3-webp.zip",
+  "bundled/scenes-4x3-webp.zip",
+  "bundled/stdlib.zip",
+]
+
+taffy_bundled_asset_destinations = [
+  "taffy-delivery/easylist-base.zip",
+  "taffy-delivery/flags-4x3-webp.zip",
+  "taffy-delivery/scenes-4x3-webp.zip",
+  "taffy-delivery/stdlib.zip",
+]

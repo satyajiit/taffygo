@@ -1,0 +1,25 @@
+# Allowlist for the banned-terms rules in ./tools/check docs.
+#
+# Columns, tab-separated:  path-glob <TAB> line-regex <TAB> reason
+#
+# A finding is suppressed when the file matches the glob AND the offending line
+# matches the regex. Regexes are Python `re`, applied case-insensitively.
+# Every entry needs a reason: an allowlist without reasons becomes a silencer.
+# The allowed hits named in docs/voice-and-naming.md section 4 are the first
+# three entries; everything after them is a specific, argued exception.
+
+docs/voice-and-naming.md	.	The banned-terms table and its own check commands live here.
+docs/decisions/0008-single-public-release.md	.	The decision record that retired the staged-release vocabulary must name it.
+docs/decisions/0010-plain-language-user-facing-naming.md	.	The renaming decision record must name both the old and the new term.
+CONTRIBUTING.md	^\s*rg .*	The documented consistency-check commands quote the patterns they search for.
+*	0009-single-assistant-no-multi-agent	A link to the decision record that removed multi-agent scope.
+*	beta[^a-z]{0,4}(milestone|channel)	Chromium's release channel, not a TaffyGo release.
+*	(cloudflare )?r2 (bucket|backend)|sccache.{0,3}R2	Cloudflare R2, the object store, not a release milestone.
+docs/open-decisions.md	OD-002	The open decision that retires the leftover names must quote them.
+docs/product/use-cases.md	Formerly framed as custom agents	Historical note pointing at decision 0009.
+docs/security/threat-model.md	^\| R[1-4] \|	The R1-R4 action-risk classes are the threat model's own taxonomy.
+docs/security/threat-model.md	R[1-4] (capability|action)	The R1-R4 action-risk classes are the threat model's own taxonomy.
+docs/decisions/0009-single-assistant-no-multi-agent.md	.	The decision record that removed multi-agent scope must name it.
+docs/decisions/0012-repository-directory-structure.md	multi-agent crates	Explains which crates the single-assistant decision makes unnecessary.
+brand/README.md	(real|premultiplied|straight) alpha|alpha (channel|matte)	The image transparency channel of the logo extraction, not a release milestone.
+*	iso 3166-1 alpha-2	The ISO standard's own name for its two-letter part, not a release stage.

@@ -1,0 +1,16 @@
+{
+  "name": "taffy-go",
+  "private": true,
+  "description": "TaffyGo JS workspace: the landing page.",
+  "packageManager": "pnpm@11.8.0",
+  "engines": {
+    "node": ">=24.0.0 <25",
+    "pnpm": ">=11.8.0 <12"
+  },
+  "scripts": {
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "build": "pnpm -r --if-present build"
+  }
+}

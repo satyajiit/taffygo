@@ -1,0 +1,16 @@
+{
+  "contract_version": "1.2",
+  "message": {
+    "host": "example.test",
+    "title": "Example",
+    "can_go_back": true,
+    "can_go_forward": false,
+    "is_loading": false,
+    "failure": 0,
+    "interstitial": 0,
+    "http_status_code": 200,
+    "filtering_active": true,
+    "blocked_request_count": 4,
+    "field_this_build_does_not_define": true
+  }
+}

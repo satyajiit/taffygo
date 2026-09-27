@@ -1,0 +1,312 @@
+#!/usr/bin/env python3
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+"""Generate `kotlin_sources.gni` from the UI host modules the overlay mounts.
+
+WHY THIS IS GENERATED AND NOT HAND-WRITTEN
+
+The same reason `rust/tools/generate_crate_sources.py` exists, for the same
+shape of problem. GN does not glob, and Chromium's convention is to list every
+source explicitly so that adding a file is a visible change in review. That
+convention assumes the sources and the build file live together. Here they do
+not: decision 0024 keeps the UI host sources in `taffy-core/ui/android/` with
+exactly one copy — the port is "a Kotlin mount, not a rewrite" — and the build
+file that lists them lives in the overlay. A hand-written list in a different
+directory from the files it names does not stay correct; it stays plausible.
+
+WHY IT HAS A --check AND WHY THAT MATTERS MORE HERE
+
+`crate_sources.gni` shipped without one. `AGENTS.md` records the consequence in
+its "What no gate checks" section: no lane regenerates or verifies it, so a
+renamed file is silently stale until a Chromium build fails, on a builder, hours
+later. This file is the twin of that one and does not repeat the mistake — the
+`catalog`-style lane runs `--check`, so the miss is a one-line failure on the
+machine that made it.
+
+WHAT IS DELIBERATELY EXCLUDED FROM THE PRODUCT LISTS
+
+Everything `kotlin_mounts.py` refuses to mount, and for its reasons: a file that
+needs an annotation processor `third_party` does not carry at the pinned
+milestone, a file reaching a generated resource class the fork produces another
+way, and a file the fork *replaces* rather than compiles. The first two are
+recomputed from the tree; the third is `REPLACED_FILES`, which is a list because
+"the fork has its own version of this" is not visible in the file itself. All
+three are recorded there, per module, so this generator lists only what is
+genuinely mounted.
+
+`src/test` remains the Gradle host loop's. `src/androidTest` is emitted per
+Gradle module for the self-instrumenting device-test APK. Five deterministic
+fixture sources shared by previews and device tests are emitted alongside the
+module that owns them; the shipping jars still never compile them. The split is
+semantic, not cosmetic: Kotlin `internal` visibility is a module boundary, so
+each device-test jar must compile one module's main, debug-fixture and
+instrumentation sources together, exactly as Gradle does. Keeping the lists
+generated closes the same silent-source gap as the product lists: a new
+semantics test cannot exist on disk while never reaching the suite that claims
+to run it.
+
+Stdlib only.
+
+    generate_kotlin_sources.py --write    rewrite kotlin_sources.gni
+    generate_kotlin_sources.py --check    fail if it is stale
+
+Exit status: 0 clean, 1 stale or malformed.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import sys
+
+import kotlin_mounts
+
+#: Paths are emitted as absolute GN labels rather than relative to one
+#: directory, so the targets that consume them can live wherever the file-size
+#: seam puts them. They did live in `android/BUILD.gn`; that file reached its
+#: line cap, and its own header records that the response is a split rather than
+#: another compaction.
+_MOUNT_LABEL = "//taffy/app/android/kotlin"
+_ANDROID_UI_LABEL = "//taffy/ui/android"
+
+# These are state/building fixtures, not @Preview entrypoints. Gradle's debug
+# variant makes them visible to androidTest automatically; Chromium has no
+# variant source-set merge, so its test-only target must name the shared files.
+# Keeping the set exact prevents the tempting but incorrect fix of compiling
+# every @Preview file (and the unavailable UI-tooling dependency) into the APK.
+_ANDROID_TEST_FIXTURES = (
+    "core/ui/src/debug/kotlin/com/taffygo/browser/ui/core/ui/TaffyPreview.kt",
+    "feature/assistant/src/debug/kotlin/"
+    "com/taffygo/browser/ui/feature/assistant/AssistantPreviewStates.kt",
+    "feature/browsing/src/debug/kotlin/com/taffygo/browser/ui/feature/browsing/PreviewStates.kt",
+    "feature/browsing/src/debug/kotlin/"
+    "com/taffygo/browser/ui/feature/browsing/PreviewStartComposer.kt",
+    "feature/downloads/src/debug/kotlin/"
+    "com/taffygo/browser/ui/feature/downloads/DownloadPreviewStates.kt",
+    "feature/workspaces/src/debug/kotlin/"
+    "com/taffygo/browser/ui/feature/workspaces/LibraryPreviewStates.kt",
+    "feature/workspaces/src/debug/kotlin/"
+    "com/taffygo/browser/ui/feature/workspaces/WorkspacePreviewStates.kt",
+)
+
+_HEADER = """\
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# @generated by //taffy/app/android/tools/generate_kotlin_sources.py
+#             — do not edit
+#
+# Regenerate:  python3 taffy-core/app/android/tools/generate_kotlin_sources.py --write
+# Verify:      python3 taffy-core/app/android/tools/generate_kotlin_sources.py --check
+#
+# Every path below is an absolute GN label and reaches a
+# UI host module through the symlinks `kotlin_mounts.py --mount` creates.
+# Nothing here is a copy of anything in `taffy-core/ui/android/`; the mount is
+# what makes a relative path work at all, and the link is anchored at the
+# package directory because compile_java.py asserts that a source file's path
+# matches its package.
+#
+# Only mounted modules appear. A module blocked on an annotation processor or on
+# a generated resource class is absent by construction rather than by omission —
+# `kotlin_mounts.py --report` prints the census and the reason for each.
+#
+# The final android-test lists deliberately name the canonical source tree
+# directly. Test sources and their fixture-only debug sources are never
+# shipping inputs and need no product mount; their paths already end in the
+# package/class suffix Chromium validates.
+"""
+
+
+def module_variable(module: str) -> str:
+    return "taffy_" + module.replace("/", "_").replace("-", "_")
+
+
+def resource_files(directory: str) -> list[str]:
+    """Every resource file under a module's `res/`, relative to it, sorted."""
+    found: list[str] = []
+    for current, _dirs, files in os.walk(directory):
+        for name in sorted(files):
+            found.append(os.path.relpath(os.path.join(current, name), directory))
+    return sorted(found)
+
+
+def android_test_sources(root: str, module: str) -> list[str]:
+    """One module's instrumentation sources, as canonical GN labels."""
+    sources: list[str] = []
+    for language in ("java", "kotlin"):
+        directory = os.path.join(
+            root,
+            "taffy-core",
+            "ui",
+            "android",
+            module,
+            "src",
+            "androidTest",
+            language,
+        )
+        if not os.path.isdir(directory):
+            continue
+        for current, _dirs, files in os.walk(directory):
+            for name in sorted(files):
+                if not name.endswith((".java", ".kt")):
+                    continue
+                relative = os.path.relpath(os.path.join(current, name), directory)
+                sources.append(
+                    os.path.join(
+                        _ANDROID_UI_LABEL,
+                        module,
+                        "src",
+                        "androidTest",
+                        language,
+                        relative,
+                    ).replace(os.sep, "/")
+                )
+    return sorted(sources)
+
+
+def android_test_fixture_sources(root: str, module: str) -> list[str]:
+    """One module's preview fixtures also consumed by instrumentation tests."""
+    sources: list[str] = []
+    source_root = os.path.join(root, "taffy-core", "ui", "android")
+    for relative in _ANDROID_TEST_FIXTURES:
+        if not relative.startswith(f"{module}/"):
+            continue
+        path = os.path.join(source_root, relative)
+        if not os.path.isfile(path):
+            raise kotlin_mounts.ContractError(
+                f"missing Android test fixture source: {relative}"
+            )
+        with open(path, encoding="utf-8") as handle:
+            contents = handle.read()
+        if "androidx.compose.ui.tooling.preview" in contents:
+            raise kotlin_mounts.ContractError(
+                f"Android test fixture imports unavailable preview tooling: {relative}"
+            )
+        sources.append(os.path.join(_ANDROID_UI_LABEL, relative).replace(os.sep, "/"))
+    return sorted(sources)
+
+
+def render(root: str) -> str:
+    lines = [_HEADER]
+
+    for directory, package in kotlin_mounts.GENERATED_SOURCE_SETS.items():
+        source_dir = kotlin_mounts.generated_source_dir(root, directory)
+        relative_root = os.path.join(_MOUNT_LABEL, kotlin_mounts.package_path(package))
+        lines.append("")
+        lines.append(f"# Generated and committed: {directory}")
+        lines.append(f"taffy_{package.replace('.', '_')}_sources = [")
+        for name in kotlin_mounts.kotlin_files(source_dir):
+            lines.append(f'  "{os.path.join(relative_root, name).replace(os.sep, "/")}",')
+        lines.append("]")
+
+    for module in kotlin_mounts.MOUNTED_MODULES:
+        package = kotlin_mounts.MODULES[module]
+        directory = kotlin_mounts.module_source_dir(root, module, package)
+        relative_root = os.path.join(_MOUNT_LABEL, kotlin_mounts.package_path(package))
+        excluded = set(
+            kotlin_mounts.excluded_files(
+                directory,
+                dagger=module in kotlin_mounts.DAGGER_MODULES,
+                replaced=kotlin_mounts.REPLACED_FILES.get(module, {}),
+            )
+        )
+        sources = [
+            os.path.join(relative_root, name).replace(os.sep, "/")
+            for name in kotlin_mounts.kotlin_files(directory)
+            if name not in excluded
+        ]
+        lines.append("")
+        if excluded:
+            lines.append(f"# {len(excluded)} file(s) left out. Run")
+            lines.append("# `kotlin_mounts.py --report` for the census; the reason is one of")
+            lines.append("# three: a non-shipping @Preview, an unavailable GN library, or a file")
+            lines.append("# named in REPLACED_FILES because the fork has its own version.")
+        lines.append(f"{module_variable(module)}_sources = [")
+        for source in sources:
+            lines.append(f'  "{source}",')
+        lines.append("]")
+
+        if module in kotlin_mounts.RESOURCE_MODULES:
+            resource_root = os.path.join(
+                _MOUNT_LABEL, "res", module.replace("/", "_")
+            )
+            resource_dir = kotlin_mounts.module_resource_dir(root, module)
+            lines.append("")
+            lines.append(f"{module_variable(module)}_resources = [")
+            for name in resource_files(resource_dir):
+                joined = os.path.join(resource_root, name).replace(os.sep, "/")
+                lines.append(f'  "{joined}",')
+            lines.append("]")
+
+    for module in kotlin_mounts.MOUNTED_MODULES:
+        test_sources = android_test_sources(root, module)
+        fixture_sources = android_test_fixture_sources(root, module)
+        if not test_sources and not fixture_sources:
+            continue
+        variable = module_variable(module)
+        lines.append("")
+        lines.append(f"# {module}: debug-only fixtures shared with device tests.")
+        lines.append(f"{variable}_android_test_fixture_sources = [")
+        for source in fixture_sources:
+            lines.append(f'  "{source}",')
+        lines.append("]")
+        lines.append("")
+        lines.append(f"# {module}: device-only Compose semantics and interaction tests.")
+        lines.append(f"{variable}_android_test_sources = [")
+        for source in test_sources:
+            lines.append(f'  "{source}",')
+        lines.append("]")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def output_path() -> str:
+    return os.path.join(kotlin_mounts.overlay_component_dir(), "android", "kotlin_sources.gni")
+
+
+def main(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--write", action="store_true", help="rewrite kotlin_sources.gni")
+    group.add_argument("--check", action="store_true", help="fail if it is stale")
+    arguments = parser.parse_args(argv)
+
+    try:
+        root = kotlin_mounts.repository_root()
+        rendered = render(root)
+    except kotlin_mounts.ContractError as error:
+        print(f"generate_kotlin_sources: {error}", file=sys.stderr)
+        return 1
+
+    destination = output_path()
+
+    if arguments.write:
+        with open(destination, "w", encoding="utf-8") as handle:
+            handle.write(rendered)
+        print(f"wrote {destination}")
+        return 0
+
+    if not os.path.exists(destination):
+        print(f"generate_kotlin_sources: {destination} does not exist; run --write", file=sys.stderr)
+        return 1
+    with open(destination, encoding="utf-8") as handle:
+        current = handle.read()
+    if current != rendered:
+        print(
+            f"generate_kotlin_sources: {destination} is stale; run --write and commit the result",
+            file=sys.stderr,
+        )
+        return 1
+    print(f"{destination} is current")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

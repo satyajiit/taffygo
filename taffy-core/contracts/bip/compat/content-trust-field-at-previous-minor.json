@@ -1,0 +1,54 @@
+{
+  "schema_version": "0.4",
+  "subscription_id": "sub_03",
+  "tab_id": "tab_01",
+  "frame_id": "frame_main",
+  "page_epoch": "epoch_c7",
+  "from_revision": 4,
+  "to_revision": 5,
+  "event_sequence": 21,
+  "coalesced_mutation_count": 1,
+  "added_nodes": [],
+  "changed_nodes": [
+    {
+      "node": {
+        "node_id": "n_quote",
+        "frame_id": "frame_main",
+        "role": "PARAGRAPH",
+        "text_runs": [
+          {
+            "text": "Reposted from a reader.",
+            "source_kind": "DOM",
+            "sensitivity": "NOT_SENSITIVE",
+            "truncated": false,
+            "content_trust": "USER_GENERATED_CONTENT"
+          }
+        ],
+        "states": [
+          "VISIBLE"
+        ],
+        "sensitivity": "NOT_SENSITIVE",
+        "content_trust": "USER_GENERATED_CONTENT",
+        "sources": [
+          "DOM"
+        ],
+        "confidence": 0.9
+      },
+      "changed_fields": [
+        "CONTENT_TRUST"
+      ]
+    }
+  ],
+  "removed_node_ids": [],
+  "changed_edges": [],
+  "invalidations": [],
+  "truncation": {
+    "truncated": false,
+    "budgets_reached": [],
+    "omitted_node_count": 0,
+    "omitted_text_bytes": 0,
+    "omitted_frame_count": 0,
+    "may_change_answer": false
+  },
+  "observed_at_monotonic_ms": 2100
+}

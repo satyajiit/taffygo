@@ -1,0 +1,317 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/chromium/test — run the Taffy suites, and optionally the affected
+# upstream suites, from a built output directory.
+
+set -euo pipefail
+
+# See ./tools/chromium/build: the JVM writes "Picked up JAVA_TOOL_OPTIONS" to
+# stderr, and Chromium build and test wrappers that treat stderr as failure
+# fail on it. No TaffyGo step needs the variable.
+unset JAVA_TOOL_OPTIONS
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/chromium.sh"
+
+PROFILE=$(taffy_state_get last_profile "$TAFFY_DEFAULT_PROFILE")
+WITH_UPSTREAM=0
+DEVICE=
+SUITES=()
+# Everything after a bare `--`, handed to each runner unchanged.
+PASSTHROUGH=()
+
+# Upstream suites that downstream integration can break. Extended as the
+# product root grows; the Chromium integration lane owns the full list.
+UPSTREAM_SUITES='chrome_public_test_apk content_shell_test_apk'
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/chromium/test [--profile <name>] [--upstream] [suite...]
+
+With no suite named, runs every TaffyGo suite that has a runner:
+
+  taffy_unittests           C++ unit tests, on the device
+  taffy_browsertests        C++ browser tests — parity, correctness and
+                            adversarial — on the device, in a real browser
+  taffy_public_test_apk     Compose instrumentation tests, on the device
+  taffy_shell_junit_tests   the shell's Robolectric JVM suite, on this host
+  taffy_profile_browsertests  the Chrome-Profile browser tests patch 0045
+                            registers, on the device — Profile recovery,
+                            the vertical task suites and the Task Benchmark
+                            probes. Android only; a host profile has no
+                            Chrome Profile to give it
+
+Suites must already be built. To build all five:
+  ./tools/chromium/build --profile dev-arm64 \
+      taffy_unittests taffy_browsertests taffy_public_test_apk \
+      taffy_shell_junit_tests taffy_profile_browsertests
+
+A host profile runs the same C++ suites on this machine instead of the phone,
+and is the only way to ask whether TaffyGo leaks:
+
+  ./tools/chromium/build --profile diag-sanitizer-x64 taffy_unittests
+  ./tools/chromium/test  --profile diag-sanitizer-x64 taffy_unittests
+
+The second command passes the sanitizer argument that run needs; see the note
+in the source for what it is for and which run paid for it.
+Host C++ runners also start Chromium's virtual display with Xvfb, so Aura and
+input devices initialize without a desktop session. Pass -- --no-xvfb only
+when supplying a working display yourself; the upstream wrapper also accepts
+--no-xvfb --use-weston or --no-xvfb --use-mutter.
+
+The three device suites need a phone attached, and two things about it are
+easy to lose hours to, so this command names both rather than leaving them to
+be rediscovered:
+
+  * The screen must be unlocked. The instrumentation tests drive real
+    Activities, an Activity cannot reach RESUMED behind a keyguard, and a
+    locked phone fails them with "No compose hierarchies found in the app"
+    rather than with anything about the product.
+  * Each test APK needs All-files access, because the runner pushes the suite's
+    data dependencies to /sdcard/chromium_tests_root and the APK reads them
+    from there. Without it the read is refused by MediaProvider and the
+    symptom names nothing: on 2026-08-19 taffy_browsertests reported 53 of 61
+    failing on `content::NavigateToURL(...)` returning false, because the
+    embedded test server could not read content/test/data/title1.html. Grant
+    it once per package:
+
+      adb -s <serial> shell appops set <package> MANAGE_EXTERNAL_STORAGE allow
+
+    The packages are org.chromium.native_test (taffy_unittests),
+    com.taffygo.browsertests and com.taffygo.browser.tests
+    (taffy_public_test_apk).
+
+Pass --device <serial> whenever more than one device is attached.
+
+Anything after a bare `--` is passed to each runner unchanged. The two worth
+knowing about, both for the sanitizer profile:
+
+  Under diag-sanitizer-x64, pass BOTH of these or the run is not evidence:
+
+      -- --test-launcher-jobs=8 --test-launcher-timeout=600000
+
+  -- --test-launcher-timeout=MS the one that actually matters. A batch child
+                                runs every test in its batch, each reporting
+                                (0 ms), and then spends more than ninety
+                                seconds writing a LeakSanitizer report over an
+                                883 MB binary. The launcher's per-test exit
+                                timeout kills it mid-report and records every
+                                test in that batch as having no result, which
+                                it then prints as SKIPPED. Upstream names this
+                                exact case three lines above the log line, at
+                                base/test/launcher/test_launcher.cc:584: "If
+                                you hit this and all of the tests passed, then
+                                it might be stuck generating something like a
+                                leak-santizer report."
+  -- --test-launcher-jobs=N     necessary but NOT sufficient, and on its own
+                                it does not fix the above — eight jobs left
+                                34 GB free and still lost half the batches.
+                                Pass it anyway: the launcher does not reduce
+                                its own default under a sanitizer, and this
+                                text claimed it did until 2026-09-20.
+                                `NumParallelJobs` ends at
+                                `cores / cores_per_job` with no sanitizer
+                                branch anywhere in the function, so a 32-core
+                                host runs 32 concurrent 884 MB children.
+                                N bounds how many symbolize at once.
+
+  The memory reading is the trap here, so it is written down rather than left
+  out: at 32 jobs swap really was exhausted, and "32 ASan children starved the
+  machine" explains every number in that log and predicts the fix. It is
+  wrong, and it survived two people because the line that says what actually
+  happened sits directly above the first no-result. A 35-hour run whose
+  mid-flight log read as a pass came out of it.
+  -- --gtest_filter=Pattern     one suite or one test
+
+For Android taffy_profile_browsertests, omit --timeout-scale or use 1.
+The pinned Chromium runner makes any other scale start Chrome native code
+off the Android UI thread, which crashes before a browser test can run.
+
+Options:
+  --profile NAME  build profile whose out/ directory to run from
+  --device SERIAL run the device suites on exactly this adb serial. Name it
+                  whenever more than one device or emulator is attached: the
+                  Chromium runner otherwise shards across all of them, and a
+                  suite that half-ran on an emulator nobody meant to use
+                  reports as a failure of the suite
+  --upstream      also run the affected upstream suites
+  -h, --help      show this help
+USAGE
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --profile) PROFILE=${2:-}; shift ;;
+    --profile=*) PROFILE=${1#*=} ;;
+    --device) DEVICE=${2:-}; shift ;;
+    --device=*) DEVICE=${1#*=} ;;
+    --upstream) WITH_UPSTREAM=1 ;;
+    -h|--help) usage; exit 0 ;;
+    --) shift; while [ $# -gt 0 ]; do PASSTHROUGH+=("$1"); shift; done; break ;;
+    -*) usage >&2; die "unknown option: $1" ;;
+    *) SUITES+=("$1") ;;
+  esac
+  shift
+done
+
+taffy_require_chromium_host
+chromium_add_depot_tools_to_path
+chromium_validate_profile "$PROFILE"
+SRC=$(chromium_require_checkout)
+
+HOST_PROFILE=0
+for known in $TAFFY_HOST_PROFILES; do
+  [ "$PROFILE" = "$known" ] && HOST_PROFILE=1
+done
+
+# A sanitizer profile needs one runtime option that neither the build nor the
+# runner supplies, and setting ASAN_OPTIONS in the environment does not work:
+# testing/test_env.py composes ASAN_OPTIONS from the build's own arguments and
+# assigns it, so whatever was exported here is discarded. It reads
+# `--asan-detect-odr-violation=0` off the command line instead
+# (testing/test_env.py:431), which is the knob this passes.
+#
+# What it is for: the pinned checkout ships media::VideoDecoderMixin's vtable in
+# two shared objects of its own, which ASan reports as a one-definition-rule
+# violation and then aborts on before the first test runs. It is upstream's, not
+# TaffyGo's, and no downstream change resolves it. Leak detection itself needs
+# no flag — the runner turns it on because the profile sets is_lsan.
+SANITIZER_ARGS=()
+if [ "$HOST_PROFILE" = 1 ] && chromium_profile_is_sanitized "$PROFILE"; then
+  SANITIZER_ARGS=(--asan-detect-odr-violation=0)
+  note "sanitizer arguments: ${SANITIZER_ARGS[*]}"
+fi
+
+# Every suite this repository declares a runner for. Named explicitly rather
+# than globbed out of out/*/bin so that a suite which failed to build is
+# reported as "not built" instead of silently skipped — the honesty rule in
+# AGENTS.md applies to this script as much as to a gate.
+TAFFY_SUITES='taffy_unittests taffy_browsertests taffy_public_test_apk taffy_shell_junit_tests taffy_profile_browsertests'
+
+if [ "${#SUITES[@]}" -eq 0 ]; then
+  for suite in $TAFFY_SUITES; do SUITES+=("$suite"); done
+fi
+if [ "$WITH_UPSTREAM" = 1 ]; then
+  for suite in $UPSTREAM_SUITES; do SUITES+=("$suite"); done
+fi
+
+# Chromium's gtest_test_instance.py turns a scaled timeout into the NativeTest
+# RunInSubThread intent extra. ChromeBrowserTestsActivity starts ContentMain on
+# the UI thread; forcing its callback onto a new thread aborts before the test
+# body in CrashKeys.flushToNative. Validate before running any selected suite.
+if [ "$HOST_PROFILE" = 0 ]; then
+  for suite in "${SUITES[@]}"; do
+    [ "$suite" = taffy_profile_browsertests ] || continue
+    if ! python3 - "${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}" <<'PY'
+import sys
+
+scale = "1"
+arguments = iter(sys.argv[1:])
+for argument in arguments:
+    if argument == "--timeout-scale":
+        scale = next(arguments, "")
+    elif argument.startswith("--timeout-scale="):
+        scale = argument.partition("=")[2]
+try:
+    sys.exit(0 if float(scale) == 1 else 1)
+except ValueError:
+    sys.exit(1)
+PY
+    then
+      die "taffy_profile_browsertests cannot use --timeout-scale other than 1" \
+        "The pinned runner starts Chrome native startup off the Android UI thread." \
+        "Omit --timeout-scale or set it to 1; the browser tests use their default timeouts."
+    fi
+    break
+  done
+fi
+
+FAILED=0
+for suite in "${SUITES[@]}"; do
+  runner="$SRC/out/$PROFILE/bin/run_$suite"
+  if [ ! -x "$runner" ]; then
+    bad "not built: $suite (expected out/$PROFILE/bin/run_$suite)"
+    FAILED=$((FAILED + 1))
+    continue
+  fi
+  step "running $suite"
+  # The Robolectric suites run on this host and their runners reject --device.
+  # Matched by shape rather than by name so that a third one added later is
+  # handled without a silent "unrecognized argument" failure.
+  RUNNER_ARGS=()
+  if [ -n "$DEVICE" ] && [ "$HOST_PROFILE" = 0 ] && [ "${suite%junit_tests}" = "$suite" ]; then
+    RUNNER_ARGS=(--device "$DEVICE")
+  fi
+  # GN's use_xvfb selects Chromium's display wrapper for these two suites.
+  # Choose its Xvfb backend explicitly rather than requiring Xorg's dummy
+  # driver. Preserve a caller's display choice, including an existing display.
+  if [ "$HOST_PROFILE" = 1 ] \
+     && { [ "$suite" = taffy_unittests ] || [ "$suite" = taffy_browsertests ]; }; then
+    DISPLAY_ARGS=(--use-xvfb)
+    for argument in "${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}"; do
+      case "$argument" in
+        --no-xvfb|--use-xvfb|--use-weston|--use-mutter) DISPLAY_ARGS=(); break ;;
+      esac
+    done
+    RUNNER_ARGS+=("${DISPLAY_ARGS[@]+"${DISPLAY_ARGS[@]}"}")
+    note "host display: Chromium display wrapper ${DISPLAY_ARGS[*]:-with caller arguments}"
+  fi
+  # The runner's exit code is necessary and not sufficient, for the same reason
+  # the build command cannot trust autoninja's. A gtest binary handed a filter
+  # that matches nothing runs zero tests and exits 0, and this command used to
+  # print `ok <suite>` and then `all suites passed` for it. That is the failure
+  # mode a filter is most likely to have: a typo, a renamed fixture, or a file
+  # that never reached the link. It reads as "the tests you asked for pass"
+  # when the truth is "there were none", and those are opposite facts.
+  #
+  # So a gtest-shaped suite must also SAY it ran something. Direct gtest and
+  # Android instrumentation emit the classic `[  PASSED  ] N tests`; Chromium's
+  # parallel launcher instead emits `[N/N]` and `SUCCESS: all tests passed.`.
+  # Require a positive numerator in either format, so a typoed filter whose
+  # launcher honestly says `[0/0]` is still a failure. Robolectric suites are
+  # matched out by the same name shape used above, because they do not print
+  # either summary and demanding one would fail them for their format.
+  TEST_LOG=$(mktemp "${TMPDIR:-/tmp}/taffy-test.XXXXXX")
+  set +e
+  "$runner" "${RUNNER_ARGS[@]+"${RUNNER_ARGS[@]}"}" \
+       "${SANITIZER_ARGS[@]+"${SANITIZER_ARGS[@]}"}" \
+       "${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}" 2>&1 | tee "$TEST_LOG"
+  RUN_RC=${PIPESTATUS[0]}
+  set -e
+  RAN_NOTHING=0
+  if [ "$RUN_RC" -eq 0 ] && [ "${suite%junit_tests}" = "$suite" ] \
+     && ! grep -qE "\[  PASSED  \] [1-9][0-9]* test|\[[1-9][0-9]*/[1-9][0-9]*\]" \
+          "$TEST_LOG"; then
+    RAN_NOTHING=1
+  fi
+  rm -f "$TEST_LOG"
+  if [ "$RUN_RC" -eq 0 ] && [ "$RAN_NOTHING" = 1 ]; then
+    bad "$suite: exited 0 having run no tests"
+    info "      A suite that runs nothing has not passed. Check the filter"
+    info "      names a fixture that exists, and that its file is listed in"
+    info "      the target's sources — an unlisted test file compiles into"
+    info "      nothing and disappears without a message."
+    FAILED=$((FAILED + 1))
+  elif [ "$RUN_RC" -eq 0 ]; then
+    ok "$suite"
+  else
+    bad "$suite"
+    # The one device-side precondition whose symptom names something else
+    # entirely. See the note in --help: a suite that cannot read
+    # /sdcard/chromium_tests_root fails on whatever it was about to assert.
+    if [ "${suite%junit_tests}" = "$suite" ]; then
+      info "      if this is a device suite, check All-files access before"
+      info "      reading the failures as a product verdict:"
+      info "        adb${DEVICE:+ -s $DEVICE} shell appops get <package> MANAGE_EXTERNAL_STORAGE"
+    fi
+    FAILED=$((FAILED + 1))
+  fi
+done
+
+info ""
+[ "$FAILED" -eq 0 ] || die "$FAILED suite(s) failed"
+ok "all suites passed"

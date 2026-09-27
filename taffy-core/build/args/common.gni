@@ -1,0 +1,111 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# TaffyGo shared GN args: the de-Google and size posture every committed
+# profile carries. The postures themselves are decision 0019
+# (docs/decisions/0019-google-service-posture.md); this file is their
+# build-time half.
+#
+# Every profile in chromium/args/ imports this file as
+#
+#   import("//taffy/build/args/common.gni")
+#
+# which resolves through the product-root mount (`taffy` is a symlink
+# into this repository). A checkout without the overlay mounted fails
+# `gn gen` on the missing import — the same loud-failure class the profiles
+# already accept for an unknown argument.
+#
+# Rules for this file:
+#   - only values no profile ever overrides live here, so the question of
+#     assign-after-import never arises;
+#   - every argument names the file that declares it, confirmed by reading
+#     the pinned checkout (milestone 152, 2026-08-18). `gn gen` fails loudly
+#     on an argument it does not recognise, which is the failure mode worth
+#     having: a renamed flag stops the build instead of silently reverting
+#     the posture.
+#
+# The `chromium` lane of ./tools/check fast gates this file and the three
+# profiles in both directions.
+
+# --- Keyless by construction (decision 0019) --------------------------------
+#
+# Declared in google_apis/config.gni (use_official_google_api_keys, default
+# empty meaning "probe the checkout") and google_apis/BUILD.gn (the three
+# key values, default empty). All four already resolve this way in a public
+# checkout; pinning them makes the keyless build a reviewed property of the
+# profile rather than an accident of checkout contents or environment
+# variables (GOOGLE_API_KEY et al. would otherwise be baked in silently).
+use_official_google_api_keys = false
+google_api_key = ""
+google_default_client_id = ""
+google_default_client_secret = ""
+
+# --- No compiled-in field-trial config (decision 0019) ----------------------
+#
+# Declared in components/variations/service/BUILD.gn, default false — and in
+# an unbranded Android build the compiled-in testing config is APPLIED at
+# run time (variations_field_trial_creator.cc), where its overrides are
+# first-wins and would beat the TaffyGo feature posture installed by patch
+# 0015. Branded Android already ships without it. Behavior becomes what the
+# source says, and upstream's own comment records the config as measurable
+# binary size.
+disable_fieldtrial_testing_config = true
+
+# --- No Reporting API / Network Error Logging (decision 0019) ---------------
+#
+# Declared in net/features.gni, default true everywhere but iOS. Compiles
+# out the Reporting API and NEL — background POSTs of network-error and
+# policy reports to site-designated collectors. A web-platform feature loss,
+# accepted deliberately as part of the posture.
+enable_reporting = false
+
+# --- No XR runtimes (decision 0019) -----------------------------------------
+#
+# All four declared in device/vr/buildflags/buildflags.gni; on Android
+# arm64/x64 the three runtimes default on. ARCore is a Google Play Services
+# for AR runtime dependency, so this is de-Google and size in one move;
+# Cardboard and OpenXR are size.
+enable_cardboard = false
+enable_arcore = false
+enable_openxr = false
+
+# enable_vr derives from the runtimes and collapses to false with them;
+# pinned so the intent survives an upstream default change. Both halves of
+# this configuration were found by building (2026-08-18), not assumed:
+# upstream Android does not compile with ENABLE_VR off as shipped
+# (AutocompleteMatch::GetVectorIcon is declared only under
+# (!IS_ANDROID || ENABLE_VR) and the omnibox calls it unguarded — patch 0017
+# mirrors the declaration's guard at the call site), and the halfway house
+# of enable_vr = true over disabled runtimes fails differently: native WebXR
+# then registers JNI for Java classes the runtime-off dex does not carry.
+enable_vr = false
+
+# --- Version code: forced, and only the code (decision 0252, point 3) --------
+#
+# Declared in build/config/android/config.gni (android_override_version_code,
+# default empty, read by the APK and bundle templates in
+# build/config/android/rules.gni). That declaration sits under `is_android`,
+# so the two host-only diag profiles do not declare it and `gn gen` names it
+# once there as an argument with no effect; it changes nothing they build.
+#
+# build/util/android_chrome_version.py derives the code as {BUILD}{PATCH, three
+# digits}{package digit}{ABI digit}. 152.0.7977.42 on arm64-only gives
+# 7977 042 0 4 = 797704204, which is the code Play accepted from the internal
+# upload of 2026-09-11, so the same derivation can never be uploaded again.
+# 797704214 keeps BUILD, PATCH and the ABI digit and raises only the package
+# digit, so it sorts above 797704204 and below 797704304, the lowest code the
+# next pin (152.0.7977.43) derives. The version name stays Chromium's.
+#
+# It lives in this fragment rather than in the release profile because every
+# profile has to carry the same code. Android refuses to install a lower code
+# over a higher one without an uninstall, and an uninstall deletes the
+# person's data, so a dev build at the derived 797704204 could never go back
+# onto a phone that had held the release. With one line here, dev-arm64 and
+# release-arm64 agree, and the phone moves between them in both directions.
+#
+# Remove this line when chromium/REVISION moves: the derived code is then above
+# this one. A second release on this pin takes a higher code below 797704304.
+android_override_version_code = "797704214"

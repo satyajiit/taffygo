@@ -1,0 +1,18 @@
+# The account plane: the browser-process half of the profile's account
+# session, and the platform seam it drives.
+#
+# Nothing here is Android. It reached this repository under browser/android/
+# because its Mojo transport is implemented in Java, which is a fact about who
+# implements the far end of one interface and not about this code; decision
+# 0042 records the move. The parent directory's rules carry almost all of it.
+#
+# Two grants are local because this subsystem makes an outbound request: a
+# traffic annotation is required of every one, and the URL loader's response
+# head is the typed shape a reply arrives in. Neither belongs to the rest of
+# //taffy/browser, where only one other seam - assets/, which fetches the
+# product's own artifacts - sends anything, and it carries its own copy of
+# these two rules for the same reason.
+include_rules = [
+  "+net/traffic_annotation",
+  "+services/network/public/mojom",
+]

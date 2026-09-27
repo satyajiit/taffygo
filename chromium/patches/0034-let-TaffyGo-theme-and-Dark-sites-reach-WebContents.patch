@@ -1,0 +1,77 @@
+From 6bdb7d54e295bcb3bca2a5d3266b1bb11a310a2c Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sat, 29 Aug 2026 14:57:50 +0530
+Subject: let TaffyGo theme and Dark sites reach WebContents
+
+WebContentsThemeClient is the Android funnel for preferred color scheme
+and force-dark. Read taffy.ui.theme (SYSTEM/LIGHT/DARK) and
+taffy.ui.force_dark_web so Appearance paints pages, not only chrome.
+Does not consult DARKEN_WEBSITES_CHECKBOX_IN_THEMES_SETTING.
+
+Needed by: SCR-407.
+Retirement: permanent while Blink reads night from this class.
+
+Taffy-Patch: 0034
+
+diff --git a/chrome/browser/ui/android/night_mode/BUILD.gn b/chrome/browser/ui/android/night_mode/BUILD.gn
+index 38e6ff91fdbee..39242257be8ac 100644
+--- a/chrome/browser/ui/android/night_mode/BUILD.gn
++++ b/chrome/browser/ui/android/night_mode/BUILD.gn
+@@ -43,6 +43,7 @@ android_library("java") {
+     "//components/content_settings/android:java",
+     "//components/feature_engagement/public:public_java",
+     "//components/messages/android:java",
++    "//components/prefs/android:java",
+     "//components/ukm/android:java",
+     "//components/user_prefs/android:java",
+     "//content/public/android:content_full_java",
+diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java
+index bda8d2b45a658..a93904221baff 100644
+--- a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java
++++ b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java
+@@ -11,8 +11,9 @@ import org.jni_zero.JNINamespace;
+ import org.jni_zero.JniType;
+ 
+ import org.chromium.build.annotations.NullMarked;
+-import org.chromium.chrome.browser.flags.ChromeFeatureList;
+ import org.chromium.chrome.browser.profiles.Profile;
++import org.chromium.components.prefs.PrefService;
++import org.chromium.components.user_prefs.UserPrefs;
+ import org.chromium.content_public.browser.WebContents;
+ import org.chromium.ui.base.WindowAndroid;
+ import org.chromium.ui.util.ColorUtils;
+@@ -25,6 +26,13 @@ public class WebContentsThemeClient {
+     public static boolean isNightModeEnabled(
+             @JniType("content::WebContents*") WebContents webContents) {
+         if (webContents == null) return false;
++        Profile profile = Profile.fromWebContents(webContents);
++        if (profile != null) {
++            PrefService prefs = UserPrefs.get(profile);
++            String theme = prefs.getString("taffy.ui.theme");
++            if ("DARK".equals(theme)) return true;
++            if ("LIGHT".equals(theme)) return false;
++        }
+         WindowAndroid window = webContents.getTopLevelNativeWindow();
+         if (window == null) return false;
+         Context context = window.getContext().get();
+@@ -36,18 +44,9 @@ public class WebContentsThemeClient {
+     public static boolean isForceDarkWebContentEnabled(
+             @JniType("content::WebContents*") WebContents webContents) {
+         if (webContents == null) return false;
+-        if (ChromeFeatureList.isEnabled(ChromeFeatureList.FORCE_WEB_CONTENTS_DARK_MODE)) {
+-            return true;
+-        }
+-        if (!ChromeFeatureList.isEnabled(
+-                ChromeFeatureList.DARKEN_WEBSITES_CHECKBOX_IN_THEMES_SETTING)) {
+-            return false;
+-        }
++        if (!isNightModeEnabled(webContents)) return false;
+         Profile profile = Profile.fromWebContents(webContents);
+         if (profile == null) return false;
+-
+-        return isNightModeEnabled(webContents)
+-                && WebContentsDarkModeController.isEnabledForUrl(
+-                        profile, webContents.getVisibleUrl());
++        return UserPrefs.get(profile).getBoolean("taffy.ui.force_dark_web");
+     }
+ }

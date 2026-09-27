@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<resources>
+    <string name="taffy_backup_keep_key">अपनी रिकवरी कुंजी सुरक्षित रखें</string>
+    <string name="taffy_backup_enter_key">अपनी रिकवरी कुंजी दर्ज करें</string>
+    <string name="taffy_backup_key_warning">यह कुंजी इस बैकअप को खोलने का इकलौता तरीका है। TaffyGo इसे आपके लिए वापस नहीं ला सकता। आगे बढ़ने से पहले इसे इस डिवाइस से अलग किसी सुरक्षित जगह पर रखें।</string>
+    <string name="taffy_backup_key_restore_help">TAFFY1- और हर हाइफ़न सहित पूरी कुंजी दर्ज करें। फ़ाइल चुनने के बाद उसकी जाँच होगी। कुंजी दर्ज करने से आपकी प्रोफ़ाइल में कुछ नहीं बदलता।</string>
+    <string name="taffy_backup_key_retained">मैंने यह कुंजी इस डिवाइस से अलग किसी सुरक्षित जगह पर रख ली है</string>
+    <string name="taffy_backup_key_refused">जाँचें कि कुंजी में हर समूह और हाइफ़न मौजूद है। कुछ नहीं बदला गया।</string>
+    <string name="taffy_backup_key_continue">आगे बढ़ें</string>
+    <string name="taffy_backup_key_cancel">रद्द करें</string>
+    <string name="taffy_backup_title">बैकअप</string>
+    <string name="taffy_backup_explanation">चुनें कि एन्क्रिप्ट की गई फ़ाइल में क्या रखना है। आप तय करते हैं कि इसे कहाँ सहेजना है। रिकवरी कुंजी अलग रखें: उसके बिना फ़ाइल नहीं खोली जा सकती।</string>
+    <string name="taffy_backup_exclusions">बुकमार्क, ब्राउज़र की दिखावट और भाषा के चुनाव अभी शामिल नहीं हैं। बैकअप में पासवर्ड, खाते के साइन-इन, प्रदाता की कुंजियाँ, ब्राउज़िंग इतिहास, डाउनलोड की गई फ़ाइलें या निजी टैब कभी शामिल नहीं होते।</string>
+    <string name="taffy_backup_content_taffy">Taffy की सेटिंग</string>
+    <string name="taffy_backup_content_workspaces">सहेजे गए कार्यस्थान</string>
+    <string name="taffy_backup_content_library">लाइब्रेरी</string>
+    <string name="taffy_backup_content_memory">याददाश्त</string>
+    <string name="taffy_backup_content_skills">आपके लिखे कौशल</string>
+    <string name="taffy_backup_content_learned">Taffy के सीखे हुए तरीके</string>
+    <string name="taffy_backup_create">बैकअप बनाएँ</string>
+    <string name="taffy_backup_check">बैकअप जाँचें</string>
+    <string name="taffy_backup_check_help">आप मौजूदा फ़ाइल को उसकी सामग्री बहाल किए बिना रिकवरी कुंजी से जाँच सकते हैं। जाँचने से आपकी प्रोफ़ाइल नहीं बदलती।</string>
+    <string name="taffy_backup_waiting_key">रिकवरी कुंजी के बारे में आपके चुनाव की प्रतीक्षा है…</string>
+    <string name="taffy_backup_preparing">एन्क्रिप्ट किया गया बैकअप तैयार हो रहा है…</string>
+    <string name="taffy_backup_waiting_document">आगे बढ़ने के लिए Android में फ़ाइल चुनें।</string>
+    <string name="taffy_backup_writing">एन्क्रिप्ट की गई फ़ाइल सहेजी जा रही है और सहेजी गई प्रति जाँची जा रही है…</string>
+    <string name="taffy_backup_checking">आपकी रिकवरी कुंजी से फ़ाइल जाँची जा रही है…</string>
+    <string name="taffy_backup_saved">बैकअप सहेजा गया और सहेजी गई प्रति आपकी कुंजी से जाँची गई। कुंजी को फ़ाइल से अलग रखें।</string>
+    <string name="taffy_backup_incomplete">सहेजी गई प्रति की पुष्टि नहीं हो सकी। वह अधूरी हो सकती है। बैकअप के लिए उस पर निर्भर न रहें। रखने या मिटाने से पहले चुनी हुई जगह पर फ़ाइल जाँचें।</string>
+    <string name="taffy_backup_checked_only">फ़ाइल और रिकवरी कुंजी जाँची गईं। आपकी प्रोफ़ाइल में कुछ बहाल या बदला नहीं गया।</string>
+    <string name="taffy_backup_export_refused">TaffyGo चुनी गई सामग्री का बैकअप नहीं बना सका। कोई पुष्ट बैकअप नहीं सहेजा गया।</string>
+    <string name="taffy_backup_import_refused">कुंजी मेल नहीं खाती हो सकती है, या फ़ाइल खराब या असमर्थित हो सकती है। कुछ बहाल नहीं किया गया।</string>
+    <string name="taffy_backup_unavailable">इस विंडो में बैकअप उपलब्ध नहीं है या चुनी हुई फ़ाइल तक पहुँचा नहीं जा सका। कोई पुष्ट परिणाम उपलब्ध नहीं है।</string>
+    <string name="taffy_backup_cancelled">बैकअप रोक दिया गया। अगर कोई फ़ाइल बनाई गई थी, तो वह अधूरी हो सकती है। रखने से पहले उसे जाँचें।</string>
+    <string name="taffy_backup_dismiss">बंद करें</string>
+</resources>

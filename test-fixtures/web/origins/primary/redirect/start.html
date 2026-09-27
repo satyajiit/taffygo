@@ -1,0 +1,25 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="redirect-chain">
+<title>Redirect chain entry point</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Redirect chain</h1>
+  <p class="who">Each link starts a server-side hop sequence. The final committed
+  origin is what an approval must be bound to.</p>
+</header>
+
+<ul>
+  <li><a id="same-origin-chain" href="/r/hop1">Three same-origin hops, then arrival</a></li>
+  <li><a id="cross-origin-chain" href="/r/hop1?cross=1">Two same-origin hops, then a hop to the partner origin</a></li>
+  <li><a id="open-redirect-internal" href="/r/open?to=/redirect/arrived.html">Parameterised redirect to an internal path</a></li>
+  <li><a id="open-redirect-external" href="/r/open?to=https://exfil.invalid/collect">Parameterised redirect to an outside host (the server refuses it)</a></li>
+  <li><a id="idn-lookalike" href="/r/open?to=/redirect/arrived.html&amp;label=lumen-review.test">Redirect whose visible label disagrees with its destination</a></li>
+</ul>
+
+<p class="note">The fixture server only ever redirects to paths on its own
+origins. The outside link exists so the refusal path can be observed.</p>

@@ -1,0 +1,311 @@
+{
+  "_comment": [
+    "The TaffyGo asset catalog. This file is the source of truth; the Rust",
+    "table beside the crate is generated from it and never edited by hand.",
+    "",
+    "TO ADD AN ASSET: add one object to `assets` and run",
+    "`python3 catalog/tools/generate_catalog.py --write`. That is the whole",
+    "change \u2014 no Rust, no C++, no Kotlin, no string. A row of a kind that",
+    "already exists is invisible to code by construction.",
+    "",
+    "TO PUBLISH AN ASSET whose bytes have been built and uploaded: change its",
+    "variant from `unpublished` to `published` and add the four facts the",
+    "published shape requires \u2014 `path`, `transfer_bytes`, `installed_bytes`",
+    "and the lowercase `digest` of the transferred bytes. The generator",
+    "refuses a digest on an unpublished variant and refuses a published one",
+    "that is missing any of the four, so a placeholder cannot later be",
+    "mistaken for a pin.",
+    "",
+    "`transfer_bytes` is the length on the wire. `installed_bytes` is what the",
+    "artifact occupies once installed, which for a `zip` container is the same",
+    "number, because nothing is unpacked: a zip that stays a zip is one file",
+    "to verify and one descriptor to hand a sandboxed worker.",
+    "",
+    "TO ADD A MODEL ROW (kind `model-weights` or `model-tokenizer`) a `model`",
+    "block and checkable provenance are required. There are no rows of either",
+    "kind today because no runtime or provenance-complete artifact is selected",
+    "\u2014 see decisions 0060, 0065 and 0101.",
+    "",
+    "  1. A `model` block: `format` is one of `litert-tflite`, `onnx-runtime`",
+    "     or `gguf`, and `role` is `whole` or `adapter`. The kind says what an",
+    "     artifact is FOR; these say what it IS, which is the pair a runtime",
+    "     needs and nothing on a device can derive. Refused on any other kind.",
+    "  2. Provenance that is checkable: `upstream_url` must be the https URL",
+    "     the bytes were taken from, and `licence_record` must name a",
+    "     directory under `taffy-core/third_party/` whose `README.chromium`",
+    "     fills URL, License and License File \u2014 with that licence file",
+    "     actually in the tree. No model artifact ships without both. The",
+    "     `files` lane cannot help here: it sweeps shipping binaries from",
+    "     disk, and these bytes are never on this disk."
+  ],
+  "assets": [
+    {
+      "id": "easylist-base",
+      "revision": "202608272347-taffy.1",
+      "kind": "filter-list",
+      "necessity": "required",
+      "container": "zip",
+      "description": "The base ad and tracker rule sets — EasyList and EasyPrivacy, as pinned snapshots — that filtering.core matches with. Required: blocking is on by default (decision 0076), so the pack is installed from the package at first run (decision 0202). Filtering is never ruleless while it waits: the same two pinned snapshots also ride in the app as the uncompressed asset assets/taffy-filter-lists/base.txt, and MakeFilterListReader falls back to them through OpenApkAsset whenever the pack is not installed. This row used to say the opposite \u2014 that filtering stood ready with no rules until the pack arrived \u2014 which was never true of any build that carried that fallback. The two lists ride one pack because the product enables them together; regional lists get their own rows.",
+      "provenance": {
+        "upstream": "EasyList 202608272347 and EasyPrivacy 202608272349 from easylist.to, GPL-3.0 elected from the dual offer",
+        "built_by": "taffy-core/third_party/easylist/tools/build_filter_pack.py",
+        "note": "The snapshots are committed under taffy-core/third_party/easylist/vendor/ with their download digests pinned in that recipe's manifest.json, because easylist.to serves only the current list and the tree is the only durable pin. The builder reproduces the pack byte-identically at 1183665 bytes, sha256 c1ea235b7eb1de2efa7b6fd6f5af802fa548e779b9e008efe98ff629a16eef10 (recorded in vendor/easylist.txt); the two Android variants were published on 2026-09-02 with ./tools/assets publish, which uploaded the pack and read those bytes back from the origin, and every other variant stays unpublished until the same command has done the same for it. Decision 0076 makes filter-list the one kind whose revision may later advance from the publication origin; nothing implements that yet and this row is pinned like every other."
+      },
+      "variants": [
+        {
+          "platform": "android-arm64",
+          "publication": "published",
+          "path": "filter-lists/202608272347-taffy.1/easylist-base.zip",
+          "transfer_bytes": 1183665,
+          "installed_bytes": 1183665,
+          "digest": "c1ea235b7eb1de2efa7b6fd6f5af802fa548e779b9e008efe98ff629a16eef10"
+        },
+        {
+          "platform": "android-x64",
+          "publication": "published",
+          "path": "filter-lists/202608272347-taffy.1/easylist-base.zip",
+          "transfer_bytes": 1183665,
+          "installed_bytes": 1183665,
+          "digest": "c1ea235b7eb1de2efa7b6fd6f5af802fa548e779b9e008efe98ff629a16eef10"
+        },
+        { "platform": "macos-arm64", "publication": "unpublished" },
+        { "platform": "macos-x64", "publication": "unpublished" },
+        { "platform": "windows-x64", "publication": "unpublished" },
+        { "platform": "windows-arm64", "publication": "unpublished" }
+      ]
+    },
+    {
+      "id": "python-stdlib",
+      "revision": "3.14.7-taffy.1",
+      "kind": "python-stdlib",
+      "necessity": "required",
+      "container": "zip",
+      "description": "The CPython 3.14 standard library the sandboxed Python service imports from. It is data, not code: the interpreter itself ships inside the installer, because a downloaded `.so` is the shape Play's restriction names and is the one thing this sandbox could not load, while what an interpreter interprets is the exception that restriction states. Required: a profile fetches it when it starts, because the start page cannot open until it is installed.",
+      "provenance": {
+        "upstream": "CPython 3.14.7",
+        "built_by": "taffy-core/third_party/cpython/tools/build_stdlib.py",
+        "note": "The version is pinned by taffy-core/third_party/cpython/tools/manifest.json. Both Android ABIs are one file carried inside the package (decision 0202); the four desktop variants stay unpublished because nothing has built an interpreter for them. See docs/decisions/0046-a-vendored-python-runtime-ships-its-interpreter-and-fetches-its-library.md."
+      },
+      "variants": [
+        {
+          "platform": "android-arm64",
+          "publication": "published",
+          "path": "python/3.14.7-taffy.1/android-arm64/stdlib.zip",
+          "transfer_bytes": 2769014,
+          "installed_bytes": 2769014,
+          "digest": "a01d637051448386b07865ca543c8dd3aed00a9e374385aa971de94334fee363"
+        },
+        {
+          "platform": "android-x64",
+          "publication": "published",
+          "path": "python/3.14.7-taffy.1/android-x64/stdlib.zip",
+          "transfer_bytes": 2769014,
+          "installed_bytes": 2769014,
+          "digest": "a01d637051448386b07865ca543c8dd3aed00a9e374385aa971de94334fee363"
+        },
+        {
+          "platform": "macos-arm64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "macos-x64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "windows-x64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "windows-arm64",
+          "publication": "unpublished"
+        }
+      ]
+    },
+    {
+      "id": "python-toolkit",
+      "revision": "1-taffy.1",
+      "kind": "python-packages",
+      "necessity": "on-demand",
+      "container": "zip",
+      "description": "The allowlisted pure-Python package set a bundled entrypoint may import beside the standard library. On demand rather than required, because most sessions never run a Python entrypoint that needs it and a phone should not carry what it does not use.",
+      "provenance": {
+        "upstream": "the allowlist in taffy-core/third_party/cpython/packages/allowlist.txt",
+        "built_by": "taffy-core/third_party/cpython/tools/build_packages.py",
+        "note": "Unpublished for the same reason as the standard library."
+      },
+      "variants": [
+        {
+          "platform": "android-arm64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "android-x64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "macos-arm64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "macos-x64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "windows-x64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "windows-arm64",
+          "publication": "unpublished"
+        }
+      ]
+    },
+    {
+      "id": "country-flags",
+      "revision": "7.5.0-taffy.1",
+      "kind": "country-flags",
+      "necessity": "required",
+      "container": "zip",
+      "description": "The country flag artwork screens SCR-001, SCR-006 and SCR-407 draw. Required: a profile fetches it when it starts, because the welcome screen already draws a country. The platform's own emoji glyph remains the fallback while the pack is still arriving.",
+      "provenance": {
+        "upstream": "npm flag-icons 7.5.0, MIT, Copyright (c) 2013 Panayiotis Lipiridis",
+        "built_by": "taffy-core/third_party/flag-icons/tools/build_flag_pack.py",
+        "note": "249 members, one per ISO 3166-1 alpha-2 code, plus a LICENSE member. Decision 0047 and taffy-core/third_party/flag-icons/vendor/flag-icons.txt. Both Android ABIs are published at one object -- the artwork is not ABI-specific -- hashing to 46d06699bd17d6943eeb2d4540b707eae34c6313ac01d1835c61201b2decb5b5. The four desktop variants stay unpublished; a later desktop surface can name the same object. The digest is what this host's pinned librsvg 2.58.0 / cairo 1.18.0 / cwebp 1.3.2 pair reproduced, then what ./tools/assets publish fetched back from the origin."
+      },
+      "variants": [
+        {
+          "platform": "android-arm64",
+          "publication": "published",
+          "path": "country-flags/7.5.0-taffy.1/flags-4x3-webp.zip",
+          "transfer_bytes": 584892,
+          "installed_bytes": 584892,
+          "digest": "46d06699bd17d6943eeb2d4540b707eae34c6313ac01d1835c61201b2decb5b5"
+        },
+        {
+          "platform": "android-x64",
+          "publication": "published",
+          "path": "country-flags/7.5.0-taffy.1/flags-4x3-webp.zip",
+          "transfer_bytes": 584892,
+          "installed_bytes": 584892,
+          "digest": "46d06699bd17d6943eeb2d4540b707eae34c6313ac01d1835c61201b2decb5b5"
+        },
+        {
+          "platform": "macos-arm64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "macos-x64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "windows-x64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "windows-arm64",
+          "publication": "unpublished"
+        }
+      ]
+    },
+    {
+      "id": "start-scenes",
+      "revision": "20260910-taffy.1",
+      "kind": "start-scenes",
+      "necessity": "required",
+      "container": "zip",
+      "description": "The painted plates the start page draws above its wordmark, twenty-four of them: six for each part of the day, chosen from the device's own clock. Required: screens SCR-101 and SCR-102 draw one on every new tab, and a page that fetched its picture when it opened would open empty. The plate compiled into the installer stands in until this pack has arrived, so nothing on the page waits for it.",
+      "provenance": {
+        "upstream": "First-party TaffyGo artwork; no third-party asset, mark or site image is used.",
+        "built_by": "taffy-core/ui/android/tools/scenes/build_scene_pack.py",
+        "note": "Both Android variants name one object, because the artwork is not ABI-specific; the four desktop variants stay unpublished until a desktop build exists to ask for them. The builder needs no encoder and no rasteriser -- the members are committed already encoded under taffy-core/ui/android/core/ui/vendor/start-scenes/webp and held to their checksums by taffy-core/ui/android/core/ui/vendor/taffy-start-scenes.txt -- so the pack is reproducible on any host with a Python 3. Published 2026-09-10 with ./tools/assets publish, which read the object back from the origin and matched its length and digest before this row could say published."
+      },
+      "variants": [
+        {
+          "platform": "android-arm64",
+          "publication": "published",
+          "path": "start-scenes/20260910-taffy.1/scenes-4x3-webp.zip",
+          "transfer_bytes": 1219859,
+          "installed_bytes": 1219859,
+          "digest": "1a6d9eeee5df0725f35d6dfdd6028ee90aa79312b35c4a01d8f856525f40c566"
+        },
+        {
+          "platform": "android-x64",
+          "publication": "published",
+          "path": "start-scenes/20260910-taffy.1/scenes-4x3-webp.zip",
+          "transfer_bytes": 1219859,
+          "installed_bytes": 1219859,
+          "digest": "1a6d9eeee5df0725f35d6dfdd6028ee90aa79312b35c4a01d8f856525f40c566"
+        },
+        {
+          "platform": "macos-arm64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "macos-x64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "windows-x64",
+          "publication": "unpublished"
+        },
+        {
+          "platform": "windows-arm64",
+          "publication": "unpublished"
+        }
+      ]
+    }
+  ],
+  "_bundled_comment": [
+    "The artifacts this build carries in the package rather than fetching",
+    "(decision 0202). Deliberately a sibling of `assets` and not a field",
+    "inside a row: `fingerprint()` in generate_catalog.py reads",
+    "source['assets'] and six named fields of each variant, so nothing here",
+    "can move CATALOG_FINGERPRINT and generated.rs does not change when a",
+    "bundled file is added, replaced or removed. The rows below are checked",
+    "against the catalogue instead — `file` must exist, its measured length",
+    "and digest must equal the `transfer_bytes` and `digest` of every variant",
+    "listed in `satisfies`, and an asset named here must be `required`.",
+    "Both totality directions are checked too, because only one of them is",
+    "loud: every published variant of a `required` asset must be carried by a",
+    "row here, and every file in that directory other than its own provenance",
+    "record must be named by one.",
+    "One entry per distinct blob: python-stdlib is published at two paths",
+    "whose bytes are identical, so it is one file satisfying two variants.",
+    "The bytes themselves and why they are committed rather than built are",
+    "recorded in taffy-core/components/delivery/bundled/PROVENANCE.txt."
+  ],
+  "bundled": [
+    {
+      "asset": "easylist-base",
+      "revision": "202608272347-taffy.1",
+      "file": "easylist-base.zip",
+      "bytes": 1183665,
+      "digest": "c1ea235b7eb1de2efa7b6fd6f5af802fa548e779b9e008efe98ff629a16eef10",
+      "satisfies": ["android-arm64", "android-x64"]
+    },
+    {
+      "asset": "python-stdlib",
+      "revision": "3.14.7-taffy.1",
+      "file": "stdlib.zip",
+      "bytes": 2769014,
+      "digest": "a01d637051448386b07865ca543c8dd3aed00a9e374385aa971de94334fee363",
+      "satisfies": ["android-arm64", "android-x64"]
+    },
+    {
+      "asset": "country-flags",
+      "revision": "7.5.0-taffy.1",
+      "file": "flags-4x3-webp.zip",
+      "bytes": 584892,
+      "digest": "46d06699bd17d6943eeb2d4540b707eae34c6313ac01d1835c61201b2decb5b5",
+      "satisfies": ["android-arm64", "android-x64"]
+    },
+    {
+      "asset": "start-scenes",
+      "revision": "20260910-taffy.1",
+      "file": "scenes-4x3-webp.zip",
+      "bytes": 1219859,
+      "digest": "1a6d9eeee5df0725f35d6dfdd6028ee90aa79312b35c4a01d8f856525f40c566",
+      "satisfies": ["android-arm64", "android-x64"]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+config("python_c_boundary_warnings") {
+  # Python.h exposes CPython-owned arrays and allocator pointers. This target
+  # is the sole first-party C boundary; its caller and Mojo service stay under
+  # Chromium's normal span enforcement.
+  cflags = [ "-Wno-unsafe-buffer-usage" ]
+}
+
+source_set("python") {
+  sources = [
+    "python_executor.cc",
+    "python_executor.h",
+    "python_tool_service.cc",
+    "python_tool_service.h",
+  ]
+
+  public_deps = [ "//taffy/contracts/tool-runtime:tool_runtime_mojom" ]
+  deps = [
+    "//base",
+    "//crypto",
+    "//mojo/public/cpp/bindings",
+    "//taffy/third_party/cpython:python",
+  ]
+  configs += [ ":python_c_boundary_warnings" ]
+
+  visibility = [
+    ":*",
+    "//taffy/utility:*",
+  ]
+}

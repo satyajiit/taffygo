@@ -1,0 +1,75 @@
+From 6486da4dc7ab4a612f350646cd4b6c017eb2d3c3 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Thu, 20 Aug 2026 11:53:23 +0530
+Subject: point the launcher at the TaffyGo activity
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Decision 0024 makes every screen in the screen catalog TaffyGo's, and a
+person reaches the first one by tapping the icon. Until this lands the
+launcher alias targets ChromeTabbedActivity, so none of the transferred
+surfaces is reachable at all.
+
+Two edits in one file. The existing `com.google.android.apps.chrome.Main`
+activity-alias is retargeted at TaffyBrowserActivity, and that activity is
+declared immediately above it — an alias may only name an activity declared
+before it in the manifest, so the position is required rather than tidy.
+The declaration takes the `chrome_activity_common` block for its
+`hardwareAccelerated="false"` posture: TaffyGo's activity is not derived
+from ChromeActivity, but it hosts the same compositor, so the note above
+`application_definitions()` applies for the same reason rather than by
+inheritance. The alias stays exported because a launcher alias must be;
+the target activity remains non-exported.
+
+This patch carried a third edit until 2026-09-20: a closed `VIEW`/`BROWSABLE`
+filter on the same alias for `com.taffygo.browser://auth`, the account
+plane's OAuth return. Decision 0200 removed the account plane's servers and
+the ingress that read that intent went with it, so the filter named a URI no
+code in the product resolves and no flow can emit. It is removed here rather
+than in a patch of its own, because a queue that adds a filter and then
+withdraws it is two numbers describing one thing that never shipped. Provider
+sign-in is unaffected and never used this road: a vendor's redirect is
+claimed by a navigation throttle inside the errand page (decision 0095), not
+delivered as an Android intent.
+
+The manifest is a jinja template and this block is not parameterised — the
+`{% if %}` conditions nearby govern channel-specific categories inside the
+launcher intent filter, not the alias or its target — so there is no
+downstream value to set. A manifest merger cannot retarget an existing alias
+either: merging adds and overlays elements, and the launcher category would
+be declared twice, pointing at two activities.
+
+ChromeTabbedActivity keeps its upstream declaration because Chromium still has
+explicit internal callers. It is not a TaffyGo product entry point.
+
+Owner: TaffyGo browser shell.
+Retirement: permanent, reviewed at each milestone rebase. It retires only if
+upstream ever parameterises the launcher alias's target, which would make it
+mechanism D in decision 0024 and cost no patch.
+
+Taffy-Patch: 0022
+
+diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
+index 96fac0c552827..bc03777611088 100644
+--- a/chrome/android/java/AndroidManifest.xml
++++ b/chrome/android/java/AndroidManifest.xml
+@@ -637,8 +637,17 @@ by a child template that "extends" this file.
+             <property android:name="android.window.PROPERTY_SUPPORTS_MULTI_INSTANCE_SYSTEM_UI"
+                 android:value="true" />
+         </activity>
++        <!-- TaffyGo: the activity the launcher alias below targets. An alias may
++             only name an activity declared before it, so this block sits here
++             rather than beside the other downstream code. -->
++        <activity android:name="org.chromium.taffy.shell.TaffyBrowserActivity"
++            android:theme="@style/Theme.Chromium.TabbedMode"
++            android:exported="false"
++            android:launchMode="singleTask"
++            {{ self.chrome_activity_common() }}>
++        </activity>
+         <activity-alias android:name="com.google.android.apps.chrome.Main"
+-            android:targetActivity="org.chromium.chrome.browser.ChromeTabbedActivity"
++            android:targetActivity="org.chromium.taffy.shell.TaffyBrowserActivity"
+             android:exported="true">
+             <property android:name="android.window.PROPERTY_SUPPORTS_MULTI_INSTANCE_SYSTEM_UI"
+                 android:value="true" />

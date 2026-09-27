@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taffygo.com/schemas/evidence-index-v1.json",
+  "title": "TaffyGo evidence index",
+  "description": "A revision-bound index of observed evidence and the nine milestone exit reviews that select it for a candidate.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "source",
+    "capability",
+    "records",
+    "milestones",
+    "candidate_ready",
+    "candidate_blockers"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "generated_at": { "$ref": "#/$defs/timestamp" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "dirty"],
+      "properties": {
+        "revision": { "$ref": "#/$defs/revision" },
+        "dirty": { "type": "boolean" }
+      }
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-remediation": "Reassemble the index from the generated capability projection selected by this build.",
+      "required": [
+        "profile",
+        "projection_sha256",
+        "configuration_fingerprint",
+        "accepted_milestone",
+        "delegated_task_start",
+        "task_milestone",
+        "policy_milestone"
+      ],
+      "properties": {
+        "profile": { "type": "string", "enum": ["development", "candidate"] },
+        "projection_sha256": { "$ref": "#/$defs/sha256" },
+        "configuration_fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "accepted_milestone": { "$ref": "#/$defs/milestone" },
+        "delegated_task_start": { "type": "boolean" },
+        "task_milestone": {
+          "enum": [null, "M2", "M3", "M4", "M5", "M6", "M7", "M8"]
+        },
+        "policy_milestone": {
+          "enum": [null, "M2", "M3", "M5", "M6", "M7"]
+        }
+      }
+    },
+    "records": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/record" }
+    },
+    "milestones": {
+      "type": "array",
+      "minItems": 9,
+      "items": { "$ref": "#/$defs/milestone_summary" }
+    },
+    "candidate_ready": { "type": "boolean" },
+    "candidate_blockers": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40,64}$",
+      "x-remediation": "Use the immutable git revision that produced the observed evidence."
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "x-remediation": "Record the lower-case SHA-256 read from the unchanged file."
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+      "x-remediation": "Record an observed UTC timestamp to whole seconds."
+    },
+    "milestone": {
+      "type": "string",
+      "enum": ["M0", "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8"]
+    },
+    "evidence_file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "size_bytes"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "x-remediation": "Stage the file beneath the evidence artifact directory and use a relative path."
+        },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "size_bytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "class",
+        "milestone",
+        "kind",
+        "result",
+        "required_for_candidate",
+        "owner",
+        "command",
+        "started_at",
+        "completed_at",
+        "environment",
+        "requirements",
+        "evidence",
+        "supports",
+        "note"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,95}$"
+        },
+        "class": {
+          "type": "string",
+          "enum": ["EV-01", "EV-02", "EV-03", "EV-04", "EV-05", "EV-06", "EV-07", "EV-08"]
+        },
+        "milestone": { "$ref": "#/$defs/milestone" },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "build",
+            "test",
+            "benchmark",
+            "measurement",
+            "backend",
+            "security-review",
+            "privacy-review",
+            "rollback",
+            "milestone-exit",
+            "other"
+          ]
+        },
+        "result": {
+          "type": "string",
+          "enum": ["pass", "fail", "blocked", "not-run"]
+        },
+        "required_for_candidate": { "type": "boolean" },
+        "owner": { "type": "string", "minLength": 1 },
+        "command": { "type": "string", "minLength": 1 },
+        "started_at": { "$ref": "#/$defs/timestamp" },
+        "completed_at": { "$ref": "#/$defs/timestamp" },
+        "environment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "identity"],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["host", "device", "backend", "review"]
+            },
+            "identity": { "type": "string", "minLength": 1 }
+          }
+        },
+        "requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidence_file" }
+        },
+        "supports": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "note": { "type": "string" }
+      }
+    },
+    "milestone_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["milestone", "verdict", "exit_record_id", "supporting_records"],
+      "properties": {
+        "milestone": { "$ref": "#/$defs/milestone" },
+        "verdict": {
+          "type": "string",
+          "enum": ["pass", "fail", "blocked", "not-run"]
+        },
+        "exit_record_id": { "type": "string" },
+        "supporting_records": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

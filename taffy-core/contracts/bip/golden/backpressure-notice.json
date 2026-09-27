@@ -1,0 +1,18 @@
+{
+  "schema_version": "0.1",
+  "subscription_id": "sub_01",
+  "tab_id": "tab_01",
+  "frame_id": "frame_main",
+  "page_epoch": "epoch_a1",
+  "event_sequence": 61,
+  "action": "SCOPE_REDUCED",
+  "dropped_delta_count": 37,
+  "dropped_categories": [
+    "TEXT",
+    "LAYOUT"
+  ],
+  "queue_depth_hint": 64,
+  "reduced_scope": "VIEWPORT",
+  "resnapshot_required": false,
+  "observed_at_monotonic_ms": 1955
+}

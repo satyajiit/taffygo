@@ -1,0 +1,18 @@
+{
+  "definitive_absent": false,
+  "plan_id": "plan-standard",
+  "model_ids": [
+    "claude-sonnet-5",
+    "gemini-3-flash"
+  ],
+  "window_seconds": 3600,
+  "requests_remaining": 9,
+  "credits_granted": 1000,
+  "credits_remaining": 964,
+  "credit_unit_micros": 500,
+  "next_renewal_epoch_seconds": 1788912000,
+  "valid_until_epoch_seconds": 0,
+  "minted_at_utc_ms": 1788306000000,
+  "worker_host": "ai.taffygo.example",
+  "gateway_host": "gateway.ai.cloudflare.example"
+}

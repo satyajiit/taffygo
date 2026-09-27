@@ -1,0 +1,107 @@
+Onboarding showcase film posters (frames of the project-authored films)
+========================================================================
+
+Vendored asset:  ../src/main/res/drawable-nodpi/ — ten lossless WebP files at
+                 720 x 900, totalling 369,494 bytes. Eight are final frames,
+                 one per film cut; two are shared light/dark start frames.
+Owner:           TaffyGo for the original compositions, copy, drawn UI, TaffyGo
+                 marks and the act of selecting and encoding these frames.
+Licence:         TaffyGo's original work is reserved media rather than code
+                 licensed under the repository LICENSE; see TRADEMARKS.md. Space Grotesk is used under the SIL Open Font License
+                 1.1. No third-party logo or product artwork appears in any of
+                 the ten files recorded here; `showcase-films.txt` states the
+                 same for their films and holds the rights reasoning for both
+                 records.
+Audio:           None. A poster is a still image and carries no part of the
+                 procedural sound design embedded in the MP4s.
+Upstream:        Captured from the project-authored HyperFrames browser
+                 timeline described by `showcase-films.txt`, then resized and
+                 encoded losslessly. They were rendered, not fetched.
+Fetched:         NOT APPLICABLE.
+Recorded:        2026-08-23. The bytes and their 2026-08-21 record are older
+                 than this date; what changed on 2026-08-23 is which files are
+                 in the directory.
+
+Six posters left with their films
+---------------------------------
+
+The 2026-08-21 record covered sixteen posters, of which six were the light and
+dark final frames of `compare`, `driving-licence` and `mail`. Those three films
+composite official third-party and Government of India artwork with no recorded
+permission, which is OD-094 in `docs/open-decisions.md`, and their final frames
+carry the same artwork behind the closing card. Films and posters are one
+rights question, so the six left with the three films rather than being kept as
+stills of something that may not ship.
+
+A poster leaves with its film and returns with it. There is no case in which
+this directory holds a final frame whose MP4 is not in `res/raw`, and the
+bidirectional check below is what makes that structural rather than a
+convention someone remembers.
+
+Checksums and byte counts of the shipped WebP files
+---------------------------------------------------
+
+The `sha256_` and `bytes_` facts are checked against every file in
+`res/drawable-nodpi` in both directions by `tools/lib/vendored_assets.py`.
+A line here with no file on disk is a finding, and so is a file with no line.
+
+sha256_taffy_showcase_form_dark_poster_webp=8015e87bf236ee9f13697e9b0049d9242d28b462292cee4574189f91595d0291
+bytes_taffy_showcase_form_dark_poster_webp=53320
+sha256_taffy_showcase_form_light_poster_webp=86fdd8273294545db70497ff7f24eb857f24459626d94126eb814178de4097dc
+bytes_taffy_showcase_form_light_poster_webp=62056
+sha256_taffy_showcase_job_dark_poster_webp=459928f3daf97b201c68bffe17481e8476670440f78642daea7f477b105fbd10
+bytes_taffy_showcase_job_dark_poster_webp=50582
+sha256_taffy_showcase_job_light_poster_webp=7ac8ca523524a0b2b9cd11101ac5c80e3fb8315a2b7b6649b605ed45f9cc50e6
+bytes_taffy_showcase_job_light_poster_webp=59910
+sha256_taffy_showcase_page_tools_dark_poster_webp=8dd65e4fb3692c44cf80a062d4a6d086d45a9bfc7a03cf1ee0945df2aa083fa0
+bytes_taffy_showcase_page_tools_dark_poster_webp=23376
+sha256_taffy_showcase_page_tools_light_poster_webp=f924caa6e5cb223f12c931b1f17b6346d3fa8bce254415203512de90b85e1af9
+bytes_taffy_showcase_page_tools_light_poster_webp=31052
+sha256_taffy_showcase_start_dark_poster_webp=25a2d9e1ce229e311aa1b4d2e48bbf980cb1516041931d064d046684a7c210b2
+bytes_taffy_showcase_start_dark_poster_webp=462
+sha256_taffy_showcase_start_light_poster_webp=1aaa2e45d96f3acb636f67a24b03232dc5bc79e27dce4b4cecbd7b9dfa23d587
+bytes_taffy_showcase_start_light_poster_webp=498
+sha256_taffy_showcase_weekly_review_dark_poster_webp=d784b83f84df9dcbe82342cab8518efbfa0eb15a1935c25c5f26c6d3799462c8
+bytes_taffy_showcase_weekly_review_dark_poster_webp=38680
+sha256_taffy_showcase_weekly_review_light_poster_webp=f0a9cd76365c1bffed54dc7f450e96c862c00bda2d3ef8a8136cbd96db81dde2
+bytes_taffy_showcase_weekly_review_light_poster_webp=49558
+
+All twenty facts are the values the 2026-08-21 record carried, re-verified
+against the file on disk on 2026-08-23. No poster was re-encoded.
+
+Generation and content
+----------------------
+
+The final frames and the two shared start frames were captured from the browser
+timeline as PNGs, then encoded with:
+
+  cwebp -lossless -z 9 -resize 720 900 -metadata none \
+    <snapshot.png> -o <poster.webp>
+
+Read from the files on 2026-08-23: all ten are RIFF/WebP containers whose
+`WEBP` fourcc is followed directly by a `VP8L` chunk, at 720 x 900 with an
+alpha channel. A file in that simple lossless form carries no `VP8X` chunk and
+therefore no EXIF, XMP or ICC block, which is the same claim the earlier record
+made and the reason `-metadata none` is in the command above.
+
+The two shared start posters are plain theme surfaces: 462 and 498 bytes of
+flat colour, one per theme, shown by every prefetched page before its decoder
+exists. They contain no mark of any kind.
+
+The eight final posters contain no third-party logo or product image. All of
+them use Space Grotesk; page-tools also contains the repository-owned synthetic
+diagram fixture. Exact frozen visual source hashes, ownership boundaries and
+licence status are in `showcase-films.txt` and apply unchanged here.
+
+Reach, use and removal trigger
+------------------------------
+
+`ShowcaseVideo.kt` pairs each film cut with its own final poster and one shared
+theme start poster. The module's resources reach the Chromium APK resource
+graph as well as the Gradle build, so these exact WebP files ship with the
+matching MP4s.
+
+A final poster is regenerated whenever its film's visual frame changes;
+audio-only changes do not alter it. Because the source project that rendered
+them is no longer on any host, in practice a poster changes only by leaving.
+This record leaves if the poster directory leaves the product.

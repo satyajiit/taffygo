@@ -1,0 +1,48 @@
+From ea641e2c48ab02cd7bea9e065bdae966ff3a9d3d Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Mon, 17 Aug 2026 20:21:09 +0530
+Subject: register the TaffyGo product target in gn_all
+
+The root gn_all group is the one registration point GN offers a downstream
+product, and gn analyze only sees targets this graph reaches. Registers
+taffy_public_apk only: the bundle and the instrumentation APK named by the
+0001 specification are deferred at SP-01 and return here when they exist.
+
+Specified by chromium/patches/0001-register-product-targets.md.
+
+Taffy-Patch: 0001
+
+diff --git a/BUILD.gn b/BUILD.gn
+index 0bd5d40ff7086..fc9989d22e8ce 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -110,6 +110,14 @@ group("gn_all") {
+       "//services/service_manager/public/cpp",
+       "//skia:skia_unittests",
+       "//sql:sql_unittests",
++
++      # TaffyGo (downstream): the native test binaries, registered here rather
++      # than beside //taffy:product in the is_android branch because they are
++      # host binaries. Without this the whole of //taffy:* is unreachable on a
++      # non-Android profile, so the committed ASan+LSan profile could not build
++      # taffy_unittests and the leak instrument proved nothing. Specified by
++      # chromium/patches/0001-register-product-targets.md.
++      "//taffy:taffy_unittests",
+       "//testing/libfuzzer/tests",
+       "//third_party/angle/src/tests:angle_end2end_tests",
+       "//third_party/angle/src/tests:angle_unittests",
+@@ -417,6 +425,14 @@ group("gn_all") {
+           "//chrome/android:chrome_public_apk",
+           "//chrome/android:chrome_public_test_apk",
+           "//chrome/android:chrome_public_unit_test_apk",
++
++          # TaffyGo (downstream): the product target, registered here because
++          # gn_all is the one registration point GN offers and `gn analyze`
++          # only sees targets this graph reaches. Specified by
++          # chromium/patches/0001-register-product-targets.md; the bundle and
++          # instrumentation APK named there are deferred at SP-01 and return
++          # here when they exist.
++          "//taffy:product",
+           "//chrome/browser/android/examples/custom_tabs_client:custom_tabs_client_example_apk",
+           "//chrome/browser/android/examples/inline_autofill_service:inline_autofill_service_example_apk",
+           "//chrome/browser/android/examples/partner_browser_customizations_provider:partner_browser_customizations_example_apk",

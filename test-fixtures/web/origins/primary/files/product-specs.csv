@@ -1,0 +1,4 @@
+model,name,brightness_lumens,power_watts,warranty_months,price_usd,availability
+LA-2600,Lumen Arc desk lamp,800,12,24,129.00,in_stock
+LF-1200,Lumen Flat desk lamp,520,9,24,89.00,in_stock
+LC-3000,Lumen Clamp desk lamp,940,14,12,149.00,backordered

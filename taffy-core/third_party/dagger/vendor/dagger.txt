@@ -1,0 +1,88 @@
+Dagger, vendored for the Chromium build
+========================================
+
+Vendored assets: lib/ — 16 files, 9,666,808 bytes
+Owner:           Google LLC and the Dagger contributors, except where a
+                 coordinate below names another project
+Licence:         Apache License 2.0 (LICENSE, beside this file) for
+                 15 of the 16. checker-compat-qual is dual-licensed
+                 GPL-2.0-with-classpath-exception / MIT and TaffyGo takes it
+                 under the MIT half; its text is LICENSE.checker-framework,
+                 copied from the Chromium checkout at the pin in
+                 chromium/REVISION
+                 (third_party/android_deps/libs/
+                  org_checkerframework_checker_compat_qual/LICENSE), which is
+                 the Checker Framework's own tree-wide licence and is not
+                 version-specific.
+Source:          Maven Central, resolved by the Gradle build of
+                 taffy-core/ui/android for Dagger 2.60.1 and copied out of the
+                 Gradle module cache. Every file below is byte-identical to the
+                 artifact its coordinate names.
+Version owner:   gradle/libs.versions.toml (`dagger = "2.60.1"`), indexed by the
+                 Dagger row of TOOLCHAIN.md. The transitive coordinates below are
+                 whatever that pin resolves; they are not pins of their own and
+                 have no TOOLCHAIN.md row.
+Recorded:        2026-08-20
+
+WHY THE BYTES ARE COMMITTED RATHER THAN FETCHED
+
+Because Chromium's own route cannot produce a reproducible checkout for a fork.
+`third_party/android_deps` commits no jars — its .gitignore ignores cipd/ and
+every DEPS entry pins a CIPD package in a namespace TaffyGo cannot publish to —
+and the roller regenerates the build files a new entry would have to live in.
+Decision 0031 records the four recurrences of that clobber (OD-076) and chooses
+an overlay-owned prebuilt instead, at zero upstream patch cost.
+
+WHAT SHIPS AND WHAT DOES NOT
+
+66,157 of the 9,666,808 bytes reach a device. Everything else runs on the
+build host inside kapt and is never dexed. README.chromium states this per
+artifact in its Shipped field, and that is the field about:credits reads.
+
+WHAT REPLACING THESE COSTS
+
+A version bump is a Dagger bump: change gradle/libs.versions.toml and the
+TOOLCHAIN.md row, re-resolve, copy the new artifacts in under their new
+versioned names, and update this file, README.chromium and the BUILD.gn
+together. The file names carry versions so that a stale record cannot look
+current.
+
+TaffyGo owns vulnerability tracking for these 16 files. Chromium's
+android_deps vulnerability flow does not see them, and no lane checks them
+today — that gap is stated in decision 0031 rather than papered over.
+
+Checksums, one per vendored file
+--------------------------------
+
+# org.checkerframework:checker-compat-qual:2.5.3  [host]
+sha256_checker_compat_qual_2_5_3_jar=d76b9afea61c7c082908023f0cbc1427fab9abd2df915c8b8a3e7a509bccbc6d
+# com.google.dagger:dagger:2.60.1  [device]
+sha256_dagger_2_60_1_jar=b012d0df527b51bfcd8953d5fcb4d022a45ebe66010d6f181ede68d1572b5cb2
+# com.google.dagger:dagger-compiler:2.60.1  [host]
+sha256_dagger_compiler_2_60_1_jar=5894b1d5acfbfd11a9ef4cbbe3471a6697d50549b967576e123bd9cd397575a6
+# com.google.dagger:dagger-spi:2.60.1  [host]
+sha256_dagger_spi_2_60_1_jar=a101f27e6c6348fbb3198778970624b3ba2214ecc738b2146c7a1244cb42c417
+# com.google.guava:failureaccess:1.0.1  [host]
+sha256_failureaccess_1_0_1_jar=a171ee4c734dd2da837e4b16be9df4661afab72a41adaf31eb84dfdaf936ca26
+# com.google.googlejavaformat:google-java-format:1.33.0  [host]
+sha256_google_java_format_1_33_0_jar=1265aa761ec2908535324b114995a1c6debaedc8a9e2e8553127babcdb58567f
+# com.google.guava:guava:33.6.0-jre  [host]
+sha256_guava_33_6_0_jre_jar=dc573e1fca4fd5454f4a5fd3d7da2df03002876a4175bafc14a95980dd7713b3
+# net.ltgt.gradle.incap:incap:0.2  [host]
+sha256_incap_0_2_jar=b625b9806b0f1e4bc7a2e3457119488de3cd57ea20feedd513db070a573a4ffd
+# jakarta.inject:jakarta.inject-api:2.0.1  [device]
+sha256_jakarta_inject_api_2_0_1_jar=f7dc98062fccf14126abb751b64fab12c312566e8cbdc8483598bffcea93af7c
+# com.squareup:javapoet:1.13.0  [host]
+sha256_javapoet_1_13_0_jar=4c7517e848a71b36d069d12bb3bf46a70fd4cda3105d822b0ed2e19c00b69291
+# javax.inject:javax.inject:1  [host]
+sha256_javax_inject_1_jar=91c77044a50c481636c32d916fd89c9118a72195390452c81065080f957de7ff
+# com.google.code.findbugs:jsr305:3.0.2  [host]
+sha256_jsr305_3_0_2_jar=766ad2a0783f2687962c8ad74ceecc38a28b9f72a2d085ee438b7813e928d0c7
+# org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.21  [host]
+sha256_kotlin_metadata_jvm_2_3_21_jar=00590f26a5a768777f04252c6cf93c016a3361a6bc93636df67375ad4d19557d
+# org.jetbrains.kotlin:kotlin-stdlib:2.4.10  [host]
+sha256_kotlin_stdlib_2_4_10_jar=4ec0293bc3751423b203f1d8493251c57c42e73eb6377a6b8560d0974ff0a6df
+# com.squareup:kotlinpoet:1.11.0  [host]
+sha256_kotlinpoet_1_11_0_jar=2887ada1ca03dd83baa2758640d87e840d1907564db0ef88d2289c868a980492
+# com.google.devtools.ksp:symbol-processing-api:2.3.11  [host]
+sha256_symbol_processing_api_2_3_11_jar=88819c9243629ee710c992d3efdc146dae31aafbb7d8029ce5d29d4fbd5d2326

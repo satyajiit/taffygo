@@ -1,0 +1,9 @@
+{
+  "provider_id": "my-gateway",
+  "display_name": "My gateway",
+  "endpoint": "https://gateway.example/v1",
+  "wire_api": 91,
+  "credential_handle": null,
+  "models": [],
+  "detected_server": null
+}

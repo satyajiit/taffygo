@@ -1,0 +1,269 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The device half of the retained Compose UI. These are the same canonical
+# `src/androidTest` sources Gradle runs in the fast Android loop; GN packages
+# them here so the shipping graph, pinned AndroidX closure, manifest merge and
+# Chromium runner see them too.
+
+import("//build/config/android/rules.gni")
+import("//taffy/app/android/kotlin_sources.gni")
+import("//taffy/app/android/taffy_android_deps.gni")
+import("//taffy/app/android/taffy_dagger_library.gni")
+import("//taffy/resources/branding/taffy_branding.gni")
+
+_compose = taffy_androidx_compose_deps
+_coroutines = taffy_kotlin_coroutines_deps
+_inject = [ "//third_party/android_deps:javax_inject_javax_inject_java" ]
+_kotlin = taffy_kotlin_deps
+_lifecycle = taffy_androidx_lifecycle_deps
+
+_feature_platform_deps = [ "//third_party/androidx:androidx_lifecycle_lifecycle_viewmodel_compose_java" ] + _compose + _coroutines + _inject + _kotlin + _lifecycle
+
+_test_deps = [
+  "//third_party/androidx:androidx_compose_ui_ui_test_android_java",
+  "//third_party/androidx:androidx_compose_ui_ui_test_junit4_java",
+  "//third_party/androidx:androidx_compose_ui_ui_test_manifest_java",
+  "//third_party/androidx:androidx_test_core_java",
+  "//third_party/androidx:androidx_test_ext_junit_java",
+  "//third_party/androidx:androidx_test_monitor_java",
+  "//third_party/androidx:androidx_test_runner_java",
+  "//third_party/junit",
+]
+
+# Gradle compiles each module's main, debug and androidTest source sets as one
+# Kotlin friend unit. Mirror that boundary here: a single aggregate test jar
+# makes every legitimate `internal` test access fail, while depending on the
+# production jar cannot recover Kotlin's compile-time module visibility. Keep
+# the Dagger rule visible at each target declaration as well: the repository's
+# static GN graph checker follows one template expansion and must see the same
+# runtime edge that configured GN sees.
+taffy_dagger_library("core_ui_instrumentation_tests_java") {
+  testonly = true
+  sources = taffy_core_ui_sources + taffy_core_ui_android_test_fixture_sources +
+            taffy_core_ui_android_test_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.core.ui"
+  deps = [
+           "//taffy/app/android/ui:core_browser_java",
+           "//taffy/app/android/ui:core_common_java",
+           "//taffy/app/android/ui:core_designsystem_java",
+           "//taffy/app/android/ui:core_model_java",
+           "//taffy/app/android/ui:core_ui_profile_banner_assets",
+           "//taffy/app/android/ui:core_ui_resources",
+           "//third_party/androidx:androidx_activity_activity_compose_java",
+           "//third_party/androidx:androidx_lifecycle_lifecycle_viewmodel_compose_java",
+         ] + _compose + _coroutines + _inject + _kotlin + _lifecycle +
+         _test_deps
+}
+
+taffy_dagger_library("feature_assistant_instrumentation_tests_java") {
+  testonly = true
+  sources = taffy_feature_assistant_sources +
+            taffy_feature_assistant_android_test_fixture_sources +
+            taffy_feature_assistant_android_test_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.assistant"
+  deps = [
+           ":core_ui_instrumentation_tests_java",
+           "//taffy/app/android/ui:core_analytics_java",
+           "//taffy/app/android/ui:core_api_java",
+           "//taffy/app/android/ui:core_browser_java",
+           "//taffy/app/android/ui:core_common_java",
+           "//taffy/app/android/ui:core_designsystem_java",
+           "//taffy/app/android/ui:core_model_java",
+           "//taffy/app/android/ui:core_page_intelligence_java",
+           "//taffy/app/android/ui:core_preferences_java",
+           "//taffy/app/android/ui:core_task_java",
+           "//taffy/app/android/ui:feature_assistant_resources",
+           "//taffy/third_party/commonmark:commonmark_java",
+           "//third_party/androidx:androidx_activity_activity_compose_java",
+           "//third_party/androidx:androidx_core_core_java",
+         ] + _feature_platform_deps + _test_deps
+}
+
+taffy_dagger_library("feature_browsing_instrumentation_tests_java") {
+  testonly = true
+  sources = taffy_feature_browsing_sources +
+            taffy_feature_browsing_android_test_fixture_sources +
+            taffy_feature_browsing_android_test_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.browsing"
+  deps = [
+           ":core_ui_instrumentation_tests_java",
+           "//taffy/app/android/ui:core_analytics_java",
+           "//taffy/app/android/ui:core_api_java",
+           "//taffy/app/android/ui:core_assets_java",
+           "//taffy/app/android/ui:core_browser_java",
+           "//taffy/app/android/ui:core_common_java",
+           "//taffy/app/android/ui:core_designsystem_java",
+           "//taffy/app/android/ui:core_model_java",
+           "//taffy/app/android/ui:core_page_intelligence_java",
+           "//taffy/app/android/ui:core_task_java",
+           "//taffy/app/android/ui:feature_browsing_resources",
+           "//third_party/androidx:androidx_activity_activity_compose_java",
+         ] + _feature_platform_deps + _test_deps
+}
+
+taffy_dagger_library("feature_downloads_instrumentation_tests_java") {
+  testonly = true
+  sources = taffy_feature_downloads_sources +
+            taffy_feature_downloads_android_test_fixture_sources +
+            taffy_feature_downloads_android_test_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.downloads"
+  deps = [
+           ":core_ui_instrumentation_tests_java",
+           "//taffy/app/android/ui:core_analytics_java",
+           "//taffy/app/android/ui:core_assets_java",
+           "//taffy/app/android/ui:core_common_java",
+           "//taffy/app/android/ui:core_designsystem_java",
+           "//taffy/app/android/ui:core_model_java",
+           "//taffy/app/android/ui:feature_downloads_resources",
+         ] + _feature_platform_deps + _test_deps
+}
+
+taffy_dagger_library("feature_onboarding_instrumentation_tests_java") {
+  testonly = true
+  sources = taffy_feature_onboarding_sources +
+            taffy_feature_onboarding_android_test_fixture_sources +
+            taffy_feature_onboarding_android_test_sources
+  chromium_code = false
+  enable_compose = true
+  enable_bytecode_checks = false
+  resources_package = "com.taffygo.browser.ui.feature.onboarding"
+  deps = [
+           ":core_ui_instrumentation_tests_java",
+           "//taffy/app/android/ui:core_analytics_java",
+           "//taffy/app/android/ui:core_api_java",
+           "//taffy/app/android/ui:core_designsystem_java",
+           "//taffy/app/android/ui:core_model_java",
+           "//taffy/app/android/ui:core_preferences_java",
+           "//taffy/app/android/ui:feature_onboarding_resources",
+         ] + _feature_platform_deps + _test_deps
+}
+
+taffy_dagger_library("feature_providers_instrumentation_tests_java") {
+  testonly = true
+  sources = taffy_feature_providers_sources +
+            taffy_feature_providers_android_test_fixture_sources +
+            taffy_feature_providers_android_test_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.providers"
+  deps = [
+           ":core_ui_instrumentation_tests_java",
+           "//taffy/app/android/ui:core_analytics_java",
+           "//taffy/app/android/ui:core_api_java",
+           "//taffy/app/android/ui:core_browser_java",
+           "//taffy/app/android/ui:core_credentials_java",
+           "//taffy/app/android/ui:core_designsystem_java",
+           "//taffy/app/android/ui:core_model_java",
+           "//taffy/app/android/ui:core_preferences_java",
+           "//taffy/app/android/ui:core_providerauth_java",
+           "//taffy/app/android/ui:core_providers_java",
+           "//taffy/app/android/ui:feature_providers_resources",
+         ] + _feature_platform_deps + _test_deps
+}
+
+taffy_dagger_library("feature_settings_instrumentation_tests_java") {
+  testonly = true
+  sources = taffy_feature_settings_sources +
+            taffy_feature_settings_android_test_fixture_sources +
+            taffy_feature_settings_android_test_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.settings"
+  deps = [
+           ":core_ui_instrumentation_tests_java",
+           "//taffy/app/android/ui:core_analytics_java",
+           "//taffy/app/android/ui:core_api_java",
+           "//taffy/app/android/ui:core_assets_java",
+           "//taffy/app/android/ui:core_browser_java",
+           "//taffy/app/android/ui:core_common_java",
+           "//taffy/app/android/ui:core_designsystem_java",
+           "//taffy/app/android/ui:core_model_java",
+           "//taffy/app/android/ui:core_preferences_java",
+           "//taffy/app/android/ui:core_workspace_java",
+           "//taffy/app/android/ui:feature_settings_resources",
+           "//taffy/app/android/ui:feature_settings_search_engine_assets",
+           "//third_party/androidx:androidx_activity_activity_compose_java",
+         ] + _feature_platform_deps + _test_deps
+}
+
+taffy_dagger_library("feature_workspaces_instrumentation_tests_java") {
+  testonly = true
+  sources = taffy_feature_workspaces_sources +
+            taffy_feature_workspaces_android_test_fixture_sources +
+            taffy_feature_workspaces_android_test_sources
+  chromium_code = false
+  enable_compose = true
+  resources_package = "com.taffygo.browser.ui.feature.workspaces"
+  deps = [
+           ":core_ui_instrumentation_tests_java",
+           "//taffy/app/android/ui:core_analytics_java",
+           "//taffy/app/android/ui:core_api_java",
+           "//taffy/app/android/ui:core_browser_java",
+           "//taffy/app/android/ui:core_common_java",
+           "//taffy/app/android/ui:core_designsystem_java",
+           "//taffy/app/android/ui:core_model_java",
+           "//taffy/app/android/ui:core_workspace_java",
+           "//taffy/app/android/ui:feature_workspaces_resources",
+           "//third_party/androidx:androidx_activity_activity_compose_java",
+         ] + _feature_platform_deps + _test_deps
+}
+
+jinja_template("ui_instrumentation_manifest") {
+  testonly = true
+  input = "AndroidManifest.xml.jinja2"
+  output = "$target_gen_dir/AndroidManifest.xml"
+  variables = [ "manifest_package=$taffy_manifest_package" ]
+}
+
+android_resources("ui_instrumentation_resources") {
+  testonly = true
+  sources = [ "//taffy/ui/android/feature/assistant/src/androidTest/res/xml/taffy_test_file_paths.xml" ]
+  custom_package = "com.taffygo.browser.tests"
+  chromium_code = false
+}
+
+# Self-instrumenting: this APK contains only deterministic Compose surfaces and
+# their test Activity. Browser-integrated behavior belongs to
+# `taffy_browsertests`; this suite must not inherit the product's authority.
+instrumentation_test_apk("taffy_public_test_apk") {
+  testonly = true
+  apk_name = taffy_test_apk_name
+  target_sdk_version = "37"
+  # The incremental bootstrap registers android.app.Instrumentation and then
+  # swaps in AndroidX. That indirection does not forward AndroidX's list-only
+  # status stream on the Xiaomi device, so Chromium sees an empty test list.
+  # This is a small, self-contained test APK; install the real manifest and
+  # runner so discovery and execution observe the same component.
+  never_incremental = true
+  # These are ordinary AndroidX/Compose JUnit4 tests, not Chromium
+  # BaseJUnit4ClassRunner tests. The default launcher injects Chromium's list
+  # listener, which must execute every non-Base runner test merely to discover
+  # its name; the aggregate suite then times out in its list phase. AndroidX's
+  # runner has a true list-only mode and owns this self-instrumenting APK.
+  use_default_launcher = false
+  android_manifest = "$target_gen_dir/AndroidManifest.xml"
+  android_manifest_dep = ":ui_instrumentation_manifest"
+  deps = [
+    ":core_ui_instrumentation_tests_java",
+    ":feature_assistant_instrumentation_tests_java",
+    ":feature_browsing_instrumentation_tests_java",
+    ":feature_downloads_instrumentation_tests_java",
+    ":feature_onboarding_instrumentation_tests_java",
+    ":feature_providers_instrumentation_tests_java",
+    ":feature_settings_instrumentation_tests_java",
+    ":feature_workspaces_instrumentation_tests_java",
+    ":ui_instrumentation_resources",
+  ]
+}

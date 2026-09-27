@@ -1,0 +1,41 @@
+From 0cf01634fca13ffb331579ae8e5e5975bd8ba55b Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sat, 29 Aug 2026 13:57:30 +0530
+Subject: register the TaffyGo profile-keyed service
+
+Register the TaffyGo core-service manager factory before Chromium closes the browser-context factory dependency graph. Service instances remain lazy and profile-owned, and the startup target declares the exact downstream dependency it includes.
+
+Taffy-Patch: 0032
+
+diff --git a/chrome/browser/profiles/BUILD.gn b/chrome/browser/profiles/BUILD.gn
+index 7261b2cc26b5f..7c025b304c0d5 100644
+--- a/chrome/browser/profiles/BUILD.gn
++++ b/chrome/browser/profiles/BUILD.gn
+@@ -781,6 +781,7 @@ source_set("profiles_extra_parts_impl") {
+     "//components/sync/base:features",
+     "//media",
+     "//services/network/public/cpp",
++    "//taffy/browser",
+     "//ui/webui:buildflags",
+   ]
+ 
+diff --git a/chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc b/chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc
+index 71127aff75a34..b3845b3e155c9 100644
+--- a/chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc
++++ b/chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc
+@@ -319,6 +319,7 @@
+ #include "pdf/buildflags.h"
+ #include "printing/buildflags/buildflags.h"
+ #include "services/network/public/cpp/features.h"
++#include "taffy/browser/core_service_manager_factory.h"
+ #include "third_party/blink/public/common/features_generated.h"
+ #include "ui/base/device_form_factor.h"
+ #include "ui/webui/buildflags.h"
+@@ -941,6 +942,7 @@ void ChromeBrowserMainExtraPartsProfiles::
+ #endif
+   ContextualSearchServiceFactory::GetInstance();
+   CookieSettingsFactory::GetInstance();
++  taffy::CoreServiceManagerFactory::GetInstance();
+ #if !BUILDFLAG(IS_ANDROID)
+   metrics::CriticalUserJourneyServiceFactory::GetInstance();
+ #endif  // BUILDFLAG(!IS_ANDROID)

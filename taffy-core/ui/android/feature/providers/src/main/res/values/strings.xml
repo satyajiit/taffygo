@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  Every string the provider surfaces show. Each name begins with
+  taffy_providers_ because an APK's resource table is one flat namespace and
+  the other settings surfaces, which live in :feature:settings, already hold
+  taffy_ai_* and taffy_settings_*.
+-->
+<resources>
+    <!-- Screen SCR-404 — the hub -->
+    <string name="taffy_providers_hub_title">AI providers</string>
+    <string name="taffy_providers_hub_intro">Every way this browser can reach a model, and where each one stands.</string>
+    <string name="taffy_providers_hub_loading">Loading providers</string>
+    <string name="taffy_providers_hub_empty_title">No providers on offer</string>
+    <string name="taffy_providers_hub_empty_body">The provider list this browser reads is empty right now. Nothing is missing from your phone — there is simply nothing to set up yet. You can still add a provider whose address you supply.</string>
+    <string name="taffy_providers_hub_all_connected_title">Everything is already set up</string>
+    <string name="taffy_providers_hub_all_connected_body">Every provider in the list this browser reads is connected. Go back to see what each one is set to, or add a provider whose address you supply.</string>
+    <string name="taffy_providers_hub_blocked_title">Nothing here can be set up</string>
+    <string name="taffy_providers_hub_blocked_body">Every provider below is turned off, has moved, or needs something this version of TaffyGo does not carry. Each row says which.</string>
+
+    <!--
+      The four categories, as the tabs name them. Each is a short noun for a
+      kind of provider rather than an instruction, because a tab is read as a
+      label and the invitation belongs on the row underneath it.
+    -->
+    <string name="taffy_providers_group_subscription">Subscription</string>
+    <string name="taffy_providers_group_key">API keys</string>
+    <string name="taffy_providers_group_endpoint">Your own</string>
+    <string name="taffy_providers_group_header">%1$s. %2$s.</string>
+    <plurals name="taffy_providers_group_count">
+        <item quantity="one">%1$s provider</item>
+        <item quantity="other">%1$s providers</item>
+    </plurals>
+
+    <!-- What a category says when it holds nothing -->
+    <string name="taffy_providers_group_empty_subscription_title">No plans to sign in to</string>
+    <string name="taffy_providers_group_empty_subscription_body">Nothing in the provider list this browser reads offers a plan you can sign in to right now.</string>
+    <string name="taffy_providers_group_empty_key_title">No providers take a key</string>
+    <string name="taffy_providers_group_empty_key_body">Nothing in the provider list this browser reads takes a key you paste right now.</string>
+    <string name="taffy_providers_group_empty_endpoint_title">You have not added one yet</string>
+    <string name="taffy_providers_group_empty_endpoint_body">A model server you run yourself appears here once you add its address. Nothing runs on this phone.</string>
+
+    <!-- What a provider would take, when the vendor has said nothing about it -->
+    <string name="taffy_providers_way_key">API key</string>
+    <string name="taffy_providers_way_plan">Plan sign-in</string>
+    <string name="taffy_providers_way_key_or_plan">API key or plan sign-in</string>
+    <string name="taffy_providers_way_endpoint">An address you supplied</string>
+    <string name="taffy_providers_way_none">This provider names no way in</string>
+    <string name="taffy_providers_label_pair">%1$s · %2$s</string>
+
+    <!-- Listed and explained, never offered -->
+    <string name="taffy_providers_block_not_actionable">Not in this version</string>
+    <string name="taffy_providers_block_held_shut">Turned off</string>
+    <string name="taffy_providers_block_sign_in_not_built">Sign-in not in this version</string>
+    <string name="taffy_providers_block_sign_in_not_cleared">Sign-in not ready yet</string>
+    <string name="taffy_providers_block_no_method">Nothing offered</string>
+
+    <!-- Where one row stands -->
+    <string name="taffy_providers_state_connected">Connected</string>
+    <string name="taffy_providers_state_unconfirmed">Not confirmed</string>
+    <string name="taffy_providers_state_signing_in">Signing in…</string>
+    <string name="taffy_providers_state_default">Default</string>
+    <string name="taffy_providers_action_set_up">Set up</string>
+    <string name="taffy_providers_action_sign_in">Sign in</string>
+    <string name="taffy_providers_action_edit">Edit</string>
+    <string name="taffy_providers_row">%1$s. %2$s. %3$s</string>
+    <string name="taffy_providers_add_endpoint">Add your own provider</string>
+
+    <!-- Screen SCR-415 -->
+    <string name="taffy_providers_config_title">Provider</string>
+    <!-- Screen SCR-416 -->
+    <string name="taffy_providers_sign_in_title">Sign in</string>
+    <!-- Screen SCR-417 -->
+    <string name="taffy_providers_models_all_title">All models</string>
+    <string name="taffy_providers_models_one_title">Models</string>
+    <string name="taffy_providers_models_loading">Loading models</string>
+    <string name="taffy_providers_models_empty_title">No models on offer</string>
+    <string name="taffy_providers_models_empty_body">The provider list this browser reads names no model here yet. Nothing is missing from your phone.</string>
+    <string name="taffy_providers_models_in_use">In use</string>
+    <string name="taffy_providers_models_asking">Asking</string>
+    <string name="taffy_providers_models_needs_setup">Set up</string>
+    <string name="taffy_providers_models_search">Search models</string>
+    <string name="taffy_providers_models_no_match_title">Nothing here goes by that name</string>
+    <string name="taffy_providers_models_no_match_body">No model or provider on this page matches what you typed. Try fewer letters.</string>
+
+    <!-- Screen SCR-417 — the kind of work a model does, read off its catalog entry -->
+    <string name="taffy_providers_models_group_reasoning">Thinks before answering</string>
+    <string name="taffy_providers_models_group_pictures">Reads pictures too</string>
+    <string name="taffy_providers_models_group_plain">Straight answers</string>
+    <string name="taffy_providers_models_context">%1$s tokens</string>
+    <string name="taffy_providers_models_badge_thinks">Thinks first</string>
+    <string name="taffy_providers_models_badge_pictures">Reads pictures</string>
+
+    <!-- Screen SCR-417 — the two halves of the whole-catalog list -->
+    <string name="taffy_providers_models_ready_title">Ready to use</string>
+    <string name="taffy_providers_models_locked_title">Needs setting up</string>
+    <string name="taffy_providers_models_locked_show">Show</string>
+    <string name="taffy_providers_models_locked_hide">Hide</string>
+    <string name="taffy_providers_models_locked_key">Paste a key on this provider\'s page and these are yours to pick.</string>
+    <string name="taffy_providers_models_locked_plan">Sign in to this provider\'s plan and these are yours to pick.</string>
+    <string name="taffy_providers_models_locked_endpoint">Finish setting up this address and these are yours to pick.</string>
+    <string name="taffy_providers_models_locked_blocked">TaffyGo cannot set this provider up, so nothing here can be picked.</string>
+    <string name="taffy_providers_models_showing_of">Showing %1$s of the %2$s models this provider carries. TaffyGo keeps a fair share of every provider\'s list.</string>
+
+    <!-- Screen SCR-417 — how much this model thinks before it answers -->
+    <string name="taffy_providers_thinking_title">Thinking</string>
+    <string name="taffy_providers_thinking_note">Auto lets Taffy pick how much to think for each question. Off asks this model for no thinking at all.</string>
+    <string name="taffy_providers_thinking_auto">Auto</string>
+    <string name="taffy_providers_thinking_off">Off</string>
+    <string name="taffy_providers_thinking_minimal">Least</string>
+    <string name="taffy_providers_thinking_low">A little</string>
+    <string name="taffy_providers_thinking_medium">Some</string>
+    <string name="taffy_providers_thinking_high">A lot</string>
+    <string name="taffy_providers_thinking_xhigh">Even more</string>
+    <string name="taffy_providers_thinking_max">Most</string>
+
+    <!-- Screen SCR-418 -->
+    <string name="taffy_providers_endpoint_add_title">Add a provider</string>
+    <string name="taffy_providers_endpoint_edit_title">Edit provider</string>
+    <!-- Screen SCR-419 -->
+    <string name="taffy_providers_connected_title">Connected providers</string>
+
+    <!-- Screen SCR-418 — a model server the person runs themselves -->
+    <string name="taffy_providers_endpoint_intro">A model server you run yourself, somewhere TaffyGo can reach it over the network — your laptop, or a machine in the next room. Nothing runs on this phone.</string>
+    <string name="taffy_providers_endpoint_presets">Common servers</string>
+    <string name="taffy_providers_endpoint_preset_ollama">Ollama</string>
+    <string name="taffy_providers_endpoint_preset_lm_studio">LM Studio</string>
+    <string name="taffy_providers_endpoint_preset_llama_cpp">llama.cpp</string>
+    <string name="taffy_providers_endpoint_preset_vllm">vLLM</string>
+    <string name="taffy_providers_endpoint_kind_openai">An OpenAI-compatible server</string>
+    <string name="taffy_providers_endpoint_address_label">Address</string>
+    <string name="taffy_providers_endpoint_address_placeholder">http://localhost:11434/v1</string>
+    <string name="taffy_providers_endpoint_address_hint">Give the whole address your server answers on, including its port and its version part. TaffyGo adds only the request onto the end of what you type, and changes nothing else about it.</string>
+    <string name="taffy_providers_endpoint_current">Currently pointed at a server on %1$s.</string>
+    <string name="taffy_providers_endpoint_current_note">The field below starts at the address TaffyGo has this provider registered at. Change it and save to point the provider somewhere else; leave it alone and nothing about the address changes.</string>
+    <string name="taffy_providers_endpoint_cleartext">This is plain http, so what TaffyGo sends is not encrypted and anyone else on that network could read it. TaffyGo allows it to a machine on your own network and nowhere else.</string>
+
+    <!-- Screen SCR-418 — why an address cannot be registered -->
+    <string name="taffy_providers_endpoint_refusal_long">That address is longer than TaffyGo can hold.</string>
+    <string name="taffy_providers_endpoint_refusal_not_an_address">TaffyGo cannot read that as an address. It needs to start with http:// or https:// and name a machine.</string>
+    <string name="taffy_providers_endpoint_refusal_cleartext">Plain http reaches only a machine on your own network, written as numbers or ending in .local. Use https for anywhere else.</string>
+    <string name="taffy_providers_endpoint_refusal_credentials">Take the user name and password off the front of the address. TaffyGo will not hold an address that carries them.</string>
+    <string name="taffy_providers_endpoint_refusal_query">Take the question mark and everything after it off the address.</string>
+    <string name="taffy_providers_endpoint_refusal_fragment">Take the hash and everything after it off the address.</string>
+
+    <!-- Screen SCR-418 — asking the address what is there -->
+    <string name="taffy_providers_endpoint_check">Check this address</string>
+    <string name="taffy_providers_endpoint_checking">Checking…</string>
+    <string name="taffy_providers_endpoint_reached">Reached</string>
+    <string name="taffy_providers_endpoint_detected">Detected: %1$s</string>
+    <plurals name="taffy_providers_endpoint_found">
+        <item quantity="one">Found %1$s model</item>
+        <item quantity="other">Found %1$s models</item>
+    </plurals>
+    <string name="taffy_providers_endpoint_no_models">No models are loaded there yet. The address is right — there is simply nothing behind it to send to. Load one on the server and Taffy can use it.</string>
+    <string name="taffy_providers_endpoint_kept_models">Keeping %1$s of the %2$s models this server listed. You can pick which one to use once the provider is saved.</string>
+    <string name="taffy_providers_endpoint_problem_nothing">Nothing answered at that address. Check the machine is awake, the server is running, and this phone is on the same network.</string>
+    <string name="taffy_providers_endpoint_problem_not_a_server">Something answered, and TaffyGo could not read a list of models from it. Check the port and the version part of the address.</string>
+    <string name="taffy_providers_endpoint_problem_credential">The server answered, and it will not list its models without a key. Open Advanced, paste the key it takes, and check the address again.</string>
+    <string name="taffy_providers_endpoint_problem_no_answer">No answer came back, so nothing was learned about the address. Try it again.</string>
+
+    <!-- Screen SCR-418 — the corrected address, offered and never applied -->
+    <string name="taffy_providers_endpoint_proposal_title">One thing to settle first</string>
+    <string name="taffy_providers_endpoint_proposal_body">Your server answers the model requests at %1$s. TaffyGo adds only the request onto the end of the address you type, so the address as it stands answered this check and would still reach nothing. TaffyGo will not change what you typed — say which one you meant.</string>
+    <string name="taffy_providers_endpoint_proposal_take">Use %1$s</string>
+    <string name="taffy_providers_endpoint_proposal_keep">Keep it exactly as I typed it</string>
+    <string name="taffy_providers_endpoint_kept">Keeping the address as you typed it. If requests come back saying nothing was found, this is the first thing to change.</string>
+
+    <!-- Screen SCR-418 — the key, for the servers that ask for one -->
+    <string name="taffy_providers_endpoint_advanced">Advanced</string>
+    <string name="taffy_providers_endpoint_key_hint">Only if your server asks for one. Most servers people run themselves ask for nothing, and leaving this empty is the ordinary answer.</string>
+    <string name="taffy_providers_endpoint_key_stored">A key is already stored for this server. Leave this empty to keep it, or paste a new one to replace it.</string>
+
+    <!-- Screen SCR-418 — what to call it, and what to send to -->
+    <string name="taffy_providers_endpoint_name_label">Name</string>
+    <string name="taffy_providers_endpoint_name_placeholder">What to call it</string>
+    <string name="taffy_providers_endpoint_name_hint">Only you see this. It is how the server appears in your provider list.</string>
+    <string name="taffy_providers_endpoint_save">Save this provider</string>
+    <string name="taffy_providers_endpoint_saving">Saving…</string>
+    <string name="taffy_providers_endpoint_save_refused">TaffyGo would not save this provider. Check the address and try again.</string>
+
+    <!-- Screen SCR-418 — removing one -->
+    <string name="taffy_providers_endpoint_delete">Remove this provider</string>
+    <string name="taffy_providers_endpoint_deleting">Removing…</string>
+    <string name="taffy_providers_endpoint_delete_title">Remove %1$s?</string>
+    <string name="taffy_providers_endpoint_delete_body">The address and its models are removed from this phone. Nothing on your own server changes.</string>
+    <string name="taffy_providers_endpoint_delete_confirm">Remove</string>
+
+    <!-- Screen SCR-419 — what is connected and what it is set to -->
+    <string name="taffy_providers_connected_add">Add a provider</string>
+    <string name="taffy_providers_connected_intro">Every provider TaffyGo can reach a model through right now, and what each one is set to.</string>
+    <string name="taffy_providers_connected_empty_title">Nothing is connected yet</string>
+    <string name="taffy_providers_connected_empty_body">No provider on this phone has a credential or an address behind it. Set one up and it appears here.</string>
+    <string name="taffy_providers_connected_thinking">Thinking: %1$s</string>
+
+    <!-- The vendor's last refusal, under a connected row and on the credential card -->
+    <string name="taffy_providers_refusal_rate_limit">%1$s is rate limiting this account right now. Your key is fine.</string>
+    <string name="taffy_providers_refusal_billing">The account behind this credential cannot pay for requests right now.</string>
+    <string name="taffy_providers_refusal_overloaded">%1$s was overloaded the last time Taffy asked.</string>
+    <string name="taffy_providers_refusal_when">That was %1$s.</string>
+
+    <!-- Screen SCR-415 — one provider's own page -->
+    <string name="taffy_providers_config_loading">Loading this provider</string>
+    <string name="taffy_providers_config_gone_title">This provider is no longer listed</string>
+    <string name="taffy_providers_config_gone_body">The provider list this browser reads no longer carries it. Nothing has been removed from your phone.</string>
+    <string name="taffy_providers_config_blocked_title">This provider cannot be set up</string>
+    <string name="taffy_providers_config_block_not_actionable">This version of TaffyGo cannot set this provider up. A later one may.</string>
+    <string name="taffy_providers_config_block_held_shut">This provider is switched off in the provider list. Nothing you did here would reach it.</string>
+    <string name="taffy_providers_config_block_not_cleared">TaffyGo has this vendor\'s sign-in built, and has not finished checking what the vendor allows it to be used for. Until that is done it will not start it. Nothing is wrong with your phone.</string>
+    <string name="taffy_providers_config_block_no_method">This provider\'s entry names no way to connect to it. That is a fault in the list, not on your phone.</string>
+    <string name="taffy_providers_config_lead_key">Pay this provider directly, with a key you paste.</string>
+    <string name="taffy_providers_config_lead_plan">Use a plan you already pay for.</string>
+    <string name="taffy_providers_config_lead_both">Use a plan you already pay for, or paste a key and pay per use.</string>
+    <string name="taffy_providers_config_lead_blocked">Nothing here can be set up right now.</string>
+
+    <!-- The card over a stored credential -->
+    <string name="taffy_providers_managed_title">Connected</string>
+    <string name="taffy_providers_managed_unconfirmed">Connected — needs a look</string>
+    <string name="taffy_providers_managed_unconfirmed_body">The last check did not go through. Nothing has been removed. Sign in again if it keeps happening.</string>
+    <string name="taffy_providers_managed_body_plan">A plan you signed in to stands behind this.</string>
+    <string name="taffy_providers_managed_body_key">A key you saved stands behind this. It is sealed on this phone and never shown again.</string>
+    <string name="taffy_providers_managed_model">Model: %1$s</string>
+    <string name="taffy_providers_managed_model_provider_order">whatever this provider offers first</string>
+    <string name="taffy_providers_managed_change_model">Change model</string>
+    <string name="taffy_providers_managed_reauthenticate">Sign in again</string>
+    <string name="taffy_providers_managed_sign_out">Sign out</string>
+    <string name="taffy_providers_managed_signing_out">Signing out…</string>
+    <string name="taffy_providers_signout_title">Sign out of %1$s?</string>
+    <string name="taffy_providers_signout_body">The credential is removed from this phone. Taffy cannot reach this provider again until you connect it.</string>
+    <string name="taffy_providers_signout_confirm">Sign out</string>
+    <string name="taffy_providers_signout_cancel">Keep it</string>
+
+    <!-- The two ways in, and the rule between them -->
+    <string name="taffy_providers_signin_blurb">Sign in with the vendor. TaffyGo never sees your password.</string>
+    <string name="taffy_providers_signin_cta">Sign in to %1$s</string>
+    <string name="taffy_providers_signin_not_built_title">Sign-in is not in this version</string>
+    <string name="taffy_providers_signin_not_built_body">%1$s offers a plan sign-in and this version of TaffyGo does not carry it, so it cannot be started here. A key would not work in its place.</string>
+    <string name="taffy_providers_signin_not_cleared_title">Sign-in is not ready yet</string>
+    <string name="taffy_providers_signin_not_cleared_body">TaffyGo has %1$s\'s sign-in built, and has not finished checking what the vendor allows it to be used for. Until that is done it will not start it. Updating the app will not change this, and a key would not work in its place.</string>
+    <string name="taffy_providers_or_paste_key">or paste a key</string>
+
+    <!-- The key form -->
+    <string name="taffy_providers_key_label">API key</string>
+    <string name="taffy_providers_key_placeholder">Paste it here</string>
+    <string name="taffy_providers_key_show">Show</string>
+    <string name="taffy_providers_key_hide">Hide</string>
+    <string name="taffy_providers_key_get">Get a key</string>
+    <string name="taffy_providers_key_docs">Read the provider\'s notes</string>
+    <string name="taffy_providers_key_prefix_hint">Keys from this provider begin with %1$s.</string>
+    <string name="taffy_providers_key_save">Continue</string>
+    <string name="taffy_providers_key_replace">Replace the key</string>
+    <string name="taffy_providers_key_testing">Testing…</string>
+    <string name="taffy_providers_key_connected">Connected</string>
+    <string name="taffy_providers_key_save_anyway">Save it without a test</string>
+    <string name="taffy_providers_key_security">The key is sealed by this phone\'s keystore. TaffyGo never shows it again and never sends it anywhere but this provider.</string>
+    <string name="taffy_providers_key_problem_empty">Paste a key first.</string>
+    <string name="taffy_providers_key_problem_prefix">That does not look like one of this provider\'s keys.</string>
+    <string name="taffy_providers_key_problem_store">This phone\'s secure store would not hold the key. Nothing was saved.</string>
+    <string name="taffy_providers_key_problem_refused">The provider refused this key. Check you copied all of it.</string>
+    <string name="taffy_providers_key_problem_billing">The account behind this key cannot pay for requests yet.</string>
+    <string name="taffy_providers_key_problem_model">The provider does not know the model TaffyGo tested with. That is a fault in the provider list, not in your key.</string>
+    <string name="taffy_providers_key_problem_rate_limited">The provider is rate limiting right now, so your key was not judged.</string>
+    <string name="taffy_providers_key_problem_overloaded">The provider is overloaded right now, so your key was not judged.</string>
+    <string name="taffy_providers_key_problem_timed_out">The test ran out of time before an answer came back.</string>
+    <string name="taffy_providers_key_problem_unreachable">The provider was not reached at all.</string>
+    <string name="taffy_providers_key_problem_unsettled">The answer did not fit anything TaffyGo can name.</string>
+    <string name="taffy_providers_key_problem_unavailable">The test could not run right now.</string>
+    <string name="taffy_providers_key_problem_no_model_listed">This provider lists its models only after a key is saved. Save it and Taffy will fetch them.</string>
+
+    <!-- Where Taffy\'s own requests go -->
+    <string name="taffy_providers_default_title">Taffy\'s own requests</string>
+    <string name="taffy_providers_default_cta">Use your own provider for Taffy</string>
+    <string name="taffy_providers_default_note">Taffy sends its own questions and task steps with your credential.</string>
+    <string name="taffy_providers_default_in_force">Taffy sends its requests here.</string>
+    <string name="taffy_providers_default_shared">Taffy uses a provider of your own. More than one is connected, and TaffyGo cannot yet say which of them a request goes to.</string>
+
+    <!-- Screen SCR-416 — one vendor\'s sign-in -->
+    <string name="taffy_providers_signin_loading">Loading this sign-in</string>
+    <string name="taffy_providers_signin_connected_note">You are signed in to %1$s. Signing in again replaces the credential on this phone.</string>
+    <string name="taffy_providers_signin_starting">Opening %1$s…</string>
+    <string name="taffy_providers_signin_waiting_title">Waiting for you to approve</string>
+    <string name="taffy_providers_signin_waiting_body">Finish it on the vendor\'s page. This screen keeps up by itself.</string>
+    <string name="taffy_providers_signin_exchanging">Finishing sign-in…</string>
+    <string name="taffy_providers_signin_exchanging_body">The vendor said yes and TaffyGo is sealing the credential on this phone.</string>
+    <string name="taffy_providers_signin_code_hint">Enter this code on the vendor\'s page:</string>
+    <string name="taffy_providers_signin_code_open">Open the page</string>
+    <string name="taffy_providers_signin_code_copy">Copy the code</string>
+    <string name="taffy_providers_signin_code_clip_label">Sign-in code</string>
+    <string name="taffy_providers_signin_clock">%1$d:%2$02d</string>
+    <string name="taffy_providers_signin_window">This screen waits %1$s longer.</string>
+    <string name="taffy_providers_signin_window_note">The code has its own expiry at the vendor, which TaffyGo cannot see. When this timer runs out, TaffyGo cancels this sign-in.</string>
+    <string name="taffy_providers_signin_cancel">Cancel sign-in</string>
+    <string name="taffy_providers_signin_cancelled_title">Sign-in cancelled</string>
+    <string name="taffy_providers_signin_cancelled_body">TaffyGo stopped this sign-in and removed its pending flow. You can start again whenever you’re ready.</string>
+    <string name="taffy_providers_signin_done_title">Signed in</string>
+    <string name="taffy_providers_signin_done_body">%1$s is connected. Choose a model on its page.</string>
+    <string name="taffy_providers_signin_done_cta">Go to this provider</string>
+    <string name="taffy_providers_signin_failed_title">Sign-in did not finish</string>
+    <string name="taffy_providers_signin_failed_denied">The sign-in was refused on the vendor\'s page.</string>
+    <string name="taffy_providers_signin_failed_provider">The vendor answered with an error.</string>
+    <string name="taffy_providers_signin_failed_timeout">The sign-in ran out of time.</string>
+    <string name="taffy_providers_signin_failed_unavailable">The sign-in could not run.</string>
+    <string name="taffy_providers_signin_failed_refused">TaffyGo would not start a sign-in for this provider right now.</string>
+    <string name="taffy_providers_signin_try_again">Try again</string>
+
+    <!-- The manual-code fallback under a redirect wait (decision 0095 section 2) -->
+    <string name="taffy_providers_signin_code_entry_title">Didn\'t come back to TaffyGo?</string>
+    <string name="taffy_providers_signin_code_entry_body">If the vendor\'s page showed a code, or landed on an address that would not load, paste it here. TaffyGo checks it against this sign-in and nothing else.</string>
+    <string name="taffy_providers_signin_code_entry_label">Code or address from the vendor\'s page</string>
+    <string name="taffy_providers_signin_code_entry_submit">Use this code</string>
+    <string name="taffy_providers_signin_code_entry_submitting">Checking…</string>
+    <string name="taffy_providers_signin_code_entry_rejected">That code did not work. Check you copied all of it and try again.</string>
+</resources>

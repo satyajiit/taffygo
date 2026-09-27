@@ -1,0 +1,49 @@
+# For more information on these fields, see:
+# https://chromium.googlesource.com/chromium/src/+/HEAD/docs/adding_to_third_party.md#readme_chromium
+#
+# TaffyGo vendors the EasyList family under //taffy rather than under
+# Chromium's own //third_party because which rule sets the product blocks with
+# is a TaffyGo product decision, not an upstream one: decision 0076 records the
+# choice and OD-070's resolution. Unlike the flag-icons recipe next door, the
+# upstream snapshots ARE committed here: easylist.to serves only the current
+# list, so a digest pin with no bytes behind it would stop being reproducible
+# the day upstream rolls, and the tree is the only durable place to keep the
+# exact bytes the pack was built from.
+
+Name: easylist
+Short Name: easylist
+URL: https://easylist.to/easylist/easylist.txt
+Version: 202608272347
+Update Mechanism: Manual
+License: GPL-3.0
+License File: vendor/easylist.GPL3.txt
+Shipped: yes
+Security Critical: no
+
+Description:
+The base ad and tracker rule sets the filtering plane blocks with: EasyList
+202608272347 and EasyPrivacy 202608272349, taken from easylist.to as pinned
+snapshots. Built by tools/build_filter_pack.py into one deterministic zip of
+the two lists plus their licence, catalogued for the delivery plane as asset
+`easylist-base`. The snapshots and the recipe live here.
+
+Shipped is "yes" because the APK carries the lists twice (decision 0202).
+`:bundled_filter_list_assets` in this directory's BUILD.gn packages the two
+snapshots, concatenated, as `taffy-filter-lists/base.txt`, and
+//taffy/components/delivery:bundled_delivery_assets packages the
+`easylist-base` zip, which is seeded into the delivery store on first run.
+Nothing fetches them from a host. Decision 0206 needs this field to be true:
+the credits page is generated from it, and a part recorded as not shipped is
+left out of the notice the package carries.
+
+Both lists are dual-licensed GPL-3.0 / CC BY-SA 3.0 by the EasyList authors
+(https://easylist.to/pages/licence.html). This vendoring elects GPL-3.0, and
+the licence text travels inside the pack as its own LICENSE member so a device
+that has the rules has the terms beside them. The lists are data the browser
+reads, not code it links: nothing derived from them enters this repository's
+own source.
+
+Local Modifications:
+None. The snapshots are byte-for-byte what easylist.to served on
+2026-08-27 (UTC); the pack carries them verbatim under lists/ beside the
+licence.

@@ -1,0 +1,372 @@
+{
+  "manifest_version": 1,
+  "encoder": {
+    "cwebp": "1.3.2",
+    "arguments": ["-lossless", "-exact", "-z", "9", "-metadata", "none"]
+  },
+  "checksums": "checksums.sha256",
+  "layer_dp": 108,
+  "mark_dp": 60,
+  "brand_mark_dp": 72,
+  "brand_lockup_dp": { "width": 180, "height": 52 },
+  "splash_icon_dp": 288,
+  "splash_mark_dp": 152,
+  "notes": [
+    "Paths are relative to the repository root, not to this file.",
+    "",
+    "The launcher sets fill an adaptive-icon layer: a 108 dp square whose",
+    "middle 72 dp is the only part a launcher promises to show. The mark spans",
+    "mark_dp of that square and is centred, which keeps it inside the safe zone",
+    "under every mask and every parallax offset a launcher applies.",
+    "",
+    "The brand-mark sets are not launcher layers and carry no safe-zone",
+    "padding: the first-run screens draw them at their stated size, so a",
+    "108 dp layer's empty margin would shrink the mark to two thirds of the",
+    "size the caller asked for. brand_mark_dp is the square they are drawn",
+    "into at 1x; a screen that asks for 68 dp or 42 dp scales the same file.",
+    "The brand lockup sets use a rectangular canvas because the supplied",
+    "taffyGo wordmark is part of the artwork and must not be rebuilt as text.",
+    "",
+    "The splash sets fill the slot the platform reserves for a launch icon",
+    "with no icon background: a splash_icon_dp square of which only a centred",
+    "circle two thirds as wide survives, everything outside it being masked",
+    "away. splash_mark_dp is the largest span at which no pixel of either",
+    "master leaves that circle -- measured from the masters rather than",
+    "inscribed by arithmetic, because the ribbon's corners are transparent and",
+    "strict inscription of the bounding box would waste a tenth of the slot.",
+    "There are two, chosen by the night resource qualifier, for the reason",
+    "TaffyBrandMark picks between the same two masters: the gradient loses its",
+    "edge against the wrong ground. This is the one slot the theme cannot ask",
+    "a token for, since the platform draws it before any of this app is",
+    "running, so the qualifier follows the system rather than the stored",
+    "Appearance choice.",
+    "",
+    "Every output is encoded losslessly, so the committed bytes are the",
+    "resampler's output and nothing else. The artwork is a stand-in: the",
+    "launcher background colour and the wider icon set are OD-071."
+  ],
+  "sets": [
+    {
+      "id": "launcher_foreground",
+      "source_asset": "brand/png/taffygo-mark-color-on-dark.png",
+      "source_sha256": "61fab10b771aa9bcd4a8b612ece85f42b95f179051878f911b79ef42a39c0d96",
+      "transform": "color",
+      "note": "The adaptive icon's foreground layer, over the flat background colour the launcher composites it on.",
+      "assets": [
+        {
+          "density": "mdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.webp",
+          "size_px": 108,
+          "mark_px": 60
+        },
+        {
+          "density": "hdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.webp",
+          "size_px": 162,
+          "mark_px": 90
+        },
+        {
+          "density": "xhdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.webp",
+          "size_px": 216,
+          "mark_px": 120
+        },
+        {
+          "density": "xxhdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.webp",
+          "size_px": 324,
+          "mark_px": 180
+        },
+        {
+          "density": "xxxhdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.webp",
+          "size_px": 432,
+          "mark_px": 240
+        }
+      ]
+    },
+    {
+      "id": "launcher_monochrome",
+      "source_asset": "brand/png/taffygo-mark-monochrome-on-dark.png",
+      "source_sha256": "3c471db417bcd3400a537ee3707c1ed55733de2c052c336d5ca18edf29ed870f",
+      "transform": "monochrome",
+      "note": "The themed layer. A launcher reads it as a shape and recolours it, so the colour channels are flattened to white and only the transparency channel carries the mark.",
+      "assets": [
+        {
+          "density": "mdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/mipmap-mdpi/ic_launcher_monochrome.webp",
+          "size_px": 108,
+          "mark_px": 60
+        },
+        {
+          "density": "hdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/mipmap-hdpi/ic_launcher_monochrome.webp",
+          "size_px": 162,
+          "mark_px": 90
+        },
+        {
+          "density": "xhdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/mipmap-xhdpi/ic_launcher_monochrome.webp",
+          "size_px": 216,
+          "mark_px": 120
+        },
+        {
+          "density": "xxhdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_monochrome.webp",
+          "size_px": 324,
+          "mark_px": 180
+        },
+        {
+          "density": "xxxhdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_monochrome.webp",
+          "size_px": 432,
+          "mark_px": 240
+        }
+      ]
+    },
+    {
+      "id": "splash_icon_on_light",
+      "source_asset": "brand/png/taffygo-mark-color-on-light.png",
+      "source_sha256": "caa965b2325d7d0d7dc3dee2a2eb4b5ecc3f0f9f0858df6f7d9729eccf605ee8",
+      "transform": "color",
+      "note": "The platform splash window's icon, on a system that is not in night mode. No safe-zone padding and no icon background: the mark is masked to a circle by the platform, and splash_mark_dp is sized so nothing of it reaches that circle's edge.",
+      "assets": [
+        {
+          "density": "mdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/drawable-mdpi/taffy_splash_icon.webp",
+          "size_px": 288,
+          "mark_px": 152
+        },
+        {
+          "density": "hdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/drawable-hdpi/taffy_splash_icon.webp",
+          "size_px": 432,
+          "mark_px": 228
+        },
+        {
+          "density": "xhdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/drawable-xhdpi/taffy_splash_icon.webp",
+          "size_px": 576,
+          "mark_px": 304
+        },
+        {
+          "density": "xxhdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/drawable-xxhdpi/taffy_splash_icon.webp",
+          "size_px": 864,
+          "mark_px": 456
+        },
+        {
+          "density": "xxxhdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/drawable-xxxhdpi/taffy_splash_icon.webp",
+          "size_px": 1152,
+          "mark_px": 608
+        }
+      ]
+    },
+    {
+      "id": "splash_icon_on_dark",
+      "source_asset": "brand/png/taffygo-mark-color-on-dark.png",
+      "source_sha256": "61fab10b771aa9bcd4a8b612ece85f42b95f179051878f911b79ef42a39c0d96",
+      "transform": "color",
+      "note": "The same slot on a system in night mode, under the night resource qualifier. The platform resolves it against the system configuration, which is the only appearance that exists before the app reads its own.",
+      "assets": [
+        {
+          "density": "mdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/drawable-night-mdpi/taffy_splash_icon.webp",
+          "size_px": 288,
+          "mark_px": 152
+        },
+        {
+          "density": "hdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/drawable-night-hdpi/taffy_splash_icon.webp",
+          "size_px": 432,
+          "mark_px": 228
+        },
+        {
+          "density": "xhdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/drawable-night-xhdpi/taffy_splash_icon.webp",
+          "size_px": 576,
+          "mark_px": 304
+        },
+        {
+          "density": "xxhdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/drawable-night-xxhdpi/taffy_splash_icon.webp",
+          "size_px": 864,
+          "mark_px": 456
+        },
+        {
+          "density": "xxxhdpi",
+          "output": "taffy-core/ui/android/app/src/main/res/drawable-night-xxxhdpi/taffy_splash_icon.webp",
+          "size_px": 1152,
+          "mark_px": 608
+        }
+      ]
+    },
+    {
+      "id": "brand_mark_on_dark",
+      "source_asset": "brand/png/taffygo-mark-color-on-dark.png",
+      "source_sha256": "61fab10b771aa9bcd4a8b612ece85f42b95f179051878f911b79ef42a39c0d96",
+      "transform": "color",
+      "note": "The in-app mark the dark theme draws.",
+      "assets": [
+        {
+          "density": "mdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-mdpi/taffy_mark_on_dark.webp",
+          "size_px": 72,
+          "mark_px": 72
+        },
+        {
+          "density": "hdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-hdpi/taffy_mark_on_dark.webp",
+          "size_px": 108,
+          "mark_px": 108
+        },
+        {
+          "density": "xhdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-xhdpi/taffy_mark_on_dark.webp",
+          "size_px": 144,
+          "mark_px": 144
+        },
+        {
+          "density": "xxhdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-xxhdpi/taffy_mark_on_dark.webp",
+          "size_px": 216,
+          "mark_px": 216
+        },
+        {
+          "density": "xxxhdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-xxxhdpi/taffy_mark_on_dark.webp",
+          "size_px": 288,
+          "mark_px": 288
+        }
+      ]
+    },
+    {
+      "id": "brand_mark_on_light",
+      "source_asset": "brand/png/taffygo-mark-color-on-light.png",
+      "source_sha256": "caa965b2325d7d0d7dc3dee2a2eb4b5ecc3f0f9f0858df6f7d9729eccf605ee8",
+      "transform": "color",
+      "note": "The in-app mark the light theme draws.",
+      "assets": [
+        {
+          "density": "mdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-mdpi/taffy_mark_on_light.webp",
+          "size_px": 72,
+          "mark_px": 72
+        },
+        {
+          "density": "hdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-hdpi/taffy_mark_on_light.webp",
+          "size_px": 108,
+          "mark_px": 108
+        },
+        {
+          "density": "xhdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-xhdpi/taffy_mark_on_light.webp",
+          "size_px": 144,
+          "mark_px": 144
+        },
+        {
+          "density": "xxhdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-xxhdpi/taffy_mark_on_light.webp",
+          "size_px": 216,
+          "mark_px": 216
+        },
+        {
+          "density": "xxxhdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-xxxhdpi/taffy_mark_on_light.webp",
+          "size_px": 288,
+          "mark_px": 288
+        }
+      ]
+    },
+    {
+      "id": "brand_lockup_on_dark",
+      "source_asset": "brand/png/taffygo-lockup-color-on-dark.png",
+      "source_sha256": "a4da3bc138a6eaa44215ee4b93077f4256b87064d2f89d44c0a9fb1af04b616e",
+      "transform": "color",
+      "note": "The in-app mark and taffyGo wordmark the dark theme draws.",
+      "assets": [
+        {
+          "density": "mdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-mdpi/taffy_lockup_on_dark.webp",
+          "width_px": 180,
+          "height_px": 52,
+          "mark_px": 172
+        },
+        {
+          "density": "hdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-hdpi/taffy_lockup_on_dark.webp",
+          "width_px": 270,
+          "height_px": 78,
+          "mark_px": 258
+        },
+        {
+          "density": "xhdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-xhdpi/taffy_lockup_on_dark.webp",
+          "width_px": 360,
+          "height_px": 104,
+          "mark_px": 344
+        },
+        {
+          "density": "xxhdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-xxhdpi/taffy_lockup_on_dark.webp",
+          "width_px": 540,
+          "height_px": 156,
+          "mark_px": 516
+        },
+        {
+          "density": "xxxhdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-xxxhdpi/taffy_lockup_on_dark.webp",
+          "width_px": 720,
+          "height_px": 208,
+          "mark_px": 688
+        }
+      ]
+    },
+    {
+      "id": "brand_lockup_on_light",
+      "source_asset": "brand/png/taffygo-lockup-color-on-light.png",
+      "source_sha256": "e515cfa0cb7e35c3ffcabf4f57cdcbace5f306ce118828a68df2e266479a8ca5",
+      "transform": "color",
+      "note": "The in-app mark and taffyGo wordmark the light theme draws.",
+      "assets": [
+        {
+          "density": "mdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-mdpi/taffy_lockup_on_light.webp",
+          "width_px": 180,
+          "height_px": 52,
+          "mark_px": 172
+        },
+        {
+          "density": "hdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-hdpi/taffy_lockup_on_light.webp",
+          "width_px": 270,
+          "height_px": 78,
+          "mark_px": 258
+        },
+        {
+          "density": "xhdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-xhdpi/taffy_lockup_on_light.webp",
+          "width_px": 360,
+          "height_px": 104,
+          "mark_px": 344
+        },
+        {
+          "density": "xxhdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-xxhdpi/taffy_lockup_on_light.webp",
+          "width_px": 540,
+          "height_px": 156,
+          "mark_px": 516
+        },
+        {
+          "density": "xxxhdpi",
+          "output": "taffy-core/ui/android/core/ui/src/main/res/drawable-xxxhdpi/taffy_lockup_on_light.webp",
+          "width_px": 720,
+          "height_px": 208,
+          "mark_px": 688
+        }
+      ]
+    }
+  ]
+}

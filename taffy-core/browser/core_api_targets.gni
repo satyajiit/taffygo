@@ -1,0 +1,96 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The address policy of decision 0096 section 3: may a person register this as
+# their own model server's address?
+#
+# A target of its own because two different planes have to ask it and neither
+# may hold a second copy. The command factory asks it at registration, to refuse
+# an address before a provider record exists; the core-service client asks it on
+# the way into the register itself. Those two targets cannot depend on each
+# other — the factory names no browser object and the client depends on the
+# factory — so a rule they share has to sit beneath both. The alternative was
+# a second spelling of "local", which is the one thing decision 0096 forbids:
+# two authorities over one address that can disagree.
+#
+# It names no browser object either, so it costs the factory nothing it did not
+# already carry: //net and //url are the factory's own deps, and the contract
+# is where the length bound lives.
+template("taffy_custom_provider_endpoint_policy") {
+  not_needed(invoker, "*")
+  source_set(target_name) {
+    sources = [
+      "model/custom_provider_endpoint_policy.cc",
+      "model/custom_provider_endpoint_policy.h",
+    ]
+
+    deps = [
+      "//base",
+      "//net",
+      "//taffy/contracts/core-service",
+      "//url",
+    ]
+  }
+}
+
+# Browser-owned projection from a generated Core API intent to generated Core
+# Service commands. It names no platform type and no browser object: it reads
+# bounded intent fields and writes a command, which is why it is a target of
+# its own and why its suite runs on any host.
+template("taffy_core_api_command_factory") {
+  not_needed(invoker, "*")
+  source_set(target_name) {
+    sources = [
+      "core_api/core_api_command_factory.cc",
+      "core_api/core_api_command_factory.h",
+      "core_api/core_api_projected_command.h",
+      "core_api/core_api_command_factory_account.cc",
+      "core_api/core_api_command_factory_artifacts.cc",
+      "core_api/core_api_command_factory_assets.cc",
+      "core_api/core_api_command_factory_composer.cc",
+      "core_api/core_api_command_factory_field_values.cc",
+      "core_api/core_api_command_factory_memory.cc",
+      "core_api/core_api_command_factory_provider.cc",
+      "core_api/core_api_command_factory_provider_custom.cc",
+      "core_api/core_api_command_factory_provider_internal.h",
+      "core_api/core_api_command_factory_skills.cc",
+      "core_api/core_api_command_factory_start_task.cc",
+      "core_api/core_api_start_task_shape.cc",
+      "core_api/core_api_start_task_shape.h",
+      "core_api/core_api_command_factory_tasks.cc",
+      "core_api/core_api_command_factory_workspace.cc",
+      "core_api/task_consent_shape.cc",
+      "core_api/task_consent_shape.h",
+      "core_api/task_workflow_tools.cc",
+      "core_api/task_workflow_tools.h",
+      "generated/product_capabilities.cc",
+      "generated/product_capabilities.h",
+    ]
+    public_configs = [ "//taffy/browser:product_capability_profile" ]
+    deps = [
+      "//base",
+
+      # core_api_command_factory_provider.cc classifies a provider endpoint, and
+      # decision 0049 assigns that refusal to the browser. It is done with GURL
+      # and net::IPAddress rather than with string patterns because the patterns
+      # are the part that gets it wrong: https://0x7f.1/ and https://2130706433/
+      # are both 127.0.0.1 once canonicalized, and
+      # https://[::ffff:169.254.169.254]/ is the link-local metadata address
+      # wearing IPv6. Both headers are already allowed by this directory's DEPS.
+      "//net",
+      "//url",
+
+      # The other endpoint rule — the one for an address a person typed
+      # themselves (decision 0096 section 3). It is a dependency rather than a
+      # second copy of the same reasoning, and it is deliberately not the rule
+      # above it: the catalog rule judges an address, this one decides what may
+      # enter the register, and relaxing either must not relax the other.
+      ":custom_provider_endpoint_policy",
+      "//taffy/contracts/core-api",
+      "//taffy/contracts/core-service",
+    ]
+  }
+}

@@ -1,0 +1,63 @@
+From aab4bbce6787ccc4845c48cd9081796f868f527b Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sat, 29 Aug 2026 14:18:46 +0530
+Subject: create the Ads and trackers cosmetic-filter render frame observer
+
+RenderFrameCreated is the embedder's one notification that a frame exists.
+Construct CosmeticFilterRenderFrameObserver beside the page-intelligence
+observer so hide stylesheets and the class/id pump run in every frame.
+DEPS admits the component; BUILD.gn links it. The observer deletes itself
+in OnDestruct(). Policy stays downstream.
+
+Needed by: CAP-BR-022, decision 0086.
+Retirement: permanent while Ads and trackers cosmetics exist.
+
+Taffy-Patch: 0035
+
+diff --git a/chrome/renderer/BUILD.gn b/chrome/renderer/BUILD.gn
+index ab3c1e6f1146e..1834210e9b5bc 100644
+--- a/chrome/renderer/BUILD.gn
++++ b/chrome/renderer/BUILD.gn
+@@ -182,6 +182,7 @@ static_library("renderer") {
+     "//components/supervised_user/core/common:buildflags",
+     "//components/surface_embed/common",
+     "//components/surface_embed/renderer",
++    "//taffy/components/filtering/renderer:renderer",
+     "//taffy/renderer",
+     "//components/translate/content/renderer",
+     "//components/translate/core/common",
+diff --git a/chrome/renderer/DEPS b/chrome/renderer/DEPS
+index 3688e876b92ce..9a1e09b7251be 100644
+--- a/chrome/renderer/DEPS
++++ b/chrome/renderer/DEPS
+@@ -80,6 +80,7 @@ include_rules = [
+   "+components/surface_embed/common",
+   "+components/surface_embed/renderer",
+   "+components/sync/base/features.h",
++  "+taffy/components/filtering/renderer",
+   "+taffy/renderer",
+   "+components/translate/content/common",
+   "+components/translate/content/renderer",
+diff --git a/chrome/renderer/chrome_content_renderer_client.cc b/chrome/renderer/chrome_content_renderer_client.cc
+index ec3103056223d..045e2fe57c90f 100644
+--- a/chrome/renderer/chrome_content_renderer_client.cc
++++ b/chrome/renderer/chrome_content_renderer_client.cc
+@@ -122,6 +122,7 @@
+ #include "components/subresource_filter/core/common/common_features.h"
+ #include "components/surface_embed/common/features.h"
+ #include "components/surface_embed/renderer/create_plugin.h"
++#include "taffy/components/filtering/renderer/cosmetic_filter_render_frame_observer.h"
+ #include "taffy/renderer/taffy_render_frame_observer.h"
+ #include "components/variations/net/variations_http_headers.h"
+ #include "components/variations/variations_switches.h"
+@@ -689,6 +690,10 @@ void ChromeContentRendererClient::RenderFrameCreated(
+   // //taffy/components/intelligence/content/frame_inclusion_policy.cc, not here.
+   new taffy::TaffyRenderFrameObserver(render_frame);
+ 
++  // Self-deleting in OnDestruct(). Posture, $document and $generichide are
++  // decided in //taffy/components/filtering/browser, not here.
++  new taffy::filtering::CosmeticFilterRenderFrameObserver(render_frame);
++
+   new security_interstitials::SecurityInterstitialPageControllerDelegateImpl(
+       render_frame);
+ 

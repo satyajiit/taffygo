@@ -1,0 +1,42 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="media-elements">
+<title>Media elements</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Media elements</h1>
+  <p class="who">Audio, an inline vector image, and a canvas whose pixels carry
+  text that exists nowhere in the document.</p>
+</header>
+
+<h2>Audio</h2>
+<audio id="tone" controls preload="none" src="/media/tone.wav"></audio>
+<p class="note">A quarter second of a fixed tone. A timestamp inside it is a source
+locator, not something to act on.</p>
+
+<h2>Vector image</h2>
+<img id="diagram" src="/media/diagram.svg" width="320" height="120"
+     alt="Bar chart: Lumen Arc 620 lux, Lumen Flat 430 lux, ceiling light 180 lux">
+
+<h2>Canvas</h2>
+<canvas id="canvas-facts" width="360" height="90" aria-label="Canvas showing the extended warranty price"></canvas>
+<p class="note" id="canvas-note">The canvas text is pixels only. There is no
+semantic graph behind it, and no adapter may invent one.</p>
+
+<script>
+  (function () {
+    "use strict";
+    var canvas = document.getElementById("canvas-facts");
+    var context = canvas.getContext("2d");
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = "#16181d";
+    context.font = "16px sans-serif";
+    context.fillText("Extended warranty: $19.00", 12, 32);
+    context.fillText("Only readable as pixels", 12, 62);
+  })();
+</script>

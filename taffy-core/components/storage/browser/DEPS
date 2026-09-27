@@ -1,0 +1,19 @@
+include_rules = [
+  "+base",
+  "+sql",
+  "+taffy/components/storage/browser",
+  "+taffy/contracts/core-service",
+
+  "-chrome",
+  "-content",
+  "-net",
+  "-services/network",
+  "-ui",
+]
+
+specific_include_rules = {
+  ".*_unittest\\.(cc|h)": [
+    "+base/test",
+    "+testing/gtest",
+  ],
+}

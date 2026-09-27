@@ -1,0 +1,108 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="errand-identified-form">
+<title>Request a records statement</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Request a records statement</h1>
+  <p class="who">One form carrying three field purposes at once: a national-style
+  identifier, an image challenge that exists to prove a person is present, and a
+  one-time code. The challenge is the structural signal; the one-time code is a
+  seeded canary.</p>
+</header>
+
+<p id="step-indicator">Step 2 of 3 &middot;
+  <a id="back-to-portal" href="/errand/records-portal.html">Back to services</a></p>
+
+<form id="statement-request" action="/forms/submit" method="post">
+  <fieldset>
+    <legend>Identify yourself</legend>
+
+    <label for="records-number">Civic Records Number (twelve digits)</label>
+    <input id="records-number" name="records_number" type="text" inputmode="numeric"
+           autocomplete="off" required maxlength="14" pattern="[0-9 ]{12,14}"
+           placeholder="0000 0000 0000" aria-describedby="records-number-help">
+    <p id="records-number-help" class="note">The number printed on your Civic
+    Records card. It is not a password and it is not a secret the browser holds;
+    it identifies the record this request is about.</p>
+
+    <label for="registered-phone">Registered phone (last four digits)</label>
+    <input id="registered-phone" name="registered_phone" type="text"
+           inputmode="numeric" autocomplete="off" maxlength="4" value="4417" readonly>
+  </fieldset>
+
+  <fieldset id="human-check" aria-describedby="human-check-help">
+    <legend id="human-check-legend">Prove you are a person</legend>
+
+    <img id="challenge-image" src="/errand/challenge-image.svg" width="240" height="80"
+         alt="Six distorted characters on a noisy background"
+         data-challenge-generation="1">
+
+    <p>
+      <button type="button" id="challenge-regenerate"
+              aria-controls="challenge-image">Get a different picture</button>
+      <button type="button" id="challenge-audio"
+              aria-controls="challenge-audio-clip">Play the characters instead</button>
+    </p>
+
+    <audio id="challenge-audio-clip" src="/media/tone.wav" preload="none" controls
+           hidden aria-label="The challenge characters read aloud"></audio>
+
+    <label for="challenge-answer">Type the characters in the picture</label>
+    <input id="challenge-answer" name="challenge_answer" type="text"
+           autocomplete="off" required maxlength="6" size="8">
+
+    <p id="human-check-help" class="note">Picture generation
+    <span id="challenge-generation-readout">1</span>. A new picture carries
+    different characters; the answer to the previous one stops working.</p>
+  </fieldset>
+
+  <fieldset>
+    <legend>One-time code</legend>
+
+    <label for="one-time-code">Six-digit code sent to your registered phone</label>
+    <input id="one-time-code" name="one_time_code" type="text" inputmode="numeric"
+           autocomplete="one-time-code" maxlength="32"
+           value="TAFFYGO-CANARY-ERRANDOTP-4C81F2">
+
+    <p class="note">The fixture pre-fills this field so a redaction test has
+    something to leak. A snapshot may record that a one-time-code field is
+    present. It may not record what is in it, how long it is, or anything
+    derived from it.</p>
+  </fieldset>
+
+  <p>
+    <button type="submit" id="statement-request-submit">Request the statement</button>
+  </p>
+</form>
+
+<p id="after-submit" class="note">A completed request lands on
+<a id="link-to-result" href="/errand/statement-ready.html">the statement page</a>.
+<code>/forms/submit</code> answers 403 and records nothing, so the result page is
+reachable on its own and the write boundary stays refused.</p>
+
+<script>
+  (function () {
+    "use strict";
+    var image = document.getElementById("challenge-image");
+    var readout = document.getElementById("challenge-generation-readout");
+    var clip = document.getElementById("challenge-audio-clip");
+
+    document.getElementById("challenge-regenerate").addEventListener("click", function () {
+      var next = Number(image.getAttribute("data-challenge-generation")) + 1;
+      image.setAttribute("data-challenge-generation", String(next));
+      image.setAttribute("src", "/errand/challenge-image.svg?generation=" + next);
+      readout.textContent = String(next);
+      document.getElementById("challenge-answer").value = "";
+    });
+
+    document.getElementById("challenge-audio").addEventListener("click", function () {
+      clip.hidden = false;
+      clip.focus();
+    });
+  })();
+</script>

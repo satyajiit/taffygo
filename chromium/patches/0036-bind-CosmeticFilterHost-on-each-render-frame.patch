@@ -1,0 +1,37 @@
+From 2bb93b68092ae5fbee4b02ac99491deb3577e51f Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sat, 29 Aug 2026 14:18:46 +0530
+Subject: bind CosmeticFilterHost on each render frame
+
+Cosmetic filtering is the inverse of BIP: the renderer holds the
+associated remote and the browser implements the host. Register the
+binder on the frame's associated interface registry. Policy lives in
+taffy::BindCosmeticFilterHost (GetForProfileIfExists).
+
+Needed by: CAP-BR-022, decision 0086.
+Retirement: permanent while Ads and trackers cosmetics exist.
+
+Taffy-Patch: 0036
+
+diff --git a/chrome/browser/chrome_content_browser_client_receiver_bindings.cc b/chrome/browser/chrome_content_browser_client_receiver_bindings.cc
+index 7d83cf933b630..6cf53712f067f 100644
+--- a/chrome/browser/chrome_content_browser_client_receiver_bindings.cc
++++ b/chrome/browser/chrome_content_browser_client_receiver_bindings.cc
+@@ -13,6 +13,7 @@
+ #include "chrome/browser/chrome_browser_interface_binders_webui.h"
+ #include "chrome/browser/chrome_content_browser_client.h"
+ #include "chrome/browser/chrome_content_browser_client_parts.h"
++#include "taffy/browser/cosmetic_filter_bindings.h"
+ #include "chrome/browser/content_settings/content_settings_manager_delegate.h"
+ #include "chrome/browser/headless/headless_mode_util.h"
+ #include "chrome/browser/net/net_error_tab_helper.h"
+@@ -406,6 +407,9 @@ void ChromeContentBrowserClient::
+                                                      associated_registry);
+   }
+ 
++  associated_registry.AddInterface<taffy::filtering::mojom::CosmeticFilterHost>(
++      base::BindRepeating(&taffy::BindCosmeticFilterHost, &render_frame_host));
++
+   associated_registry.AddInterface<autofill::mojom::AutofillDriver>(
+       base::BindRepeating(
+           &autofill::ContentAutofillDriverFactory::BindAutofillDriver,

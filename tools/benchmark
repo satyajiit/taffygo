@@ -1,0 +1,578 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/benchmark — run a versioned suite of the Task Benchmark.
+#
+# The benchmark is defined by docs/quality/benchmark-corpus.md and its pass
+# values live only in docs/quality/metrics.md. This command owns neither: it
+# resolves the corpus, proves the inputs are intact, runs the suite, and writes
+# the report. Numbers are never restated here.
+#
+# A benchmark is a measurement instrument. It therefore refuses to produce a
+# result it did not measure. Two different things can be missing, and the
+# command says which:
+#
+#   the corpus is absent      — nothing to select from, so there is no suite;
+#   the corpus is present     — it is loaded, self-checked and counted, and the
+#                               command still stops unless this host can drive
+#                               the run: an attached device, the profile its
+#                               ABI requires, and a Chromium checkout holding
+#                               the built suites. Loading is not measuring, and
+#                               an empty run is not a passing run.
+#
+# When those three are present the command hands the selection to
+# tools/benchmark.d/run.py, which is the only thing here that can report a
+# result, and passes its exit status back unchanged. `production` additionally
+# refuses without --matrix: without the ratified matrix (OD-017) a run cannot
+# say which devices it is evidence for, so it is not a production result.
+#
+# Exit codes: 0 = the suite ran and passed, 1 = it failed or could not run.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/versions.sh"
+
+# Local interface timing has its own report and never enters Task Benchmark
+# scoring or release evidence. It needs no Chromium checkout or device.
+if [ "${1:-}" = "--local-loop" ]; then
+  shift
+  require_cmd python3 "install Python 3 to measure local loop interfaces"
+  exec python3 "$TAFFY_ROOT/tools/benchmark.d/local_loop.py" "$@"
+fi
+
+# name|what it covers
+BENCHMARK_SUITES='production|every scenario in the corpus, on the reference device matrix (unratified: OD-017)
+affected|only the scenarios a change touches, for the Chromium integration loop'
+
+SUITE=''
+LIST=0
+EVIDENCE=''
+FRAGMENT=''
+SINCE=''
+MATRIX=''
+SAMPLES=0
+RUN_DEVICE=''
+RUN_PROFILE=''
+BENCH_SERIAL=''
+BENCH_PROFILE=''
+BENCH_SRC=''
+CORPUS="$TAFFY_ROOT/test-fixtures/tasks"
+FIXTURES="$TAFFY_ROOT/test-fixtures/web"
+REPORTS="$TAFFY_ROOT/benchmark-results"
+RESOLVER="$TAFFY_ROOT/tools/benchmark.d/corpus.py"
+
+BENCH_TMP=$(mktemp -d "${TMPDIR:-/tmp}/taffy-benchmark.XXXXXX")
+trap 'rm -rf "$BENCH_TMP"' EXIT
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/benchmark --suite <production|affected> [options]
+       ./tools/benchmark --local-loop --output FILE [--cpu N] [--trials N]
+
+The local-loop path measures release-mode host interfaces only. Its separate
+report includes raw samples and host/build identity; it is not a device Task
+Benchmark result. Use --local-loop --help for workload and sampling options.
+
+Suites:
+  production   every scenario in the corpus, on the reference device matrix.
+               No matrix is ratified yet — it is open under OD-017 — so this
+               suite describes what it will cover, not what it has covered.
+  affected     only the scenarios a change touches (the Chromium integration loop)
+
+Options:
+  --list          print every suite, what it selects, and whether it can run here
+  --corpus PATH   scenario corpus root (default: test-fixtures/tasks)
+  --since REF     the change set the "affected" suite selects against, as a Git
+                  ref: every scenario whose directory or page fixtures changed
+                  since REF, plus every scenario when the corpus contract itself
+                  changed
+  --device SERIAL drive the run on exactly this adb device; required when more
+                  than one is attached
+  --profile NAME  build profile to take the suites from (default: the one this
+                  device's ABI requires — dev-arm64 or dev-x64)
+  --matrix FILE   the ratified device matrix a "production" run is evidence
+                  for. That matrix is open under OD-017, so there is nothing to
+                  pass yet and "production" refuses without it
+  --samples N     samples per scenario (default: enough to reach the report
+                  floor across the selection)
+  --evidence FILE write the run's evidence record here, as JSON
+  --fragment FILE write the release-manifest fragment that cites it
+  -h, --help      show this help
+
+The evidence record is not a result. It records which corpus versions were
+verified, on which host, what each suite selected, and which suites could not
+run and why. A release manifest cites it (tests.benchmark_evidence) so that a
+reader can tell the difference between "the benchmark passed" and "the benchmark
+was not run", which is exactly the distinction an artifact manifest exists to
+preserve.
+
+Inputs, and who owns them:
+  job families and labels  docs/quality/benchmark-corpus.md
+  pass values              docs/quality/metrics.md (never restated here)
+  scenarios                test-fixtures/tasks/ (self-checked before any run)
+  page fixtures            test-fixtures/web/ (self-checked before any run)
+  device matrix            OD-017, in docs/open-decisions.md
+
+Network and money: the benchmark never calls a live model and never touches a
+shared database. Scripted model outputs are part of the corpus version, so a
+run is reproducible.
+USAGE
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --suite) SUITE=${2:-}; shift ;;
+    --suite=*) SUITE=${1#*=} ;;
+    --corpus) CORPUS=${2:-}; shift ;;
+    --corpus=*) CORPUS=${1#*=} ;;
+    --since) SINCE=${2:-}; shift ;;
+    --since=*) SINCE=${1#*=} ;;
+    --list) LIST=1 ;;
+    --evidence) EVIDENCE=${2:-}; shift ;;
+    --evidence=*) EVIDENCE=${1#*=} ;;
+    --fragment) FRAGMENT=${2:-}; shift ;;
+    --fragment=*) FRAGMENT=${1#*=} ;;
+    --device) RUN_DEVICE=${2:-}; shift ;;
+    --device=*) RUN_DEVICE=${1#*=} ;;
+    --profile) RUN_PROFILE=${2:-}; shift ;;
+    --profile=*) RUN_PROFILE=${1#*=} ;;
+    --matrix) MATRIX=${2:-}; shift ;;
+    --matrix=*) MATRIX=${1#*=} ;;
+    --samples) SAMPLES=${2:-}; shift ;;
+    --samples=*) SAMPLES=${1#*=} ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage >&2; die "unknown option: $1" ;;
+  esac
+  shift
+done
+
+suite_known() {
+  printf '%s\n' "$BENCHMARK_SUITES" | awk -F'|' -v want="$1" '$1 == want { found = 1 } END { exit !found }'
+}
+
+relative() { printf '%s\n' "${1#"$TAFFY_ROOT"/}"; }
+
+# --- corpus resolution ------------------------------------------------------
+#
+# tools/benchmark.d/corpus.py reads the corpus; test-fixtures/tasks/check.py
+# validates it. This command asks the first for facts and the second for a
+# verdict, and never forms a second opinion of its own about either.
+
+CORPUS_SUMMARY=''
+
+# Caches the resolver's summary once per invocation. Nonzero when the corpus
+# cannot be read at all; callers then fall back on the blocker list, which says
+# why in the words the runner prints.
+corpus_summary() {
+  [ -n "$CORPUS_SUMMARY" ] && return 0
+  have python3 || return 1
+  [ -f "$RESOLVER" ] || return 1
+  if ( cd "$TAFFY_ROOT" && python3 "$RESOLVER" --corpus "$CORPUS" \
+        --repo-root "$TAFFY_ROOT" --mode summary ) > "$BENCH_TMP/summary.tsv" 2>/dev/null; then
+    CORPUS_SUMMARY="$BENCH_TMP/summary.tsv"
+    return 0
+  fi
+  return 1
+}
+
+# corpus_value <key> — every value the summary records for a key, one per line.
+corpus_value() {
+  corpus_summary || return 1
+  awk -F'\t' -v key="$1" '$1 == key { print $2; found = 1 } END { exit !found }' "$CORPUS_SUMMARY"
+}
+
+# The change set the "affected" suite selects against: what moved since the ref,
+# plus anything written but not yet committed. A scenario written and not staged
+# is exactly the material an integration loop exists to catch.
+changed_paths_file() {
+  local out="$BENCH_TMP/changed.txt"
+  {
+    git -C "$TAFFY_ROOT" diff --name-only "$SINCE" -- 2>/dev/null || true
+    git -C "$TAFFY_ROOT" ls-files --others --exclude-standard 2>/dev/null || true
+  } | sed '/^$/d' | sort -u > "$out"
+  printf '%s\n' "$out"
+}
+
+# suite_selection <suite> — the scenario ids the suite would run, one per line.
+suite_selection() {
+  local suite=$1
+  have python3 || return 1
+  [ -f "$RESOLVER" ] || return 1
+  case "$suite" in
+    affected)
+      [ -n "$SINCE" ] || return 1
+      ( cd "$TAFFY_ROOT" && python3 "$RESOLVER" --corpus "$CORPUS" --repo-root "$TAFFY_ROOT" \
+          --mode select --suite affected --changed "$(changed_paths_file)" ) 2>/dev/null
+      ;;
+    *)
+      ( cd "$TAFFY_ROOT" && python3 "$RESOLVER" --corpus "$CORPUS" --repo-root "$TAFFY_ROOT" \
+          --mode select --suite "$suite" ) 2>/dev/null
+      ;;
+  esac
+}
+
+# `set -o pipefail` is on, and a suite that cannot select returns nonzero on the
+# left of this pipe. The count is still correct — zero — so the caller gets a
+# number rather than a dead shell, and the *reason* stays where it belongs, in
+# suite_blockers.
+suite_selection_count() { suite_selection "$1" | awk 'END { print NR + 0 }' || true; }
+
+# What is missing before a suite can select anything, one reason per line. This
+# is about inputs only: a suite with no blockers has everything it needs to
+# choose scenarios, which is a different and much weaker claim than being able
+# to run them.
+suite_blockers() { # <suite>
+  [ -d "$CORPUS" ] || printf 'the scenario corpus directory %s does not exist\n' "$(relative "$CORPUS")"
+  [ -f "$CORPUS/manifest.json" ] || printf 'no scenario manifest at %s/manifest.json\n' "$(relative "$CORPUS")"
+  [ -f "$CORPUS/check.py" ] || printf 'the scenario corpus has no self-check at %s/check.py\n' "$(relative "$CORPUS")"
+  [ -f "$FIXTURES/manifest.json" ] || printf 'the page fixture corpus test-fixtures/web/ is not present\n'
+  case "$1" in
+    affected)
+      if [ -z "$SINCE" ]; then
+        printf 'no change set: pass --since <git-ref> so the suite can select the scenarios a change touches\n'
+      elif ! git -C "$TAFFY_ROOT" rev-parse --verify --quiet "$SINCE^{commit}" >/dev/null 2>&1; then
+        # Without this, an unresolvable ref produces an empty change set, which
+        # reads exactly like "nothing changed" — a suite that silently selects
+        # nothing is worse than one that refuses.
+        printf 'the change set --since %s does not resolve to a commit in this checkout\n' "$SINCE"
+      fi
+      ;;
+  esac
+  return 0
+}
+
+# Why no suite executes here, in the corpus's own words where it has them.
+execution_needs() {
+  corpus_value execution_needs 2>/dev/null || cat <<'NEEDS'
+an installed TaffyGo package to drive the page corpus, which milestone M2 delivers
+a device from the reference device matrix, which is open under OD-017
+the run's audit stream read back, which most expected facts are checked against
+NEEDS
+}
+
+resolved_state() {
+  local version corpusname devices line
+  step "benchmark: resolved state"
+  if [ -f "$FIXTURES/manifest.json" ]; then
+    corpusname=$(taffy_version_value json "$FIXTURES/manifest.json" corpus 2>/dev/null || printf 'unknown')
+    version=$(taffy_version_value json "$FIXTURES/manifest.json" version 2>/dev/null || printf 'unknown')
+    note "page fixtures    $corpusname version $version (test-fixtures/web/)"
+  else
+    note "page fixtures    absent"
+  fi
+  if corpus_summary; then
+    note "scenario corpus  $(corpus_value corpus) version $(corpus_value version) ($(relative "$CORPUS")/)"
+    note "                 $(corpus_value scenarios) scenarios, $(corpus_value job_families) job families, $(corpus_value page_fixtures_used) page fixtures referenced"
+    note "                 by job family: $(corpus_value by_job_family)"
+    note "                 by expected outcome: $(corpus_value by_expected_outcome)"
+    note "                 pins page corpus $(corpus_value page_corpus) version $(corpus_value page_corpus_version)"
+    note "                 scripted model outputs: $(corpus_value scripted_model_outputs)"
+  else
+    note "scenario corpus  $(relative "$CORPUS") — not readable"
+    suite_blockers production | while IFS= read -r line; do
+      [ -n "$line" ] && note "                 $line"
+    done
+  fi
+  note "reports          $(relative "$REPORTS")"
+  if have adb; then
+    devices=$(adb devices 2>/dev/null | awk 'NR>1 && NF { print $1 }' | tr '\n' ' ' | sed 's/ $//')
+    note "devices          ${devices:-none attached}"
+  else
+    note "devices          adb not installed"
+  fi
+  note "report floor     see docs/quality/benchmark-corpus.md section 4"
+  return 0
+}
+
+cmd_list() {
+  step "benchmark: suites"
+  local name what blockers count line
+  printf '%s\n' "$BENCHMARK_SUITES" | while IFS='|' read -r name what; do
+    [ -n "$name" ] || continue
+    blockers=$(suite_blockers "$name")
+    if [ -n "$blockers" ]; then
+      warn "$name — cannot select: $(printf '%s' "$blockers" | head -n 1)"
+      note "$what"
+    else
+      count=$(suite_selection_count "$name")
+      ok "$name — selects $count of $(corpus_value scenarios) scenario(s), across $(corpus_value job_families) job families"
+      note "$what"
+    fi
+  done
+  # Whether a suite can be *driven* here is a different question from whether
+  # it can select, and the answer changed the moment this command learned to
+  # invoke tools/benchmark.d/run.py. Asking it rather than asserting the old
+  # answer is what keeps this line from becoming false on a builder.
+  if benchmark_device_ready; then
+    ok "this host can drive a run: $BENCH_SERIAL, profile $BENCH_PROFILE, suites from $BENCH_SRC"
+    note "\"affected\" needs --since <ref>; \"production\" additionally needs --matrix, which OD-017 has not ratified."
+  else
+    warn "no suite is executable on this host, whatever it selects"
+    execution_needs | while IFS= read -r line; do
+      [ -n "$line" ] && note "needs: $line"
+    done
+  fi
+  note "Selecting scenarios is not running them, and this command will not report a run it did not measure."
+  return 0
+}
+
+# Proves the inputs a run depends on are intact before anything is measured. A
+# benchmark against a drifted corpus produces numbers that mean nothing. Each
+# corpus is verified by its own self-check, never by a copy of its rules here.
+preflight() {
+  step "benchmark: input integrity"
+  have python3 || die "python3 is required to verify the corpora" \
+    "It is a host tool here, unrelated to decision 0007's utility service."
+
+  if [ ! -f "$FIXTURES/check.py" ]; then
+    die "the page fixture corpus has no self-check" \
+      "test-fixtures/web/check.py is what makes a corpus version meaningful."
+  fi
+  note "\$ python3 test-fixtures/web/check.py"
+  if ( cd "$TAFFY_ROOT" && python3 test-fixtures/web/check.py ); then
+    ok "page fixture corpus intact"
+  else
+    die "the page fixture corpus does not match its manifest" \
+      "Fix the corpus before measuring anything against it; a fixture change is a version bump."
+  fi
+
+  if [ ! -f "$CORPUS/check.py" ]; then
+    warn "the scenario corpus at $(relative "$CORPUS") has no self-check"
+    note "A corpus that cannot verify itself cannot make its version mean anything."
+    return 0
+  fi
+  note "\$ python3 $(relative "$CORPUS")/check.py"
+  if ( cd "$TAFFY_ROOT" && python3 "$CORPUS/check.py" ); then
+    ok "scenario corpus intact"
+  else
+    die "the scenario corpus does not hold together" \
+      "Fix it before measuring anything against it; a scenario change is a version bump."
+  fi
+  return 0
+}
+
+# The record of what was verified and what could not run. It is deliberately
+# not a result: `measured` is false until a scenario actually executes against
+# an installed build, and the release manifest carries that distinction into
+# the evidence trail rather than losing it.
+write_evidence() { # <suite-or-empty> <self-check-state>
+  [ -n "$EVIDENCE$FRAGMENT" ] || return 0
+  local suite=${1:-}
+  B_SUITE=$suite
+  # The record says what actually happened on this run. `--list` does not verify
+  # the corpora, so it must not leave a record claiming it did.
+  B_SELF_CHECK=${2:-not-run}
+  B_CORPUS_DIR=$(relative "$CORPUS")
+  B_FIXTURES_MANIFEST="$FIXTURES/manifest.json"
+  B_HOST="$(taffy_os)/$(taffy_arch)"
+  B_CORPUS_NAME=$(taffy_version_value json "$FIXTURES/manifest.json" corpus 2>/dev/null || printf '')
+  B_CORPUS_VERSION=$(taffy_version_value json "$FIXTURES/manifest.json" version 2>/dev/null || printf '')
+  B_SCENARIO_SUMMARY=''
+  if corpus_summary; then
+    B_SCENARIO_SUMMARY=$(cat "$CORPUS_SUMMARY")
+  fi
+  B_BLOCKERS=''
+  local name what
+  while IFS='|' read -r name what; do
+    [ -n "$name" ] || continue
+    : "$what"
+    B_BLOCKERS="${B_BLOCKERS}${name}	$(suite_blockers "$name" | tr '\n' ';')	$(suite_selection_count "$name")
+"
+  done <<EOF
+$BENCHMARK_SUITES
+EOF
+  if have adb; then
+    B_DEVICES=$(adb devices 2>/dev/null | awk 'NR>1 && NF { print $1 }' | tr '\n' ' ')
+  else
+    B_DEVICES=''
+  fi
+  B_EVIDENCE=$EVIDENCE
+  B_FRAGMENT=$FRAGMENT
+  export B_SUITE B_SELF_CHECK B_CORPUS_DIR B_FIXTURES_MANIFEST B_HOST B_CORPUS_NAME \
+    B_CORPUS_VERSION B_SCENARIO_SUMMARY B_BLOCKERS B_DEVICES B_EVIDENCE B_FRAGMENT
+  python3 "$TAFFY_ROOT/tools/benchmark.d/evidence.py"
+  [ -n "$EVIDENCE" ] && ok "evidence record: $(relative "$EVIDENCE")"
+  [ -n "$FRAGMENT" ] && ok "manifest fragment: $(relative "$FRAGMENT")"
+  return 0
+}
+
+# --- a measured run ---------------------------------------------------------
+#
+# Everything above resolves and verifies inputs. This is the only part of the
+# command that can produce a result, and it produces one by handing the facts
+# to tools/benchmark.d/run.py, which selects, installs, launches both adapters,
+# scores every sample and writes the evidence record. Its exit status is passed
+# back unchanged: a suite that ran and did not pass must never become a zero
+# here, and a suite that did not run must never become a report.
+
+# Whether this host can drive a run, and against what.
+#
+# Three facts are needed and each is refused rather than guessed: one attached
+# device (two is a question, not a default), the profile that device's ABI
+# requires, and a recorded Chromium checkout, because the suites a run drives
+# are built there and nowhere else. A "no" here is not an error — it is the
+# ordinary state of a documentation host — so it prints a note only when the
+# reason is something the caller can act on.
+benchmark_device_ready() {
+  local devices count abi workspace
+  BENCH_SERIAL=''
+  BENCH_PROFILE=''
+  BENCH_SRC=''
+  have adb || return 1
+  devices=$(adb devices 2>/dev/null | awk 'NR > 1 && $2 == "device" { print $1 }')
+  if [ -n "$RUN_DEVICE" ]; then
+    if ! printf '%s\n' "$devices" | grep -Fqx "$RUN_DEVICE"; then
+      note "--device $RUN_DEVICE is not online and authorized according to adb devices"
+      return 1
+    fi
+    BENCH_SERIAL=$RUN_DEVICE
+  else
+    count=$(printf '%s\n' "$devices" | awk 'NF { n += 1 } END { print n + 0 }')
+    case "$count" in
+      0) return 1 ;;
+      1) BENCH_SERIAL=$devices ;;
+      *)
+        note "$count devices are attached; name one with --device <serial> to drive a run"
+        return 1
+        ;;
+    esac
+  fi
+  abi=$(adb -s "$BENCH_SERIAL" shell getprop ro.product.cpu.abi 2>/dev/null \
+        | tr -d '\r[:space:]')
+  case "$abi" in
+    arm64-v8a) BENCH_PROFILE=dev-arm64 ;;
+    x86_64) BENCH_PROFILE=dev-x64 ;;
+    *)
+      note "$BENCH_SERIAL reports ABI '$abi'; the committed profiles cover arm64-v8a and x86_64"
+      return 1
+      ;;
+  esac
+  [ -n "$RUN_PROFILE" ] && BENCH_PROFILE=$RUN_PROFILE
+  workspace=${TAFFY_CHROMIUM_WORKSPACE:-$(taffy_state_get chromium_workspace "")}
+  if [ -z "$workspace" ] || [ ! -d "$workspace/src" ]; then
+    note "a device is attached, but no Chromium checkout is recorded, so the built suites a run drives are not on this host"
+    note "Run: ./tools/bootstrap --profile chromium --workspace <path>, then ./tools/chromium/sync"
+    return 1
+  fi
+  BENCH_SRC="$workspace/src"
+  return 0
+}
+
+benchmark_execute() { # <suite>
+  local suite=$1 selection status=0
+  selection="$BENCH_TMP/selection.txt"
+  if ! suite_selection "$suite" > "$selection"; then
+    die "the \"$suite\" suite listed its scenarios once and then could not list them again" \
+      "Nothing was run. Re-run the command; if it repeats, the corpus changed underneath it."
+  fi
+
+  step "benchmark: measured run of \"$suite\" on $BENCH_SERIAL ($BENCH_PROFILE)"
+  note "\$ python3 tools/benchmark.d/run.py --suite $suite --profile $BENCH_PROFILE --device $BENCH_SERIAL"
+  python3 "$TAFFY_ROOT/tools/benchmark.d/run.py" \
+    --repo-root "$TAFFY_ROOT" \
+    --chromium-src "$BENCH_SRC" \
+    --corpus "$CORPUS" \
+    --web "$FIXTURES" \
+    --selection "$selection" \
+    --suite "$suite" \
+    --profile "$BENCH_PROFILE" \
+    --device "$BENCH_SERIAL" \
+    --samples "$SAMPLES" \
+    --matrix "$MATRIX" \
+    --reports "$REPORTS" \
+    --evidence "$EVIDENCE" \
+    --fragment "$FRAGMENT" || status=$?
+  if [ "$status" -eq 0 ]; then
+    ok "the \"$suite\" suite ran and every selected scenario passed"
+  else
+    bad "the \"$suite\" suite did not produce a passing measured result"
+    note "The evidence record run.py just named says which: \`measured\` is whether any scenario executed, and \`blockers\` is why not."
+  fi
+  return "$status"
+}
+
+cmd_run() { # <suite>
+  local suite=$1 blockers count line status=0
+  resolved_state
+  preflight
+  write_evidence "$suite" passed
+
+  step "benchmark: suite \"$suite\""
+  blockers=$(suite_blockers "$suite")
+  if [ -n "$blockers" ]; then
+    printf '%s\n' "$blockers" | while IFS= read -r line; do
+      [ -n "$line" ] && bad "$line"
+    done
+    if corpus_summary; then
+      die "the \"$suite\" suite cannot select, so there is no result to report" \
+        "The corpus at $(relative "$CORPUS") resolved; this suite is missing something" \
+        "of its own, named above. Supply it and re-run." \
+        "This command will not emit an empty report and call it a benchmark."
+    fi
+    die "the \"$suite\" suite has nothing to run, so there is no result to report" \
+      "The scenario corpus — the job, fixture and expected-outcome triples of" \
+      "docs/quality/benchmark-corpus.md sections 2, 3 and 6 — could not be resolved" \
+      "at $(relative "$CORPUS"). It is ratified at M0 under OD-004; point --corpus at" \
+      "it, or supply what the suite says is missing." \
+      "This command will not emit an empty report and call it a benchmark."
+  fi
+
+  count=$(suite_selection_count "$suite")
+  ok "corpus loaded and validated: $count of $(corpus_value scenarios) scenario(s) selected"
+  note "by job family: $(corpus_value by_job_family)"
+  note "by expected outcome: $(corpus_value by_expected_outcome)"
+  note "scripted model outputs: $(corpus_value scripted_model_outputs)"
+
+  # The one path that can report a result. Everything after it is the refusal,
+  # unchanged: a host that cannot drive a run says so and exits 1, and so does
+  # a run that ran and did not pass.
+  if benchmark_device_ready; then
+    if [ "$count" -eq 0 ]; then
+      bad "the selection is empty"
+      die "the \"$suite\" suite selected no scenario, so there is nothing to measure" \
+        "This host can drive a run; the change set simply touches no scenario." \
+        "A run of nothing is not a passing run, and this command will not record one." \
+        "Widen --since, or use --suite production for the whole corpus."
+    fi
+    if [ "$suite" = production ] && [ -z "$MATRIX" ]; then
+      bad "no ratified device matrix was given"
+      die "the \"production\" suite will not run without --matrix FILE" \
+        "A production result has to name the devices it is evidence for, and the" \
+        "reference matrix is open under OD-017. There is nothing to pass yet." \
+        "Use --suite affected, which is the integration loop and claims no matrix."
+    fi
+    benchmark_execute "$suite" || status=$?
+    exit "$status"
+  fi
+
+  execution_needs | while IFS= read -r line; do
+    [ -n "$line" ] && bad "missing: $line"
+  done
+  die "the corpus is loadable and validated, and this host cannot execute it" \
+    "Executing a scenario means driving the installed TaffyGo package on a device" \
+    "from the ratified matrix (OD-017) and reading its audit stream back, which is" \
+    "where every expected fact that is not a page field is checked. That path" \
+    "arrives with the browser itself; until then this command verifies the inputs," \
+    "counts what a suite would select, and stops. Emitting a report it did not" \
+    "measure would be a fabrication." \
+    "Corpus read: $(relative "$CORPUS") ($(corpus_value corpus) version $(corpus_value version))"
+}
+
+if [ "$LIST" = 1 ]; then
+  resolved_state
+  cmd_list
+  write_evidence ''
+  exit 0
+fi
+
+[ -n "$SUITE" ] || { usage >&2; die "--suite is required" "Use --list to see the suites."; }
+suite_known "$SUITE" || die "unknown suite: $SUITE" \
+  "Known suites: $(printf '%s\n' "$BENCHMARK_SUITES" | awk -F'|' '{ printf "%s ", $1 }')"
+
+cmd_run "$SUITE"

@@ -1,0 +1,316 @@
+# The browser-process half of //taffy.
+#
+# //components layering: this directory may use //content/public/browser
+# because it is browser-process code, and it must not be reachable from the
+# renderer. The renderer half lives in //taffy/renderer and the two
+# share exactly one thing — the mojom target.
+#
+# Browser host code is product/embedder code under //taffy, not a reusable
+# Chromium //components leaf. Profile-scoped supervisors may therefore use the
+# narrow profile and keyed-service ownership APIs. Portable components remain
+# forbidden from depending upward on //chrome by their own DEPS files.
+#
+# Two absences are deliberate:
+#
+#   * no +taffy/renderer. If the broker and the endpoint ever need
+#     to share a type, it belongs in the mojom or in public/, not in a direct
+#     include across the process boundary.
+#   * no broad +chrome. The three profile ownership headers below are the exact
+#     embedder seam used by CoreServiceManager and its factory.
+
+include_rules = [
+  "+base",
+  "+base/android",
+
+  "+chrome/browser/profiles/profile.h",
+  "+chrome/browser/profiles/profile_keyed_service_factory.h",
+  "+chrome/browser/profiles/profile_selections.h",
+  "+components/keyed_service/core",
+
+  # Decision 0019's runtime posture (feature_posture.cc) and its tripwires.
+  # Every rule below names one header, allowed for one reason: the constant
+  # it declares. Naming the upstream constant is what makes a rename a
+  # compile error here instead of a silently revived Google service — the
+  # same rule the probe's switch table follows. None of these allows the
+  # owning component's mechanics; //components/prefs is whole because
+  # PrefRegistry and its stores are the mechanism patch 0016 exists to call.
+  "+components/autofill/core/common/autofill_debug_features.h",
+  "+components/feed/core/shared_prefs/pref_names.h",
+  "+components/feed/feed_feature_list.h",
+  "+components/metrics/server_urls.h",
+  "+components/network_time/network_time_tracker.h",
+  "+components/optimization_guide/core/optimization_guide_features.h",
+  "+components/password_manager/core/common/password_manager_pref_names.h",
+  "+components/prefs",
+  "+components/signin/public/base/signin_pref_names.h",
+  "+components/signin/public/base/signin_switches.h",
+  "+components/translate/core/browser/translate_ranker_impl.h",
+  "+components/user_prefs/user_prefs.h",
+  "+media/base/media_switches.h",
+
+  # PAR-SEC-001's build-time half: whether Safe Browsing is compiled in. The
+  # generated buildflags header only, never the Safe Browsing implementation —
+  # //taffy has no business calling into it, and the reputation
+  # strategy for a Chromium derivative is [Open (OD-053)].
+  # RESOLVED AT SP-01, and narrowly. PAR-SEC-001's switch table needs
+  # switches::kIgnoreCertificateErrors, which this header owns; the alternative
+  # was a second hand-copied string literal, and this file already carries one
+  # of those under protest for a switch //chrome owns. One header, constants
+  # only, no mechanics.
+  "+components/network_session_configurator/common/network_switches.h",
+  "+components/safe_browsing/buildflags.h",
+
+  # PAR-SEC-002's provenance half: the milestone, the tag, the commit, the
+  # patch delta and the security patch level, generated once from
+  # chromium/REVISION and chromium/patches/. Reading it here is what lets one
+  # report answer both "what build is this" and "what did it switch off";
+  # restating any of those values in this directory would be the defect.
+  "+taffy/resources/branding",
+
+  # This directory and its test/ subdirectory. Named explicitly rather than
+  # relied on implicitly, so that the browser tests reaching for the corpus
+  # reader in test/ are a visible allowance rather than an accident of how
+  # checkdeps treats subdirectories.
+  "+taffy/browser",
+  "+taffy/common/public",
+  "+taffy/components/filtering/browser",
+  "+taffy/components/filtering/core",
+  "+taffy/components/filtering/mojom",
+  "+taffy/components/intelligence/content",
+  "+taffy/components/storage/browser",
+  "+taffy/components/security/browser",
+  "+taffy/components/tools/entrypoints",
+  "+taffy/contracts/bip/mojom",
+  "+taffy/contracts/browsing",
+  "+taffy/contracts/core-api",
+  "+taffy/contracts/core-service",
+  "+taffy/services/tool-runtime/supervisor",
+
+  "+content/public/browser",
+
+  # Switch names only — content_switches.h. The browser-process security
+  # posture is read from the command line, and the constants have exactly one
+  # definition, upstream.
+  "+content/public/common",
+
+  "+crypto",
+  "+mojo/public/cpp/bindings",
+
+  # Three narrow uses, each of which would otherwise become a stale copy of an
+  # upstream table inside this directory:
+  #   net/base/net_errors.h                     the navigation error classifier
+  #   net/base/registry_controlled_domains/     the address-bar classifier
+  #   net/cert/cert_status_flags.h              the interstitial classifier
+  #   net/ssl/ssl_info.h                        the committed connection's
+  #                                             certificate status. Itself pulls
+  #                                             in net/cert/cert_status_flags.h,
+  #                                             already allowed above.
+  #   net/http/http_response_headers.h          the committed response code
+  "+net/base",
+  "+net/cert",
+  "+net/ssl",
+  "+net/http",
+
+  # The sandbox switch names, for the same reason as content_switches.h.
+  "+sandbox/policy",
+
+  "+services/network/public/cpp",
+  "+third_party/blink/public/common",
+  "+ui/base",
+  "+url",
+]
+
+specific_include_rules = {
+  # Shared RenderViewHost fixture for source attribution and saved-flow offers.
+  # Only the unit-test target compiles it; production sources gain no test API.
+  "task_source_selection_registry_actions_test_support\\.(cc|h)": [
+    "+content/public/test",
+  ],
+  # Complete, side-effect-free validation against Chromium's stable bookmark
+  # identity invariants. It reads constants only and never mutates the model.
+  "backup_bookmark_forest_validation(_unittest)?\\.(cc|h)": [
+    "+components/bookmarks/browser/bookmark_uuids.h",
+  ],
+  # Typed, local bookmark snapshot reads; no profile factory or disk parser.
+  "backup_bookmark_reader(_unittest)?\\.(cc|h)": [
+    "+components/bookmarks/browser",
+  ],
+  "backup_bookmark_reader_unittest\\.cc": [
+    "+components/bookmarks/test",
+  ],
+  # The dormant target adapter mutates only an already-owned, pristine local
+  # BookmarkModel through its typed API. Its test uses Chromium's test client;
+  # no profile factory or bookmark file parser enters this seam.
+  "backup_bookmark_target_writer(_unittest)?\\.(cc|h)": [
+    "+components/bookmarks/browser",
+  ],
+  "backup_bookmark_target_writer_unittest\\.cc": [
+    "+components/bookmarks/test",
+  ],
+  "backup_browser_preference_reader\\.cc": [
+    "+third_party/icu/source/common/unicode/uloc.h",
+  ],
+  "profile_backup_coordinator_commit_test_fixture\\.h": [
+    "+content/public/test",
+  ],
+  # Shared fixture for the task discovery, landing and effect suites. Only the
+  # unit-test target compiles it; no production source gains a test API.
+  "core_service_manager_task_discovery_test_support\\.(cc|h)": [
+    "+content/public/test",
+  ],
+  # A quarantined restore target must never construct the live Core manager:
+  # bootstrap itself journals initial asset work. The factory consults the
+  # browser-wide physical registry before asking the keyed-service system to
+  # build dependencies or the manager.
+  "core_service_manager_factory\.cc": [
+    "+chrome/browser/browser_process.h",
+  ],
+  # Chromium owns History and Bookmarks. This one file is the entire product
+  # adapter for an attached-store read (decision 0133): it asks the two
+  # services for bounded entries and hands back a title, an address and a
+  # time per entry. browser_shared asserts that neither Chrome target reaches
+  # it; the generic manager sees only the interface.
+  "profile_store/profile_store_reader_chrome\\.cc": [
+    "+chrome/browser/bookmarks/bookmark_model_factory.h",
+    "+chrome/browser/history/history_service_factory.h",
+    "+components/bookmarks/browser",
+    "+components/history/core/browser",
+  ],
+  # Chromium owns saved passwords and address profiles. These two files are
+  # the entire product adapter, projecting bounded metadata without exposing
+  # credential secrets. The generic manager factory sees only their interface;
+  # browser_shared asserts that none of these Chrome targets reaches it.
+  "saved_data/profile_saved_data_(broker|validation)\\.(cc|h)": [
+    "+chrome/browser/affiliations/affiliation_service_factory.h",
+    "+chrome/browser/autofill/personal_data_manager_factory.h",
+    "+chrome/browser/password_manager/factories/account_password_store_factory.h",
+    "+chrome/browser/password_manager/factories/profile_password_store_factory.h",
+    "+components/autofill/core/browser",
+    "+components/autofill/core/browser/field_types.h",
+    "+components/password_manager/core/browser",
+  ],
+  # Exact-node media and person-only challenge capture are browser-owned
+  # platform reads. These two modules may ask the compositor for a bounded
+  # crop; no other browser source gains that mechanism by accident. The media
+  # path places its crop in a one-use model attachment, while the challenge
+  # path can present its crop only to the person's field-value surface.
+  "(page_media_observation|field_challenge_capture)\\.(cc|h)": [
+    "+components/viz/common",
+    "+third_party/skia/include/core",
+    "+ui/gfx/codec",
+    "+ui/gfx/geometry",
+  ],
+  "page_pdf_observation\\.(cc|h)": [
+    "+components/pdf/browser",
+    "+pdf/mojom",
+  ],
+  # The exact task-navigation authority is carried through Chrome's own
+  # NavigationUIData before content registers start throttles. Only the
+  # product-composition adapter creates and reads that carrier; the authority
+  # and throttle stay expressed in content types and browser_shared remains
+  # link-closed for content-shell binaries.
+  "android/task_navigation_authority_chrome\\.(cc|h)": [
+    "+chrome/browser/renderer_host/chrome_navigation_ui_data.h",
+  ],
+  # The witness and its unit test, and nothing else in this directory outside
+  # a browser test. Narrow on purpose, and spelled out file by file rather
+  # than with a prefix wildcard: `taffy_browser_effect_source.*` would hand the
+  # same allowance to the next file that happens to start with that name,
+  # which is the argument this block exists to make somebody write down.
+  #
+  # The general rule below says the download seam talks to a delegate and must
+  # not depend on the download component, because //taffy has no business
+  # owning download mechanics. The witness does not own any: it implements
+  # content::DownloadManager::Observer and download::DownloadItem::Observer and
+  # calls nothing but const accessors on the item it is handed. It starts
+  # nothing, pauses nothing, retargets nothing and opens nothing — every one of
+  # those still goes out through DownloadCommandDelegate.
+  #
+  # A witness with no access to the download system would have to be told what
+  # happened by something else, and the only candidate is the renderer, which
+  # is the claim protocol section 11.6 refuses. So this file reads the download
+  # system directly, and the allowance is by file name so that the next file
+  # that wants it has to argue for it here.
+  #
+  # The third name is the witness's attribution suite. It was split out of the
+  # unit test when that file outgrew the line cap, and it is here for the same
+  # reason the second name is: it drives download::DownloadItem states directly
+  # to assert what the witness will and will not credit to an action. Written
+  # out rather than folded into a wildcard, because a wildcard would hand the
+  # allowance to whatever is added next.
+  "(taffy_browser_effect_source|taffy_browser_effect_source_unittest|taffy_browser_effect_source_attribution_unittest)\.(cc|h)": [
+    "+components/download/public/common",
+  ],
+  # The typed assistant download executor is the sole reviewed mechanics seam.
+  # It creates frame-associated DownloadUrlParameters, asks the profile's
+  # DownloadManager to run Chromium's ordinary safety path, and projects only
+  # a bounded content-free witness. No other task/browser file gains direct
+  # download mechanics by sharing this allowance.
+  "task_download_manager_adapter\.(cc|h)": [
+    "+components/download/public/common",
+    "+net/traffic_annotation",
+  ],
+  # The person's Open action rechecks the exact task-owned completed item
+  # through const Chromium accessors. This file starts or opens no download;
+  # the existing platform provider performs Open after this validation.
+  "core_service_manager_task_download_open\.cc": [
+    "+components/download/public/common",
+  ],
+  # Browser tests drive a real WebContents through content_shell and the
+  # embedded test server.
+  #
+  # +components/download is test-only on purpose. The download parity rows are
+  # asserted against Chromium's own download system rather than a fake, because
+  # the row is about that system's behavior being preserved — but the seam
+  # itself talks to a delegate and must not gain a dependency on the download
+  # component, or //taffy would start owning download mechanics it
+  # has no business owning.
+  ".*browsertest\.(cc|h)": [
+    "+components/download/public/common",
+    "+content/public/test",
+    "+content/shell/browser",
+    "+net/dns",
+    "+net/test",
+    # Shell::CreateNewWindow takes a window size.
+    "+ui/gfx/geometry",
+  ],
+  # No browser unit test names //chrome. Every one of them drives the seam
+  # through content::TestBrowserContext and content::RenderViewHostTestHarness,
+  # because everything under test here uses a browser context through
+  # content::BrowserContext API and nothing else. The one that used to need a
+  # Profile needed it for two authority ledgers the profile happened to own,
+  # and TaffyPageIntelligenceHost is now handed those rather than looking them
+  # up.
+  ".*unittest\.(cc|h)": [
+    "+base/test",
+    "+content/public/test",
+  ],
+  # The shared tail of a test-built CoreServiceManager: compiled only into the
+  # unit-test target (see source_lists.gni), and existing exactly so the five
+  # manager suites stop repeating the constructor's quiet brokers. It carries
+  # the same grant the unittest pattern gives, because it is called from
+  # nothing but files that match that pattern.
+  "core_service_manager_test_support\.(cc|h)": [
+    "+content/public/test",
+  ],
+  # The shared harness two facade suites build a manager with: compiled only
+  # into the unit-test target, and existing so a second suite over the same
+  # facade does not copy the manager's construction. It carries the same grant
+  # the unittest pattern gives, because it is included from nothing but files
+  # that match that pattern.
+  "profile_core_api_facade_test_support\.h": [
+    "+content/public/test",
+  ],
+  # The corpus reader parses one JSON manifest from disk. It is test-only, and
+  # the reason it is allowed to read a file at all is that the alternative — a
+  # copy of the corpus's expectations compiled into a test — is the thing the
+  # corpus's immutability rule exists to prevent.
+  # Headers as well as sources, for the same reason the renderer's rules give:
+  # a harness that derives from an upstream test fixture names it in its own
+  # header.
+  "test/.*\.(cc|h)": [
+    "+base/files",
+    "+base/json",
+    "+base/values",
+  ],
+}

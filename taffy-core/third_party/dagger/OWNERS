@@ -1,0 +1,25 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# No addresses yet: review falls through to ../../OWNERS. See that file.
+#
+# What this directory needs from a reviewer is different from what the rest of
+# the overlay needs, and the difference is worth writing down.
+#
+# Every file under lib/ is bytes this project did not write and cannot read.
+# Three things have to be true of a change here and none of them is visible in a
+# diff: the artifact is the one its coordinate names, the terms recorded in
+# README.chromium are the terms it actually carries, and the version agrees with
+# the Dagger pin in gradle/libs.versions.toml that the Gradle build resolves. The
+# `files` lane checks the first mechanically against vendor/dagger.txt. The second
+# is a legal reading and belongs to whoever owns decision 0027. The third is a
+# pin bump, which TOOLCHAIN.md governs.
+#
+# So: a change that adds, removes or replaces a jar is a vendoring review, not a
+# build review, and it wants a reviewer who will open README.chromium rather
+# than only BUILD.gn. There is no per-file rule saying so, because the reviewer
+# is a role this repository has not named yet — naming one is an M0 item, the
+# same way ../../android/OWNERS records it for the island's attachment points.

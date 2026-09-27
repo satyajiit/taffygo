@@ -1,0 +1,17 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# This file intentionally lists no addresses yet, for the same reason the
+# component root's does: review falls through to the parent, which is the honest
+# state while the owner roles named in the M0 milestone are unfilled. Adding a
+# name here is part of closing M0, not something to guess at now.
+#
+# One explicit reviewer requirement survives that. The adversarial suite and the
+# fuzzers are where a weakened assertion is indistinguishable from a passing
+# one, and both consume data a compromised renderer controls.
+per-file adversarial/*=file://ipc/SECURITY_OWNERS
+per-file fuzz/*=file://ipc/SECURITY_OWNERS
+per-file support/scripted_renderer_endpoint.*=file://ipc/SECURITY_OWNERS

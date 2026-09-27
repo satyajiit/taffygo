@@ -1,0 +1,17 @@
+[package]
+name = "policy-engine"
+description = "Capability, origin, and action policy plus redaction decisions. The only component that may grant authority."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+bip-types = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+

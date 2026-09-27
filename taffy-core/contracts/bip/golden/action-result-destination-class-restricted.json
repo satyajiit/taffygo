@@ -1,0 +1,41 @@
+{
+  "schema_version": "0.5",
+  "action_id": "act_06",
+  "dispatch_id": "disp_06",
+  "result_code": "DESTINATION_CLASS_RESTRICTED",
+  "dispatched": false,
+  "terminal": true,
+  "verified_by": [],
+  "postcondition_outcomes": [
+    {
+      "postcondition": {
+        "kind": "COMMITTED_NAVIGATION",
+        "expected_destination": {
+          "url_metadata": {
+            "origin": {
+              "kind": "TUPLE",
+              "serialization": "https://mail.example.test"
+            },
+            "disclosure": "ORIGIN_ONLY",
+            "has_query": true,
+            "has_fragment": false
+          },
+          "is_cross_origin": true,
+          "opens_new_tab": false,
+          "is_download": false
+        },
+        "allowed_origins": [
+          {
+            "kind": "TUPLE",
+            "serialization": "https://mail.example.test"
+          }
+        ],
+        "timeout_ms": 8000
+      },
+      "satisfied": false,
+      "verifier": "FRESH_SNAPSHOT",
+      "detail_code": "destination_class_not_in_task_scope"
+    }
+  ],
+  "completed_at_monotonic_ms": 21140
+}

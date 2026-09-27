@@ -1,0 +1,10 @@
+[
+  {"file": "bundled-python-job.json", "type": "ToolJob"},
+  {"file": "local-embedding-job.json", "type": "ToolJob"},
+  {"file": "text-output-chunk.json", "type": "ToolOutputChunk"},
+  {"file": "final-output-chunk.json", "type": "ToolOutputChunk"},
+  {"file": "bundled-python-success.json", "type": "ToolSuccess"},
+  {"file": "local-embedding-success.json", "type": "ToolSuccess"},
+  {"file": "bundled-python-completed.json", "type": "ToolCompletion"},
+  {"file": "runtime-crashed.json", "type": "ToolCompletion"}
+]

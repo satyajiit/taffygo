@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Content-free words for SCR-801. No task, page, source, or provider text is formatted here. -->
+<resources>
+    <string name="taffy_task_notification_channel_name">Taffy tasks</string>
+    <string name="taffy_task_notification_channel_description">Progress and controls for tasks you asked Taffy to do.</string>
+    <string name="taffy_task_notification_active_title">Taffy is working</string>
+    <string name="taffy_task_notification_active_body">You can pause or stop it here.</string>
+    <string name="taffy_task_notification_waiting_title">Taffy is waiting for you</string>
+    <string name="taffy_task_notification_waiting_body">Open TaffyGo to continue.</string>
+    <string name="taffy_task_notification_paused_title">Task paused</string>
+    <string name="taffy_task_notification_paused_body">Resume or stop when you’re ready.</string>
+    <string name="taffy_task_notification_pause">Pause</string>
+    <string name="taffy_task_notification_resume">Resume</string>
+    <string name="taffy_task_notification_stop">Stop</string>
+    <string name="taffy_task_notification_public_title">TaffyGo task</string>
+    <string name="taffy_task_notification_public_body">Task details hidden</string>
+</resources>

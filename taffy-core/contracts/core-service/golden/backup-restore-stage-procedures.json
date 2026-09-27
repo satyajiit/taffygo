@@ -1,0 +1,46 @@
+{
+  "operation": {
+    "operation_id": "verify-stage-1",
+    "service_generation": 7,
+    "task_revision": 0,
+    "deadline_monotonic_ms": 42000,
+    "idempotency_key": "verify-stage-1-once"
+  },
+  "authorization": {
+    "binding": {
+      "planning_operation": {
+        "operation_id": "plan-1",
+        "service_generation": 7,
+        "task_revision": 0,
+        "deadline_monotonic_ms": 40000,
+        "idempotency_key": "plan-1-once"
+      },
+      "owner_profile_id": "source-profile",
+      "target": {"kind": 0, "profile_id": "target-profile"},
+      "backup_id": "backup-1",
+      "snapshot_sha256": [17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17],
+      "confirmation_sha256": [18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18]
+    },
+    "decision_operation": {
+      "operation_id": "stage-1",
+      "service_generation": 7,
+      "task_revision": 0,
+      "deadline_monotonic_ms": 41000,
+      "idempotency_key": "stage-1-once"
+    }
+  },
+  "staged_snapshot_sha256": [17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17],
+  "skills": [
+    {
+      "skill_id": "selected-procedure",
+      "origin": "https://example.test",
+      "provenance": 1,
+      "status": 4,
+      "active_version": 2,
+      "definition": [84,70,83,75,1,0],
+      "step_count": 1,
+      "installed_at_utc_ms": 17,
+      "updated_at_utc_ms": 23
+    }
+  ]
+}

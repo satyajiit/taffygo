@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="taffy_backup_keep_key">Keep your recovery key</string>
+    <string name="taffy_backup_enter_key">Enter your recovery key</string>
+    <string name="taffy_backup_key_warning">This key is the only way to open this backup. TaffyGo cannot recover it for you. Keep it somewhere separate from this device before continuing.</string>
+    <!-- TAFFY1- is the intentional, versioned recovery-key prefix. -->
+    <string name="taffy_backup_key_restore_help" tools:ignore="Typos">Enter the full key, including TAFFY1- and each hyphen. The file will be checked after you choose it. Entering a key changes nothing in your profile.</string>
+    <string name="taffy_backup_key_retained">I kept this key somewhere separate from this device</string>
+    <string name="taffy_backup_key_refused">Check the key includes every group and hyphen. Nothing was changed.</string>
+    <string name="taffy_backup_key_continue">Continue</string>
+    <string name="taffy_backup_key_cancel">Cancel</string>
+    <string name="taffy_backup_title">Backup</string>
+    <string name="taffy_backup_explanation">Choose what to keep in an encrypted file. You choose where to save it. Keep the recovery key separately: without it, the file cannot be opened.</string>
+    <string name="taffy_backup_exclusions">Bookmarks, browser appearance and language choices are not included yet. Backups never include passwords, account sign-ins, provider keys, browsing history, downloaded files or private tabs.</string>
+    <string name="taffy_backup_content_taffy">Taffy settings</string>
+    <string name="taffy_backup_content_workspaces">Saved workspaces</string>
+    <string name="taffy_backup_content_library">Library</string>
+    <string name="taffy_backup_content_memory">Memory</string>
+    <string name="taffy_backup_content_skills">Skills you wrote</string>
+    <string name="taffy_backup_content_learned">Steps Taffy learned</string>
+    <string name="taffy_backup_create">Create backup</string>
+    <string name="taffy_backup_check">Check a backup</string>
+    <string name="taffy_backup_check_help">You can check an existing file with its recovery key without restoring it. Checking does not change your profile.</string>
+    <string name="taffy_backup_waiting_key">Waiting for your recovery key choice…</string>
+    <string name="taffy_backup_preparing">Preparing the encrypted backup…</string>
+    <string name="taffy_backup_waiting_document">Choose a file in Android to continue.</string>
+    <string name="taffy_backup_writing">Saving the encrypted file and checking the saved copy…</string>
+    <string name="taffy_backup_checking">Checking the file with your recovery key…</string>
+    <string name="taffy_backup_saved">The backup was saved and the saved copy was checked with your key. Keep the key separate from the file.</string>
+    <string name="taffy_backup_incomplete">The saved copy could not be verified. It may be incomplete. Do not rely on it as a backup. Check the file in the place you chose before keeping or deleting it.</string>
+    <string name="taffy_backup_checked_only">The file and recovery key were checked. Nothing was restored or changed in your profile.</string>
+    <string name="taffy_backup_export_refused">TaffyGo could not make a backup of that selection. No verified backup was saved.</string>
+    <string name="taffy_backup_import_refused">The key may not match, or the file may be damaged or unsupported. Nothing was restored.</string>
+    <string name="taffy_backup_unavailable">Backup is unavailable for this window or the selected file could not be reached. No verified result is available.</string>
+    <string name="taffy_backup_cancelled">Backup stopped. If a file was created, it may be incomplete. Check it before keeping it.</string>
+    <string name="taffy_backup_dismiss">Dismiss</string>
+</resources>

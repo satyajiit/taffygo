@@ -1,0 +1,11 @@
+{
+  "operation": {
+    "operation_id": "resolve-recovery-missing-authority",
+    "service_generation": 7,
+    "task_revision": 0,
+    "deadline_monotonic_ms": 42000,
+    "idempotency_key": "resolve-recovery-missing-authority"
+  },
+  "status": 0,
+  "authorization": null
+}

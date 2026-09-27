@@ -1,0 +1,33 @@
+From 75fe506dbf6b0ba974d045503001534314fb0463 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Tue, 18 Aug 2026 22:55:01 +0530
+Subject: skip the Gaia account enumeration when signin is disallowed
+
+A profile whose signin.allowed pref is false has no Google session to
+enumerate, but the cookie listener still queued a /ListAccounts request
+for every .google.com cookie change - eight requests in two idle minutes
+on a fresh profile, all triggered by the default search engine's own
+cookies. TriggerListAccounts is the funnel every trigger path shares, so
+one gate there is complete; callers observe the stale, empty cookie jar
+such a profile honestly has.
+
+Taffy-Patch: 0020
+
+diff --git a/components/signin/internal/identity_manager/gaia_cookie_manager_service.cc b/components/signin/internal/identity_manager/gaia_cookie_manager_service.cc
+index db2e0266aa220..79941a9b7284e 100644
+--- a/components/signin/internal/identity_manager/gaia_cookie_manager_service.cc
++++ b/components/signin/internal/identity_manager/gaia_cookie_manager_service.cc
+@@ -525,6 +525,13 @@ GaiaCookieManagerService::GetCachedListAccounts() {
+ }
+ 
+ void GaiaCookieManagerService::TriggerListAccounts() {
++  // Taffy: a profile that disallows signin never enumerates Gaia session
++  // cookies; every caller observes the honest state of such a profile — a
++  // stale, empty cookie jar.
++  // chromium/patches/0020-no-listaccounts-when-signin-disallowed.md
++  if (!signin_client_->GetPrefs()->GetBoolean(prefs::kSigninAllowed)) {
++    return;
++  }
+   // Callers suspect that a check to Gaia needs to be done, don't rely on the
+   // in progress request, conditions might have changed while the request is
+   // in-flight.

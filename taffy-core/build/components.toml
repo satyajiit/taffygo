@@ -1,0 +1,1350 @@
+# TaffyGo component graph. `component_graph.py` owns this schema and checks it.
+#
+# `layer` is the tier a component declares for itself, and every first-party
+# edge must fall strictly: a component may depend only on a lower layer. The
+# process and trust matrices already say which *kind* of component may reach
+# which; this says which way the graph points, so an inversion that is not a
+# cycle — a leaf reaching up into a surface — is a finding rather than a build
+# that happens to link. The bands are spaced by ten so a tier can be inserted
+# without renumbering the graph:
+#
+#   10  leaves — generated contracts, resources, vendored third party, and the
+#       pure data and model modules. Nothing first-party sits beneath them.
+#   20  the first layer built on a leaf: the portable engines, the renderer
+#       seam, the sandboxed service shells, and the planned surfaces.
+#   30  subsystem facades, each composing two or more layer-20 pieces.
+#   40  the browser host, the core service, and the Compose modules that own
+#       one domain surface.
+#   45  the utility-process service registry. It sat at 50 beside the test
+#       assemblies until one of them needed it: a harness that launches a real
+#       sandboxed worker must install the product's own registry rather than a
+#       second one, and an assembly reaching a peer is the inversion the layer
+#       rule exists to catch. It composes only sandboxed services, so it sits
+#       under every assembly, product and test alike.
+#   50  feature surfaces and the test assemblies.
+#   60  the Android UI assembly.
+#   70  the product assembly.
+#   80  Android Profile tests that compose the shipping assembly.
+schema_version = 3
+root_label = "//taffy"
+
+[[component]]
+id = "app.android"
+state = "active"
+process = "assembly"
+trust = "assembly"
+layer = 70
+platforms = ["android"]
+sources = ["app/android/**"]
+direct_deps = ["browser.host", "common", "contracts.aggregate", "contracts.core-api", "contracts.core-service", "delivery.bundled", "renderer", "resources", "third-party.easylist", "ui.android.app", "ui.android.core.api", "ui.android.core.browser", "ui.android.core.common", "ui.android.core.designsystem", "ui.android.core.model", "ui.android.core.page-intelligence", "ui.android.core.preferences", "ui.android.core.providerauth", "ui.android.core.ui", "ui.android.feature.browsing", "ui.android.feature.downloads", "ui.android.feature.settings", "utility.registry"]
+gn_targets = ["//taffy/app/android:taffy_public_apk", "//taffy/app/android:taffy_public_base_bundle_module", "//taffy/app/android:taffy_public_bundle", "//taffy:native", "//taffy:product"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "browser.host"
+state = "active"
+process = "browser"
+trust = "browser"
+layer = 40
+platforms = ["android", "macos", "windows"]
+sources = ["browser/**"]
+direct_deps = ["common", "contracts.bip", "contracts.browsing", "contracts.core-api", "contracts.core-service", "filtering.browser", "filtering.mojom", "intelligence.content", "resources", "security.browser", "services.tool-supervisor", "storage.browser", "tools.entrypoints"]
+gn_targets = ["//taffy/browser:browser"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "build.manifest"
+state = "active"
+process = "build"
+trust = "build"
+layer = 10
+platforms = ["host"]
+sources = ["build/**"]
+direct_deps = []
+gn_targets = ["//taffy:architecture_manifest"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "common"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["common/**"]
+direct_deps = []
+gn_targets = ["//taffy/common/public:public"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "contracts.aggregate"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["contracts/BUILD.gn"]
+direct_deps = ["contracts.bip", "contracts.browsing", "contracts.core-api", "contracts.core-service", "contracts.tool-runtime"]
+gn_targets = ["//taffy/contracts:contracts", "//taffy:contracts"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "contracts.bip"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["contracts/bip/**"]
+direct_deps = []
+gn_targets = ["//taffy/contracts/bip/mojom:mojom", "//taffy/contracts/bip/rust/bip-types:bip_types"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "contracts.browsing"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["contracts/browsing/**"]
+direct_deps = []
+gn_targets = ["//taffy/contracts/browsing:browsing"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "contracts.codegen"
+state = "active"
+process = "build"
+trust = "build"
+layer = 10
+platforms = ["host"]
+sources = ["contracts/codegen/**"]
+direct_deps = []
+gn_targets = []
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "contracts.core-api"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["contracts/core-api/**"]
+direct_deps = []
+gn_targets = ["//taffy/contracts/core-api/rust/core-api-types:core_api_types", "//taffy/contracts/core-api:core-api"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "contracts.core-service"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["contracts/core-service/**"]
+direct_deps = []
+gn_targets = ["//taffy/contracts/core-service/rust/core-service-types:core_service_types", "//taffy/contracts/core-service:core-service"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "contracts.tool-runtime"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["contracts/tool-runtime/**"]
+direct_deps = []
+gn_targets = ["//taffy/contracts/tool-runtime:tool-runtime"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "delivery.asset-plane"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["components/delivery/core/rust/asset-plane/**"]
+direct_deps = []
+gn_targets = ["//taffy/components/delivery/core/rust/asset-plane:asset_plane"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+# The artifacts decision 0202 carries in the package, and the GN target that
+# puts them there. Bytes and a build file, no code: the browser's seeder is in
+# browser.host and the rules that hold these bytes to the catalogue are the
+# asset plane's own generator. It is a component of its own rather than part
+# of `delivery.asset-plane` because the dependency runs the other way from
+# that crate's — the Android assembly has to depend on it to package it, and
+# an `app.android` edge to the core's Rust crate would be a layer inversion.
+# `third-party.easylist` is the same shape for the same reason.
+[[component]]
+id = "delivery.bundled"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android"]
+sources = [
+  "components/delivery/BUILD.gn",
+  "components/delivery/bundled/**",
+  "components/delivery/bundled_assets.gni",
+]
+direct_deps = []
+gn_targets = ["//taffy/components/delivery:bundled_delivery_assets"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+# The performing half of the filtering plane (decision 0076): the network
+# hook, the loaded rule sets, the per-tab counters and the preference
+# writes. It lives in the browser process because a subresource request
+# never reaches the sandboxed core.
+[[component]]
+id = "filtering.browser"
+state = "active"
+process = "browser"
+trust = "browser"
+layer = 30
+platforms = ["android", "macos", "windows"]
+sources = ["components/filtering/browser/**"]
+direct_deps = ["filtering.core", "filtering.mojom"]
+gn_targets = [
+  "//taffy/components/filtering/browser:browser",
+  "//taffy/components/filtering/browser:prefs",
+]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+# The ad- and tracker-blocking decision policy (decision 0076): a pure
+# matcher that answers block or allow given compiled rules, a per-site
+# posture and one request's facts. The engine inside is Brave's
+# adblock-rust through a C ABI (decision 0086).
+[[component]]
+id = "filtering.core"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["components/filtering/core/**"]
+direct_deps = ["third-party.adblock-rust"]
+gn_targets = ["//taffy/components/filtering/core:core"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+# The renderer-to-browser filtering seams (decision 0086). The renderer holds
+# the remotes and the browser implements both cosmetic lookup and resource
+# decisions. They never enter BIP, the Core API, or the journal.
+[[component]]
+id = "filtering.mojom"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["components/filtering/mojom/**"]
+direct_deps = []
+gn_targets = ["//taffy/components/filtering/mojom:mojom"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+# Renderer half of Ads and trackers: apply browser-decided cosmetics and defer
+# renderer-originated resources while the browser decides. The engine, posture,
+# and blocked counters stay in the browser process.
+[[component]]
+id = "filtering.renderer"
+state = "active"
+process = "renderer"
+trust = "sandboxed"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["components/filtering/renderer/**"]
+direct_deps = ["filtering.mojom"]
+gn_targets = ["//taffy/components/filtering/renderer:renderer"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "intelligence.content"
+state = "active"
+process = "browser"
+trust = "browser"
+layer = 30
+platforms = ["android", "macos", "windows"]
+sources = ["components/intelligence/content/**"]
+direct_deps = ["common", "contracts.bip", "security.browser"]
+gn_targets = ["//taffy/components/intelligence/content:content"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "intelligence.file-engine"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["components/intelligence/core/rust/file-engine/**"]
+direct_deps = []
+gn_targets = ["//taffy/components/intelligence/core/rust/file-engine:file_engine"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+# Host-test doubles for the kernel's ports (decision 0072). Dev-dependency
+# only: no GN target builds it and no shipping crate may depend on it.
+[[component]]
+id = "intelligence.kernel-test-support"
+state = "active"
+process = "assembly"
+trust = "assembly"
+layer = 50
+platforms = ["android", "macos", "windows"]
+sources = ["components/intelligence/core/rust/kernel-test-support/**"]
+direct_deps = ["contracts.bip", "intelligence.procedure-engine", "intelligence.runtime", "intelligence.task-engine"]
+gn_targets = []
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = true
+
+# The loop kernel (decision 0072): the walk, turn composition, and the
+# transient context one task holds. Visible only to intelligence.runtime.
+[[component]]
+id = "intelligence.loop-kernel"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 26
+platforms = ["android", "macos", "windows"]
+sources = ["components/intelligence/core/rust/loop-kernel/**"]
+direct_deps = ["contracts.bip", "contracts.core-service", "intelligence.model-router", "intelligence.procedure-engine", "intelligence.table-engine", "intelligence.task-engine", "security.policy-engine"]
+gn_targets = ["//taffy/components/intelligence/core/rust/loop-kernel:loop_kernel"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "intelligence.model-router"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["components/intelligence/core/rust/model-router/**"]
+direct_deps = []
+gn_targets = ["//taffy/components/intelligence/core/rust/model-router:model_router"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "intelligence.procedure-engine"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 25
+platforms = ["android", "macos", "windows"]
+sources = ["components/intelligence/core/rust/procedure-engine/**"]
+direct_deps = ["contracts.bip", "intelligence.task-engine", "security.policy-engine"]
+gn_targets = ["//taffy/components/intelligence/core/rust/procedure-engine:procedure_engine"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "intelligence.runtime"
+state = "active"
+process = "utility"
+trust = "sandboxed"
+layer = 30
+platforms = ["android", "macos", "windows"]
+sources = ["components/intelligence/core/rust/core-runtime/**"]
+direct_deps = ["contracts.bip", "contracts.core-api", "contracts.core-service", "delivery.asset-plane", "intelligence.file-engine", "intelligence.loop-kernel", "intelligence.model-router", "intelligence.procedure-engine", "intelligence.task-engine", "security.audit-engine", "security.policy-engine", "storage.domain", "tools.entrypoints"]
+gn_targets = ["//taffy/components/intelligence/core/rust/core-runtime:core_runtime"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "intelligence.table-engine"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["components/intelligence/core/rust/table-engine/**"]
+direct_deps = []
+gn_targets = ["//taffy/components/intelligence/core/rust/table-engine:table_engine"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "intelligence.task-engine"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["components/intelligence/core/rust/task-engine/**"]
+direct_deps = ["contracts.bip"]
+gn_targets = ["//taffy/components/intelligence/core/rust/task-engine:task_engine"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "renderer"
+state = "active"
+process = "renderer"
+trust = "sandboxed"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["renderer/**"]
+direct_deps = ["contracts.bip"]
+gn_targets = ["//taffy/renderer:renderer"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "resources"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["resources/**"]
+direct_deps = []
+gn_targets = ["//taffy/resources/branding:upstream_provenance", "//taffy/resources/catalog:resources", "//taffy/resources/tokens:tokens"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "security.audit-engine"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["components/security/core/rust/audit-engine/**"]
+direct_deps = ["contracts.bip"]
+gn_targets = ["//taffy/components/security/core/rust/audit-engine:audit_engine"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "security.browser"
+state = "active"
+process = "browser"
+trust = "browser"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["components/security/browser/**"]
+direct_deps = ["common", "contracts.core-service"]
+gn_targets = ["//taffy/components/security/browser:authority"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "security.policy-engine"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["components/security/core/rust/policy-engine/**"]
+direct_deps = ["common", "contracts.bip"]
+gn_targets = ["//taffy/components/security/core/rust/policy-engine:policy_engine"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "services.core"
+state = "active"
+process = "utility"
+trust = "sandboxed"
+layer = 40
+platforms = ["android", "macos", "windows"]
+sources = ["services/core/**"]
+direct_deps = ["contracts.core-service", "intelligence.runtime"]
+gn_targets = ["//taffy/services/core:service"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "services.local-model"
+state = "planned"
+process = "utility"
+trust = "sandboxed"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["services/tool-runtime/local-model/**"]
+direct_deps = ["common", "contracts.tool-runtime"]
+gn_targets = []
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "services.media"
+state = "active"
+process = "utility"
+trust = "sandboxed"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["services/tool-runtime/media/**"]
+direct_deps = ["contracts.tool-runtime"]
+gn_targets = ["//taffy/services/tool-runtime/media:media"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "services.python"
+state = "active"
+process = "utility"
+trust = "sandboxed"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["services/tool-runtime/python/**"]
+direct_deps = ["contracts.tool-runtime", "third-party.cpython-runtime"]
+gn_targets = ["//taffy/services/tool-runtime/python:python"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "services.tool-supervisor"
+state = "active"
+process = "browser"
+trust = "browser"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["services/tool-runtime/supervisor/**"]
+direct_deps = ["contracts.core-service", "contracts.tool-runtime"]
+gn_targets = ["//taffy/services/tool-runtime/supervisor:supervisor"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "services.wasm"
+state = "planned"
+process = "utility"
+trust = "sandboxed"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["services/tool-runtime/wasm/**"]
+direct_deps = ["common", "contracts.tool-runtime"]
+gn_targets = []
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "storage.browser"
+state = "active"
+process = "browser"
+trust = "browser"
+layer = 20
+platforms = ["android", "macos", "windows"]
+sources = ["components/storage/browser/**"]
+direct_deps = ["common", "contracts.core-service", "storage.domain"]
+gn_targets = ["//taffy/components/storage/browser:storage"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "storage.domain"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["components/storage/core/rust/storage-domain/**", "components/storage/core/schema/**"]
+direct_deps = []
+gn_targets = ["//taffy/components/storage/core/rust/storage-domain:taffy_storage"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "test.android-profile"
+state = "active"
+process = "assembly"
+trust = "assembly"
+layer = 80
+platforms = ["android"]
+sources = ["test/android/profile/**"]
+direct_deps = ["app.android", "test.recovery"]
+gn_targets = ["//taffy/test/android/profile:task_pdf_handoff_java"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = true
+
+# Owns the standalone Compose instrumentation targets plus the root
+# `//taffy:taffy_android_tests` aggregate that combines them with the portable
+# native suite. The aggregate is a human/build root, not a shipping dependency.
+[[component]]
+id = "test.android-ui"
+state = "active"
+process = "assembly"
+trust = "assembly"
+layer = 60
+platforms = ["android"]
+sources = ["test/android/ui/**"]
+direct_deps = [
+  "test.support",
+  "third-party.commonmark",
+  "third-party.dagger",
+  "ui.android.core.analytics",
+  "ui.android.core.api",
+  "ui.android.core.assets",
+  "ui.android.core.browser",
+  "ui.android.core.common",
+  "ui.android.core.credentials",
+  "ui.android.core.designsystem",
+  "ui.android.core.model",
+  "ui.android.core.page-intelligence",
+  "ui.android.core.preferences",
+  "ui.android.core.providerauth",
+  "ui.android.core.providers",
+  "ui.android.core.task",
+  "ui.android.core.ui",
+  "ui.android.core.workspace",
+  "ui.android.feature.assistant",
+  "ui.android.feature.browsing",
+  "ui.android.feature.downloads",
+  "ui.android.feature.onboarding",
+  "ui.android.feature.providers",
+  "ui.android.feature.settings",
+  "ui.android.feature.workspaces",
+]
+gn_targets = [
+  "//taffy/test/android/ui:core_ui_instrumentation_tests_java",
+  "//taffy/test/android/ui:feature_assistant_instrumentation_tests_java",
+  "//taffy/test/android/ui:feature_browsing_instrumentation_tests_java",
+  "//taffy/test/android/ui:feature_downloads_instrumentation_tests_java",
+  "//taffy/test/android/ui:feature_onboarding_instrumentation_tests_java",
+  "//taffy/test/android/ui:feature_providers_instrumentation_tests_java",
+  "//taffy/test/android/ui:feature_settings_instrumentation_tests_java",
+  "//taffy/test/android/ui:feature_workspaces_instrumentation_tests_java",
+  "//taffy/test/android/ui:taffy_public_test_apk",
+  "//taffy/test/android/ui:ui_instrumentation_manifest",
+  "//taffy/test/android/ui:ui_instrumentation_resources",
+  "//taffy:taffy_android_tests",
+]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = true
+
+[[component]]
+id = "test.recovery"
+state = "active"
+process = "assembly"
+trust = "assembly"
+layer = 50
+platforms = ["android", "macos", "windows"]
+sources = ["test/recovery/**"]
+direct_deps = ["browser.host", "contracts.core-api", "contracts.core-service", "filtering.browser", "intelligence.content", "security.browser", "storage.browser", "test.support"]
+gn_targets = ["//taffy/test/recovery:core_service_recovery_browser_tests", "//taffy/test/recovery:task_pdf_handoff_jni_headers"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = true
+
+[[component]]
+id = "test.support"
+state = "active"
+process = "assembly"
+trust = "assembly"
+layer = 49
+platforms = ["android", "macos", "windows"]
+sources = [
+  "test/BUILD.gn",
+  "test/adversarial/**",
+  "test/android/AndroidManifest.xml.jinja2",
+  "test/android/taffy_browsertests_jni_onload.cc",
+  "test/benchmark/**",
+  "test/corpus/**",
+  "test/correctness/**",
+  "test/fuzz/**",
+  "test/parity/**",
+  "test/support/**",
+  "test/taffy_browser_test_main_delegate.cc",
+  "test/taffy_browser_test_main_delegate.h",
+  "test/taffy_content_renderer_client.cc",
+  "test/taffy_content_renderer_client.h",
+  "test/taffy_content_utility_client.cc",
+  "test/taffy_content_utility_client.h",
+  "test/tool/**",
+]
+direct_deps = [
+  "browser.host",
+  "common",
+  "contracts.bip",
+  "contracts.tool-runtime",
+  "filtering.browser",
+  "filtering.core",
+  "filtering.renderer",
+  "intelligence.content",
+  "renderer",
+  "security.browser",
+  "services.core",
+  "services.media",
+  "services.tool-supervisor",
+  "storage.browser",
+  "utility.registry",
+]
+gn_targets = [
+  "//taffy/test:benchmark_audit_decoder",
+  "//taffy/test:benchmark_audit_support",
+  "//taffy/test:benchmark_page_evidence",
+  "//taffy/test:benchmark_support",
+  "//taffy/test:benchmark_unit_tests",
+  "//taffy/test:fixture_server_support",
+  "//taffy/test:support",
+  "//taffy/test:workspace_snapshot_compat_unit_tests",
+  "//taffy:taffy_browsertests",
+  "//taffy:taffy_browsertests_manifest",
+  "//taffy:taffy_tests",
+  "//taffy:taffy_unittests",
+]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = true
+
+# Vendored matching engine and its C ABI (decision 0086). Filtering.core
+# is the only first-party edge; the crate is not a TaffyGo workspace member.
+[[component]]
+id = "third-party.adblock-rust"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["third_party/adblock-rust/**"]
+direct_deps = []
+gn_targets = ["//taffy/third_party/adblock-rust:c_abi"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "third-party.commonmark"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 10
+platforms = ["android"]
+sources = ["third_party/commonmark/**"]
+direct_deps = []
+gn_targets = ["//taffy/third_party/commonmark:commonmark_java"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "third-party.cpython-build"
+state = "active"
+process = "build"
+trust = "build"
+layer = 10
+platforms = ["host"]
+sources = ["third_party/cpython/OWNERS", "third_party/cpython/README.chromium", "third_party/cpython/README.md", "third_party/cpython/packages/**", "third_party/cpython/tools/**"]
+direct_deps = []
+gn_targets = []
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "third-party.cpython-runtime"
+state = "active"
+process = "utility"
+trust = "sandboxed"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["third_party/cpython/BUILD.gn", "third_party/cpython/generated/**", "third_party/cpython/python_sources.gni", "third_party/cpython/runtime/**"]
+direct_deps = []
+gn_targets = ["//taffy/third_party/cpython:python"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "third-party.dagger"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 10
+platforms = ["android"]
+sources = ["third_party/dagger/**"]
+direct_deps = []
+gn_targets = ["//taffy/third_party/dagger:taffy_dagger_runtime_java"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "third-party.easylist"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android"]
+sources = [
+  "third_party/easylist/BUILD.gn",
+  "third_party/easylist/concat_snapshots.py",
+  "third_party/easylist/snapshots/**",
+]
+direct_deps = []
+gn_targets = ["//taffy/third_party/easylist:bundled_filter_list_assets"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "third-party.easylist-build"
+state = "active"
+process = "build"
+trust = "build"
+layer = 10
+platforms = ["host"]
+sources = ["third_party/easylist/tools/**"]
+direct_deps = []
+gn_targets = []
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "third-party.flag-icons-build"
+state = "active"
+process = "build"
+trust = "build"
+layer = 10
+platforms = ["host"]
+sources = ["third_party/flag-icons/tools/**"]
+direct_deps = []
+gn_targets = []
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "tools.entrypoints"
+state = "active"
+process = "neutral"
+trust = "core"
+layer = 10
+platforms = ["android", "macos", "windows"]
+sources = ["components/tools/**"]
+direct_deps = []
+gn_targets = ["//taffy/components/tools/core/rust/tool-entrypoints:tool_entrypoints", "//taffy/components/tools/entrypoints:entrypoints"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.app"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 60
+platforms = ["android"]
+sources = ["ui/android/app/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.analytics", "ui.android.core.api", "ui.android.core.assets", "ui.android.core.browser", "ui.android.core.common", "ui.android.core.credentials", "ui.android.core.designsystem", "ui.android.core.model", "ui.android.core.page-intelligence", "ui.android.core.preferences", "ui.android.core.providerauth", "ui.android.core.providers", "ui.android.core.task", "ui.android.core.ui", "ui.android.core.workspace", "ui.android.feature.assistant", "ui.android.feature.browsing", "ui.android.feature.downloads", "ui.android.feature.onboarding", "ui.android.feature.providers", "ui.android.feature.settings", "ui.android.feature.workspaces"]
+gn_targets = ["//taffy/app/android/ui:app_java"]
+gradle_path = ":app"
+gradle_api_surface = "flat"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.assets-build"
+state = "active"
+process = "build"
+trust = "build"
+layer = 10
+platforms = ["host"]
+sources = ["ui/android/tools/**"]
+direct_deps = []
+gn_targets = []
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.core.analytics"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 30
+platforms = ["android"]
+sources = ["ui/android/core/analytics/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.common", "ui.android.core.model"]
+gn_targets = ["//taffy/app/android/ui:core_analytics_java"]
+gradle_path = ":core:analytics"
+gradle_api_surface = "split"
+gradle_api_deps = ["ui.android.core.common", "ui.android.core.model"]
+test_only = false
+
+[[component]]
+id = "ui.android.core.api"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 30
+platforms = ["android"]
+sources = ["ui/android/core/api/**"]
+direct_deps = ["contracts.core-api", "ui.android.core.common", "ui.android.core.model"]
+gn_targets = ["//taffy/app/android/ui:core_api_java"]
+gradle_path = ":core:api"
+gradle_api_surface = "split"
+gradle_api_deps = ["ui.android.core.common", "ui.android.core.model"]
+test_only = false
+
+[[component]]
+id = "ui.android.core.assets"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 40
+platforms = ["android"]
+sources = ["ui/android/core/assets/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.api", "ui.android.core.common", "ui.android.core.model"]
+gn_targets = ["//taffy/app/android/ui:core_assets_java"]
+gradle_path = ":core:assets"
+gradle_api_surface = "split"
+gradle_api_deps = ["ui.android.core.common", "ui.android.core.model"]
+test_only = false
+
+[[component]]
+id = "ui.android.core.browser"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 30
+platforms = ["android"]
+sources = ["ui/android/core/browser/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.common", "ui.android.core.model"]
+gn_targets = ["//taffy/app/android/ui:core_browser_java"]
+gradle_path = ":core:browser"
+gradle_api_surface = "split"
+gradle_api_deps = ["ui.android.core.model"]
+test_only = false
+
+[[component]]
+id = "ui.android.core.common"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 20
+platforms = ["android"]
+sources = ["ui/android/core/common/**"]
+direct_deps = ["third-party.dagger"]
+gn_targets = ["//taffy/app/android/ui:core_common_java"]
+gradle_path = ":core:common"
+gradle_api_surface = "split"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.core.credentials"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 10
+platforms = ["android"]
+sources = ["ui/android/core/credentials/**"]
+direct_deps = []
+gn_targets = ["//taffy/app/android/ui:core_credentials_java"]
+gradle_path = ":core:credentials"
+gradle_api_surface = "split"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.core.designsystem"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 30
+platforms = ["android"]
+sources = ["ui/android/core/designsystem/**"]
+direct_deps = ["resources", "ui.android.core.common"]
+gn_targets = ["//taffy/app/android/ui:core_designsystem_java"]
+gradle_path = ":core:designsystem"
+gradle_api_surface = "split"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.core.model"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 10
+platforms = ["android"]
+sources = ["ui/android/core/model/**"]
+direct_deps = []
+gn_targets = ["//taffy/app/android/ui:core_model_java"]
+gradle_path = ":core:model"
+gradle_api_surface = "flat"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.core.page-intelligence"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 40
+platforms = ["android"]
+sources = ["ui/android/core/page-intelligence/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.api", "ui.android.core.common"]
+gn_targets = ["//taffy/app/android/ui:core_page_intelligence_java"]
+gradle_path = ":core:page-intelligence"
+gradle_api_surface = "split"
+gradle_api_deps = ["ui.android.core.api"]
+test_only = false
+
+[[component]]
+id = "ui.android.core.preferences"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 20
+platforms = ["android"]
+sources = ["ui/android/core/preferences/**"]
+direct_deps = ["ui.android.core.model"]
+gn_targets = ["//taffy/app/android/ui:core_preferences_java"]
+gradle_path = ":core:preferences"
+gradle_api_surface = "split"
+gradle_api_deps = ["ui.android.core.model"]
+test_only = false
+
+# The subscription sign-in engine: the compiled vendor flow map, the visible
+# per-provider sign-in state, and the connect/acknowledge gestures. Every
+# network leg and every token lives in the browser process; this module is
+# the state machine's face (decision 0081).
+[[component]]
+id = "ui.android.core.providerauth"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 40
+platforms = ["android"]
+sources = ["ui/android/core/providerauth/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.api", "ui.android.core.common"]
+gn_targets = ["//taffy/app/android/ui:core_providerauth_java"]
+gradle_path = ":core:providerauth"
+gradle_api_surface = "split"
+gradle_api_deps = ["ui.android.core.api"]
+test_only = false
+
+# Android's projection of the provider roster the isolated core publishes
+# (decision 0080). Read-only: every intent about a provider goes through its
+# own seam and comes back as the next published roster.
+[[component]]
+id = "ui.android.core.providers"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 40
+platforms = ["android"]
+sources = ["ui/android/core/providers/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.api", "ui.android.core.common", "ui.android.core.model"]
+gn_targets = ["//taffy/app/android/ui:core_providers_java"]
+gradle_path = ":core:providers"
+gradle_api_surface = "split"
+gradle_api_deps = ["ui.android.core.model"]
+test_only = false
+
+
+[[component]]
+id = "ui.android.core.task"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 40
+platforms = ["android"]
+sources = ["ui/android/core/task/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.analytics", "ui.android.core.api", "ui.android.core.common", "ui.android.core.model"]
+gn_targets = ["//taffy/app/android/ui:core_task_java"]
+gradle_path = ":core:task"
+gradle_api_surface = "split"
+gradle_api_deps = ["ui.android.core.api", "ui.android.core.common", "ui.android.core.model"]
+test_only = false
+
+[[component]]
+id = "ui.android.core.ui"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 40
+platforms = ["android"]
+sources = ["ui/android/core/ui/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.browser", "ui.android.core.common", "ui.android.core.designsystem", "ui.android.core.model"]
+gn_targets = ["//taffy/app/android/ui:core_ui_java"]
+gradle_path = ":core:ui"
+gradle_api_surface = "split"
+gradle_api_deps = ["ui.android.core.browser", "ui.android.core.designsystem", "ui.android.core.model"]
+test_only = false
+
+[[component]]
+id = "ui.android.core.workspace"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 40
+platforms = ["android"]
+sources = ["ui/android/core/workspace/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.api", "ui.android.core.common", "ui.android.core.model"]
+gn_targets = ["//taffy/app/android/ui:core_workspace_java"]
+gradle_path = ":core:workspace"
+gradle_api_surface = "split"
+gradle_api_deps = ["ui.android.core.common", "ui.android.core.model"]
+test_only = false
+
+[[component]]
+id = "ui.android.feature.assistant"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 50
+platforms = ["android"]
+sources = ["ui/android/feature/assistant/**"]
+direct_deps = ["third-party.commonmark", "third-party.dagger", "ui.android.core.analytics", "ui.android.core.api", "ui.android.core.browser", "ui.android.core.common", "ui.android.core.designsystem", "ui.android.core.model", "ui.android.core.page-intelligence", "ui.android.core.preferences", "ui.android.core.task", "ui.android.core.ui"]
+gn_targets = ["//taffy/app/android/ui:feature_assistant_java"]
+gradle_path = ":feature:assistant"
+gradle_api_surface = "flat"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.feature.browsing"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 50
+platforms = ["android"]
+sources = ["ui/android/feature/browsing/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.analytics", "ui.android.core.api", "ui.android.core.assets", "ui.android.core.browser", "ui.android.core.common", "ui.android.core.designsystem", "ui.android.core.model", "ui.android.core.page-intelligence", "ui.android.core.task", "ui.android.core.ui"]
+gn_targets = ["//taffy/app/android/ui:feature_browsing_java"]
+gradle_path = ":feature:browsing"
+gradle_api_surface = "flat"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.feature.downloads"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 50
+platforms = ["android"]
+sources = ["ui/android/feature/downloads/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.analytics", "ui.android.core.assets", "ui.android.core.common", "ui.android.core.designsystem", "ui.android.core.model", "ui.android.core.ui"]
+gn_targets = ["//taffy/app/android/ui:feature_downloads_java"]
+gradle_path = ":feature:downloads"
+gradle_api_surface = "flat"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.feature.onboarding"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 50
+platforms = ["android"]
+sources = ["ui/android/feature/onboarding/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.analytics", "ui.android.core.api", "ui.android.core.designsystem", "ui.android.core.model", "ui.android.core.preferences", "ui.android.core.ui"]
+gn_targets = ["//taffy/app/android/ui:feature_onboarding_java"]
+gradle_path = ":feature:onboarding"
+gradle_api_surface = "flat"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.feature.providers"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 50
+platforms = ["android"]
+sources = ["ui/android/feature/providers/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.analytics", "ui.android.core.api", "ui.android.core.browser", "ui.android.core.credentials", "ui.android.core.designsystem", "ui.android.core.model", "ui.android.core.preferences", "ui.android.core.providerauth", "ui.android.core.providers", "ui.android.core.ui"]
+gn_targets = ["//taffy/app/android/ui:feature_providers_java"]
+gradle_path = ":feature:providers"
+gradle_api_surface = "flat"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.feature.settings"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 50
+platforms = ["android"]
+sources = ["ui/android/feature/settings/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.analytics", "ui.android.core.api", "ui.android.core.assets", "ui.android.core.browser", "ui.android.core.common", "ui.android.core.designsystem", "ui.android.core.model", "ui.android.core.preferences", "ui.android.core.ui", "ui.android.core.workspace"]
+gn_targets = ["//taffy/app/android/ui:feature_settings_java"]
+gradle_path = ":feature:settings"
+gradle_api_surface = "flat"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.android.feature.workspaces"
+state = "active"
+process = "ui"
+trust = "platform"
+layer = 50
+platforms = ["android"]
+sources = ["ui/android/feature/workspaces/**"]
+direct_deps = ["third-party.dagger", "ui.android.core.analytics", "ui.android.core.api", "ui.android.core.browser", "ui.android.core.common", "ui.android.core.designsystem", "ui.android.core.model", "ui.android.core.ui", "ui.android.core.workspace"]
+gn_targets = ["//taffy/app/android/ui:feature_workspaces_java"]
+gradle_path = ":feature:workspaces"
+gradle_api_surface = "flat"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.views"
+state = "planned"
+process = "ui"
+trust = "platform"
+layer = 20
+platforms = ["macos", "windows"]
+sources = ["ui/views/**"]
+direct_deps = ["common", "contracts.core-api", "resources"]
+gn_targets = []
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "ui.webui"
+state = "planned"
+process = "ui"
+trust = "platform"
+layer = 20
+platforms = ["macos", "windows"]
+sources = ["ui/webui/**"]
+direct_deps = ["common", "contracts.core-api", "resources"]
+gn_targets = []
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false
+
+[[component]]
+id = "utility.registry"
+state = "active"
+process = "assembly"
+trust = "assembly"
+layer = 45
+platforms = ["android", "macos", "windows"]
+sources = ["utility/**"]
+direct_deps = ["contracts.core-service", "contracts.tool-runtime", "services.core", "services.media", "services.python"]
+gn_targets = ["//taffy/utility:registry"]
+gradle_path = ""
+gradle_api_surface = "none"
+gradle_api_deps = []
+test_only = false

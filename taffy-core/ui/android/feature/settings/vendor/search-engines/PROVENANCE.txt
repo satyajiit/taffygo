@@ -1,0 +1,22 @@
+Search-engine marks used only to identify the engine in Settings.
+
+Sources (fetched 2026-08-29):
+- google.ico        https://www.google.com/favicon.ico
+- duckduckgo.ico    https://duckduckgo.com/favicon.ico
+- bing.ico          https://www.bing.com/favicon.ico
+- yahoo.ico         https://search.yahoo.com/favicon.ico
+- qwant.ico         https://www.qwant.com/favicon.ico
+- startpage.ico     https://www.startpage.com/favicon.ico
+- ecosia.ico        https://www.ecosia.org/favicon.ico
+- yandex.ico        https://yandex.com/favicon.ico
+- brave-search.ico  https://brave.com/static-assets/images/brave-favicon.png
+  (search.brave.com/favicon.ico returned 429)
+
+These are vendor trademarks. They are not part of the Phosphor set
+(decision 0030). Same rule as the Google G already in the tree: a vendor
+mark is that vendor's mark, used to name the engine, tinted by no token.
+
+Engine list (Brave prepopulated set, _refs/brave-core/components/search_engines/):
+Google, Bing, DuckDuckGo (and regional DDG), Yahoo, Qwant, Startpage,
+Ecosia, Yandex, Brave Search. Default remains Google (decision 0019).
+Regional rows follow the stored country code.

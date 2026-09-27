@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/doctor — read-only host, tool, pin, lane, and device audit.
+#
+# Makes no network requests, installs nothing, and changes no file outside a
+# private temporary directory. Safe in a dirty working tree.
+# Contract: docs/development/development-setup.md section 6.
+#
+# The audits themselves live in lib/audit_host.sh (host, repository, pins,
+# Chromium workspace, build caches) and lib/audit_components.sh (Android
+# toolchain, devices, secret names, and which lanes of
+# ./tools/check fast this host can run). This file is the command: options,
+# order, and exit status.
+#
+# Exit codes: 0 = no blocking problem, 1 = at least one `fail`.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
+
+JSON=0
+PROBE=1
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/doctor [options]
+
+Read-only audit of this host, the repository pins, the Chromium workspace, and
+the lanes ./tools/check fast can run here.
+
+Options:
+  --json        machine-readable output (no colors, one JSON document)
+  --no-probe    skip probes that talk to a local daemon (ADB, caches)
+  -h, --help    show this help
+
+Reports every value the setup contract requires, and the *names* of missing
+secrets — never a secret value. Nothing here writes to the repository or the
+network.
+USAGE
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --json) JSON=1 ;;
+    --no-probe) PROBE=0 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage >&2; die "unknown option: $1" ;;
+  esac
+  shift
+done
+
+TAFFY_DOCTOR_TMP=$(mktemp -d "${TMPDIR:-/tmp}/taffy-doctor.XXXXXX")
+trap 'rm -rf "$TAFFY_DOCTOR_TMP"' EXIT
+
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/report.sh"
+# The pin register and the lane predicates are the same ones ./tools/check uses,
+# so the audit and the gate cannot drift apart.
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/pins.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/lanes.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/audit_host.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/audit_components.sh"
+
+# Stated first, because every later finding depends on it: a report produced
+# with --no-probe says nothing about ADB or the build caches, and must not be
+# read as if it did.
+if [ "$PROBE" = 1 ]; then
+  record host "daemon probes" info "enabled"
+else
+  record host "daemon probes" info "disabled (--no-probe)" \
+    "ADB and build-cache probes did not run."
+fi
+
+audit_host
+audit_repo
+audit_pins
+audit_chromium
+audit_caches
+audit_android_toolchain
+audit_devices
+audit_secrets
+audit_lanes
+
+if [ "$JSON" = 1 ]; then report_print_json; else report_print_text; fi
+[ "$TAFFY_N_FAIL" -eq 0 ]

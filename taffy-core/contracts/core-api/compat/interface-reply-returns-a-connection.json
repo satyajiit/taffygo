@@ -1,0 +1,19 @@
+{
+  "interfaces": [
+    {
+      "name": "DeviantObserverFactory",
+      "description": "A deviant interface that returns a live connection from a reply.",
+      "methods": [
+        {
+          "name": "TakeObserver",
+          "ordinal": 0,
+          "description": "Hands the caller a connection back instead of taking one.",
+          "params": [],
+          "response": [
+            {"name": "observer", "type": "pending_receiver<DeviantObserverFactory>", "ordinal": 0, "description": "A live connection returned as though it were a value."}
+          ]
+        }
+      ]
+    }
+  ]
+}

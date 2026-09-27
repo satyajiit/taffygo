@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  Strings shared by every Taffy-owned surface. A module owns the strings it
+  uses: checkStringResources fails the build on a reference to a name this
+  module does not declare, and on a name this module declares and never uses.
+
+  The seven task-state words are here rather than in a feature because more than
+  one feature shows them, and two copies of "Partly done" is how a product ends
+  up rounding partial work up to success in one place and not the other.
+-->
+<resources>
+    <string name="taffy_task_state_running">Running</string>
+    <string name="taffy_task_state_waiting_for_you">Waiting for you</string>
+    <string name="taffy_task_state_paused">Paused</string>
+    <string name="taffy_task_state_done">Done</string>
+    <string name="taffy_task_state_partly_done">Partly done</string>
+    <string name="taffy_task_state_stopped">Stopped</string>
+    <string name="taffy_task_state_failed">Failed</string>
+
+    <string name="taffy_download_state_running">Downloading</string>
+    <string name="taffy_download_state_paused">Paused</string>
+    <string name="taffy_download_state_complete">Saved</string>
+    <string name="taffy_download_state_failed">Didn\'t finish</string>
+
+    <string name="taffy_mode_you_browse">You browse</string>
+    <string name="taffy_mode_browse_together">Browse together</string>
+    <string name="taffy_mode_taffy_browses">Taffy browses</string>
+
+    <string name="taffy_control_pause">Pause</string>
+    <string name="taffy_control_resume">Resume</string>
+    <string name="taffy_control_stop">Stop</string>
+    <string name="taffy_control_take_over">Take over</string>
+
+    <string name="taffy_action_back">Back</string>
+
+    <!-- The address pill (handoff/TgAddressPill.dc.html). -->
+    <string name="taffy_address_pill_secure">Secure connection</string>
+    <string name="taffy_address_pill_insecure">Not a private connection</string>
+    <string name="taffy_address_pill_reload">Reload page</string>
+    <string name="taffy_address_pill_stop">Stop loading</string>
+    <string name="taffy_address_field_confirm">Use this reading</string>
+    <plurals name="taffy_blocked_trackers">
+        <item quantity="one">%1$d tracker blocked</item>
+        <item quantity="other">%1$d trackers blocked</item>
+    </plurals>
+
+    <!-- The assistant pill (handoff/TgAssistantPill.dc.html). -->
+    <string name="taffy_assistant_ask_taffy">Ask Taffy</string>
+    <string name="taffy_assistant_review">Review</string>
+    <string name="taffy_assistant_resume">Resume</string>
+
+    <!--
+      Two already-translated pieces joined for a screen reader. The separator is
+      a resource because it is punctuation, and punctuation is a translation.
+    -->
+    <string name="taffy_accessible_pair">%1$s, %2$s</string>
+
+    <!--
+      How a fact was established. One vocabulary, rendered by a task view and by
+      a workspace table alike, so it lives beside the controls that draw it
+      rather than once per feature — see FactKindLabel.kt.
+    -->
+    <string name="taffy_fact_kind_from_the_page">from the page</string>
+    <string name="taffy_fact_kind_summarized">summarized</string>
+    <string name="taffy_fact_kind_inference">Taffy\'s inference</string>
+    <string name="taffy_fact_kind_you_entered">you entered</string>
+    <string name="taffy_fact_kind_conflict">sources disagree</string>
+    <string name="taffy_fact_kind_needs_a_new_source">needs a new source</string>
+
+    <string name="taffy_search_clear">Clear search</string>
+
+
+    <!-- Review of an explicitly accepted recorded web flow. -->
+    <string name="taffy_flow_review_origin">From %1$s</string>
+    <string name="taffy_flow_review_start">Starting page</string>
+    <string name="taffy_flow_review_steps">Steps to remember</string>
+    <string name="taffy_flow_review_privacy">Only these steps are saved. You enter private details, one-time codes and verification answers each time.</string>
+    <string name="taffy_flow_review_named_action">%1$s · %2$s</string>
+    <string name="taffy_flow_open">Open the page</string>
+    <string name="taffy_flow_read">Read the page</string>
+    <string name="taffy_flow_find">Find a page control</string>
+    <string name="taffy_flow_choose">Choose the page control</string>
+    <string name="taffy_flow_scroll">Scroll the page</string>
+    <string name="taffy_flow_handover">Hand the page to you, then wait for you to continue</string>
+    <string name="taffy_flow_inspect_form">Check the form</string>
+    <string name="taffy_flow_fill_form">Fill the form with details supplied for this run</string>
+    <string name="taffy_flow_submit_form">Submit the form when allowed</string>
+    <string name="taffy_flow_download">Download the file when allowed</string>
+    <string name="taffy_flow_downloads">Check downloads</string>
+    <string name="taffy_flow_pdf">Read the PDF</string>
+    <string name="taffy_flow_back">Go back</string>
+    <string name="taffy_flow_forward">Go forward</string>
+    <string name="taffy_flow_reload">Reload the page</string>
+    <string name="taffy_flow_stop_loading">Stop loading the page</string>
+    <string name="taffy_flow_open_tab">Open a tab</string>
+    <string name="taffy_flow_target_sign_in">Sign in</string>
+    <string name="taffy_flow_target_sign_out">Sign out</string>
+    <string name="taffy_flow_target_search">Search</string>
+    <string name="taffy_flow_target_add_to_cart">Add to cart</string>
+    <string name="taffy_flow_target_view_cart">View cart</string>
+    <string name="taffy_flow_target_checkout">Checkout</string>
+    <string name="taffy_flow_target_continue">Continue</string>
+    <string name="taffy_flow_target_confirm">Confirm</string>
+    <string name="taffy_flow_target_cancel">Cancel</string>
+    <string name="taffy_flow_target_next_page">Next page</string>
+    <string name="taffy_flow_target_download">Download</string>
+    <string name="taffy_flow_person_identity">You enter your identity number.</string>
+    <string name="taffy_flow_person_verification">You complete the verification.</string>
+    <string name="taffy_flow_person_code">You enter the one-time code.</string>
+    <string name="taffy_flow_person_details">You provide the requested form details.</string>
+    <string name="taffy_flow_focus">Focus the page control</string>
+    <string name="taffy_flow_link">Open the link</string>
+</resources>

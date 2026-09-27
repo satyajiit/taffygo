@@ -1,0 +1,211 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+module taffy.browser.field_values.mojom;
+
+// The one seam a person's typed value crosses, and the reason it is its own
+// interface rather than four methods on TaffyProfileCoreApi.
+//
+// TaffyProfileCoreApi is the *status plane*. Everything on it is projected
+// from the isolated core's own state, is journalled, and is designed to be
+// safe to persist and safe to show — which is exactly the set of properties a
+// value a person typed into a form must not have. Decision 0088 says what
+// crosses back into the core about such a value: a count, and nothing else.
+// Putting the values on the Core API would make that sentence a convention
+// somebody has to keep, because the surface would then hold a method that
+// could carry bytes toward the plane that journals them. Here it cannot: no
+// method on the Core API takes a value, and no message on this interface
+// reaches the core.
+//
+// Three further consequences follow from the split, and each is the reason a
+// method is shaped the way it is.
+//
+//   * Nothing here is projected. `Open` describes a form to draw and `Supply`
+//     carries what the person typed; neither has a counterpart in any status
+//     payload, so an image challenge's bytes and a person's answer have no
+//     route into the journal even by accident.
+//   * The browser is the server. The UI calls in with the values and the
+//     browser mints them into its own vault
+//     (taffy-core/components/security/browser/value_reference_vault.h). A
+//     reply-callback shape would have made a second answer to one request
+//     inexpressible rather than refused, and "refused" is what a person needs
+//     to be told when the sheet they filled in twice only counted once.
+//   * The person's bytes travel exactly once, in one direction, into a
+//     process that already holds them. This interface has no method that
+//     returns a value, no method that returns a length, and no method that
+//     returns anything derived from one — for the reason decision 0063
+//     section 4 gives: a value that goes into a form field is drawn from a
+//     domain small enough that any function of it is the value.
+//
+// Hand-written rather than generated, for the reason decision 0042 section 4
+// gives about the platform adapter beside it: it carries no vocabulary the
+// generated contracts own, so a fifth generated contract would describe a
+// browser-to-surface relay that copies nothing.
+
+// What one field of a form is, when it is not plain text a person just types.
+//
+// Closed. A surface that cannot recognise a kind refuses the whole request
+// rather than drawing a field it does not understand: half a form is worse
+// than none, because the person fills in what they can see, the site rejects
+// it, and nothing on the screen can say why.
+//
+// The browser derives this from the renderer's structural classification of
+// the field, never from a vendor name, an origin list or knowledge of any
+// particular site, and it is a **hint**: it may cause a better surface to be
+// offered and it may never cause a handover not to happen (decision 0088
+// section 3).
+enum FieldChallengeKind {
+  // An ordinary field: a label, a keyboard, and what the person types.
+  kNone,
+  // A picture the site wants read back. The bytes travel with the field and
+  // the surface never holds an address for one — a request the UI process
+  // made itself would carry that process's cookies to the site, from outside
+  // everything the browser decided about the page.
+  kImageChallenge,
+  // A widget the person has to work in on the page itself. It cannot be drawn
+  // in a sheet, so the sheet collapses to an instruction and a highlight.
+  kInteractiveChallenge,
+  // A short code that arrived by message. Numeric, and never remembered.
+  kOneTimeCode,
+};
+
+// A rectangle over the visible page viewport, as fractions from its top-left
+// corner. Normalized so nothing downstream depends on a device, zoom level or
+// scroll offset; the surface that draws it multiplies by the viewport it is
+// overlaying.
+struct FieldHighlight {
+  float left@0;
+  float top@1;
+  float right@2;
+  float bottom@3;
+};
+
+// One row of a form the browser is holding open.
+//
+// Every presentational fact here is the browser's description of the node,
+// not a claim the proposal made: the model names a form and the browser
+// decides what is inside it (decision 0088 section 1).
+struct FieldValueDescriptor {
+  // Opaque identity for this row, minted by the browser. It is what the
+  // person's answers are ordered against and is never shown to anybody.
+  string field_id@0;
+  // What to call the field, as the page called it. A value rather than a
+  // string resource, because nothing compiled in can name a field a page
+  // invented. Empty when the browser could not read one.
+  string label@1;
+  // Whether what is typed here must not be legible on screen.
+  bool masked@2;
+  FieldChallengeKind challenge@3;
+  // The picture for a kImageChallenge, as bytes the browser already captured.
+  // Bytes rather than an address, for the reason the enumeration gives.
+  array<uint8>? challenge_image@4;
+  // Where the widget for a kInteractiveChallenge is on the page.
+  FieldHighlight? highlight@5;
+};
+
+// One open ask. It names the request and the task so a surface can correlate
+// it with what the status plane is already showing, and carries nothing about
+// any value.
+struct FieldValueRequest {
+  string request_id@0;
+  string task_id@1;
+  // The site the form belongs to, for the sentence that names it.
+  string host@2;
+  array<FieldValueDescriptor> fields@3;
+  // Exact lifetime of the one-use fill approval, starting when the person
+  // confirms and the values enter the browser vault. The surface shows this
+  // before Supply; it never guesses a policy duration.
+  uint32 approval_lifetime_seconds@4;
+};
+
+// Why a request was closed without an answer.
+enum FieldValueCloseReason {
+  // The person answered; the browser is holding what it could hold.
+  kAnswered,
+  // The person dismissed the sheet.
+  kDismissed,
+  // The task, the profile generation or the page went away underneath it.
+  kRevoked,
+  // Nobody answered before the browser's own deadline on the held values.
+  kExpired,
+};
+
+// What the browser did with one set of answers.
+enum FieldValueSupplyVerdict {
+  // The greatest contiguous prefix the browser could hold was minted, and
+  // `refused` names the first unavailable row and every supplied row after
+  // it. The isolated core receives only a count and can therefore name
+  // [0, count), never a sparse set.
+  kAccepted,
+  // No request is open under that identity: never opened, already answered,
+  // or closed underneath the surface.
+  kUnknownRequest,
+  // The shape was wrong — more answers than the request has fields.
+  kMalformed,
+};
+
+// Why the browser did not hold one field's answer.
+//
+// Every one of these names a field. A value the person typed that the browser
+// will not hold is told back to them field by field, never dropped quietly:
+// the whole of what they can do about it is retype that one into the page
+// themselves, and they cannot do that if nothing says which one it was.
+enum FieldValueRefusalReason {
+  // The node no longer resolves. The page changed while the sheet was open.
+  kFieldGone,
+  // The field's classification, re-read from the node at this moment, is one
+  // Taffy may never hold bytes for: a password, a card security code, a
+  // passkey assertion, anything the fill table calls never fillable, and a
+  // field this build could not classify at all. It is not a setting and no
+  // approval reaches it (decision 0061; decision 0088 section 4).
+  kFieldMayNotBeFilled,
+  // The browser could not hold it: no profile generation is active, the task
+  // is not one it recognises, the answer was empty, or a value for this
+  // field's position is already held.
+  kNotHeld,
+};
+
+struct FieldValueRefusal {
+  string field_id@0;
+  FieldValueRefusalReason reason@1;
+};
+
+// Browser to surface. Implemented by the UI, held by the browser process.
+interface TaffyFieldValueClient {
+  // Draw this form. Exactly one Close follows, ever.
+  Open(FieldValueRequest request);
+  Close(string request_id, FieldValueCloseReason reason);
+};
+
+// Surface to browser. Implemented by the browser process.
+interface TaffyFieldValueSurface {
+  // Registers the surface that draws requests. One at a time per profile: a
+  // second connection replaces the first, and every request open under the
+  // first is closed as kRevoked rather than left drawn on a pipe nobody is
+  // reading.
+  Connect(pending_remote<TaffyFieldValueClient> client);
+
+  // The person's answers, in the order of the request's own fields.
+  //
+  // This is the only message in TaffyGo that carries bytes a person typed for
+  // a form field, and it travels one hop into the process that will hold
+  // them. The browser re-reads each target field's classification from the
+  // node before it holds anything and refuses unavailable fields by name. It
+  // mints only the contiguous prefix before the first refusal; every supplied
+  // value after that point is scrubbed and refused too, because a count cannot
+  // describe a hole. Only then does that exact prefix count reach the core.
+  //
+  // A second Supply for the same request is kUnknownRequest: the request is
+  // closed by the first one, and a value that could be presented twice is a
+  // value rather than a reference.
+  Supply(string request_id, array<string> values)
+      => (FieldValueSupplyVerdict verdict, array<FieldValueRefusal> refused);
+
+  // The person closed the sheet without answering. The task learns that they
+  // answered with nothing, which is an answer: it is what stops the errand
+  // waiting on a surface that is no longer on the screen.
+  Dismiss(string request_id);
+};

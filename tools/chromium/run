@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/chromium/run — incremental install + launch on the connected device.
+
+set -euo pipefail
+
+# See ./tools/chromium/build: the JVM writes "Picked up JAVA_TOOL_OPTIONS" to
+# stderr, and Chromium build and test wrappers that treat stderr as failure
+# fail on it. No TaffyGo step needs the variable.
+unset JAVA_TOOL_OPTIONS
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/chromium.sh"
+
+PROFILE=$(taffy_state_get last_profile "$TAFFY_DEFAULT_PROFILE")
+TARGET=$TAFFY_DEFAULT_TARGET
+URL=''
+INSTALL_ONLY=0
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/chromium/run [--profile <name>] [--target <name>] [--url <url>]
+
+Installs the built APK incrementally and launches it. Uses the profile from the
+last build unless --profile says otherwise.
+
+Options:
+  --profile NAME  build profile whose out/ directory to install from
+  --target NAME   APK target (default: taffy_public_apk)
+  --url URL       open this URL after launch
+  --install-only  install without launching
+  -h, --help      show this help
+
+Select a device with ANDROID_SERIAL when more than one is attached.
+USAGE
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --profile) PROFILE=${2:-}; shift ;;
+    --profile=*) PROFILE=${1#*=} ;;
+    --target) TARGET=${2:-}; shift ;;
+    --target=*) TARGET=${1#*=} ;;
+    --url) URL=${2:-}; shift ;;
+    --url=*) URL=${1#*=} ;;
+    --install-only) INSTALL_ONLY=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage >&2; die "unknown option: $1" ;;
+  esac
+  shift
+done
+
+taffy_require_chromium_host
+chromium_add_depot_tools_to_path
+# Device class only. A host profile has no APK, and being told that here
+# is better than a missing-file error five lines down.
+chromium_validate_profile "$PROFILE" device
+
+SRC=$(chromium_require_checkout)
+RUNNER="$SRC/out/$PROFILE/bin/$TARGET"
+[ -x "$RUNNER" ] || die \
+  "no installer script at out/$PROFILE/bin/$TARGET" \
+  "Build it first: ./tools/chromium/build --profile $PROFILE $TARGET"
+
+if have adb; then
+  DEVICES=$(adb devices | awk 'NR>1 && $2 == "device" { n++ } END { print n + 0 }')
+  [ "$DEVICES" -eq 0 ] && die "no device or emulator attached" \
+    "Start an emulator or connect a device, then check: adb devices -l"
+  [ "$DEVICES" -gt 1 ] && [ -z "${ANDROID_SERIAL:-}" ] && \
+    note "$DEVICES devices attached — set ANDROID_SERIAL to choose one"
+fi
+
+step "installing $TARGET (out/$PROFILE)"
+"$RUNNER" install
+
+if [ "$INSTALL_ONLY" = 1 ]; then
+  ok "installed"
+  exit 0
+fi
+
+step "launching $TARGET${URL:+ at $URL}"
+if [ -n "$URL" ]; then "$RUNNER" launch "$URL"; else "$RUNNER" launch; fi

@@ -1,0 +1,124 @@
+From e4f064832fee2dc56d76f97b3cf3a40aa2cf56d5 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Wed, 19 Aug 2026 02:04:15 +0530
+Subject: register taffy_browsertests as an Android browser test suite
+
+content::BrowserTestBase requires one fresh Android process per test.
+Register taffy_browsertests so the instrumentation runner enforces a
+one-test shard limit.
+
+Also keep fast-local-dev's scoped-wildcard shortcut from bypassing that
+limit. A wildcard such as Suite.* is otherwise sent to Android as one
+synthetic test and expands only inside the native process, where its second
+match trips BrowserTestBase's process-reuse CHECK. Browser suites now
+enumerate wildcard matches into exact test names before instrumentation
+sharding. Exact browser filters and non-browser wildcard shortcuts keep
+their existing fast path.
+
+Cover stock and downstream browser suites, the exact-filter path, and the
+unchanged non-browser path in the local-device runner unit tests.
+
+Taffy-Patch: 0021
+
+diff --git a/build/android/pylib/gtest/gtest_test_instance.py b/build/android/pylib/gtest/gtest_test_instance.py
+index 26a757eefed9a..5fb3f5d433429 100644
+--- a/build/android/pylib/gtest/gtest_test_instance.py
++++ b/build/android/pylib/gtest/gtest_test_instance.py
+@@ -31,6 +31,7 @@ BROWSER_TEST_SUITES = [
+     'android_sync_integration_tests',
+     'components_browsertests',
+     'content_browsertests',
++    'taffy_browsertests',
+ ]
+ 
+ # The max number of tests to run on a batch during the test run.
+diff --git a/build/android/pylib/local/device/local_device_gtest_run.py b/build/android/pylib/local/device/local_device_gtest_run.py
+index e949b41b99961..f790ab1f070f0 100644
+--- a/build/android/pylib/local/device/local_device_gtest_run.py
++++ b/build/android/pylib/local/device/local_device_gtest_run.py
+@@ -91,9 +91,14 @@ def _GenerateSequentialFileNames(filename):
+     yield '%s_%d%s' % (base, i, ext)
+ 
+ 
+-def _ExtractTestsFromFilters(gtest_filters):
++def _ExtractTestsFromFilters(gtest_filters, allow_wildcard=True):
+   """Returns the list of tests specified by the given filters.
+ 
++  Args:
++    gtest_filters: The filters to extract test names from.
++    allow_wildcard: Whether a scoped trailing wildcard may stand in for all of
++      its matches.
++
+   Returns:
+     None if the device should be queried for the test list instead.
+   """
+@@ -105,7 +110,7 @@ def _ExtractTestsFromFilters(gtest_filters):
+   if not any(gtest_filters):
+     return None
+ 
+-  if len(gtest_filters) == 1:
++  if allow_wildcard and len(gtest_filters) == 1:
+     patterns = gtest_filters[0].split(':')
+     # For a single pattern, allow it even if it has a wildcard so long as the
+     # wildcard comes at the end and there is at least one . to prove the scope
+@@ -619,6 +624,19 @@ class LocalDeviceGtestRun(local_device_test_run.LocalDeviceTestRun):
+     """
+     return True
+ 
++  def _GetTestsFromFilters(self):
++    if not self._test_instance.extract_test_list_from_filter:
++      return None
++
++    # A browser test needs one Android process per exact test name. A wildcard
++    # handed straight to gtest can match several tests inside one process, so
++    # query the device to expand it before the instrumentation runner shards it.
++    allow_wildcard = (
++        self._test_instance.suite not in
++        gtest_test_instance.BROWSER_TEST_SUITES)
++    return _ExtractTestsFromFilters(
++        self._test_instance.gtest_filters, allow_wildcard=allow_wildcard)
++
+   #override
+   def _CreateShardsForDevices(self, tests):
+     """Create shards of tests to run on devices.
+@@ -674,7 +692,7 @@ class LocalDeviceGtestRun(local_device_test_run.LocalDeviceTestRun):
+       # When the exact list of tests to run is given via command-line (e.g. when
+       # locally iterating on a specific test), skip querying the device (which
+       # takes ~3 seconds).
+-      tests = _ExtractTestsFromFilters(self._test_instance.gtest_filters)
++      tests = self._GetTestsFromFilters()
+       if tests:
+         return tests
+ 
+diff --git a/build/android/pylib/local/device/local_device_gtest_run_test.py b/build/android/pylib/local/device/local_device_gtest_run_test.py
+index 33fae87ecc9f1..2a6b43c9e41d9 100755
+--- a/build/android/pylib/local/device/local_device_gtest_run_test.py
++++ b/build/android/pylib/local/device/local_device_gtest_run_test.py
+@@ -58,6 +58,27 @@ class LocalDeviceGtestRunTest(unittest.TestCase):
+                      local_device_gtest_run._ExtractTestsFromFilters(
+                          ['b17:m4e3:p51', 'b17:m4e3', 'm4e3:p51']))
+ 
++  def testGetTestsFromFiltersBrowserWildcardNeedsEnumeration(self):
++    self._obj._test_instance.extract_test_list_from_filter = True
++    self._obj._test_instance.gtest_filters = ['TestSuite.*']
++    for suite in ('android_browsertests', 'taffy_browsertests'):
++      with self.subTest(suite=suite):
++        self._obj._test_instance.suite = suite
++        self.assertIsNone(self._obj._GetTestsFromFilters())
++
++  def testGetTestsFromFiltersBrowserExactTestSkipsEnumeration(self):
++    self._obj._test_instance.extract_test_list_from_filter = True
++    self._obj._test_instance.gtest_filters = ['TestSuite.TestName']
++    self._obj._test_instance.suite = 'android_browsertests'
++    self.assertEqual(['TestSuite.TestName'],
++                     self._obj._GetTestsFromFilters())
++
++  def testGetTestsFromFiltersNonBrowserWildcardSkipsEnumeration(self):
++    self._obj._test_instance.extract_test_list_from_filter = True
++    self._obj._test_instance.gtest_filters = ['TestSuite.*']
++    self._obj._test_instance.suite = 'base_unittests'
++    self.assertEqual(['TestSuite.*'], self._obj._GetTestsFromFilters())
++
+   def testGetLLVMProfilePath(self):
+     path = local_device_gtest_run._GetLLVMProfilePath('test_dir', 'sr71', '5')
+     self.assertEqual(path, os.path.join('test_dir', 'sr71_5_%2m%c.profraw'))

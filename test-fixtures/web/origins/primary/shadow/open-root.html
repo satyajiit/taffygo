@@ -1,0 +1,49 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="shadow-dom-open">
+<title>Open shadow root</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Open shadow root</h1>
+  <p class="who">The product card below renders from an open shadow root with a
+  slotted heading from the light tree.</p>
+</header>
+
+<lumen-card id="card">
+  <h2 slot="title">Lumen Arc desk lamp</h2>
+  <p slot="note">Slotted from the light tree; composed into the shadow tree.</p>
+</lumen-card>
+
+<p class="note">Light-tree text outside the component stays addressable
+independently of the shadow content.</p>
+
+<script>
+  (function () {
+    "use strict";
+    var template = document.createElement("template");
+    template.innerHTML = [
+      '<section part="card">',
+      '  <slot name="title"></slot>',
+      '  <p id="shadow-price">Price: <strong>$129.00</strong></p>',
+      '  <p id="shadow-availability">Availability: <strong>In stock</strong></p>',
+      '  <ul id="shadow-spec">',
+      '    <li>Brightness: 800 lumens</li>',
+      '    <li>Warranty: 2 years</li>',
+      '  </ul>',
+      '  <a id="shadow-link" href="/product/lumen-desk-lamp.html">Full specification</a>',
+      '  <slot name="note"></slot>',
+      '</section>'
+    ].join("\n");
+
+    customElements.define("lumen-card", class extends HTMLElement {
+      constructor() {
+        super();
+        this.attachShadow({ mode: "open" }).appendChild(template.content.cloneNode(true));
+      }
+    });
+  })();
+</script>

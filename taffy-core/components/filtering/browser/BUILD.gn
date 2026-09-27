@@ -1,0 +1,95 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The filtering plane's performing half (decision 0076): the request-path
+# throttle, the per-tab counters and their coalescing, the preference-backed
+# posture and the ruleset lifecycle from asset-store bytes to a published
+# matcher. Browser process only, because a subresource request never reaches
+# the sandboxed core. The one place a blocked request is recorded durably is
+# a profile preference total; nothing here touches the journal or the Core
+# API, because a blocked request is not a task fact.
+# The preference names and their registration, alone, so the browser host's
+# pref-registration target can carry them without carrying the request path.
+source_set("prefs") {
+  sources = [
+    "filtering_prefs.cc",
+    "filtering_prefs.h",
+  ]
+  deps = [ "//components/prefs" ]
+  visibility = [
+    ":browser",
+    ":unit_tests",
+    "//taffy/browser:*",
+  ]
+}
+
+source_set("browser") {
+  sources = [
+    "cosmetic_filter_host.cc",
+    "cosmetic_filter_host.h",
+    "filtering_document_decisions.cc",
+    "filtering_document_decisions.h",
+    "filtering_ruleset_service.cc",
+    "filtering_ruleset_service.h",
+    "filtering_tab_counters.cc",
+    "filtering_tab_counters.h",
+    "filtering_throttle.cc",
+    "filtering_throttle.h",
+    "filtering_throttle_factory.cc",
+    "filtering_throttle_factory.h",
+  ]
+  public_deps = [
+    ":prefs",
+    "//taffy/components/filtering/core:core",
+    "//taffy/components/filtering/mojom",
+  ]
+  deps = [
+    "//base",
+    "//components/prefs",
+    "//content/public/browser",
+    "//mojo/public/cpp/bindings",
+    "//net",
+    "//services/network/public/cpp",
+    "//services/network/public/mojom",
+    "//third_party/blink/public/common",
+    "//url",
+  ]
+  visibility = [
+    ":unit_tests",
+    "//taffy/browser:*",
+
+    # The Android JNI bridge projects this plane's facts to the product UI.
+    "//taffy/browser/android:*",
+
+    # Chrome's Profile browser-test composition proves the shipping request
+    # hook against a real tab. No product target depends back on the test.
+    "//taffy/test/recovery:*",
+  ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+  sources = [
+    "cosmetic_filter_host_unittest.cc",
+    "filtering_document_decisions_unittest.cc",
+    "filtering_ruleset_service_unittest.cc",
+    "filtering_tab_counters_unittest.cc",
+    "filtering_throttle_unittest.cc",
+  ]
+  deps = [
+    ":browser",
+    "//base",
+    "//base/test:test_support",
+    "//components/prefs:test_support",
+    "//content/test:test_support",
+    "//net",
+    "//services/network/public/cpp",
+    "//services/network/public/mojom",
+    "//taffy/components/filtering/mojom",
+    "//testing/gtest",
+    "//url",
+  ]
+}

@@ -1,0 +1,3669 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// Generated from schema/contract.json. Do not edit.
+// Contract core_service 2.113.
+
+module taffy.core_service.mojom;
+
+const uint64 kMaxSavedFlowQueryResults = 4;
+const uint64 kMaxCommandBytes = 262144;
+const uint64 kMaxEffectBytes = 1048576;
+const uint64 kMaxInFlightPerProfile = 64;
+const uint64 kMaxQueuedBytesPerProfile = 4194304;
+const uint64 kMaxOperationIdBytes = 128;
+const uint64 kMaxIdempotencyKeyBytes = 256;
+const uint64 kMaxIdentifierBytes = 256;
+const uint64 kMaxUserInputAnswerBytes = 512;
+const uint64 kMaxAuthoritySubjectIdBytes = 128;
+const uint64 kMaxDirectObservationNodes = 1500;
+const uint64 kMaxDirectObservationTextBytes = 65536;
+const uint64 kMaxDirectObservationTotalBytes = 1048576;
+const uint64 kMaxDirectObservationFrames = 1;
+const uint64 kMaxDirectObservationDeadlineMs = 1500;
+const uint64 kMaxDirectObservationLeaseMs = 2000;
+const uint64 kMaxPageSnapshotExportBytes = 262144;
+const uint64 kMaxTaskArtifactExportBytes = 262144;
+const uint64 kMaxAccountEmailBytes = 320;
+const uint64 kMaxAccountDisplayNameBytes = 128;
+const uint64 kMaxAccountScopes = 3;
+const uint64 kMaxAccountResponseBytes = 65536;
+const uint64 kMaxAccountAccessTokenBytes = 16384;
+const uint64 kMaxAccountRefreshTokenBytes = 16384;
+const uint64 kMaxAccountIdTokenBytes = 16384;
+const uint64 kMaxAccountLinkedProviders = 4;
+const uint64 kMaxEntitledModels = 64;
+const uint64 kMaxAccountSessionLifetimeSeconds = 31536000;
+const uint64 kMaxPendingAccountFlows = 8;
+const uint64 kGoogleNonceEntropyBytes = 32;
+const uint64 kGoogleNonceHashHexBytes = 64;
+const uint64 kMaxGoogleRawNonceBytes = 43;
+const uint64 kMaxGoalBytes = 65536;
+const uint64 kMaxTaskConsentSources = 64;
+const uint64 kMaxNormalizedOriginBytes = 2048;
+const uint64 kMaxLibraryRefreshSources = 64;
+const uint64 kMaxSourceLocatorBytes = 4096;
+const uint64 kMaxSourceTitleBytes = 1024;
+const uint64 kMaxSourceHostBytes = 253;
+const uint64 kMaxLibraryRefreshPreviewIdBytes = 64;
+const uint64 kMaxDestinationAddressBytes = 4096;
+const uint64 kMaxCanonicalActionIntentBytes = 16384;
+const uint64 kMaxTransientSearchQueryBytes = 4096;
+const uint64 kMaxNewSourceCap = 64;
+const uint64 kMaxWorkspacesPerProfile = 32;
+const uint64 kMaxWorkspaceSnapshotBytes = 262144;
+const uint64 kMaxWorkspaceBootstrapBytes = 4194304;
+const uint64 kMaxWorkspaceValueBytes = 16384;
+const uint64 kMaxWorkspaceDisplayNameBytes = 256;
+const uint64 kMaxWorkspaceConfirmationTokenBytes = 64;
+const uint64 kMaxLibraryEntries = 1024;
+const uint64 kMaxLibrarySources = 16;
+const uint64 kMaxLibraryQueryBytes = 512;
+const uint64 kMaxLibrarySearchTerms = 16;
+const uint64 kMaxLibrarySearchResults = 32;
+const uint64 kMaxMemoryRecords = 512;
+const uint64 kMaxMemoryStatementBytes = 2048;
+const uint64 kMaxMemoryQueryBytes = 512;
+const uint64 kMaxMemorySearchTerms = 16;
+const uint64 kMaxMemorySearchResults = 32;
+const uint64 kMaxAssetPathBytes = 256;
+const uint64 kMaxAssetTransferBytes = 4294967296;
+const uint64 kMaxToolAllowlistEntries = 128;
+const uint64 kMaxTaskBudgetEntries = 10;
+const uint64 kMaxPendingApprovalsPerProfile = 64;
+const uint64 kMaxPendingPermissionsPerProfile = 64;
+const uint64 kMaxPendingTaskPolicyPerProfile = 64;
+const uint64 kMaxTaskEffectsPerState = 64;
+const uint64 kMaxTaskTabResults = 16;
+const uint64 kMaxTaskDownloadResults = 16;
+const uint64 kMaxTaskStoreResults = 32;
+const uint64 kMaxTaskStoreRowFieldBytes = 512;
+const uint64 kMaxTaskStoreQueryBytes = 512;
+const uint64 kMaxTaskSuppliedValues = 8;
+const uint64 kMaxTaskActionPreconditions = 4;
+const uint64 kMaxTaskObservationNodes = 1500;
+const uint64 kMaxTaskObservationTextBytes = 65536;
+const uint64 kMaxTaskObservationTotalBytes = 1048576;
+const uint64 kMaxTaskObservationFrames = 1;
+const uint64 kMaxTaskObservationDeadlineMs = 1500;
+const uint64 kMaxMediaFacts = 256;
+const uint64 kMaxMediaFactTextBytes = 8192;
+const uint64 kMaxMediaFactLocatorBytes = 512;
+const uint64 kMaxMediaFactTotalBytes = 131072;
+const uint64 kMaxMediaAttachmentHandleBytes = 128;
+const uint64 kMaxMediaAttachmentBytes = 4194304;
+const uint64 kMaxMediaDimensionPx = 4096;
+const uint64 kMaxMediaPdfPages = 256;
+const uint64 kMaxTaskRevisionsPerProfile = 64;
+const uint64 kMaxTaskControls = 4;
+const uint64 kMaxToolJobInputBytes = 16777216;
+const uint64 kMaxToolJobOutputBytes = 16777216;
+const uint64 kMaxToolOutputChunkBytes = 65536;
+const uint64 kMaxToolOutputChunks = 256;
+const uint64 kMaxToolProgressEvents = 256;
+const uint64 kMaxToolJobIdBytes = 128;
+const uint64 kMaxToolOperationIdBytes = 128;
+const uint64 kMaxToolIdempotencyKeyBytes = 128;
+const uint64 kMaxToolIdBytes = 128;
+const uint64 kMaxToolVersionBytes = 64;
+const uint64 kMaxToolConversationIdBytes = 128;
+const uint64 kMaxToolEntrypointIdBytes = 128;
+const uint64 kMaxToolHandleIdBytes = 256;
+const uint64 kMaxToolPresetIdBytes = 128;
+const uint64 kMaxToolJobMemoryBytes = 4294967296;
+const uint64 kMaxToolJobCpuMs = 600000;
+const uint64 kMaxToolJobTemporaryBytes = 1073741824;
+const uint64 kMaxToolJobWallTimeMs = 600000;
+const uint64 kMaxToolInlinePayloadBytes = 262144;
+const uint64 kMaxToolStreamOutputChunks = 65536;
+const uint64 kMaxToolStreamChunkBytes = 4096;
+const uint64 kMaxToolModelIdBytes = 128;
+const uint64 kMaxToolModelRevisionBytes = 64;
+const uint64 kMaxToolModelArtifactBytes = 2147483648;
+const uint64 kMaxRegisteredModelArtifacts = 64;
+const uint64 kMaxToolEmbeddingDimensions = 4096;
+const uint64 kMaxToolEmbeddingValueBytes = 16384;
+const uint64 kMaxProviderIdBytes = 64;
+const uint64 kMaxProviderDisplayNameBytes = 128;
+const uint64 kMaxProviderEndpointBytes = 512;
+const uint64 kMaxCustomProviders = 32;
+const uint64 kMaxModelIdBytes = 128;
+const uint64 kMaxAvailableModelIds = 64;
+const uint64 kMaxModelStaticHeaders = 8;
+const uint64 kMaxModelHeaderNameBytes = 64;
+const uint64 kMaxModelHeaderValueBytes = 1024;
+const uint64 kMaxModelStreamChunkBytes = 16384;
+const uint64 kMaxTaskAnswerDeltaBytes = 16384;
+const uint64 kMaxTaskAnswerEventsPerBatch = 64;
+const uint64 kMaxSkillsPerProfile = 64;
+const uint64 kMaxSkillVersionsPerSkill = 16;
+const uint64 kMaxSkillIdBytes = 128;
+const uint64 kMaxSkillDefinitionBytes = 65536;
+const uint64 kMaxSkillSteps = 32;
+const uint64 kMaxSkillMatchClauses = 8;
+const uint64 kMaxSkillArgumentsPerStep = 16;
+const uint64 kMaxSkillRecallEntries = 32;
+const uint64 kMaxCustomModelEntries = 32;
+const uint64 kMaxModelDisplayNameBytes = 128;
+const uint64 kMaxComposerPrefixBytes = 4096;
+const uint64 kMaxComposerSuffixBytes = 1024;
+const uint64 kMaxComposerCompletionBytes = 512;
+const uint64 kMaxProviderListingBytes = 262144;
+const uint64 kMaxAssistantAbilities = 16;
+const uint64 kMaxPersonalityScale = 2;
+const uint64 kMaxSavedSignIns = 256;
+const uint64 kMaxSavedDetails = 64;
+const uint64 kMaxSavedSignInSiteBytes = 253;
+const uint64 kMaxSavedSignInUsernameBytes = 320;
+const uint64 kMaxSavedDetailNameBytes = 256;
+const uint64 kMaxSavedDetailEmailBytes = 320;
+const uint64 kMaxSavedDetailPhoneBytes = 128;
+const uint64 kMaxSavedDetailAddressBytes = 2048;
+const uint64 kMaxSavedDetailPostcodeBytes = 64;
+const uint64 kMaxSavedDetailCountryBytes = 128;
+const uint64 kMaxBackupRecords = 100000;
+const uint64 kMaxBackupRecordBytes = 67108864;
+const uint64 kMaxBackupPlaintextBytes = 8589934592;
+const uint64 kMaxBackupManifestBytes = 67108864;
+const uint64 kMaxBackupIdBytes = 160;
+const uint64 kMaxBackupTimestampBytes = 40;
+const uint64 kMaxBackupSelectionKinds = 8;
+const uint64 kMaxBackupRestoreRecoveryRecords = 128;
+const uint64 kMaxBackupSealedChunks = 8193;
+const uint64 kBackupPayloadChunkBytes = 1048576;
+
+enum CoreServiceCommandKind {
+  kStartTask = 0,
+  kCancelTask = 1,
+  kUserDecision = 2,
+  kAuthCallback = 3,
+  kPermissionResult = 4,
+  kStartAuth = 5,
+  kRequestEmailLink = 6,
+  kSignOut = 7,
+  kAuthCredentialResult = 8,
+  kCorrectWorkspaceFact = 9,
+  kExcludeWorkspaceSource = 10,
+  kRequestWorkspaceExport = 11,
+  kSetAssetDeliveryPolicy = 12,
+  kRequestAsset = 13,
+  kRemoveAsset = 14,
+  kSaveProviderCredential = 15,
+  kForgetProviderCredential = 16,
+  kStartProviderAuth = 17,
+  kProviderAuthCallback = 18,
+  kSaveCustomProvider = 19,
+  kRemoveCustomProvider = 20,
+  kCompleteHandover = 21,
+  kExpireHandover = 22,
+  kSupplyUserInput = 23,
+  kSetProviderCredentialState = 24,
+  kProbeProviderCredential = 25,
+  kSupplyFieldValues = 26,
+  kSetProviderModelPreference = 27,
+  kProbeCustomEndpoint = 28,
+  kRequestComposerCompletion = 29,
+  kCancelComposerCompletion = 30,
+  kPauseTask = 31,
+  kResumeTask = 32,
+  kTakeOver = 33,
+  kSetAssistantConfiguration = 34,
+  kSaveWorkspace = 35,
+  kRenameWorkspace = 36,
+  kDeleteWorkspace = 37,
+  kDiscardWorkspace = 38,
+  kSearchLibrary = 39,
+  kSaveLibraryFact = 40,
+  kRemoveLibraryEntry = 41,
+  kRequestLibraryExport = 42,
+  kSearchMemory = 43,
+  kUpsertMemory = 44,
+  kDeleteMemory = 45,
+  kAcceptTaskArtifact = 46,
+  kExportTaskArtifact = 47,
+  kReplaceSavedDataSnapshot = 48,
+  kMutateSkill = 49,
+  kCancelProviderAuth = 50,
+  kFollowUp = 51,
+};
+
+enum SavedDataAvailability {
+  kLoading = 0,
+  kReady = 1,
+  kUnavailable = 2,
+};
+
+enum TaskControlKind {
+  kPause = 0,
+  kResume = 1,
+  kTakeOver = 2,
+  kStop = 3,
+};
+
+enum EffectKind {
+  kStorageCommit = 0,
+  kPageObservation = 1,
+  kModelRequest = 2,
+  kNetworkRequest = 3,
+  kBrowserAction = 4,
+  kToolJob = 5,
+  kSecureStore = 6,
+  kOpenAuthSurface = 7,
+  kRequestPermission = 8,
+  kDeliverAsset = 9,
+  kFetchCatalog = 10,
+  kFetchProviderListing = 11,
+  kDeliverComposerCompletion = 12,
+  kProbeCustomEndpoint = 13,
+};
+
+enum CatalogNetworkOperation {
+  kFetchPublishedCatalog = 0,
+};
+
+enum CatalogFetchDisposition {
+  kSuccess = 0,
+  kNotModified = 1,
+  kUnavailable = 2,
+  kOversized = 3,
+  kMalformedTransport = 4,
+};
+
+enum RetryClass {
+  kIdempotent = 0,
+  kConsequential = 1,
+  kNever = 2,
+};
+
+enum EffectStatus {
+  kCompleted = 0,
+  kDenied = 1,
+  kCancelled = 2,
+  kDeadlineExceeded = 3,
+  kResourceLimit = 4,
+  kUnavailable = 5,
+  kOutcomeUnknown = 6,
+  kInvalidResult = 7,
+};
+
+enum DisclosureClass {
+  kContentFree = 0,
+  kAccountMetadata = 1,
+  kUserSelectedContent = 2,
+  kPageContent = 3,
+};
+
+enum InitializationStatus {
+  kReady = 0,
+  kInvalidBootstrap = 1,
+  kIncompatibleVersion = 2,
+  kResourceLimit = 3,
+};
+
+enum AdmissionStatus {
+  kAccepted = 0,
+  kStaleGeneration = 1,
+  kStaleRevision = 2,
+  kDeadlineExceeded = 3,
+  kBackpressure = 4,
+  kInvalidCommand = 5,
+  kCoreUnavailable = 6,
+  kDuplicate = 7,
+};
+
+enum TaskKind {
+  kResearch = 0,
+  kErrand = 1,
+};
+
+enum TaskTemplateId {
+  kCompareProducts = 0,
+  kSummarizeEvidence = 1,
+  kBuildSourceTable = 2,
+  kWebErrand = 3,
+};
+
+enum BuiltinSkillId {
+  kGeneralWebResearch = 0,
+  kDeepResearch = 1,
+  kProductComparison = 2,
+  kMultiTabComparison = 3,
+  kWebsiteSummarizer = 4,
+  kPdfAnalysis = 5,
+  kDataExtraction = 6,
+  kFormAssistant = 7,
+  kShopping = 8,
+  kDownloadOrganizer = 9,
+  kTravelResearch = 10,
+  kVideoTranscriptAnalyzer = 11,
+  kImageUnderstanding = 12,
+  kLibraryBuilder = 13,
+  kSpreadsheetBuilder = 14,
+  kDocumentGenerator = 15,
+};
+
+enum TaskProviderRoute {
+  kNotConfigured = 0,
+  kDirectUserKey = 1,
+  kManagedService = 2,
+  kNoModelRequired = 3,
+};
+
+enum TaskControlMode {
+  kUser = 0,
+  kShared = 1,
+  kAssistant = 2,
+};
+
+enum TaskMilestone {
+  kM0 = 0,
+  kM1 = 1,
+  kM2 = 2,
+  kM3 = 3,
+  kM4 = 4,
+  kM5 = 5,
+  kM6 = 6,
+  kM7 = 7,
+  kM8 = 8,
+};
+
+enum TaskBudgetKind {
+  kMaxSources = 0,
+  kMaxWorkingTabs = 1,
+  kMaxWallTimeMs = 2,
+  kMaxModelRequests = 3,
+  kMaxInputUnits = 4,
+  kMaxOutputUnits = 5,
+  kMaxCostUnits = 6,
+  kMaxNavigationDepth = 7,
+  kMaxRetriesPerStep = 8,
+  kMaxArtifactBytes = 9,
+};
+
+enum UserDecisionKind {
+  kAccept = 0,
+  kDeny = 1,
+  kDismiss = 2,
+};
+
+enum CancelReason {
+  kUser = 0,
+  kProfileShutdown = 1,
+  kDeadline = 2,
+};
+
+enum TaskSettlementKind {
+  kPause = 0,
+  kCancel = 1,
+};
+
+enum TerminalTaskKind {
+  kCompleted = 0,
+  kPartial = 1,
+  kFailed = 2,
+  kCancelled = 3,
+};
+
+enum TaskReducerEffectKind {
+  kRevokeAuthority = 0,
+  kAskPolicy = 1,
+  kRequestApproval = 2,
+  kRequestPermission = 3,
+  kDispatchAction = 4,
+  kAwaitInFlightWork = 5,
+  kReconcileAction = 6,
+  kReleaseTaskTabs = 7,
+  kGenerateArtifact = 8,
+  kExportArtifact = 9,
+  kCallModel = 10,
+  kAwaitHandover = 11,
+  kRunToolJob = 12,
+  kRequestFieldValues = 13,
+  kPrepareDiscoveryTab = 14,
+  kRunLibraryTool = 15,
+  kRunMemoryTool = 16,
+};
+
+enum TaskRevocationReason {
+  kUserTookOver = 0,
+  kDirectUserInput = 1,
+  kTaskCancelled = 2,
+  kPolicyRevoked = 3,
+  kTabClosed = 4,
+};
+
+enum TaskRecoveryRule {
+  kRetryWithinEpochAndBudget = 0,
+  kRetryAfterStateCheck = 1,
+  kReconcileFirst = 2,
+  kNeverAutomatically = 3,
+};
+
+enum TaskArtifactKind {
+  kMarkdown = 0,
+  kCsv = 1,
+  kXlsx = 2,
+  kPdf = 3,
+  kDocx = 4,
+  kPptx = 5,
+  kWaveAudio = 6,
+  kFrameArchive = 7,
+};
+
+enum TaskActionPrecondition {
+  kDocumentUnchanged = 0,
+  kGraphRevisionAtLeast = 1,
+  kNodePresent = 2,
+  kDestinationUnchanged = 3,
+};
+
+enum TaskActionPostcondition {
+  kObservationCaptured = 0,
+  kDocumentNavigated = 1,
+  kNodeStateChanged = 2,
+  kDownloadStarted = 3,
+  kPlatformAcknowledged = 4,
+  kTaskTabsListed = 5,
+  kTaskTabActive = 6,
+  kTaskTabAbsent = 7,
+  kDownloadCancelled = 8,
+  kPageReloaded = 9,
+  kLoadingStopped = 10,
+  kStoreRowsListed = 11,
+};
+
+enum TaskTabPostcondition {
+  kListed = 0,
+  kActive = 1,
+  kAbsent = 2,
+};
+
+enum TaskDownloadPostcondition {
+  kStarted = 0,
+  kListed = 1,
+  kCancelled = 2,
+};
+
+enum TaskDownloadState {
+  kCreated = 0,
+  kInProgress = 1,
+  kPaused = 2,
+  kComplete = 3,
+  kInterrupted = 4,
+  kCancelled = 5,
+};
+
+enum TaskDownloadMediaType {
+  kUnknown = 0,
+  kApplication = 1,
+  kAudio = 2,
+  kFont = 3,
+  kImage = 4,
+  kMessage = 5,
+  kModel = 6,
+  kMultipart = 7,
+  kText = 8,
+  kVideo = 9,
+};
+
+enum TaskDownloadDirectoryClass {
+  kUndecided = 0,
+  kPersonChosen = 1,
+  kDefaultDownloads = 2,
+  kApplicationPrivate = 3,
+};
+
+enum TaskEffectCompletionStatus {
+  kSucceeded = 0,
+  kRefused = 1,
+  kUnavailable = 2,
+  kCancelled = 3,
+  kOutcomeUnknown = 4,
+  kValueReferenceUnknown = 5,
+};
+
+enum AuthCallbackStatus {
+  kAuthorizationCode = 0,
+  kDenied = 1,
+  kProviderError = 2,
+  kDeadlineExceeded = 3,
+  kPlatformUnavailable = 4,
+};
+
+enum AccountAuthMethod {
+  kGoogle = 0,
+  kEmailLink = 1,
+  kGithub = 2,
+  kFacebook = 3,
+};
+
+enum AccountTokenValidationStatus {
+  kValidated = 0,
+  kInvalidResponse = 1,
+  kStaleGeneration = 2,
+  kDeadlineExceeded = 3,
+  kResourceLimit = 4,
+};
+
+enum AccountScope {
+  kOpenId = 0,
+  kEmail = 1,
+  kProfile = 2,
+};
+
+enum AuthCredentialStatus {
+  kSuccess = 0,
+  kCancelled = 1,
+  kNoCredential = 2,
+  kUnavailable = 3,
+};
+
+enum PlatformPermission {
+  kNotifications = 0,
+  kMicrophone = 1,
+  kCamera = 2,
+  kLocation = 3,
+};
+
+enum PermissionDecision {
+  kGranted = 0,
+  kDenied = 1,
+  kDismissed = 2,
+  kUnavailable = 3,
+};
+
+enum StorageOperation {
+  kAppendTaskCommit = 0,
+  kQueryWorkspace = 1,
+  kDeleteSource = 2,
+  kUpsertWorkspace = 3,
+  kInstallSkill = 4,
+  kSetSkillStatus = 5,
+  kRecordSkillRun = 6,
+  kForgetSkill = 7,
+  kSetAssistantConfiguration = 8,
+  kDeleteWorkspace = 9,
+  kUpsertLibraryEntry = 10,
+  kRemoveLibraryEntry = 11,
+  kUpsertMemory = 12,
+  kDeleteMemory = 13,
+};
+
+enum LibraryFactKind {
+  kFromPage = 0,
+  kSummarized = 1,
+  kTaffyInference = 2,
+  kUserEntered = 3,
+};
+
+enum MemorySourceKind {
+  kUserEntered = 0,
+  kAcceptedTaskSuggestion = 1,
+};
+
+enum MemoryScopeKind {
+  kAllTasks = 0,
+  kWorkspace = 1,
+};
+
+enum MemorySensitivity {
+  kStandard = 0,
+  kSensitive = 1,
+};
+
+enum AssistantAbility {
+  kPagesLookup = 0,
+  kPagesCompare = 1,
+  kPagesSummarize = 2,
+  kPagesTable = 3,
+  kProducts = 4,
+  kOffers = 5,
+  kForm = 6,
+  kDownloads = 7,
+  kPdf = 8,
+  kSheet = 9,
+  kDocument = 10,
+  kDepth = 11,
+  kTrip = 12,
+  kPictures = 13,
+  kVideo = 14,
+  kKeep = 15,
+};
+
+enum PersonalityPreset {
+  kCarefulResearcher = 0,
+  kQuickShopper = 1,
+  kTripPlanner = 2,
+};
+
+enum SkillProvenance {
+  kAuthored = 0,
+  kRecordedFromTask = 1,
+  kInstalledFromPack = 2,
+};
+
+enum SkillMutationKind {
+  kTeach = 0,
+  kUpdate = 1,
+  kSetEnabled = 2,
+  kRemove = 3,
+};
+
+enum SkillClauseKind {
+  kRolePresent = 0,
+  kPhraseAt = 1,
+  kStateAt = 2,
+};
+
+enum SkillArgumentKind {
+  kFromEarlierStep = 0,
+  kFromPerson = 1,
+  kChoice = 2,
+  kCount = 3,
+  kFlag = 4,
+  kPublicAddress = 5,
+  kSemanticTarget = 6,
+};
+
+enum SkillStatus {
+  kDraft = 0,
+  kActive = 1,
+  kSuperseded = 2,
+  kRetired = 3,
+  kDisabled = 4,
+};
+
+enum SkillRunOutcome {
+  kCompleted = 0,
+  kRefused = 1,
+  kAbandoned = 2,
+  kUnavailable = 3,
+};
+
+enum WorkspaceExportFormat {
+  kMarkdown = 0,
+  kCsv = 1,
+};
+
+enum PageSnapshotExportFormat {
+  kMarkdown = 0,
+  kCanonicalJson = 1,
+};
+
+enum PageSnapshotExportStatus {
+  kExported = 0,
+  kStalePage = 1,
+  kPrivateProfile = 2,
+  kIncomplete = 3,
+  kOversize = 4,
+  kMalformed = 5,
+  kCancelled = 6,
+  kReplayConflict = 7,
+  kUnavailable = 8,
+};
+
+enum SiteSkillMatchStatus {
+  kAvailable = 0,
+  kStalePage = 1,
+  kPrivateProfile = 2,
+  kIncomplete = 3,
+  kMalformed = 4,
+  kUnavailable = 5,
+};
+
+enum ObservationScope {
+  kCurrentDocument = 0,
+  kSelectedSources = 1,
+};
+
+enum BipObservationStatus {
+  kOk = 0,
+  kUnsupported = 1,
+  kIncomplete = 2,
+  kConflicted = 3,
+  kStalePageEpoch = 4,
+  kDocumentInactive = 5,
+  kBudgetExceeded = 6,
+  kDeadlineExceeded = 7,
+  kCancelled = 8,
+  kResourcePressure = 9,
+  kInternalError = 10,
+};
+
+enum BipGraphEncoding {
+  kNone = 0,
+  kBipContract = 1,
+};
+
+enum MediaObservationKind {
+  kImage = 0,
+  kVideo = 1,
+  kPdf = 2,
+  kPageScreenshot = 3,
+};
+
+enum MediaFactKind {
+  kDescription = 0,
+  kOcrText = 1,
+  kTranscript = 2,
+  kPdfText = 3,
+  kPdfTableRow = 4,
+  kMetadata = 5,
+};
+
+enum MediaEvidenceKind {
+  kDom = 0,
+  kAccessibility = 1,
+  kCaptionTrack = 2,
+  kPdfTextLayer = 3,
+  kVisualInference = 4,
+  kTableHeuristic = 5,
+};
+
+enum BipSensitivity {
+  kNotSensitive = 0,
+  kPersonal = 1,
+  kAccount = 2,
+  kPayment = 3,
+  kIdentity = 4,
+  kHealth = 5,
+  kFinancial = 6,
+  kLegal = 7,
+  kPrivateCommunication = 8,
+  kAdministration = 9,
+  kCredential = 10,
+  kUnknownSensitive = 11,
+  kOneTimeCode = 12,
+  kChallengeResponse = 13,
+};
+
+enum AccountNetworkOperation {
+  kExchangeAuthorizationCode = 0,
+  kExchangeNativeCredential = 1,
+  kRequestEmailLink = 2,
+  kRefreshSession = 3,
+  kRevokeSession = 4,
+  kFetchEntitlement = 5,
+};
+
+enum EntitlementFetchReason {
+  kBootstrap = 0,
+  kSignIn = 1,
+  kCadence = 2,
+  kQuotaRefused = 3,
+};
+
+enum BrowserActionOperation {
+  kDispatch = 0,
+  kReconcile = 1,
+  kReleaseTaskTabs = 2,
+  kExportArtifact = 3,
+};
+
+enum ToolRuntimeKind {
+  kPython = 0,
+  kLocalModel = 1,
+  kMedia = 2,
+  kWasm = 3,
+};
+
+enum ToolOperation {
+  kRunBundledPythonModule = 0,
+  kGenerateLocalModel = 1,
+  kProbeMedia = 2,
+  kExtractAudio = 3,
+  kSampleFrames = 4,
+  kTranscodePreset = 5,
+  kRunSignedWasmTransform = 6,
+  kEmbedLocalModel = 7,
+};
+
+enum ToolModelArtifactKind {
+  kLitertTflite = 0,
+  kOnnxRuntime = 1,
+  kGguf = 2,
+};
+
+enum EmbeddingElementKind {
+  kFloat32Le = 0,
+};
+
+enum ToolChunkKind {
+  kTextUtf8 = 0,
+  kBinary = 1,
+};
+
+enum LocalModelFinishReason {
+  kStop = 0,
+  kTokenLimit = 1,
+};
+
+enum ToolTerminalStatus {
+  kCompleted = 0,
+  kCancelled = 1,
+  kDeadlineExceeded = 2,
+  kResourceLimit = 3,
+  kRuntimeCrashed = 4,
+  kInvalidInput = 5,
+  kUnsupported = 6,
+  kOutcomeUnknown = 7,
+  kModelArtifactMissing = 8,
+  kModelArtifactIncompatible = 9,
+  kLocalRuntimeUnavailable = 10,
+};
+
+enum SecureStoreOperation {
+  kGenerateEntropy = 0,
+  kWriteTransient = 1,
+  kDeleteHandle = 2,
+};
+
+enum SecretMaterialPurpose {
+  kPkceVerifier = 0,
+  kGoogleRawNonce = 1,
+};
+
+enum AuthSurfaceOperation {
+  kOpenOauth = 0,
+  kRequestNativeCredential = 1,
+};
+
+enum BrowserActionOutcome {
+  kCompleted = 0,
+  kRefused = 1,
+  kOutcomeUnknown = 2,
+};
+
+enum CapabilityRegistrationStatus {
+  kRegistered = 0,
+  kDuplicate = 1,
+  kStaleGeneration = 2,
+  kLeaseMissing = 3,
+  kInvalidGrant = 4,
+};
+
+enum PendingApprovalRegistrationStatus {
+  kRegistered = 0,
+  kStaleGeneration = 1,
+  kStaleSequence = 2,
+  kInvalidBinding = 3,
+  kTooManyBindings = 4,
+};
+
+enum PolicyActionClass {
+  kObservePage = 0,
+  kScrollIntoView = 1,
+  kOpenLink = 2,
+  kCreateTaskTab = 3,
+  kSyntheticClick = 4,
+  kMoveFocus = 5,
+  kFillField = 6,
+  kSelectOption = 7,
+  kToggleControl = 8,
+  kSubmitForm = 9,
+  kStartDownload = 10,
+  kUploadFile = 11,
+  kSendMessage = 12,
+  kPurchase = 13,
+  kExtractCredential = 14,
+  kBypassAccessControl = 15,
+  kExecuteToolJob = 16,
+  kLibraryRead = 17,
+  kLibraryWrite = 18,
+  kMemoryRead = 19,
+  kMemoryWrite = 20,
+  kControlTab = 21,
+  kProfileStoreRead = 22,
+};
+
+enum TaskActionOperationKind {
+  kNavigate = 0,
+  kSearch = 1,
+  kHistoryBack = 2,
+  kHistoryForward = 3,
+  kTabsOpen = 4,
+  kTabsList = 5,
+  kTabsActivate = 6,
+  kTabsClose = 7,
+  kDomQuery = 8,
+  kDomRead = 9,
+  kDomClick = 10,
+  kDomScroll = 11,
+  kFormInspect = 12,
+  kFormFill = 13,
+  kFormSubmit = 14,
+  kDownloadStart = 15,
+  kDownloadList = 16,
+  kSelectionRead = 17,
+  kImageDescribe = 18,
+  kImageReadText = 19,
+  kVideoInspect = 20,
+  kPdfInspect = 21,
+  kToolJob = 22,
+  kLinkOpen = 23,
+  kFormSelect = 24,
+  kFormToggle = 25,
+  kLibrarySearch = 26,
+  kLibrarySave = 27,
+  kLibraryRemove = 28,
+  kMemorySearch = 29,
+  kMemorySave = 30,
+  kMemoryUpdate = 31,
+  kMemoryDelete = 32,
+  kDomFocus = 33,
+  kPageScreenshotInspect = 34,
+  kDownloadCancel = 35,
+  kReload = 36,
+  kStopLoading = 37,
+  kHistorySearch = 38,
+  kHistoryRecent = 39,
+  kBookmarksSearch = 40,
+  kBookmarksList = 41,
+  kOpenTabsList = 42,
+};
+
+enum TaskActionInputKind {
+  kNone = 0,
+  kSuppliedValue = 1,
+  kToggleState = 2,
+};
+
+enum PolicyPrincipalKind {
+  kAssistant = 0,
+  kSkill = 1,
+};
+
+enum PolicyEvaluationContext {
+  kTask = 0,
+  kDirectUserObservation = 1,
+  kTaskDiscovery = 2,
+};
+
+enum AuthoritySubjectKind {
+  kTask = 0,
+  kDirectUserIntent = 1,
+};
+
+enum PolicyOriginKind {
+  kTuple = 0,
+  kOpaque = 1,
+};
+
+enum PolicyRiskClass {
+  kLocalRead = 0,
+  kReversibleDisclosure = 1,
+  kSensitiveDisclosure = 2,
+  kExcludedCommitment = 3,
+  kProhibitedAbuse = 4,
+};
+
+enum PolicyEvaluationStatus {
+  kGranted = 0,
+  kApprovalRequired = 1,
+  kDenied = 2,
+  kInvalidRequest = 3,
+  kCoreUnavailable = 4,
+};
+
+enum TaskActionResultCode {
+  kVerified = 0,
+  kDeniedByPolicy = 1,
+  kApprovalRequired = 2,
+  kApprovalDenied = 3,
+  kActorLeaseMissing = 4,
+  kCapabilityExpired = 5,
+  kTabGone = 6,
+  kFrameGone = 7,
+  kDocumentInactive = 8,
+  kStalePageEpoch = 9,
+  kStaleGraph = 10,
+  kNodeGone = 11,
+  kOriginChanged = 12,
+  kRoleOrActionChanged = 13,
+  kNotVisible = 14,
+  kOccluded = 15,
+  kNotEnabled = 16,
+  kNotEditable = 17,
+  kSensitiveField = 18,
+  kDestinationChanged = 19,
+  kUnsupported = 20,
+  kBudgetExceeded = 21,
+  kDispatchFailed = 22,
+  kNavigationStarted = 23,
+  kPostconditionTimeout = 24,
+  kPostconditionFailed = 25,
+  kCancelledByUser = 26,
+  kCancelledByNavigation = 27,
+  kRendererCrashed = 28,
+  kOutcomeUnknown = 29,
+  kInternalError = 30,
+  kEgressNotAuthorized = 31,
+  kDestinationClassRestricted = 32,
+  kUntrustedContentOrigin = 33,
+  kPreparedEffectChanged = 34,
+  kCommitWithoutPrepare = 35,
+  kGraphMovedDuringPreflight = 36,
+  kValueReferenceUnknown = 37,
+};
+
+enum AssetDeliveryOperation {
+  kFetchAsset = 0,
+  kRemoveAsset = 1,
+};
+
+enum AssetPlatform {
+  kAndroidArm64 = 0,
+  kAndroidX64 = 1,
+  kMacosArm64 = 2,
+  kMacosX64 = 3,
+  kWindowsX64 = 4,
+  kWindowsArm64 = 5,
+  kUnsupported = 6,
+};
+
+enum AssetKind {
+  kPythonStdlib = 0,
+  kPythonPackages = 1,
+  kModelWeights = 2,
+  kModelTokenizer = 3,
+  kFilterList = 4,
+  kCountryFlags = 5,
+  kStartScenes = 6,
+};
+
+enum AssetContainer {
+  kRaw = 0,
+  kZip = 1,
+};
+
+enum AssetPresence {
+  kAbsent = 0,
+  kPartial = 1,
+  kComplete = 2,
+  kInstalled = 3,
+};
+
+enum AssetRefusalReason {
+  kUnknownAsset = 0,
+  kNoVariantForPlatform = 1,
+  kNotPublishedYet = 2,
+  kCatalogRowIncomplete = 3,
+  kVariantTooLarge = 4,
+  kAttemptsExhausted = 5,
+  kIntegrityFailed = 6,
+  kNetworkNotPermitted = 7,
+  kDeclinedByPerson = 8,
+};
+
+enum AssetTransferOutcome {
+  kInterrupted = 0,
+  kOriginRefusedTemporary = 1,
+  kOriginRefusedPermanent = 2,
+  kIntegritySound = 3,
+  kIntegrityWrongLength = 4,
+  kIntegrityWrongDigest = 5,
+  kInstalled = 6,
+  kDeclined = 7,
+};
+
+enum AssetNetworkCost {
+  kOffline = 0,
+  kMetered = 1,
+  kUnmetered = 2,
+};
+
+enum ProviderAuthMethod {
+  kApiKey = 0,
+  kOauth = 1,
+};
+
+enum ThinkingLevel {
+  kOff = 0,
+  kMinimal = 1,
+  kLow = 2,
+  kMedium = 3,
+  kHigh = 4,
+  kXhigh = 5,
+  kMax = 6,
+};
+
+enum ProviderCredentialState {
+  kUsable = 0,
+  kNeedsSignIn = 1,
+  kRefreshFailed = 2,
+};
+
+enum ProviderWireApi {
+  kAnthropicMessages = 0,
+  kOpenAiResponses = 1,
+  kOpenAiCompletions = 2,
+  kGoogleGenerativeLanguage = 3,
+  kManaged = 4,
+  kOpenAiCodexResponses = 5,
+  kGoogleCloudCodeAssist = 6,
+};
+
+enum ModelErrorClass {
+  kAuth = 0,
+  kQuota = 1,
+  kOverloaded = 2,
+  kInvalidRequest = 3,
+  kNetwork = 4,
+  kOverflow = 5,
+  kCanceled = 6,
+  kUnknown = 7,
+};
+
+enum ModelEndpointKind {
+  kCatalogOrigin = 0,
+  kUserBaseUrl = 1,
+};
+
+enum ServerKind {
+  kOpenaiCompatible = 0,
+  kOllama = 1,
+  kLmStudio = 2,
+  kVllm = 3,
+  kLlamaCpp = 4,
+};
+
+enum ModelStreamChunkStatus {
+  kAccepted = 0,
+  kInvalid = 1,
+  kStale = 2,
+  kUnavailable = 3,
+};
+
+enum BackupRecordKind {
+  kAssistantConfiguration = 0,
+  kSavedWorkspace = 1,
+  kLibraryEntry = 2,
+  kMemoryRecord = 3,
+  kUserAuthoredSkill = 4,
+  kLearnedProcedure = 5,
+  kBookmark = 6,
+  kBrowserPreference = 7,
+};
+
+enum BackupRecordState {
+  kActive = 0,
+  kTombstone = 1,
+};
+
+enum BackupPlanningStatus {
+  kSucceeded = 0,
+  kInvalidRequest = 1,
+  kInvalidManifest = 2,
+  kSnapshotMismatch = 3,
+  kStagedPayloadMismatch = 4,
+  kRestoreConflict = 5,
+  kDigestUnavailable = 6,
+  kUnavailable = 7,
+};
+
+enum BackupRestoreTargetKind {
+  kNewRegularProfile = 0,
+  kExistingRegularProfile = 1,
+};
+
+enum BackupRestoreAction {
+  kStageCreate = 0,
+  kStageDeletion = 1,
+  kAlreadyPresent = 2,
+  kKeepNewerCurrent = 3,
+  kBlockedByDeletion = 4,
+  kNeedsExplicitConflictChoice = 5,
+};
+
+enum BackupRestoreProtocolStatus {
+  kSucceeded = 0,
+  kInvalidOperation = 1,
+  kUnavailable = 2,
+  kBindingMismatch = 3,
+  kWrongPhase = 4,
+  kConfirmationMismatch = 5,
+  kSnapshotMismatch = 6,
+  kReconcileRequired = 7,
+};
+
+enum BackupRestoreCommitOutcome {
+  kCommitted = 0,
+  kDefinitelyNotCommitted = 1,
+  kOutcomeUnknown = 2,
+};
+
+enum BackupRestoreResolutionChoice {
+  kAcceptCandidate = 0,
+  kDiscardCandidate = 1,
+};
+
+enum BackupRestoreResolutionOutcome {
+  kCompleted = 0,
+  kDefinitelyNotCompleted = 1,
+  kOutcomeUnknown = 2,
+};
+
+enum BackupRestoreRecoveryFactKind {
+  kIntentRecorded = 0,
+  kOutcomeObserved = 1,
+};
+
+enum BackupRestorePhysicalIntent {
+  kCommitCandidate = 0,
+  kAcceptCandidate = 1,
+  kDiscardCandidate = 2,
+};
+
+enum BackupRestoreObservedOutcome {
+  kCompleted = 0,
+  kDefinitelyNotCompleted = 1,
+  kOutcomeUnknown = 2,
+};
+
+enum BackupRestoreRecoveryClassificationKind {
+  kReconcileRequired = 0,
+  kRollbackAvailable = 1,
+  kCleanupRequired = 2,
+  kPublished = 3,
+  kVerifiedDeleted = 4,
+};
+
+enum BackupRestoreRecoveryError {
+  kMissingCommitIntent = 0,
+  kTooManyRecords = 1,
+  kUnsupportedVersion = 2,
+  kInvalidSequence = 3,
+  kInvalidBinding = 4,
+  kBindingChanged = 5,
+  kInvalidIntentId = 6,
+  kIntentIdReused = 7,
+  kUnexpectedIntent = 8,
+  kUnresolvedIntent = 9,
+  kOutcomeWithoutIntent = 10,
+  kOutcomeIntentMismatch = 11,
+  kDuplicateUnknownOutcome = 12,
+  kTerminalHistoryExtended = 13,
+};
+
+enum BackupRestoreRecoveryInspectionStatus {
+  kSucceeded = 0,
+  kInvalidOperation = 1,
+  kInvalidRecord = 2,
+  kInvalidHistory = 3,
+  kUnavailable = 4,
+};
+
+enum SavedFlowQueryStatus {
+  kAvailable = 0,
+  kPrivateProfile = 1,
+  kUnavailable = 2,
+  kInvalidRequest = 3,
+  kStaleRequest = 4,
+};
+
+enum SavedFlowQueryKind {
+  kExactGoal = 0,
+  kReview = 1,
+  kPublicStart = 2,
+};
+
+enum FieldValueAskOutcome {
+  kAnswered = 0,
+  kDismissed = 1,
+  kNotAField = 2,
+  kChallengeOffScreen = 3,
+  kCannotBeShown = 4,
+  kPageMoved = 5,
+  kNoSurface = 6,
+};
+
+struct OperationEnvelope {
+  string operation_id@0;
+  uint64 service_generation@1;
+  uint64 task_revision@2;
+  uint64 deadline_monotonic_ms@3;
+  string idempotency_key@4;
+};
+
+struct PolicyPrincipal {
+  PolicyPrincipalKind kind@0;
+  string? skill_version_id@1;
+};
+
+struct AuthoritySubject {
+  AuthoritySubjectKind kind@0;
+  string authority_subject_id@1;
+};
+
+struct PolicyOrigin {
+  PolicyOriginKind kind@0;
+  string? serialization@1;
+  string? opaque_id@2;
+};
+
+struct PolicyCapabilityScope {
+  string profile_id@0;
+  string tab_id@1;
+  string frame_id@2;
+  string page_epoch@3;
+  PolicyOrigin origin@4;
+  string? node_id@5;
+  PolicyOrigin? destination_scope@6;
+  uint64 required_graph_revision@7;
+  array<PolicyOrigin> allowed_redirects@8;
+  string? destination_address@9;
+};
+
+struct PolicyApprovalFact {
+  string receipt_reference@0;
+  string proposal_digest@1;
+  uint64 service_generation@2;
+  uint64 expires_at_monotonic_ms@3;
+  uint64 expires_at_utc_ms@4;
+  string browser_session_id@5;
+};
+
+struct ActorLeaseFact {
+  string lease_id@0;
+  uint64 service_generation@1;
+  string task_id@2;
+  string profile_id@3;
+  string tab_id@4;
+  TaskControlMode control_mode@5;
+  uint64 expires_at_monotonic_ms@6;
+  AuthoritySubject authority_subject@7;
+};
+
+struct TaskDiscoveryAuthorityFact {
+  string discovery_tab_id@0;
+  string browser_session_id@1;
+  uint32 remaining_new_source_cap@2;
+};
+
+struct PolicyEvaluationRequest {
+  OperationEnvelope operation@0;
+  uint64 now_monotonic_ms@1;
+  string action_id@2;
+  string task_id@3;
+  PolicyPrincipal principal@4;
+  PolicyActionClass action_class@5;
+  string proposal_digest@6;
+  PolicyCapabilityScope scope@7;
+  array<BipSensitivity> data_classes@8;
+  PolicyRiskClass context_risk@9;
+  uint64 expires_at_monotonic_ms@10;
+  ActorLeaseFact actor_lease@11;
+  PolicyApprovalFact? approval@12;
+  PolicyEvaluationContext context@13;
+  AuthoritySubject authority_subject@14;
+  uint32 policy_version@15;
+  uint64 now_utc_ms@16;
+  TaskActionOperationKind operation_kind@17;
+  array<uint8, 32> canonical_intent_digest@18;
+  TaskDiscoveryAuthorityFact? discovery@19;
+};
+
+struct PolicyEvaluationResult {
+  string operation_id@0;
+  PolicyEvaluationStatus status@1;
+  MintedCapabilityGrant? minted_grant@2;
+  EffectEnvelope? direct_observation_effect@3;
+  PolicyDenial? denial@4;
+};
+
+struct PolicyDenial {
+  TaskActionResultCode code@0;
+};
+
+struct MintedCapabilityGrant {
+  string capability_id@0;
+  uint64 service_generation@1;
+  uint32 policy_version@2;
+  string actor_lease_id@3;
+  string task_id@4;
+  string action_id@5;
+  PolicyActionClass action_class@6;
+  PolicyPrincipal principal@7;
+  string proposal_digest@8;
+  string idempotency_key@9;
+  PolicyCapabilityScope scope@10;
+  array<BipSensitivity> data_classes@11;
+  PolicyRiskClass effective_risk@12;
+  PolicyApprovalFact? approval@13;
+  uint64 issued_at_monotonic_ms@14;
+  uint64 expires_at_monotonic_ms@15;
+  AuthoritySubject authority_subject@16;
+  TaskActionOperationKind operation_kind@17;
+  array<uint8, 32> canonical_intent_digest@18;
+  TaskDiscoveryAuthorityFact? discovery@19;
+};
+
+struct CommittedTaskBatch {
+  string effect_id@0;
+  uint64 expected_revision@1;
+  uint64 resulting_revision@2;
+  array<uint8> transaction_batch@3;
+};
+
+struct TaskRestoreRecord {
+  string task_id@0;
+  array<CommittedTaskBatch> batches@1;
+  array<uint8, 32> task_id_seed@2;
+};
+
+struct AccountSessionHandle {
+  string session_handle@0;
+  string account_subject@1;
+  uint64 expires_at_monotonic_ms@2;
+  uint64 rotation@3;
+  AccountAuthMethod auth_method@4;
+  string? email@5;
+  string? display_name@6;
+};
+
+struct WorkspaceRestoreRecord {
+  string workspace_id@0;
+  uint64 revision@1;
+  array<uint8> snapshot@2;
+};
+
+struct LibrarySourceRecord {
+  string source_id@0;
+  string title@1;
+  string host@2;
+  uint64 observed_at_epoch_ms@3;
+};
+
+struct LibraryEntryRecord {
+  string entry_id@0;
+  uint64 revision@1;
+  string collection_id@2;
+  string collection_name@3;
+  string source_workspace_id@4;
+  uint64 source_workspace_revision@5;
+  string source_fact_id@6;
+  string field@7;
+  string original_value@8;
+  string? correction@9;
+  LibraryFactKind kind@10;
+  array<LibrarySourceRecord> sources@11;
+  uint64 captured_at_epoch_ms@12;
+  uint64 last_checked_epoch_ms@13;
+  bool has_conflict@14;
+};
+
+struct MemoryWorkspaceRecord {
+  string workspace_id@0;
+  string display_name@1;
+};
+
+struct MemoryRecord {
+  string memory_id@0;
+  uint64 revision@1;
+  string statement@2;
+  MemorySourceKind source_kind@3;
+  string? source_task_id@4;
+  MemoryWorkspaceRecord? source_workspace@5;
+  MemoryScopeKind scope_kind@6;
+  MemoryWorkspaceRecord? scope_workspace@7;
+  MemorySensitivity sensitivity@8;
+  uint64 created_at_epoch_ms@9;
+  uint64 updated_at_epoch_ms@10;
+  uint64 reviewed_at_epoch_ms@11;
+  uint64 expires_at_epoch_ms@12;
+};
+
+struct AssetFetchRequest {
+  string asset_id@0;
+  string asset_revision@1;
+  string origin_path@2;
+  uint64 offset_bytes@3;
+  uint64 total_bytes@4;
+  array<uint8, 32> expected_digest@5;
+  AssetContainer container@6;
+};
+
+struct AssetRemoveRequest {
+  string asset_id@0;
+  string asset_revision@1;
+};
+
+struct AssetDeliveryEffect {
+  AssetDeliveryOperation operation_kind@0;
+  AssetFetchRequest? fetch@1;
+  AssetRemoveRequest? remove@2;
+};
+
+struct AssetTransferReport {
+  string asset_id@0;
+  string asset_revision@1;
+  AssetTransferOutcome outcome@2;
+  uint64 written_bytes@3;
+  uint64 observed_bytes@4;
+  array<uint8, 32> observed_digest@5;
+};
+
+struct AssetRemovalReport {
+  string asset_id@0;
+  string asset_revision@1;
+  uint64 reclaimed_bytes@2;
+};
+
+struct AssetDeliveryEffectResult {
+  AssetDeliveryOperation operation_kind@0;
+  AssetTransferReport? transfer@1;
+  AssetRemovalReport? removal@2;
+};
+
+struct CatalogFetchEffect {
+  CatalogNetworkOperation operation_kind@0;
+  string? known_catalog_version@1;
+  uint32 max_response_bytes@2;
+};
+
+struct CatalogFetchEffectResult {
+  CatalogNetworkOperation operation_kind@0;
+  CatalogFetchDisposition disposition@1;
+  array<uint8> body@2;
+};
+
+struct CachedCatalogOverlay {
+  uint64 fetched_at_utc_ms@0;
+  array<uint8> document@1;
+};
+
+struct AssetOnDisk {
+  string asset_id@0;
+  string asset_revision@1;
+  AssetPresence presence@2;
+  uint64 written_bytes@3;
+};
+
+struct SetAssetDeliveryPolicyCommand {
+  AssetNetworkCost network_cost@0;
+  bool metered_permitted@1;
+};
+
+struct RequestAssetCommand {
+  string asset_id@0;
+  string asset_revision@1;
+};
+
+struct RemoveAssetCommand {
+  string asset_id@0;
+  string asset_revision@1;
+};
+
+struct SkillRecord {
+  string skill_id@0;
+  string origin@1;
+  SkillProvenance provenance@2;
+  SkillStatus status@3;
+  uint32 active_version@4;
+  array<uint8> definition@5;
+  uint32 step_count@6;
+  uint64 installed_at_utc_ms@7;
+  uint64 updated_at_utc_ms@8;
+};
+
+struct SkillRunRecord {
+  string skill_id@0;
+  uint32 version@1;
+  string task_id@2;
+  SkillRunOutcome outcome@3;
+  uint64 ran_at_utc_ms@4;
+};
+
+struct AssistantConfiguration {
+  uint64 revision@0;
+  array<AssistantAbility> disabled_abilities@1;
+  PersonalityPreset preset@2;
+  uint32 pace@3;
+  uint32 length@4;
+  uint32 check_in@5;
+};
+
+struct CoreBootstrap {
+  uint64 service_generation@0;
+  bool private_profile@1;
+  uint32 core_journal_schema_version@2;
+  string core_journal_schema_checksum@3;
+  array<TaskRestoreRecord> tasks@4;
+  array<uint8, 32> generation_capability_entropy@5;
+  AccountSessionHandle? account_session@6;
+  string browser_profile_id@7;
+  array<WorkspaceRestoreRecord> workspaces@8;
+  string browser_session_id@9;
+  array<AccountAuthMethod> available_account_methods@10;
+  AssetPlatform asset_platform@11;
+  array<AssetOnDisk> assets@12;
+  array<SkillRecord> skills@13;
+  array<SkillRunRecord> recall@14;
+  CachedCatalogOverlay? cached_catalog_overlay@15;
+  AssistantConfiguration? assistant_configuration@16;
+  uint64 library_revision@17;
+  array<LibraryEntryRecord> library_entries@18;
+  uint64 memory_revision@19;
+  array<MemoryRecord> memory_records@20;
+};
+
+struct TaskBudget {
+  TaskBudgetKind kind@0;
+  uint64 limit@1;
+};
+
+struct TaskConsentSource {
+  string source_id@0;
+  string tab_id@1;
+  string normalized_origin@2;
+  string? canonical_locator@3;
+};
+
+struct LibraryRefreshSource {
+  string source_id@0;
+  string title@1;
+  string host@2;
+  string canonical_locator@3;
+  array<uint8, 32> original_content_digest@4;
+};
+
+struct LibraryRefreshRequest {
+  string preview_id@0;
+  uint64 library_revision@1;
+  string collection_id@2;
+  uint64 source_workspace_revision@3;
+  array<LibraryRefreshSource> sources@4;
+};
+
+struct TaskConsentPreview {
+  array<TaskConsentSource> sources@0;
+  bool source_discovery_enabled@1;
+  uint32 new_source_cap@2;
+  TaskProviderRoute provider_route@3;
+};
+
+struct TaskSuppliedValuePosition {
+  uint32 index@0;
+  string request_id@1;
+};
+
+struct TaskToggleState {
+  bool checked@0;
+};
+
+struct TaskActionInput {
+  TaskActionInputKind kind@0;
+  TaskSuppliedValuePosition? supplied_value@1;
+  TaskToggleState? toggle_state@2;
+};
+
+struct TaskPolicyEffect {
+  OperationEnvelope operation@0;
+  string effect_id@1;
+  string task_id@2;
+  string action_id@3;
+  PolicyActionClass action_class@4;
+  string proposal_digest@5;
+  string idempotency_key@6;
+  string tab_id@7;
+  string? node_id@8;
+  PolicyPrincipal principal@9;
+  array<BipSensitivity> data_classes@10;
+  PolicyRiskClass context_risk@11;
+  PolicyApprovalFact? approval@12;
+  TaskControlMode control_mode@13;
+  uint32 policy_version@14;
+  TaskActionOperationKind operation_kind@15;
+  string tool_name@16;
+  string? destination_address@17;
+  array<uint8> canonical_intent@18;
+  string? transient_search_query@19;
+  TaskActionInput input@20;
+  TaskDiscoveryAuthorityFact? discovery@21;
+};
+
+struct TaskFrozenDocument {
+  string frame_id@0;
+  string page_epoch@1;
+  uint64 graph_revision@2;
+  string normalized_origin@3;
+  string? opaque_origin_id@4;
+};
+
+struct TaskTabDocumentTarget {
+  string tab_id@0;
+  string frame_id@1;
+  string page_epoch@2;
+  uint64 graph_revision@3;
+};
+
+struct TaskTabActionBinding {
+  string browser_session_id@0;
+  TaskTabDocumentTarget? target@1;
+};
+
+struct TaskDownloadActionBinding {
+  string browser_session_id@0;
+  string? download_id@1;
+};
+
+struct TaskStoreActionBinding {
+  string? query@0;
+  uint32 limit@1;
+};
+
+struct TaskExecutableAction {
+  PolicyActionClass action_class@0;
+  string tool_name@1;
+  string tab_id@2;
+  string? node_id@3;
+  string? destination_origin@4;
+  string? operand_handle@5;
+  string? destination_address@6;
+  TaskActionOperationKind operation_kind@7;
+  array<uint8> canonical_intent@8;
+  string? transient_search_query@9;
+  TaskActionInput input@10;
+  TaskTabActionBinding? task_tab@11;
+  TaskDownloadActionBinding? task_download@12;
+  TaskStoreActionBinding? task_store@13;
+};
+
+struct TaskObservationBounds {
+  ObservationScope scope@0;
+  uint32 max_bytes@1;
+  uint32 max_nodes@2;
+  uint32 max_text_bytes@3;
+  uint32 max_frames@4;
+  uint32 deadline_ms@5;
+};
+
+struct TaskActionEffect {
+  string action_id@0;
+  string proposal_digest@1;
+  string idempotency_key@2;
+  string capability_id@3;
+  string dispatch_id@4;
+  TaskFrozenDocument document@5;
+  TaskExecutableAction executable@6;
+  array<TaskActionPrecondition> preconditions@7;
+  TaskActionPostcondition postcondition@8;
+  TaskObservationBounds? observation@9;
+};
+
+struct TaskRevocationEffect {
+  TaskRevocationReason reason@0;
+};
+
+struct TaskApprovalEffect {
+  string action_id@0;
+  string proposal_digest@1;
+  TaskExecutableAction? form_action@2;
+};
+
+struct TaskPermissionEffect {
+  string request_id@0;
+  PlatformPermission permission@1;
+  uint64 deadline_monotonic_ms@2;
+  uint64 deadline_utc_ms@3;
+  string browser_session_id@4;
+};
+
+struct TaskSettlementEffect {
+  TaskSettlementKind kind@0;
+};
+
+struct TaskReconcileEffect {
+  string action_id@0;
+  TaskRecoveryRule rule@1;
+  string dispatch_id@2;
+  TaskActionOperationKind operation@3;
+};
+
+struct TaskReleaseTabsEffect {
+  uint64 terminal_revision@0;
+};
+
+struct TaskArtifactEffect {
+  TaskArtifactKind kind@0;
+  string artifact_id@1;
+  uint64 workspace_revision@2;
+  array<uint8> content@3;
+};
+
+struct TaskModelEffect {
+  string call_id@0;
+  ModelRequestEffect request@1;
+};
+
+struct TaskHandoverEffect {
+  string handover_id@0;
+  uint32 window_ms@1;
+};
+
+struct TaskToolJobEffect {
+  string action_id@0;
+  string job_id@1;
+  ToolRuntimeKind runtime@2;
+  ToolJobEffect? job@3;
+};
+
+struct TaskFieldValuesEffect {
+  string request_id@0;
+  string tab_id@1;
+  string node_id@2;
+  array<string> companion_node_ids@3;
+};
+
+struct TaskDiscoveryBootstrapEffect {
+  string browser_session_id@0;
+  uint32 remaining_new_source_cap@1;
+};
+
+struct TaskLibraryToolEffect {
+  string action_id@0;
+  TaskActionOperationKind operation_kind@1;
+};
+
+struct TaskMemoryToolEffect {
+  string action_id@0;
+  TaskActionOperationKind operation_kind@1;
+};
+
+struct TaskEffectBinding {
+  OperationEnvelope operation@0;
+  string effect_id@1;
+  string task_id@2;
+  uint32 ordinal@3;
+  TaskReducerEffectKind kind@4;
+  TaskRevocationEffect? revocation@5;
+  TaskPolicyEffect? policy@6;
+  TaskApprovalEffect? approval@7;
+  TaskPermissionEffect? permission@8;
+  TaskActionEffect? action@9;
+  TaskSettlementEffect? settlement@10;
+  TaskReconcileEffect? reconcile@11;
+  TaskReleaseTabsEffect? release_tabs@12;
+  TaskArtifactEffect? generate_artifact@13;
+  TaskArtifactEffect? export_artifact@14;
+  TaskModelEffect? model@15;
+  TaskHandoverEffect? handover@16;
+  TaskToolJobEffect? tool_job@17;
+  TaskFieldValuesEffect? field_values@18;
+  TaskDiscoveryBootstrapEffect? discovery_bootstrap@19;
+  TaskLibraryToolEffect? library_tool@20;
+  TaskMemoryToolEffect? memory_tool@21;
+};
+
+struct TaskProducedArtifactReceipt {
+  string artifact_id@0;
+  TaskArtifactKind kind@1;
+};
+
+struct TaskToolOutputReceipt {
+  array<uint8> digest@0;
+  uint64 byte_count@1;
+  uint32 chunk_count@2;
+  TaskProducedArtifactReceipt? artifact@3;
+};
+
+struct TaskReconciledActionResult {
+  uint32 result_code@0;
+};
+
+struct TaskEffectCompletion {
+  OperationEnvelope operation@0;
+  string effect_id@1;
+  string task_id@2;
+  TaskReducerEffectKind kind@3;
+  TaskEffectCompletionStatus status@4;
+  EffectResult? effect_result@5;
+  TaskToolOutputReceipt? tool_output@6;
+  TaskReconciledActionResult? reconciled_action_result@7;
+};
+
+struct BuiltinSkillReference {
+  BuiltinSkillId skill_id@0;
+  uint32 version@1;
+};
+
+struct StartTaskCommand {
+  string task_id@0;
+  string? workspace_id@1;
+  string browser_profile_id@2;
+  TaskKind kind@3;
+  string goal@4;
+  TaskControlMode control_mode@5;
+  string? provider_route_id@6;
+  uint32 assistant_config_version@7;
+  uint32 policy_version@8;
+  string? skill_version_id@9;
+  array<string> tool_allowlist@10;
+  TaskMilestone milestone@11;
+  array<TaskBudget> budgets@12;
+  bool has_task_deadline@13;
+  uint64 task_deadline_monotonic_ms@14;
+  string? predecessor_task_id@15;
+  string trace_id@16;
+  array<uint8, 32> task_id_seed@17;
+  TaskTemplateId template_id@18;
+  TaskConsentPreview consent_preview@19;
+  string initial_consent_receipt_id@20;
+  string browser_session_id@21;
+  uint64 task_deadline_utc_ms@22;
+  LibraryRefreshRequest? library_refresh@23;
+  BuiltinSkillReference? builtin_skill@24;
+};
+
+struct CancelTaskCommand {
+  string task_id@0;
+  CancelReason reason@1;
+  string trace_id@2;
+};
+
+struct PauseTaskCommand {
+  string task_id@0;
+  string trace_id@1;
+};
+
+struct ResumeTaskCommand {
+  string task_id@0;
+  string trace_id@1;
+};
+
+struct TakeOverCommand {
+  string task_id@0;
+  string trace_id@1;
+};
+
+struct UserDecisionCommand {
+  string task_id@0;
+  string action_id@1;
+  UserDecisionKind decision@2;
+  string approval_digest@3;
+  string trace_id@4;
+  string approval_receipt_id@5;
+  uint64 approval_expires_at_monotonic_ms@6;
+  uint64 approval_expires_at_utc_ms@7;
+  string browser_session_id@8;
+};
+
+struct AuthCallbackCommand {
+  string flow_id@0;
+  string redirect_binding_id@1;
+  string returned_state@2;
+  AuthCallbackStatus status@3;
+  string? authorization_code_handle@4;
+};
+
+struct PermissionResultCommand {
+  string task_id@0;
+  string request_id@1;
+  PlatformPermission permission@2;
+  PermissionDecision decision@3;
+  string trace_id@4;
+};
+
+struct CompleteHandoverCommand {
+  string task_id@0;
+  string handover_id@1;
+  string lease_before@2;
+  string resumed_with@3;
+  uint32 person_input@4;
+  string trace_id@5;
+};
+
+struct ExpireHandoverCommand {
+  string task_id@0;
+  string handover_id@1;
+  string trace_id@2;
+};
+
+struct SupplyUserInputCommand {
+  string task_id@0;
+  string answer@1;
+  string trace_id@2;
+};
+
+struct FollowUpCommand {
+  string task_id@0;
+  string question@1;
+  string trace_id@2;
+};
+
+struct SupplyFieldValuesCommand {
+  string task_id@0;
+  string request_id@1;
+  uint32 supplied@2;
+  string trace_id@3;
+  FieldValueAskOutcome outcome@4;
+  array<string> field_node_ids@5;
+};
+
+struct StartAuthCommand {
+  string flow_id@0;
+  AccountAuthMethod method@1;
+  string redirect_binding_id@2;
+  array<AccountScope> scopes@3;
+  uint64 issued_at_monotonic_ms@4;
+};
+
+struct RequestEmailLinkCommand {
+  string flow_id@0;
+  string email@1;
+  string redirect_binding_id@2;
+  array<AccountScope> scopes@3;
+  uint64 issued_at_monotonic_ms@4;
+};
+
+struct SignOutCommand {
+  string? account_subject@0;
+};
+
+struct AuthCredentialResultCommand {
+  string flow_id@0;
+  AccountAuthMethod method@1;
+  string? credential_handle@2;
+  AuthCredentialStatus status@3;
+};
+
+struct CorrectWorkspaceFactCommand {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+  string fact_id@2;
+  string value@3;
+};
+
+struct ExcludeWorkspaceSourceCommand {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+  string source_id@2;
+};
+
+struct RequestWorkspaceExportCommand {
+  string request_id@0;
+  string workspace_id@1;
+  uint64 expected_revision@2;
+  WorkspaceExportFormat format@3;
+};
+
+struct SaveWorkspaceCommand {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+};
+
+struct RenameWorkspaceCommand {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+  string display_name@2;
+};
+
+struct DeleteWorkspaceCommand {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+  string confirmation_token@2;
+};
+
+struct DiscardWorkspaceCommand {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+};
+
+struct SearchLibraryCommand {
+  string request_id@0;
+  string query@1;
+  uint32 limit@2;
+  uint64 requested_at_epoch_ms@3;
+};
+
+struct SaveLibraryFactCommand {
+  string workspace_id@0;
+  uint64 expected_workspace_revision@1;
+  string fact_id@2;
+  uint64 expected_library_revision@3;
+  uint64 expected_entry_revision@4;
+  uint64 approved_at_epoch_ms@5;
+};
+
+struct RemoveLibraryEntryCommand {
+  string entry_id@0;
+  uint64 expected_library_revision@1;
+  uint64 expected_entry_revision@2;
+  uint64 removed_at_epoch_ms@3;
+};
+
+struct RequestLibraryExportCommand {
+  string request_id@0;
+  uint64 expected_library_revision@1;
+  string? collection_id@2;
+  WorkspaceExportFormat format@3;
+};
+
+struct SearchMemoryCommand {
+  string request_id@0;
+  string query@1;
+  uint32 limit@2;
+  uint64 requested_at_epoch_ms@3;
+};
+
+struct UpsertMemoryCommand {
+  string? memory_id@0;
+  string statement@1;
+  MemoryScopeKind scope_kind@2;
+  MemoryWorkspaceRecord? scope_workspace@3;
+  MemorySensitivity sensitivity@4;
+  uint64 expected_memory_revision@5;
+  uint64 expected_record_revision@6;
+  uint64 expires_at_epoch_ms@7;
+  uint64 approved_at_epoch_ms@8;
+};
+
+struct DeleteMemoryCommand {
+  string memory_id@0;
+  uint64 expected_memory_revision@1;
+  uint64 expected_record_revision@2;
+  uint64 deleted_at_epoch_ms@3;
+};
+
+struct SaveProviderCredentialCommand {
+  string provider_id@0;
+  ProviderAuthMethod auth_method@1;
+  string credential_handle@2;
+};
+
+struct SetProviderCredentialStateCommand {
+  string provider_id@0;
+  ProviderCredentialState state@1;
+  array<string> available_model_ids@2;
+};
+
+struct ThinkingPreference {
+  ThinkingLevel level@0;
+};
+
+struct SetProviderModelPreferenceCommand {
+  string provider_id@0;
+  string? model_id@1;
+  ThinkingPreference? thinking@2;
+};
+
+struct ProbeProviderCredentialCommand {
+  string provider_id@0;
+  string credential_handle@1;
+};
+
+struct ForgetProviderCredentialCommand {
+  string provider_id@0;
+};
+
+struct StartProviderAuthCommand {
+  string flow_id@0;
+  string provider_id@1;
+  string redirect_binding_id@2;
+  uint64 issued_at_monotonic_ms@3;
+};
+
+struct CancelProviderAuthCommand {
+  string flow_id@0;
+};
+
+struct ProviderAuthCallbackCommand {
+  string flow_id@0;
+  string redirect_binding_id@1;
+  string returned_state@2;
+  AuthCallbackStatus status@3;
+  string? authorization_code_handle@4;
+};
+
+struct CustomModelSpec {
+  string model_id@0;
+  string display_name@1;
+  uint32 context_window@2;
+  uint32 max_output_tokens@3;
+  bool reasoning@4;
+  bool tool_calling@5;
+};
+
+struct DetectedServer {
+  ServerKind server_kind@0;
+};
+
+struct SaveCustomProviderCommand {
+  string provider_id@0;
+  string display_name@1;
+  string endpoint@2;
+  ProviderWireApi wire_api@3;
+  string? credential_handle@4;
+  array<CustomModelSpec> models@5;
+  DetectedServer? detected_server@6;
+};
+
+struct RemoveCustomProviderCommand {
+  string provider_id@0;
+};
+
+struct ProbeCustomEndpointCommand {
+  string endpoint@0;
+  ProviderWireApi wire_api@1;
+  string? credential_handle@2;
+  string provider_id@3;
+};
+
+struct RequestComposerCompletionCommand {
+  string request_id@0;
+  string prefix@1;
+  string? suffix@2;
+};
+
+struct CancelComposerCompletionCommand {
+  string request_id@0;
+};
+
+struct SetAssistantConfigurationCommand {
+  uint64 expected_revision@0;
+  array<AssistantAbility> disabled_abilities@1;
+  PersonalityPreset preset@2;
+  uint32 pace@3;
+  uint32 length@4;
+  uint32 check_in@5;
+};
+
+struct SavedSignInMetadata {
+  string id@0;
+  string site@1;
+  string username@2;
+  uint64 last_used_epoch_ms@3;
+};
+
+struct SavedDetailRecord {
+  string id@0;
+  string given_name@1;
+  string family_name@2;
+  string email@3;
+  string phone@4;
+  string address@5;
+  string postcode@6;
+  string country@7;
+};
+
+struct ReplaceSavedDataSnapshotCommand {
+  SavedDataAvailability sign_ins_availability@0;
+  uint64 sign_ins_revision@1;
+  array<SavedSignInMetadata> sign_ins@2;
+  SavedDataAvailability details_availability@3;
+  uint64 details_revision@4;
+  array<SavedDetailRecord> details@5;
+};
+
+struct AcceptTaskArtifactCommand {
+  string task_id@0;
+  string artifact_id@1;
+};
+
+struct ExportTaskArtifactCommand {
+  string task_id@0;
+  string artifact_id@1;
+  TaskArtifactKind kind@2;
+};
+
+struct SkillObservedClause {
+  SkillClauseKind kind@0;
+  uint32 role@1;
+  uint32 detail@2;
+};
+
+struct SkillSemanticTarget {
+  uint32 role@0;
+  uint32 phrase@1;
+};
+
+struct SkillObservedArgument {
+  uint32 parameter@0;
+  SkillArgumentKind kind@1;
+  uint64 value@2;
+  uint32 purpose@3;
+  string? public_address@4;
+  SkillSemanticTarget? semantic_target@5;
+};
+
+struct SkillObservedStep {
+  string verb@0;
+  array<SkillObservedArgument> arguments@1;
+  uint32 postcondition@2;
+  bool has_fill@3;
+  uint32 fill_purpose@4;
+};
+
+struct MutateSkillCommand {
+  SkillMutationKind kind@0;
+  string skill_id@1;
+  uint32 expected_version@2;
+  string origin@3;
+  array<SkillObservedClause> clauses@4;
+  array<SkillObservedStep> steps@5;
+  uint32 admitted@6;
+  bool enabled@7;
+  uint64 recorded_at_epoch_ms@8;
+};
+
+struct CoreServiceCommand {
+  OperationEnvelope operation@0;
+  CoreServiceCommandKind kind@1;
+  StartTaskCommand? start_task@2;
+  CancelTaskCommand? cancel_task@3;
+  UserDecisionCommand? user_decision@4;
+  AuthCallbackCommand? auth_callback@5;
+  PermissionResultCommand? permission_result@6;
+  StartAuthCommand? start_auth@7;
+  RequestEmailLinkCommand? request_email_link@8;
+  SignOutCommand? sign_out@9;
+  AuthCredentialResultCommand? auth_credential_result@10;
+  CorrectWorkspaceFactCommand? correct_workspace_fact@11;
+  ExcludeWorkspaceSourceCommand? exclude_workspace_source@12;
+  RequestWorkspaceExportCommand? request_workspace_export@13;
+  SetAssetDeliveryPolicyCommand? set_asset_delivery_policy@14;
+  RequestAssetCommand? request_asset@15;
+  RemoveAssetCommand? remove_asset@16;
+  SaveProviderCredentialCommand? save_provider_credential@17;
+  ForgetProviderCredentialCommand? forget_provider_credential@18;
+  StartProviderAuthCommand? start_provider_auth@19;
+  ProviderAuthCallbackCommand? provider_auth_callback@20;
+  SaveCustomProviderCommand? save_custom_provider@21;
+  RemoveCustomProviderCommand? remove_custom_provider@22;
+  CompleteHandoverCommand? complete_handover@23;
+  ExpireHandoverCommand? expire_handover@24;
+  SupplyUserInputCommand? supply_user_input@25;
+  SetProviderCredentialStateCommand? set_provider_credential_state@26;
+  ProbeProviderCredentialCommand? probe_provider_credential@27;
+  SupplyFieldValuesCommand? supply_field_values@28;
+  SetProviderModelPreferenceCommand? set_provider_model_preference@29;
+  ProbeCustomEndpointCommand? probe_custom_endpoint@30;
+  RequestComposerCompletionCommand? request_composer_completion@31;
+  CancelComposerCompletionCommand? cancel_composer_completion@32;
+  PauseTaskCommand? pause_task@33;
+  ResumeTaskCommand? resume_task@34;
+  TakeOverCommand? take_over@35;
+  SetAssistantConfigurationCommand? set_assistant_configuration@36;
+  SaveWorkspaceCommand? save_workspace@37;
+  RenameWorkspaceCommand? rename_workspace@38;
+  DeleteWorkspaceCommand? delete_workspace@39;
+  DiscardWorkspaceCommand? discard_workspace@40;
+  SearchLibraryCommand? search_library@41;
+  SaveLibraryFactCommand? save_library_fact@42;
+  RemoveLibraryEntryCommand? remove_library_entry@43;
+  RequestLibraryExportCommand? request_library_export@44;
+  SearchMemoryCommand? search_memory@45;
+  UpsertMemoryCommand? upsert_memory@46;
+  DeleteMemoryCommand? delete_memory@47;
+  AcceptTaskArtifactCommand? accept_task_artifact@48;
+  ExportTaskArtifactCommand? export_task_artifact@49;
+  ReplaceSavedDataSnapshotCommand? replace_saved_data_snapshot@50;
+  MutateSkillCommand? mutate_skill@51;
+  CancelProviderAuthCommand? cancel_provider_auth@52;
+  FollowUpCommand? follow_up@53;
+};
+
+struct CoreBootstrapResult {
+  InitializationStatus status@0;
+  uint64 accepted_generation@1;
+};
+
+struct Admission {
+  string operation_id@0;
+  AdmissionStatus status@1;
+};
+
+struct ModelArtifactRegistration {
+  string asset_id@0;
+  string asset_revision@1;
+  AssetKind asset_kind@2;
+  ToolModelArtifactKind format@3;
+  bool adapter@4;
+  uint64 byte_length@5;
+  array<uint8, 32> digest@6;
+};
+
+struct CoreStateUpdate {
+  uint64 service_generation@0;
+  uint64 sequence@1;
+  uint32 core_status_schema_version@2;
+  array<uint8> payload@3;
+  array<ModelArtifactRegistration> model_artifacts@4;
+};
+
+struct PendingApprovalBinding {
+  string task_id@0;
+  string action_id@1;
+  string proposal_digest@2;
+  uint64 service_generation@3;
+  uint64 task_revision@4;
+};
+
+struct TaskRevisionBinding {
+  string task_id@0;
+  uint64 service_generation@1;
+  uint64 task_revision@2;
+  array<TaskControlKind> allowed_controls@3;
+};
+
+struct TaskSettlementBinding {
+  string task_id@0;
+  uint64 service_generation@1;
+  uint64 task_revision@2;
+  TaskSettlementKind kind@3;
+};
+
+struct TerminalTaskBinding {
+  string task_id@0;
+  uint64 service_generation@1;
+  uint64 task_revision@2;
+  TerminalTaskKind kind@3;
+};
+
+struct PendingPermissionBinding {
+  string task_id@0;
+  string request_id@1;
+  PlatformPermission permission@2;
+  uint64 service_generation@3;
+  uint64 task_revision@4;
+  uint64 deadline_monotonic_ms@5;
+  uint64 deadline_utc_ms@6;
+  string browser_session_id@7;
+};
+
+struct AcceptedTaskConsentBinding {
+  string task_id@0;
+  uint64 service_generation@1;
+  uint64 current_task_revision@2;
+  uint64 accepted_revision@3;
+  string browser_session_id@4;
+  string receipt_id@5;
+  TaskConsentPreview consent_preview@6;
+};
+
+struct CommittedActionApprovalBinding {
+  string task_id@0;
+  string action_id@1;
+  uint64 service_generation@2;
+  uint64 committed_revision@3;
+  string receipt_id@4;
+  string proposal_digest@5;
+  uint64 expires_at_monotonic_ms@6;
+  uint64 expires_at_utc_ms@7;
+  string browser_session_id@8;
+};
+
+struct CoreStateBrowserBindings {
+  uint64 service_generation@0;
+  uint64 state_sequence@1;
+  array<TaskRevisionBinding> task_revisions@2;
+  array<PendingApprovalBinding> pending_approvals@3;
+  array<TaskSettlementBinding> task_settlements@4;
+  array<PendingPermissionBinding> pending_permissions@5;
+  array<TerminalTaskBinding> terminal_tasks@6;
+  array<AcceptedTaskConsentBinding> accepted_task_consents@7;
+  array<CommittedActionApprovalBinding> committed_action_approvals@8;
+};
+
+struct WorkspacePersistEffect {
+  string workspace_id@0;
+  array<uint8> snapshot@1;
+  uint64 expected_revision@2;
+  uint64 resulting_revision@3;
+};
+
+struct WorkspaceDeletionEffect {
+  string workspace_id@0;
+  uint64 expected_revision@1;
+  uint64 resulting_revision@2;
+  uint32 sources@3;
+  uint32 facts@4;
+  uint32 artifact_metadata@5;
+  uint32 derived_indexes@6;
+  string confirmation_token@7;
+};
+
+struct SkillInstallEffect {
+  string skill_id@0;
+  string origin@1;
+  SkillProvenance provenance@2;
+  uint32 version@3;
+  array<uint8> definition@4;
+  uint32 step_count@5;
+  uint64 recorded_at_utc_ms@6;
+};
+
+struct SkillStatusEffect {
+  string skill_id@0;
+  SkillStatus status@1;
+  uint64 changed_at_utc_ms@2;
+  uint32 version@3;
+};
+
+struct SkillRunEffect {
+  string skill_id@0;
+  uint32 version@1;
+  string task_id@2;
+  SkillRunOutcome outcome@3;
+  uint64 ran_at_utc_ms@4;
+};
+
+struct SkillForgetEffect {
+  string skill_id@0;
+};
+
+struct SourceDeletionEffect {
+  string source_id@0;
+  string origin@1;
+};
+
+struct AssistantConfigurationPersistEffect {
+  array<AssistantAbility> disabled_abilities@0;
+  PersonalityPreset preset@1;
+  uint32 pace@2;
+  uint32 length@3;
+  uint32 check_in@4;
+};
+
+struct LibraryPersistEffect {
+  LibraryEntryRecord entry@0;
+  uint64 expected_entry_revision@1;
+};
+
+struct LibraryDeletionEffect {
+  string entry_id@0;
+  uint64 expected_entry_revision@1;
+  uint64 resulting_entry_revision@2;
+  uint64 removed_at_epoch_ms@3;
+};
+
+struct MemoryPersistEffect {
+  MemoryRecord record@0;
+  uint64 expected_record_revision@1;
+};
+
+struct MemoryDeletionEffect {
+  string memory_id@0;
+  uint64 expected_record_revision@1;
+  uint64 resulting_record_revision@2;
+  uint64 deleted_at_epoch_ms@3;
+};
+
+struct StorageCommitEffect {
+  StorageOperation operation_kind@0;
+  string task_id@1;
+  uint64 expected_revision@2;
+  uint64 resulting_revision@3;
+  array<uint8> transaction_batch@4;
+  array<uint8, 32> task_id_seed@5;
+  WorkspacePersistEffect? workspace@6;
+  SkillInstallEffect? install_skill@7;
+  SkillStatusEffect? skill_status@8;
+  SkillRunEffect? skill_run@9;
+  SkillForgetEffect? forget_skill@10;
+  SourceDeletionEffect? source_deletion@11;
+  AssistantConfigurationPersistEffect? assistant_configuration@12;
+  WorkspaceDeletionEffect? workspace_deletion@13;
+  LibraryPersistEffect? library_entry@14;
+  LibraryDeletionEffect? library_deletion@15;
+  MemoryPersistEffect? memory_record@16;
+  MemoryDeletionEffect? memory_deletion@17;
+};
+
+struct PageObservationEffect {
+  string tab_id@0;
+  string frame_id@1;
+  string page_epoch@2;
+  ObservationScope scope@3;
+  uint32 max_bytes@4;
+  string task_id@5;
+  string action_id@6;
+  string capability_id@7;
+  string proposal_digest@8;
+  string idempotency_key@9;
+  AuthoritySubject authority_subject@10;
+  uint32 max_nodes@11;
+  uint32 max_text_bytes@12;
+  uint32 max_frames@13;
+  uint32 deadline_ms@14;
+  uint64 expected_graph_revision@15;
+};
+
+struct ModelStaticHeader {
+  string name@0;
+  string value@1;
+};
+
+struct ModelRequestEffect {
+  string route_id@0;
+  string model_id@1;
+  DisclosureClass disclosure@2;
+  array<uint8> request_body@3;
+  uint32 max_output_bytes@4;
+  string task_id@5;
+  string provider_id@6;
+  ProviderWireApi wire_api@7;
+  string endpoint@8;
+  string? credential_handle@9;
+  array<ModelStaticHeader> static_headers@10;
+  bool probe@11;
+  ModelEndpointKind endpoint_kind@12;
+  string? media_attachment_handle@13;
+  string? media_attachment_mime_type@14;
+  uint64 not_before_monotonic_ms@15;
+};
+
+struct ExchangeAuthorizationCodeRequest {
+  string flow_id@0;
+  AccountAuthMethod auth_method@1;
+  string authorization_code_handle@2;
+  string pkce_verifier_handle@3;
+  string redirect_binding_id@4;
+};
+
+struct ExchangeNativeCredentialRequest {
+  string flow_id@0;
+  AccountAuthMethod auth_method@1;
+  string credential_handle@2;
+  string raw_nonce_handle@3;
+};
+
+struct EmailLinkNetworkRequest {
+  string flow_id@0;
+  string email@1;
+  string pkce_verifier_handle@2;
+  string redirect_binding_id@3;
+  string pkce_challenge@4;
+  string state@5;
+};
+
+struct RefreshSessionRequest {
+  string session_handle@0;
+  uint64 expected_rotation@1;
+  string expected_account_subject@2;
+  AccountAuthMethod expected_auth_method@3;
+};
+
+struct RevokeSessionRequest {
+  string session_handle@0;
+};
+
+struct FetchEntitlementRequest {
+  EntitlementFetchReason reason@0;
+};
+
+struct NetworkRequestEffect {
+  AccountNetworkOperation operation_kind@0;
+  ExchangeAuthorizationCodeRequest? exchange_authorization_code@1;
+  ExchangeNativeCredentialRequest? exchange_native_credential@2;
+  EmailLinkNetworkRequest? request_email_link@3;
+  RefreshSessionRequest? refresh_session@4;
+  RevokeSessionRequest? revoke_session@5;
+  uint32 max_response_bytes@6;
+  FetchEntitlementRequest? fetch_entitlement@7;
+};
+
+struct BrowserActionEffect {
+  BrowserActionOperation operation_kind@0;
+  string action_id@1;
+  string grant_reference@2;
+  string approval_digest@3;
+  string origin_scope_digest@4;
+};
+
+struct ToolModelArtifact {
+  string model_id@0;
+  string model_revision@1;
+  ToolModelArtifactKind kind@2;
+  uint64 artifact_bytes@3;
+  array<uint8, 32> artifact_digest@4;
+  string adapter_id@5;
+  uint64 adapter_bytes@6;
+  array<uint8, 32> adapter_digest@7;
+};
+
+struct ToolResourceBudget {
+  uint64 max_input_bytes@0;
+  uint64 max_output_bytes@1;
+  uint64 max_memory_bytes@2;
+  uint64 max_cpu_ms@3;
+  uint64 max_temporary_bytes@4;
+  uint32 max_output_chunks@5;
+};
+
+struct BundledPythonArguments {
+  string entrypoint_id@0;
+  array<uint8> input@1;
+};
+
+struct LocalModelArguments {
+  string conversation_id@0;
+  array<uint8> prompt_utf8@1;
+  uint32 max_output_tokens@2;
+  ToolModelArtifact model@3;
+};
+
+struct LocalEmbeddingArguments {
+  ToolModelArtifact model@0;
+  array<uint8> input_utf8@1;
+  uint32 max_input_tokens@2;
+  bool normalize@3;
+};
+
+struct MediaProbeArguments {
+  string input_handle@0;
+};
+
+struct AudioExtractArguments {
+  string input_handle@0;
+  string output_handle@1;
+  string preset_id@2;
+};
+
+struct FrameSampleArguments {
+  string input_handle@0;
+  string output_handle@1;
+  string preset_id@2;
+  uint32 max_frames@3;
+};
+
+struct TranscodeArguments {
+  string input_handle@0;
+  string output_handle@1;
+  string preset_id@2;
+};
+
+struct SignedWasmArguments {
+  string entrypoint_id@0;
+  array<uint8> input@1;
+};
+
+struct ToolJobEffect {
+  string job_id@0;
+  ToolRuntimeKind runtime@1;
+  string tool_id@2;
+  string tool_version@3;
+  ToolOperation operation_kind@4;
+  ToolResourceBudget budget@5;
+  BundledPythonArguments? bundled_python@6;
+  LocalModelArguments? local_model@7;
+  MediaProbeArguments? media_probe@8;
+  AudioExtractArguments? audio_extract@9;
+  FrameSampleArguments? frame_sample@10;
+  TranscodeArguments? transcode@11;
+  SignedWasmArguments? signed_wasm@12;
+  LocalEmbeddingArguments? local_embedding@13;
+  string task_id@14;
+};
+
+struct GenerateEntropyRequest {
+  string flow_id@0;
+  uint32 byte_count@1;
+};
+
+struct WriteTransientSecretRequest {
+  string flow_id@0;
+  SecretMaterialPurpose purpose@1;
+  array<uint8> material@2;
+};
+
+struct DeleteSecretHandleRequest {
+  string secret_handle@0;
+};
+
+struct SecureStoreEffect {
+  SecureStoreOperation operation_kind@0;
+  GenerateEntropyRequest? generate_entropy@1;
+  WriteTransientSecretRequest? write_transient@2;
+  DeleteSecretHandleRequest? delete_handle@3;
+};
+
+struct OAuthSurfaceRequest {
+  string flow_id@0;
+  AccountAuthMethod auth_method@1;
+  string redirect_binding_id@2;
+  string pkce_challenge@3;
+  string state@4;
+  array<AccountScope> scopes@5;
+  string pkce_verifier_handle@6;
+};
+
+struct NativeCredentialSurfaceRequest {
+  string flow_id@0;
+  AccountAuthMethod auth_method@1;
+  string raw_nonce_handle@2;
+  string hashed_nonce@3;
+};
+
+struct AuthSurfaceEffect {
+  AuthSurfaceOperation operation_kind@0;
+  OAuthSurfaceRequest? oauth@1;
+  NativeCredentialSurfaceRequest? native_credential@2;
+};
+
+struct PermissionRequestEffect {
+  string request_id@0;
+  PlatformPermission permission@1;
+  string task_id@2;
+  uint64 task_revision@3;
+  uint64 deadline_monotonic_ms@4;
+  uint64 deadline_utc_ms@5;
+  string browser_session_id@6;
+};
+
+struct ProviderListingFetchEffect {
+  string provider_id@0;
+  string endpoint@1;
+  ProviderWireApi wire_api@2;
+  string? credential_handle@3;
+  uint32 max_response_bytes@4;
+};
+
+struct ProviderListingFetchResult {
+  string provider_id@0;
+  CatalogFetchDisposition disposition@1;
+  array<uint8> body@2;
+};
+
+struct CustomEndpointProbeEffect {
+  string provider_id@0;
+  string endpoint@1;
+  ProviderWireApi wire_api@2;
+  string? credential_handle@3;
+  uint32 max_response_bytes@4;
+};
+
+struct CustomEndpointProbeResult {
+  string provider_id@0;
+  bool reached@1;
+  DetectedServer? detected_server@2;
+  uint32 model_count@3;
+  array<CustomModelSpec> models@4;
+  string? proved_base@5;
+};
+
+struct ComposerCompletionEffect {
+  string request_id@0;
+  string? text@1;
+};
+
+struct ComposerCompletionEffectResult {
+  string request_id@0;
+  bool delivered@1;
+};
+
+struct EffectEnvelope {
+  OperationEnvelope operation@0;
+  string effect_id@1;
+  EffectKind kind@2;
+  RetryClass retry_class@3;
+  StorageCommitEffect? storage_commit@4;
+  PageObservationEffect? page_observation@5;
+  ModelRequestEffect? model_request@6;
+  NetworkRequestEffect? network_request@7;
+  BrowserActionEffect? browser_action@8;
+  ToolJobEffect? tool_job@9;
+  SecureStoreEffect? secure_store@10;
+  AuthSurfaceEffect? auth_surface@11;
+  PermissionRequestEffect? permission_request@12;
+  AssetDeliveryEffect? asset_delivery@13;
+  CatalogFetchEffect? catalog_fetch@14;
+  ProviderListingFetchEffect? provider_listing_fetch@15;
+  ComposerCompletionEffect? composer_completion@16;
+  CustomEndpointProbeEffect? custom_endpoint_probe@17;
+};
+
+struct StorageEffectResult {
+  uint64 committed_revision@0;
+};
+
+struct MediaObservationFact {
+  MediaFactKind kind@0;
+  MediaEvidenceKind evidence@1;
+  string text@2;
+  string source_locator@3;
+  uint32 source_start@4;
+  uint32 source_end@5;
+  uint32 page_index_plus_one@6;
+  uint64 timestamp_start_ms@7;
+  uint64 timestamp_end_ms@8;
+  uint32 row_index_plus_one@9;
+  uint32 confidence_ppm@10;
+  bool truncated@11;
+};
+
+struct MediaCaptureProvenance {
+  uint32 capture_x_dip@0;
+  uint32 capture_y_dip@1;
+  uint32 capture_width_dip@2;
+  uint32 capture_height_dip@3;
+  uint32 viewport_width_dip@4;
+  uint32 viewport_height_dip@5;
+  uint32 output_scale_ppm@6;
+  uint64 captured_at_monotonic_ms@7;
+  uint32 redacted_region_count@8;
+};
+
+struct MediaObservationResult {
+  MediaObservationKind kind@0;
+  array<MediaObservationFact> facts@1;
+  string? attachment_handle@2;
+  string? attachment_mime_type@3;
+  uint32 width_px@4;
+  uint32 height_px@5;
+  bool has_meaningful_text@6;
+  bool scanned_pdf_ocr_required@7;
+  MediaCaptureProvenance? capture_provenance@8;
+};
+
+struct ObservationEffectResult {
+  BipObservationStatus status@0;
+  string schema_version@1;
+  string tab_id@2;
+  string frame_id@3;
+  string page_epoch@4;
+  uint64 graph_revision@5;
+  string origin@6;
+  bool is_potentially_trustworthy@7;
+  bool private_profile@8;
+  uint32 node_count@9;
+  uint32 total_bytes@10;
+  bool truncated@11;
+  bool may_change_answer@12;
+  uint32 redacted_field_count@13;
+  uint32 suppressed_secret_value_count@14;
+  uint32 sensitive_zone_count@15;
+  uint32 policy_filtered_frame_count@16;
+  BipSensitivity highest_sensitivity@17;
+  BipGraphEncoding graph_encoding@18;
+  array<uint8> graph_payload@19;
+  MediaObservationResult? media@20;
+};
+
+struct PageSnapshotExportCommand {
+  OperationEnvelope operation@0;
+  PageSnapshotExportFormat format@1;
+  string expected_tab_id@2;
+  string expected_frame_id@3;
+  string expected_page_epoch@4;
+  uint64 expected_graph_revision@5;
+  string expected_origin@6;
+  uint32 max_bytes@7;
+  ObservationEffectResult observation@8;
+  uint64 captured_at_epoch_ms@9;
+  bool source_query_withheld@10;
+  bool source_fragment_withheld@11;
+};
+
+struct PageSnapshotExportResult {
+  OperationEnvelope operation@0;
+  PageSnapshotExportStatus status@1;
+  PageSnapshotExportFormat format@2;
+  string tab_id@3;
+  string frame_id@4;
+  string page_epoch@5;
+  uint64 graph_revision@6;
+  string origin@7;
+  string mime_type@8;
+  string suggested_file_name@9;
+  array<uint8> content@10;
+  uint32 node_count@11;
+  uint32 redacted_field_count@12;
+  uint32 suppressed_secret_value_count@13;
+  uint32 withheld_field_count@14;
+  uint64 captured_at_epoch_ms@15;
+  bool source_query_withheld@16;
+  bool source_fragment_withheld@17;
+  bool secure_context@18;
+};
+
+struct SiteSkillMatchCommand {
+  OperationEnvelope operation@0;
+  string expected_tab_id@1;
+  string expected_frame_id@2;
+  string expected_page_epoch@3;
+  uint64 expected_graph_revision@4;
+  string expected_origin@5;
+  ObservationEffectResult observation@6;
+};
+
+struct SiteSkillMatchOffer {
+  string skill_version_id@0;
+  string skill_id@1;
+  uint32 active_version@2;
+  uint32 step_count@3;
+};
+
+struct SiteSkillMatchResult {
+  OperationEnvelope operation@0;
+  SiteSkillMatchStatus status@1;
+  string tab_id@2;
+  string frame_id@3;
+  string page_epoch@4;
+  uint64 graph_revision@5;
+  string origin@6;
+  array<SiteSkillMatchOffer> offers@7;
+};
+
+struct ModelStreamChunk {
+  OperationEnvelope operation@0;
+  string effect_id@1;
+  uint32 sequence@2;
+  array<uint8> data@3;
+};
+
+struct TaskAnswerEvent {
+  string task_id@0;
+  string call_id@1;
+  uint32 sequence@2;
+  string? text@3;
+  bool terminal@4;
+  bool complete@5;
+};
+
+struct ModelFailure {
+  ModelErrorClass error_class@0;
+  bool has_retry_after@1;
+  uint64 retry_after_millis@2;
+};
+
+struct ModelEffectResult {
+  string model_id@0;
+  array<uint8> completion@1;
+  uint64 input_units@2;
+  uint64 output_units@3;
+  uint32 provider_http_status@4;
+  bool streamed@5;
+  ModelFailure? failure@6;
+};
+
+struct AccountTokenValidationRequest {
+  OperationEnvelope operation@0;
+  AccountNetworkOperation operation_kind@1;
+  AccountAuthMethod expected_auth_method@2;
+  string? expected_account_subject@3;
+  uint64 target_rotation@4;
+  array<uint8> response_body@5;
+};
+
+struct AccountTokenValidationResult {
+  AccountTokenValidationStatus status@0;
+  string operation_id@1;
+  AccountNetworkOperation operation_kind@2;
+  AccountAuthMethod auth_method@3;
+  string account_subject@4;
+  uint64 expires_in_seconds@5;
+  uint64 target_rotation@6;
+  array<uint8> access_token@7;
+  array<uint8> refresh_token@8;
+  string? email@9;
+  string? display_name@10;
+};
+
+struct AccountSessionReceipt {
+  string session_handle@0;
+  string account_subject@1;
+  uint64 expires_at_monotonic_ms@2;
+  uint64 rotation@3;
+  AccountAuthMethod auth_method@4;
+  string? email@5;
+  string? display_name@6;
+};
+
+struct EntitlementSummaryResult {
+  bool definitive_absent@0;
+  string plan_id@1;
+  array<string> model_ids@2;
+  uint32 window_seconds@3;
+  uint64 requests_remaining@4;
+  uint64 credits_granted@5;
+  uint64 credits_remaining@6;
+  uint64 credit_unit_micros@7;
+  uint64 next_renewal_epoch_seconds@8;
+  uint64 valid_until_epoch_seconds@9;
+  uint64 minted_at_utc_ms@10;
+  string worker_host@11;
+  string gateway_host@12;
+};
+
+struct EmailLinkNetworkResult {
+  string flow_id@0;
+  bool accepted@1;
+};
+
+struct RevokedSessionResult {
+  string session_handle@0;
+  bool deleted@1;
+};
+
+struct NetworkEffectResult {
+  AccountNetworkOperation operation_kind@0;
+  AccountSessionReceipt? authorization_code_session@1;
+  AccountSessionReceipt? native_credential_session@2;
+  EmailLinkNetworkResult? email_link@3;
+  AccountSessionReceipt? refreshed_session@4;
+  RevokedSessionResult? revoked_session@5;
+  EntitlementSummaryResult? entitlement_summary@6;
+};
+
+struct TaskTabSnapshot {
+  TaskTabDocumentTarget target@0;
+  bool active@1;
+};
+
+struct TaskTabActionResult {
+  string browser_session_id@0;
+  TaskActionOperationKind operation_kind@1;
+  TaskTabPostcondition postcondition@2;
+  array<TaskTabSnapshot> tabs@3;
+  TaskTabDocumentTarget? target@4;
+  bool state_was_already_satisfied@5;
+};
+
+struct TaskDownloadSnapshot {
+  string download_id@0;
+  TaskDownloadState state@1;
+  TaskDownloadMediaType media_type@2;
+  uint64 received_bytes@3;
+  TaskDownloadDirectoryClass directory_class@4;
+};
+
+struct TaskDownloadActionResult {
+  string browser_session_id@0;
+  TaskActionOperationKind operation_kind@1;
+  TaskDownloadPostcondition postcondition@2;
+  array<TaskDownloadSnapshot> downloads@3;
+  bool truncated@4;
+};
+
+struct TaskActionRefusal {
+  TaskActionResultCode code@0;
+};
+
+struct BrowserActionEffectResult {
+  BrowserActionOutcome outcome@0;
+  string? dispatch_id@1;
+  TaskConsentSource? discovered_source@2;
+  string? discovery_tab_id@3;
+  string? browser_session_id@4;
+  TaskTabActionResult? task_tab@5;
+  TaskDownloadActionResult? task_download@6;
+  TaskStoreActionResult? task_store@7;
+  TaskActionRefusal? refused_code@8;
+};
+
+struct TaskStoreRow {
+  string title@0;
+  string host@1;
+  string path@2;
+  uint64 when_utc_ms@3;
+};
+
+struct TaskStoreActionResult {
+  TaskActionOperationKind operation_kind@0;
+  array<TaskStoreRow> rows@1;
+  uint32 omitted@2;
+};
+
+struct ToolProgress {
+  string job_id@0;
+  uint32 sequence@1;
+  uint32 progress_basis_points@2;
+};
+
+struct TextOutputChunk {
+  array<uint8> utf8@0;
+};
+
+struct BinaryOutputChunk {
+  array<uint8> data@0;
+};
+
+struct ToolOutputChunk {
+  string job_id@0;
+  uint32 sequence@1;
+  ToolChunkKind kind@2;
+  TextOutputChunk? text@3;
+  BinaryOutputChunk? binary@4;
+  bool is_final@5;
+};
+
+struct BundledPythonResult {
+  array<uint8> output@0;
+};
+
+struct LocalModelResult {
+  LocalModelFinishReason finish_reason@0;
+  uint32 input_tokens@1;
+  uint32 output_tokens@2;
+};
+
+struct LocalEmbeddingResult {
+  uint32 dimensions@0;
+  EmbeddingElementKind element_kind@1;
+  array<uint8> values@2;
+  uint32 input_tokens@3;
+};
+
+struct MediaProbeResult {
+  uint64 duration_ms@0;
+  uint32 audio_streams@1;
+  uint32 video_streams@2;
+  uint32 width@3;
+  uint32 height@4;
+};
+
+struct AudioExtractResult {
+  string output_handle@0;
+  uint64 output_bytes@1;
+  array<uint8> output_digest@2;
+};
+
+struct FrameSampleResult {
+  string output_handle@0;
+  uint32 frame_count@1;
+  uint64 output_bytes@2;
+  array<uint8> output_digest@3;
+};
+
+struct TranscodeResult {
+  string output_handle@0;
+  uint64 output_bytes@1;
+  array<uint8> output_digest@2;
+};
+
+struct SignedWasmResult {
+  array<uint8> output@0;
+};
+
+struct ToolSuccess {
+  ToolOperation operation_kind@0;
+  BundledPythonResult? bundled_python@1;
+  LocalModelResult? local_model@2;
+  MediaProbeResult? media_probe@3;
+  AudioExtractResult? audio_extract@4;
+  FrameSampleResult? frame_sample@5;
+  TranscodeResult? transcode@6;
+  SignedWasmResult? signed_wasm@7;
+  LocalEmbeddingResult? local_embedding@8;
+};
+
+struct ToolEffectResult {
+  string job_id@0;
+  ToolTerminalStatus status@1;
+  array<ToolProgress> progress@2;
+  array<ToolOutputChunk> chunks@3;
+  ToolSuccess? success@4;
+  uint32 streamed_chunks@5;
+};
+
+struct ToolStreamChunk {
+  OperationEnvelope operation@0;
+  string effect_id@1;
+  string job_id@2;
+  ToolOutputChunk chunk@3;
+};
+
+struct GeneratedEntropyResult {
+  string flow_id@0;
+  array<uint8> entropy@1;
+};
+
+struct TransientSecretWriteResult {
+  string flow_id@0;
+  SecretMaterialPurpose purpose@1;
+  string secret_handle@2;
+};
+
+struct DeletedSecretHandleResult {
+  string secret_handle@0;
+  bool deleted@1;
+};
+
+struct SecureStoreEffectResult {
+  SecureStoreOperation operation_kind@0;
+  GeneratedEntropyResult? generated_entropy@1;
+  TransientSecretWriteResult? transient_write@2;
+  DeletedSecretHandleResult? deleted_handle@3;
+};
+
+struct OAuthSurfaceResult {
+  string flow_id@0;
+  bool opened@1;
+};
+
+struct NativeCredentialSurfaceResult {
+  string flow_id@0;
+  bool opened@1;
+};
+
+struct AuthSurfaceEffectResult {
+  AuthSurfaceOperation operation_kind@0;
+  OAuthSurfaceResult? oauth@1;
+  NativeCredentialSurfaceResult? native_credential@2;
+};
+
+struct PermissionEffectResult {
+  string request_id@0;
+  PlatformPermission permission@1;
+  PermissionDecision decision@2;
+};
+
+struct EffectResult {
+  OperationEnvelope operation@0;
+  string effect_id@1;
+  EffectStatus status@2;
+  EffectKind kind@3;
+  StorageEffectResult? storage@4;
+  ObservationEffectResult? observation@5;
+  ModelEffectResult? model@6;
+  NetworkEffectResult? network@7;
+  BrowserActionEffectResult? browser_action@8;
+  ToolEffectResult? tool@9;
+  SecureStoreEffectResult? secure_store@10;
+  AuthSurfaceEffectResult? auth_surface@11;
+  PermissionEffectResult? permission@12;
+  AssetDeliveryEffectResult? asset_delivery@13;
+  CatalogFetchEffectResult? catalog@14;
+  ProviderListingFetchResult? provider_listing@15;
+  ComposerCompletionEffectResult? composer_completion@16;
+  CustomEndpointProbeResult? custom_endpoint_probe@17;
+};
+
+struct BackupRecordDescriptor {
+  BackupRecordKind kind@0;
+  string stable_id@1;
+  uint64 revision@2;
+  uint32 schema_version@3;
+  BackupRecordState state@4;
+  uint64 plaintext_bytes@5;
+  array<uint8, 32> plaintext_sha256@6;
+};
+
+struct BackupManifestPrepareRequest {
+  OperationEnvelope operation@0;
+  string backup_id@1;
+  string source_installation_id@2;
+  string created_at_utc@3;
+  array<BackupRecordKind> selection@4;
+  array<BackupRecordDescriptor> records@5;
+};
+
+struct BackupManifestPrepareResult {
+  OperationEnvelope operation@0;
+  BackupPlanningStatus status@1;
+  array<uint8> manifest_plaintext@2;
+  array<uint8, 32> snapshot_sha256@3;
+  uint64 payload_plaintext_bytes@4;
+  array<uint32> source_order@5;
+  uint32 expected_sealed_chunks@6;
+};
+
+struct BackupManifestInspectRequest {
+  OperationEnvelope operation@0;
+  array<uint8> manifest_plaintext@1;
+};
+
+struct BackupPayloadLayoutEntry {
+  BackupRecordState state@0;
+  uint64 plaintext_bytes@1;
+};
+
+struct BackupManifestInspectResult {
+  OperationEnvelope operation@0;
+  BackupPlanningStatus status@1;
+  string backup_id@2;
+  string source_installation_id@3;
+  string created_at_utc@4;
+  array<BackupRecordKind> selection@5;
+  uint32 record_count@6;
+  array<uint8, 32> snapshot_sha256@7;
+  uint64 payload_plaintext_bytes@8;
+  array<BackupPayloadLayoutEntry> records@9;
+};
+
+struct StagedBackupRecord {
+  uint64 plaintext_bytes@0;
+  array<uint8, 32> plaintext_sha256@1;
+};
+
+struct BackupRestoreTarget {
+  BackupRestoreTargetKind kind@0;
+  string profile_id@1;
+};
+
+struct BackupRestoreBinding {
+  OperationEnvelope planning_operation@0;
+  string owner_profile_id@1;
+  BackupRestoreTarget target@2;
+  string backup_id@3;
+  array<uint8, 32> snapshot_sha256@4;
+  array<uint8, 32> confirmation_sha256@5;
+};
+
+struct BackupRestoreStageAuthorization {
+  BackupRestoreBinding binding@0;
+  OperationEnvelope decision_operation@1;
+};
+
+struct BackupRestoreCommitAuthorization {
+  BackupRestoreBinding binding@0;
+  OperationEnvelope decision_operation@1;
+};
+
+struct BackupRestoreResolutionAuthorization {
+  BackupRestoreBinding binding@0;
+  OperationEnvelope decision_operation@1;
+  BackupRestoreResolutionChoice choice@2;
+};
+
+struct BackupRestorePlanRequest {
+  OperationEnvelope operation@0;
+  array<uint8> manifest_plaintext@1;
+  array<StagedBackupRecord> staged_records@2;
+  array<BackupRecordDescriptor> current_records@3;
+  BackupRestoreTarget target@4;
+};
+
+struct BackupRestorePlanEntry {
+  BackupRecordKind kind@0;
+  string stable_id@1;
+  uint64 archive_revision@2;
+  BackupRestoreAction action@3;
+  uint32 schema_version@4;
+  BackupRecordState state@5;
+  uint64 plaintext_bytes@6;
+  array<uint8, 32> plaintext_sha256@7;
+};
+
+struct BackupRestorePlanResult {
+  OperationEnvelope operation@0;
+  BackupPlanningStatus status@1;
+  string backup_id@2;
+  array<uint8, 32> snapshot_sha256@3;
+  BackupRestoreTarget target@4;
+  array<BackupRestorePlanEntry> entries@5;
+  bool has_conflicts@6;
+  array<uint8, 32> confirmation_sha256@7;
+  BackupRestoreBinding? binding@8;
+};
+
+struct BackupRestorePlanConfirmationRequest {
+  OperationEnvelope operation@0;
+  BackupRestoreBinding binding@1;
+  array<uint8, 32> confirmed_sha256@2;
+};
+
+struct BackupRestoreStageAuthorizationResult {
+  OperationEnvelope operation@0;
+  BackupRestoreProtocolStatus status@1;
+  BackupRestoreStageAuthorization? authorization@2;
+};
+
+struct BackupRestoreStageVerificationRequest {
+  OperationEnvelope operation@0;
+  BackupRestoreStageAuthorization authorization@1;
+  array<uint8, 32> staged_snapshot_sha256@2;
+  array<SkillRecord> skills@3;
+};
+
+struct BackupRestoreCommitAuthorizationResult {
+  OperationEnvelope operation@0;
+  BackupRestoreProtocolStatus status@1;
+  BackupRestoreCommitAuthorization? authorization@2;
+};
+
+struct BackupRestoreCommitOutcomeReport {
+  OperationEnvelope operation@0;
+  BackupRestoreCommitAuthorization authorization@1;
+  BackupRestoreCommitOutcome outcome@2;
+};
+
+struct BackupRestoreResolutionRequest {
+  OperationEnvelope operation@0;
+  BackupRestoreBinding binding@1;
+  BackupRestoreResolutionChoice choice@2;
+};
+
+struct BackupRestoreResolutionAuthorizationResult {
+  OperationEnvelope operation@0;
+  BackupRestoreProtocolStatus status@1;
+  BackupRestoreResolutionAuthorization? authorization@2;
+};
+
+struct BackupRestoreResolutionOutcomeReport {
+  OperationEnvelope operation@0;
+  BackupRestoreResolutionAuthorization authorization@1;
+  BackupRestoreResolutionOutcome outcome@2;
+};
+
+struct BackupRestoreCancellationRequest {
+  OperationEnvelope operation@0;
+  BackupRestoreBinding binding@1;
+};
+
+struct BackupRestoreProtocolResult {
+  OperationEnvelope operation@0;
+  BackupRestoreProtocolStatus status@1;
+};
+
+struct BackupRestoreCandidateWitness {
+  array<BackupRecordKind> selection@0;
+  uint64 record_count@1;
+  array<uint8, 32> candidate_records_sha256@2;
+};
+
+struct BackupRestoreRecoveryBinding {
+  string reservation_id@0;
+  string owner_profile_id@1;
+  BackupRestoreTargetKind target_kind@2;
+  string target_profile_id@3;
+  string backup_id@4;
+  array<uint8, 32> snapshot_sha256@5;
+  array<uint8, 32> confirmation_sha256@6;
+  array<BackupRecordKind> selection@7;
+  uint64 record_count@8;
+  array<uint8, 32> candidate_records_sha256@9;
+};
+
+struct BackupRestoreRecoveryIntentFact {
+  string intent_id@0;
+  BackupRestorePhysicalIntent intent@1;
+};
+
+struct BackupRestoreRecoveryOutcomeFact {
+  string intent_id@0;
+  BackupRestoreObservedOutcome outcome@1;
+};
+
+struct BackupRestoreRecoveryRecord {
+  uint32 format_version@0;
+  uint64 sequence@1;
+  BackupRestoreRecoveryBinding binding@2;
+  BackupRestoreRecoveryFactKind fact_kind@3;
+  BackupRestoreRecoveryIntentFact? intent@4;
+  BackupRestoreRecoveryOutcomeFact? outcome@5;
+};
+
+struct BackupRestoreRecoveryInspectionRequest {
+  OperationEnvelope operation@0;
+  array<BackupRestoreRecoveryRecord> records@1;
+};
+
+struct BackupRestoreRecoveryReconciliation {
+  string intent_id@0;
+  BackupRestorePhysicalIntent intent@1;
+};
+
+struct BackupRestoreRecoveryClassification {
+  BackupRestoreRecoveryClassificationKind kind@0;
+  BackupRestoreRecoveryReconciliation? reconciliation@1;
+};
+
+struct BackupRestoreRecoveryFailure {
+  BackupRestoreRecoveryError error@0;
+};
+
+struct BackupRestoreRecoveryInspectionResult {
+  OperationEnvelope operation@0;
+  BackupRestoreRecoveryInspectionStatus status@1;
+  BackupRestoreRecoveryClassification? classification@2;
+  BackupRestoreRecoveryFailure? failure@3;
+};
+
+struct BackupRestoreRecoveryResolutionRequest {
+  OperationEnvelope operation@0;
+  array<BackupRestoreRecoveryRecord> history_prefix@1;
+  BackupRestoreResolutionChoice choice@2;
+  string intent_id@3;
+};
+
+struct BackupRestoreRecoveryResolutionAuthorization {
+  BackupRestoreRecoveryBinding binding@0;
+  OperationEnvelope decision_operation@1;
+  BackupRestoreResolutionChoice choice@2;
+  string intent_id@3;
+  array<BackupRestoreRecoveryRecord> history_prefix@4;
+};
+
+struct BackupRestoreRecoveryResolutionAuthorizationResult {
+  OperationEnvelope operation@0;
+  BackupRestoreProtocolStatus status@1;
+  BackupRestoreRecoveryResolutionAuthorization? authorization@2;
+};
+
+struct BackupRestoreRecoveryResolutionOutcomeReport {
+  OperationEnvelope operation@0;
+  BackupRestoreRecoveryResolutionAuthorization authorization@1;
+  array<BackupRestoreRecoveryRecord> durable_history@2;
+};
+
+struct SavedFlowReview {
+  string skill_id@0;
+  string origin@1;
+  SkillProvenance provenance@2;
+  SkillStatus status@3;
+  uint32 active_version@4;
+  uint32 step_count@5;
+  uint64 installed_at_epoch_ms@6;
+  uint64 updated_at_epoch_ms@7;
+  string? recorded_from_task_id@8;
+  array<SkillObservedStep> reviewed_steps@9;
+};
+
+struct SavedFlowQueryCommand {
+  OperationEnvelope operation@0;
+  SavedFlowQueryKind kind@1;
+  string goal@2;
+  string skill_id@3;
+  uint32 expected_version@4;
+};
+
+struct SavedFlowQueryResult {
+  OperationEnvelope operation@0;
+  SavedFlowQueryStatus status@1;
+  array<SavedFlowReview> flows@2;
+};

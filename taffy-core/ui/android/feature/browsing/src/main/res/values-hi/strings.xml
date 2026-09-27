@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Machine-translated (hi), pending native review. -->
+<resources>
+    <!-- Screen SCR-101 -->
+    <string name="taffy_browser_loading">लोड हो रहा है…</string>
+    <string name="taffy_browser_address_hint">साइट, खोज या सवाल टाइप करें</string>
+    <string name="taffy_browser_address_description">पता बार, %1$s दिखा रहा है</string>
+    <string name="taffy_browser_address_description_blank">पता बार, अभी कुछ भी खुला नहीं है</string>
+    <string name="taffy_browser_address_description_private">निजी टैब में पता बार, %1$s दिखा रहा है</string>
+    <string name="taffy_browser_address_description_blank_private">निजी टैब में पता बार, अभी कुछ भी खुला नहीं है</string>
+    <string name="taffy_browser_private_title">निजी टैब</string>
+    <string name="taffy_browser_private_body">बंद करते ही यह सब कुछ भूल जाता है।</string>
+    <string name="taffy_browser_private_description">%1$s. %2$s</string>
+    <string name="taffy_browser_content_placeholder">पेज यहाँ बनता है।</string>
+    <plurals name="taffy_browser_tabs">
+        <item quantity="one">%1$d टैब</item>
+        <item quantity="other">%1$d टैब</item>
+    </plurals>
+    <string name="taffy_browser_downloads">डाउनलोड</string>
+    <string name="taffy_browser_settings">सेटिंग</string>
+    <string name="taffy_browser_back">वापस</string>
+    <string name="taffy_browser_forward">आगे</string>
+    <string name="taffy_browser_no_search_title">अभी कोई सर्च इंजन नहीं है</string>
+    <string name="taffy_browser_no_search_body">TaffyGo ने अभी कोई नहीं चुना है, इसलिए कुछ भी नहीं भेजा गया — आपने जो लिखा वह इसी फ़ोन पर रहा। सीधे किसी साइट पर जाने के लिए उसका पता टाइप करें।</string>
+    <string name="taffy_browser_notice_dismiss">ठीक है</string>
+    <string name="taffy_browser_page_actions">ब्राउज़र और पेज के विकल्प</string>
+    <string name="taffy_browser_more_title">और</string>
+    <string name="taffy_browser_menu_site">यह साइट</string>
+    <string name="taffy_browser_menu_reload">फिर से लोड करें</string>
+    <string name="taffy_browser_menu_stop">रोकें</string>
+    <string name="taffy_browser_menu_pages">आपके पेज</string>
+    <string name="taffy_browser_menu_find">पेज में खोजें</string>
+    <string name="taffy_browser_menu_share">साझा करें</string>
+    <string name="taffy_browser_menu_save_page">पेज सहेजें</string>
+    <string name="taffy_browser_menu_ads">विज्ञापन और ट्रैकर</string>
+    <string name="taffy_browser_menu_history">इतिहास</string>
+    <string name="taffy_browser_menu_bookmarks">बुकमार्क</string>
+    <string name="taffy_browser_menu_library">लाइब्रेरी</string>
+    <string name="taffy_browser_menu_you">आप</string>
+    <string name="taffy_browser_share_chooser">यह पेज साझा करें</string>
+
+    <!-- Screen SCR-102 -->
+    <string name="taffy_new_tab_focus_address_bar">साइट, खोज या सवाल टाइप करें</string>
+    <string name="taffy_start_options">ब्राउज़र विकल्प</string>
+    <string name="taffy_new_tab_workspaces">वर्कस्पेस</string>
+    <string name="taffy_start_greeting_where_to">आज कहाँ चलना है?</string>
+    <string name="taffy_start_greeting_fresh">एक नई शुरुआत।</string>
+    <string name="taffy_start_greeting_ask">कोई साइट लिखें, या Taffy से पूछें।</string>
+    <string name="taffy_start_greeting_ready">आप जब तैयार हों।</string>
+    <string name="taffy_start_frequent_description">%1$s, %2$s. यह साइट खोलता है।</string>
+    <string name="taffy_start_frequent_empty">जिन साइटों पर आप अक्सर जाते हैं वे यहाँ दिखती हैं। इस फ़ोन से कुछ भी बाहर नहीं जाता।</string>
+    <string name="taffy_start_preparing_title">Taffy को तैयार किया जा रहा है</string>
+    <string name="taffy_start_preparing_body">Taffy इंस्टॉल हो रहा है। यह सिर्फ़ एक बार होता है।</string>
+    <string name="taffy_start_preparing_installing">Taffy आ चुका है और जाँचा जा रहा है।</string>
+    <string name="taffy_start_preparing_not_started">Taffy अभी शुरू नहीं हुआ है, इसलिए अभी बताने को कुछ नहीं है।</string>
+    <string name="taffy_start_preparing_offline">कनेक्शन का इंतज़ार है।</string>
+    <string name="taffy_start_preparing_failed">पूरा नहीं हो सका। फिर कोशिश करें।</string>
+    <string name="taffy_start_preparing_unavailable">Taffy का यह हिस्सा इस डिवाइस पर उपलब्ध नहीं है।</string>
+    <string name="taffy_start_preparing_progress">%1$d%% तैयार</string>
+
+    <!-- Screen SCR-103 -->
+    <string name="taffy_address_bar_title">पता बार</string>
+    <string name="taffy_address_bar_label">साइट, खोज, सवाल या अनुरोध</string>
+    <string name="taffy_address_bar_reading_go_to">जाएँ</string>
+    <string name="taffy_address_bar_reading_search">खोजें</string>
+    <string name="taffy_address_bar_reading_ask">Taffy से पूछें</string>
+    <string name="taffy_address_bar_reading_task">Taffy के लिए कार्य</string>
+    <string name="taffy_address_bar_interpretation_description">%1$s: %2$s. इस अर्थ को अपनाने के लिए टैप करें।</string>
+    <string name="taffy_address_bar_suggestion_description">%1$s। %2$s</string>
+    <string name="taffy_address_bar_suggestion_supporting">%1$s · %2$s</string>
+    <string name="taffy_address_bar_reading_command">ब्राउज़र कमांड</string>
+    <string name="taffy_address_bar_source_go_to">वेब पता</string>
+    <string name="taffy_address_bar_source_search">वेब खोज</string>
+    <string name="taffy_address_bar_source_ask">Taffy जवाब देता है</string>
+    <string name="taffy_address_bar_source_task">Taffy कई पेजों पर काम करता है</string>
+    <string name="taffy_address_bar_source_command">ब्राउज़र कमांड</string>
+    <string name="taffy_address_bar_source_open_tab">खुला टैब</string>
+    <string name="taffy_address_bar_source_bookmark">बुकमार्क</string>
+    <string name="taffy_address_bar_source_history">इतिहास</string>
+
+    <!-- जहाँ टाइप किया वहीं शुरू हुआ कार्य: बॉक्स के नीचे सहमति (निर्णय 0087 खंड 4), और शुरू क्यों नहीं हो सकता -->
+    <plurals name="taffy_task_start_discovery">
+        <item quantity="one">Taffy साइट खुद खोजेगा और अधिकतम %1$d साइट खोल सकता है।</item>
+        <item quantity="other">Taffy साइट खुद खोजेगा और अधिकतम %1$d साइटें खोल सकता है।</item>
+    </plurals>
+    <string name="taffy_task_start_values">Taffy आपसे ऐसी बातें पूछ सकता है जो सिर्फ़ आप जानते हैं। आप उन्हें TaffyGo में टाइप करते हैं और वे सिर्फ़ उस साइट तक जाती हैं।</string>
+    <string name="taffy_task_start_store_history">आपका इतिहास</string>
+    <string name="taffy_task_start_store_bookmarks">आपके बुकमार्क</string>
+    <string name="taffy_task_start_store_open_tabs">आपके खुले टैब</string>
+    <string name="taffy_task_start_stores_one">Taffy इसके लिए %1$s खोज सकता है।</string>
+    <string name="taffy_task_start_stores_two">Taffy इसके लिए %1$s और %2$s खोज सकता है।</string>
+    <string name="taffy_task_start_stores_three">Taffy इसके लिए %1$s, %2$s और %3$s खोज सकता है।</string>
+    <string name="taffy_task_start_route_direct">पेज का टेक्स्ट सीधे आपके प्रोवाइडर तक जाता है।</string>
+    <string name="taffy_task_start_submitting">Taffy शुरू हो रहा है…</string>
+    <string name="taffy_task_start_refused_no_goal">बताएँ कि Taffy क्या करे।</string>
+    <string name="taffy_task_start_refused_setup_needed">यह करने के लिए Taffy सेट अप करें। तब तक इस फ़ोन से कुछ बाहर नहीं जाता।</string>
+    <string name="taffy_task_start_refused_not_ready">Taffy अभी तैयार हो रहा है।</string>
+    <string name="taffy_task_start_refused_core_not_ready">Taffy अभी उपलब्ध नहीं है। आपके टैब अब भी काम करते हैं।</string>
+    <string name="taffy_task_start_refused_already_running">एक कार्य पहले से चल रहा है। दूसरा शुरू करने से पहले उसे रोकें।</string>
+    <string name="taffy_task_start_refused_wrong_page_count">इस तरह का कार्य आपके बताए पेज पढ़ता है। चुनने के लिए टैप करें।</string>
+    <string name="taffy_task_start_failed_invalid_request">Taffy यह अनुरोध पढ़ नहीं सका। इसे बदलकर फिर कोशिश करें।</string>
+    <string name="taffy_task_start_failed_stale_generation">भेजते समय Taffy फिर से शुरू हुआ। फिर कोशिश करें।</string>
+    <string name="taffy_task_start_failed_stale_revision">भेजते समय कुछ बदल गया। फिर कोशिश करें।</string>
+    <string name="taffy_task_start_failed_deadline_exceeded">Taffy समय पर शुरू नहीं हुआ। फिर कोशिश करें।</string>
+    <string name="taffy_task_start_failed_backpressure">Taffy व्यस्त है। थोड़ी देर में फिर कोशिश करें।</string>
+    <string name="taffy_task_start_failed_core_unavailable">Taffy अभी उपलब्ध नहीं है। आपके टैब अब भी काम करते हैं।</string>
+    <string name="taffy_task_start_failed_duplicate">Taffy के पास यह अनुरोध पहले से है।</string>
+    <string name="taffy_task_start_failed_protocol_violation">Taffy यह अनुरोध ले नहीं सका। फिर कोशिश करें।</string>
+    <string name="taffy_task_start_failed_source_not_open">Taffy सिर्फ़ आपके अपने टैब के पेज पढ़ सकता है। पेज को नए टैब में खोलें, फिर से पूछें।</string>
+    <string name="taffy_task_start_failed_source_ambiguous">आपके एक से ज़्यादा टैब एक ही साइट पर हैं। एक को छोड़कर बाकी बंद करें, फिर से पूछें।</string>
+    <string name="taffy_task_start_failed_window_unavailable">Taffy एक समय में एक ही विंडो में काम करता है। TaffyGo की कोई दूसरी विंडो बंद करें, फिर से पूछें।</string>
+    <string name="taffy_address_bar_command_history">इतिहास खोलें</string>
+    <string name="taffy_address_bar_command_bookmarks">बुकमार्क खोलें</string>
+    <string name="taffy_address_bar_command_downloads">डाउनलोड खोलें</string>
+    <string name="taffy_address_bar_command_settings">सेटिंग खोलें</string>
+    <string name="taffy_address_bar_command_clear_data">ब्राउज़िंग डेटा मिटाने की स्क्रीन खोलें</string>
+    <string name="taffy_address_bar_send_description">%1$s: %2$s</string>
+    <string name="taffy_address_bar_chip_remove">%1$s को इस अनुरोध से हटाएँ</string>
+    <string name="taffy_start_store_open_tabs">खुले टैब</string>
+    <string name="taffy_start_store_attached">%1$s, जोड़ा गया</string>
+    <string name="taffy_address_voice_start">बोलें</string>
+    <string name="taffy_address_voice_title">आवाज़ से लिखें</string>
+    <string name="taffy_address_voice_ready">तैयार होने पर शुरू करें।</string>
+    <string name="taffy_address_voice_permission">माइक्रोफ़ोन की अनुमति का इंतज़ार है…</string>
+    <string name="taffy_address_voice_listening_title">सुन रहा है</string>
+    <string name="taffy_address_voice_listening">अब बोलें। आपके देखने तक किसी शब्द का उपयोग नहीं होगा।</string>
+    <string name="taffy_address_voice_processing_title">आपके शब्द तैयार हो रहे हैं</string>
+    <string name="taffy_address_voice_processing">आपका फ़ोन शब्द तैयार कर रहा है।</string>
+    <string name="taffy_address_voice_review_title">इन शब्दों का उपयोग करें?</string>
+    <string name="taffy_address_voice_review">पता बार बदलने से पहले शब्द देख लें। उनका मतलब चुनना अब भी एक अलग कदम है।</string>
+    <string name="taffy_address_voice_error_title">आवाज़ से लिखना उपलब्ध नहीं है</string>
+    <string name="taffy_address_voice_permission_denied">माइक्रोफ़ोन की अनुमति नहीं मिली। आप टाइप कर सकते हैं या Android सेटिंग में अनुमति दे सकते हैं।</string>
+    <string name="taffy_address_voice_unavailable">इस फ़ोन पर अभी कोई वाणी सेवा उपलब्ध नहीं है।</string>
+    <string name="taffy_address_voice_no_speech">कोई शब्द सुनाई नहीं दिया। यह संदेश बंद करके फिर कोशिश करें।</string>
+    <string name="taffy_address_voice_busy">आपका फ़ोन आवाज़ से लिखने में व्यस्त है। थोड़ी देर में फिर कोशिश करें।</string>
+    <string name="taffy_address_voice_connection">आपका फ़ोन आवाज़ से लिखना पूरा नहीं कर सका। आप टाइप कर सकते हैं।</string>
+    <string name="taffy_address_voice_too_long">ये शब्द पता बार के लिए बहुत लंबे हैं। छोटा अनुरोध बोलें।</string>
+    <string name="taffy_address_voice_failed">फ़ोन इस आवाज़ को टेक्स्ट में नहीं बदल सका। फिर कोशिश करें।</string>
+    <string name="taffy_address_voice_truncated">केवल पहला हिस्सा समा सका। उपयोग करने से पहले इसे ध्यान से देखें।</string>
+    <string name="taffy_address_voice_privacy">आपका फ़ोन ऑडियो को टेक्स्ट में बदलता है। पुष्टि से पहले TaffyGo ऑडियो सेव नहीं करता और इन शब्दों को Taffy या किसी पेज को नहीं देता।</string>
+    <string name="taffy_address_voice_use">इन शब्दों का उपयोग करें</string>
+    <string name="taffy_address_voice_cancel">रद्द करें</string>
+    <string name="taffy_address_voice_close">बंद करें</string>
+    <string name="taffy_address_bar_task_templates">कार्य टेम्पलेट</string>
+    <string name="taffy_address_bar_template_compare_products">उत्पादों की तुलना करें</string>
+    <string name="taffy_address_bar_template_summarize_evidence">प्रमाणों का सार दें</string>
+    <string name="taffy_address_bar_template_build_a_source_table">स्रोतों की तालिका बनाएँ</string>
+    <string name="taffy_address_bar_template_web_errand">यह मेरे लिए कर दो</string>
+
+    <!-- Screen SCR-104 -->
+    <string name="taffy_tab_switcher_new_tab">नया टैब</string>
+    <string name="taffy_tab_switcher_new_private_tab">नया निजी टैब</string>
+    <string name="taffy_tab_switcher_search">खुले टैब खोजें</string>
+    <string name="taffy_tab_switcher_search_empty_title">कोई खुला टैब मेल नहीं खाता</string>
+    <string name="taffy_tab_switcher_search_empty_body">यहाँ खुली किसी चीज़ में “%1$s” नहीं है। आपके टैब अब भी खुले हैं — उन्हें देखने के लिए खोज हटाएँ।</string>
+    <string name="taffy_tab_switcher_close_all">ये टैब बंद करें</string>
+    <string name="taffy_tab_switcher_close_all_title">ये टैब बंद करें?</string>
+    <string name="taffy_tab_switcher_close_all_body">इस समूह का हर टैब बंद हो जाएगा। चल रहे काम के लिए Taffy ने जो टैब खोले हैं वे खुले रहेंगे, ताकि काम बता सके कि उसके तथ्य कहाँ से आए।</string>
+    <string name="taffy_tab_switcher_close_all_confirm">बंद करें</string>
+    <string name="taffy_tab_switcher_close_all_cancel">रहने दें</string>
+    <string name="taffy_tab_switcher_your_tabs">आपके टैब</string>
+    <string name="taffy_tab_switcher_private">निजी</string>
+    <string name="taffy_tab_switcher_show_taffy_tabs">Taffy के टैब दिखाएँ (%1$d)</string>
+    <string name="taffy_tab_switcher_hide_taffy_tabs">Taffy के टैब छिपाएँ (%1$d)</string>
+    <string name="taffy_tab_switcher_taffy_tabs">Taffy के टैब</string>
+    <string name="taffy_tab_switcher_amber_legend">अंबर किनारा: Taffy ने इसे किसी कार्य के लिए खोला</string>
+    <string name="taffy_tab_switcher_close_description">%1$s बंद करें</string>
+    <string name="taffy_tab_switcher_description_join">%1$s, %2$s</string>
+    <string name="taffy_tab_switcher_showing_now">अभी दिख रहा है</string>
+    <string name="taffy_tab_switcher_by_taffy">Taffy ने खोला</string>
+    <string name="taffy_tab_switcher_blank_tab">नया टैब</string>
+    <string name="taffy_tab_switcher_reading">पढ़ रहा है…</string>
+    <plurals name="taffy_tab_switcher_facts">
+        <item quantity="one">%1$d तथ्य</item>
+        <item quantity="other">%1$d तथ्य</item>
+    </plurals>
+    <plurals name="taffy_tab_switcher_tab_count">
+        <item quantity="one">%1$d टैब</item>
+        <item quantity="other">%1$d टैब</item>
+    </plurals>
+    <plurals name="taffy_tab_switcher_opened_by_taffy">
+        <item quantity="one">%1$d Taffy ने खोला</item>
+        <item quantity="other">%1$d Taffy ने खोले</item>
+    </plurals>
+    <string name="taffy_tab_switcher_counts">%1$s · %2$s</string>
+    <plurals name="taffy_tab_switcher_new_workspace">
+        <item quantity="one">%1$d टैब से नया वर्कस्पेस…</item>
+        <item quantity="other">%1$d टैब से नया वर्कस्पेस…</item>
+    </plurals>
+    <string name="taffy_tab_switcher_new_workspace_description">%1$s. कार्य टेम्पलेट खोलता है, जहाँ आप वर्कस्पेस का आकार चुनते हैं।</string>
+    <string name="taffy_tab_switcher_ask_taffy">Taffy से पूछें</string>
+    <plurals name="taffy_tab_switcher_ask_taffy_pages">
+        <item quantity="one">%1$d पेज के बारे में Taffy से पूछें</item>
+        <item quantity="other">%1$d पेजों के बारे में Taffy से पूछें</item>
+    </plurals>
+    <string name="taffy_tab_switcher_chosen_for_ask">Taffy से पूछने के लिए चुना गया</string>
+    <string name="taffy_tab_switcher_open_age_just">अभी खोला</string>
+    <plurals name="taffy_tab_switcher_open_age_minutes">
+        <item quantity="one">%1$d मिनट</item>
+        <item quantity="other">%1$d मिनट</item>
+    </plurals>
+    <plurals name="taffy_tab_switcher_open_age_hours">
+        <item quantity="one">%1$d घंटा</item>
+        <item quantity="other">%1$d घंटे</item>
+    </plurals>
+    <plurals name="taffy_tab_switcher_open_age_days">
+        <item quantity="one">%1$d दिन</item>
+        <item quantity="other">%1$d दिन</item>
+    </plurals>
+    <string name="taffy_tab_switcher_empty_title">कोई टैब खुला नहीं है</string>
+    <string name="taffy_tab_switcher_empty_body">ब्राउज़ करना शुरू करने के लिए एक टैब खोलें।</string>
+    <string name="taffy_tab_switcher_private_empty_title">कोई निजी टैब नहीं</string>
+    <string name="taffy_tab_switcher_private_empty_body">निजी टैब बंद करते ही सब कुछ भूल जाता है। इसे यहाँ के जोड़ें बटन से खोलें।</string>
+
+    <!-- Screen SCR-108 -->
+    <string name="taffy_error_offline_title">आप ऑफ़लाइन हैं</string>
+    <string name="taffy_error_offline_body">इस पेज के लिए नेटवर्क कनेक्शन चाहिए। कुछ भी नहीं भेजा गया।</string>
+    <string name="taffy_error_name_title">वह पता नहीं मिल पाया</string>
+    <string name="taffy_error_name_body">उस नाम के लिए किसी सर्वर ने जवाब नहीं दिया। वर्तनी जाँचें या फिर कोशिश करें।</string>
+    <string name="taffy_error_unreachable_title">वह साइट तक नहीं पहुँचा जा सका</string>
+    <string name="taffy_error_unreachable_body">उस पते पर कोई जवाब नहीं मिला। वर्तनी जाँचें या फिर कोशिश करें।</string>
+    <string name="taffy_error_timeout_title">सर्वर ने जवाब नहीं दिया</string>
+    <string name="taffy_error_timeout_body">पेज को बहुत समय लगा। फिर कोशिश करने से अक्सर काम बन जाता है।</string>
+    <string name="taffy_error_certificate_title">यह कनेक्शन निजी नहीं है</string>
+    <string name="taffy_error_certificate_body">साइट का प्रमाणपत्र सही नहीं निकला। फिर कोशिश करने से यह नहीं बदलेगा, इसलिए TaffyGo यहीं रुकता है।</string>
+    <string name="taffy_error_crashed_title">यह पेज रुक गया</string>
+    <string name="taffy_error_crashed_body">पेज दिख रहा था, फिर नहीं दिखा। फिर कोशिश करने से अक्सर वापस आ जाता है।</string>
+    <string name="taffy_error_retry">फिर कोशिश करें</string>
+
+    <!-- Screen SCR-203 -->
+    <string name="taffy_preparing_parts_retry">फिर कोशिश करें</string>
+    <string name="taffy_preparing_parts_product_defect">Taffy के इस हिस्से में कुछ गड़बड़ है</string>
+
+    <string name="taffy_site_filtering_title">विज्ञापन और ट्रैकर</string>
+    <plurals name="taffy_site_filtering_blocked">
+        <item quantity="one">इस पेज पर %1$d ट्रैकर ब्लॉक किया गया</item>
+        <item quantity="other">इस पेज पर %1$d ट्रैकर ब्लॉक किए गए</item>
+    </plurals>
+    <string name="taffy_site_filtering_page_stat">इस पेज पर</string>
+    <string name="taffy_site_filtering_none_yet">इस पेज पर अभी कुछ ब्लॉक नहीं हुआ</string>
+    <string name="taffy_site_filtering_site_off">इस साइट पर विज्ञापन और ट्रैकर बंद हैं</string>
+    <string name="taffy_site_filtering_master_off">TaffyGo के लिए विज्ञापन और ट्रैकर बंद हैं</string>
+    <string name="taffy_site_filtering_site_toggle">इस साइट पर विज्ञापन और ट्रैकर ब्लॉक करें</string>
+    <string name="taffy_site_filtering_site_failed">वह बदलाव सहेजा नहीं जा सका। इस साइट के लिए विज्ञापन और ट्रैकर अपरिवर्तित हैं।</string>
+    <string name="taffy_site_filtering_settings">विज्ञापन और ट्रैकर की सभी सेटिंग</string>
+    <string name="taffy_site_filtering_why_heading">यह क्यों ज़रूरी है</string>
+    <string name="taffy_site_filtering_why_body">कम विज्ञापन और ट्रैकर का मतलब है पेज आमतौर पर तेज़ लोड होते हैं, और साइटों के पास आपको फ़ॉलो करने के लिए कम रहता है।</string>
+    <string name="taffy_site_filtering_breakage">अगर इस साइट के टुकड़े गायब हैं, तो इस साइट के लिए विज्ञापन और ट्रैकर बंद करें। आप उन्हें कभी भी वापस चालू कर सकते हैं।</string>
+    <string name="taffy_site_filtering_connection">कनेक्शन</string>
+    <string name="taffy_site_filtering_secure">सुरक्षित कनेक्शन</string>
+    <string name="taffy_site_filtering_insecure">निजी कनेक्शन नहीं</string>
+    <string name="taffy_site_filtering_permissions">अनुमतियाँ</string>
+    <string name="taffy_site_filtering_permissions_loading">बदली हुई अनुमतियों की जाँच हो रही है…</string>
+    <string name="taffy_site_filtering_permissions_empty">इस साइट के लिए कोई बदली हुई अनुमति नहीं है।</string>
+    <string name="taffy_site_filtering_permissions_unavailable">साइट अनुमतियाँ उपलब्ध नहीं हैं।</string>
+    <plurals name="taffy_site_filtering_permissions_changed">
+        <item quantity="one">%1$d बदली हुई अनुमति</item>
+        <item quantity="other">%1$d बदली हुई अनुमतियाँ</item>
+    </plurals>
+    <plurals name="taffy_site_filtering_permissions_other">
+        <item quantity="one">साइट अनुमति में %1$d और बदलाव</item>
+        <item quantity="other">साइट अनुमतियों में %1$d और बदलाव</item>
+    </plurals>
+    <string name="taffy_site_filtering_permissions_reset">बदली हुई अनुमतियाँ रीसेट करें</string>
+    <string name="taffy_site_filtering_permissions_reset_title">साइट अनुमतियाँ रीसेट करें?</string>
+    <string name="taffy_site_filtering_permissions_reset_body">%1$s के लिए हर सहेजा हुआ अनुमति विकल्प हटाएँ। साइट आपकी डिफ़ॉल्ट सेटिंग इस्तेमाल करेगी और फिर से पूछ सकती है।</string>
+    <string name="taffy_site_filtering_permissions_reset_confirm">अनुमतियाँ रीसेट करें</string>
+    <string name="taffy_site_filtering_permissions_reset_cancel">विकल्प रखें</string>
+    <string name="taffy_site_filtering_permissions_resetting">बदली हुई अनुमतियाँ रीसेट हो रही हैं…</string>
+    <string name="taffy_site_filtering_permissions_reset_done">बदली हुई अनुमतियाँ रीसेट कर दी गईं।</string>
+    <string name="taffy_site_filtering_permissions_reset_failed">बदली हुई अनुमतियाँ रीसेट नहीं हो सकीं। मौजूदा विकल्प ऊपर दिखाए गए हैं।</string>
+    <string name="taffy_site_filtering_permission_location">जगह</string>
+    <string name="taffy_site_filtering_permission_camera">कैमरा</string>
+    <string name="taffy_site_filtering_permission_microphone">माइक्रोफ़ोन</string>
+    <string name="taffy_site_filtering_permission_notifications">सूचनाएँ</string>
+    <string name="taffy_site_filtering_permission_javascript">JavaScript</string>
+    <string name="taffy_site_filtering_permission_pop_ups">पॉप-अप और रीडायरेक्ट</string>
+    <string name="taffy_site_filtering_permission_automatic_downloads">अपने-आप डाउनलोड</string>
+    <string name="taffy_site_filtering_permission_clipboard">क्लिपबोर्ड</string>
+    <string name="taffy_site_filtering_permission_sensors">सेंसर</string>
+    <string name="taffy_site_filtering_permission_sound">आवाज़</string>
+    <string name="taffy_page_zoom_title">पेज ज़ूम</string>
+    <string name="taffy_page_zoom_smaller">पेज छोटा करें</string>
+    <string name="taffy_page_zoom_larger">पेज बड़ा करें</string>
+    <string name="taffy_page_zoom_percent">%1$d%%</string>
+    <string name="taffy_page_zoom_reset_description">पेज ज़ूम रीसेट करें। मौजूदा ज़ूम: %1$d%%</string>
+    <string name="taffy_page_zoom_unavailable">इस पेज पर ज़ूम उपलब्ध नहीं है।</string>
+    <string name="taffy_site_filtering_desktop">डेस्कटॉप साइट</string>
+    <string name="taffy_site_filtering_desktop_unavailable">डेस्कटॉप साइट अभी उपलब्ध नहीं है।</string>
+    <string name="taffy_site_filtering_desktop_description">%1$s. %2$s</string>
+    <string name="taffy_find_placeholder">पेज में खोजें</string>
+    <string name="taffy_find_count">%1$d / %2$d</string>
+    <string name="taffy_find_next">अगला मिलान</string>
+    <string name="taffy_find_previous">पिछला मिलान</string>
+    <string name="taffy_find_close">खोज बंद करें</string>
+    <string name="taffy_find_unavailable">पेज में खोज इस फ़ोन पर अभी जुड़ी नहीं है।</string>
+    <string name="taffy_save_page_title">पेज सहेजें</string>
+    <string name="taffy_save_page_save">सहेजें</string>
+    <string name="taffy_save_page_cancel">रद्द करें</string>
+    <string name="taffy_save_page_unavailable">यह पेज इस फ़ोन पर अभी सहेजा नहीं जा सका।</string>
+    <string name="taffy_save_page_failed">वह पेज सहेजा नहीं गया। फिर से कोशिश करें।</string>
+    <string name="taffy_save_page_private">यह एक निजी टैब है। बंद करते ही यह सब कुछ भूल जाता है, इसलिए यह पेज सहेजा नहीं जा सकता।</string>
+    <!-- The takeover band, frame and page cut-out (screen SCR-101). -->
+    <string name="taffy_browser_takeover_description">%1$s. %2$s</string>
+    <string name="taffy_browser_takeover_frame_description">Taffy इस पेज पर काम कर रहा है</string>
+    <string name="taffy_browser_takeover_highlight_description">Taffy ने इस पेज का वह हिस्सा चिह्नित किया है जो आपको करना है</string>
+    <string name="taffy_browser_takeover_lock_line">Taffy इस पेज पर काम कर रहा है</string>
+    <string name="taffy_browser_takeover_lock_hint_take_over">खुद इस्तेमाल करने के लिए संभालें</string>
+    <string name="taffy_browser_takeover_lock_hint_wait">ज़रूरत होने पर Taffy पेज आपको लौटा देगा</string>
+    <!-- The toolbar over a page opened for one errand (screen SCR-110). -->
+    <string name="taffy_errand_back">पीछे</string>
+    <string name="taffy_errand_close">हो गया</string>
+
+    <!-- Ask ओवरले (SCR-301): जिन पेजों के बारे में सवाल है, और पूछने पर क्या भेजा जाता है (निर्णय 0034, 0035, 0087) -->
+    <string name="taffy_ask_composer_title">Taffy से पूछें</string>
+    <string name="taffy_ask_overlay_close">Ask Taffy बंद करें</string>
+    <string name="taffy_ask_overlay_close_control">बंद करें</string>
+    <string name="taffy_ask_add_pages">पेज जोड़ें</string>
+    <string name="taffy_ask_tab_closed">यह टैब बंद हो गया</string>
+    <string name="taffy_ask_taffy_opened">Taffy ने यह खोला</string>
+    <string name="taffy_ask_remove_page">%1$s को उन पेजों से हटाएँ जिन्हें Taffy देखेगा</string>
+    <string name="taffy_ask_page_spoken">%1$s, %2$s</string>
+    <string name="taffy_ask_will_do_none_private">Taffy निजी टैब नहीं पढ़ सकता — बंद करते ही वह सब कुछ भूल जाता है। पेज को अपने किसी टैब में खोलें, वहाँ Taffy उसे पढ़ सकेगा।</string>
+    <plurals name="taffy_count_pages">
+        <item quantity="one">%1$d पेज</item>
+        <item quantity="other">%1$d पेज</item>
+    </plurals>
+    <string name="taffy_ask_disclosure_one_page">Taffy इस पेज का शीर्षक और टेक्स्ट भेजेगा। %1$s</string>
+    <string name="taffy_ask_disclosure_many_pages">Taffy इन %1$s के शीर्षक और टेक्स्ट भेजेगा। %2$s</string>
+    <string name="taffy_ask_disclosure_closed">आपने जो पेज चुना वह बंद है। उसे हटाएँ, या फिर खोलकर जोड़ें।</string>
+    <string name="taffy_ask_same_site">ये दो टैब एक ही साइट पर हैं। पूछने से पहले एक बंद करें।</string>
+    <string name="taffy_ask_scope_exact">Taffy सिर्फ़ ऊपर दिए पेज पढ़ता है और कोई और पेज नहीं खोलता।</string>
+    <string name="taffy_ask_disclosure_direct_compact">%1$s: शीर्षक और टेक्स्ट सीधे आपके AI प्रोवाइडर तक जाते हैं।</string>
+    <string name="taffy_ask_disclosure_local_compact">%1$s: बिना AI प्रोवाइडर के इसी डिवाइस पर पढ़े जाते हैं।</string>
+    <string name="taffy_ask_scope_compact">सिर्फ़ ये पेज। कोई और पेज नहीं खुलेगा।</string>
+    <string name="taffy_ask_values_compact">आपकी दर्ज की गई निजी जानकारी सिर्फ़ साइट तक जाती है।</string>
+    <string name="taffy_ask_field_hint_page">इस पेज के बारे में पूछें</string>
+    <string name="taffy_ask_field_hint_pages">इन पेजों के बारे में पूछें</string>
+    <string name="taffy_ask_field_hint_none">Taffy से कुछ भी पूछें</string>
+    <string name="taffy_task_start_route_no_model">इस डिवाइस पर रहता है। यह जाँचा गया काम किसी मॉडल का उपयोग नहीं करता।</string>
+
+    <!-- Ask ओवरले के ऊपर पेज जोड़ें शीट -->
+    <string name="taffy_attach_pages_title">पेज जोड़ें</string>
+    <string name="taffy_attach_pages_body">Taffy उन पेजों को देखेगा जिन्हें आप चुनते हैं।</string>
+    <string name="taffy_attach_pages_search">खुले पेज खोजें</string>
+    <string name="taffy_attach_pages_your_tabs">आपके टैब</string>
+    <plurals name="taffy_attach_pages_selected">
+        <item quantity="one">%1$d चुना गया</item>
+        <item quantity="other">%1$d चुने गए</item>
+    </plurals>
+    <string name="taffy_attach_pages_empty_search">वे पेज अभी भी खुले हैं। यहाँ कुछ मेल नहीं खाता।</string>
+    <string name="taffy_attach_pages_use">इन पेजों का इस्तेमाल करें</string>
+    <string name="taffy_attach_pages_caution">Taffy कुछ ही पेजों के साथ बेहतर काम करता है।</string>
+    <string name="taffy_attach_pages_taffy_tabs">Taffy के टैब मौजूदा काम के साथ रहते हैं। वे ऐसे पेज नहीं हैं जिन्हें आप जोड़ सकें।</string>
+    <string name="taffy_attach_pages_loading">खुले पेज लोड हो रहे हैं</string>
+    <string name="taffy_attach_pages_unavailable_title">Taffy अभी उपलब्ध नहीं है</string>
+    <string name="taffy_attach_pages_unavailable_body">आपके टैब अभी भी काम करते हैं। Taffy के तैयार होने पर पेज जोड़ने की कोशिश करें।</string>
+    <string name="taffy_attach_pages_row">%1$s, %2$s</string>
+    <string name="taffy_attach_pages_row_chosen">%1$s, %2$s, चुना गया</string>
+
+    <!-- कुछ सेट अप न होने पर Ask ओवरले: बॉक्स की जगह सेट-अप पैनल -->
+    <string name="taffy_ask_setup_title">Taffy अभी सेट अप नहीं है</string>
+    <string name="taffy_ask_setup_body">किसी सवाल का जवाब देने या कोई काम चलाने से पहले Taffy को एक प्रदाता चाहिए। अपनी कुंजी जोड़ें, किसी प्लान में साइन इन करें, या अपने प्रदाता का पता जोड़ें। तब तक इस फ़ोन से कुछ भी बाहर नहीं जाता।</string>
+    <string name="taffy_ask_setup_route_title">Taffy अभी किसी प्रदाता तक नहीं पहुँच पा रहा</string>
+    <string name="taffy_ask_setup_route_direct_body">Taffy आपकी कुंजी इस्तेमाल करने के लिए सेट है, पर इस फ़ोन पर कोई कुंजी इस्तेमाल के लिए तैयार नहीं है। अपनी कुंजी जोड़ें या जाँचें, फिर Taffy शुरू कर सकता है।</string>
+    <string name="taffy_ask_setup_primary">Taffy सेट अप करें</string>
+    <string name="taffy_ask_setup_secondary">अभी नहीं</string>
+    <string name="taffy_page_flows_title">सेव किए गए तरीके</string>
+    <string name="taffy_page_flows_goal">%1$s पर सेव किया गया तरीका इस्तेमाल करें</string>
+    <string name="taffy_page_flows_refresh">इस पेज को फिर जाँचें</string>
+    <string name="taffy_page_flows_view_steps">सेव किए गए चरण देखें</string>
+    <string name="taffy_page_flows_hide_steps">सेव किए गए चरण छिपाएँ</string>
+    <string name="taffy_page_flows_use">यह तरीका इस्तेमाल करें</string>
+    <string name="taffy_page_flows_setup">Taffy सेट अप करें</string>
+    <string name="taffy_page_flows_loading">इस पेज के लिए आपके सेव किए गए तरीके जाँचे जा रहे हैं…</string>
+    <string name="taffy_page_flows_ready">ये सेव किए गए तरीके इस पेज से मेल खाते हैं। Taffy के लिए कोई एक चुनें।</string>
+    <string name="taffy_page_flows_empty">इस पेज से अभी कोई सेव किया गया तरीका मेल नहीं खाता।</string>
+    <string name="taffy_page_flows_stale">यह पेज या इसके सेव किए गए तरीके बदल गए हैं। उपलब्ध तरीके देखने के लिए पेज फिर जाँचें।</string>
+    <string name="taffy_page_flows_unavailable">इस पेज के लिए सेव किए गए तरीके अभी उपलब्ध नहीं हैं।</string>
+    <string name="taffy_page_flows_review_unavailable">कुछ सेव किए गए फ़्लो इस्तेमाल करने से पहले उनके सभी चरण लोड करने होंगे।</string>
+    <string name="taffy_page_flows_manage">सेव किए गए तरीके देखें</string>
+    <string name="taffy_page_flows_replay">Taffy इस साइट पर सेव किए गए चरणों का पालन करेगा।</string>
+    <string name="taffy_page_flows_handover">आप साइट पर अपनी निजी जानकारी भरते हैं और सत्यापन पूरा करते हैं। फिर काम Taffy को वापस सौंपें।</string>
+    <plurals name="taffy_page_flows_permission"><item quantity="one">आप इस काम को अधिकतम %1$d नई साइट खोलने की अनुमति देते हैं।</item><item quantity="other">आप इस काम को अधिकतम %1$d नई साइटें खोलने की अनुमति देते हैं।</item></plurals>
+    <plurals name="taffy_page_flows_steps"><item quantity="one">सेव किया गया तरीका · %1$d चरण</item><item quantity="other">सेव किया गया तरीका · %1$d चरण</item></plurals>
+    <string name="taffy_repeat_checking">सेव किए गए फ़्लो जाँच रहे हैं…</string>
+    <string name="taffy_repeat_title">एक सेव किया गया फ़्लो मिला</string>
+    <string name="taffy_repeat_unavailable">सेव किए गए फ़्लो उपलब्ध नहीं हैं</string>
+    <string name="taffy_repeat_lookup_failed">यह संदेश बंद करें और अपना अनुरोध फिर भेजें।</string>
+    <string name="taffy_repeat_body">इसके चरण देखें, फिर शुरुआती पेज खोलें। Taffy के शुरू करने से पहले आप उस पेज पर सेव किया गया फ़्लो इस्तेमाल करने का विकल्प चुनेंगे।</string>
+    <string name="taffy_repeat_open">शुरुआती पेज खोलें</string>
+    <string name="taffy_repeat_opening">शुरुआती पेज खुल रहा है…</string>
+    <string name="taffy_repeat_failed">शुरुआती पेज नहीं खुल सका। फिर कोशिश करें।</string>
+    <string name="taffy_repeat_dismiss">बंद करें</string>
+    <string name="taffy_page_flows_review_load">सभी चरण लोड करें</string>
+    <string name="taffy_page_flows_review_loading">सभी चरण लोड हो रहे हैं…</string>
+</resources>

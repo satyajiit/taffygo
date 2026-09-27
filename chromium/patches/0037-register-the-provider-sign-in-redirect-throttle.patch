@@ -1,0 +1,31 @@
+From 8f7118b19a86f97cbd82c852db61b3a7f2623962 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sun, 30 Aug 2026 14:11:37 +0530
+Subject: register the provider sign-in redirect throttle
+
+Wire the already-tested downstream redirect interceptor into Chrome\u2019s one navigation-throttle funnel so provider sign-in codes are claimed before a localhost request can leave the browser.
+
+Specified by chromium/patches/0037-register-provider-auth-redirect-throttle.md.
+
+Taffy-Patch: 0037
+
+diff --git a/chrome/browser/chrome_content_browser_client.cc b/chrome/browser/chrome_content_browser_client.cc
+index 184097d42827a..127081580c1ec 100644
+--- a/chrome/browser/chrome_content_browser_client.cc
++++ b/chrome/browser/chrome_content_browser_client.cc
+@@ -423,6 +423,7 @@
+ #include "services/network/public/mojom/web_transport.mojom.h"
+ #include "services/network/public/mojom/websocket.mojom.h"
+ #include "taffy/browser/filtering_throttles.h"
++#include "taffy/browser/providerauth/provider_auth_redirect_throttle.h"
+ #include "third_party/blink/public/common/chrome_debug_urls.h"
+ #include "third_party/blink/public/common/features.h"
+ #include "third_party/blink/public/common/loader/url_loader_throttle.h"
+@@ -5596,6 +5597,7 @@ void ChromeContentBrowserClient::RemovePresentationObserver(
+ void ChromeContentBrowserClient::CreateThrottlesForNavigation(
+     content::NavigationThrottleRegistry& registry) {
+   CreateAndAddChromeThrottlesForNavigation(registry);
++  taffy::ProviderAuthRedirectThrottle::MaybeCreateAndAdd(registry);
+ }
+ 
+ std::vector<std::unique_ptr<content::CommitDeferringCondition>>

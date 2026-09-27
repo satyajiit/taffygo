@@ -1,0 +1,24 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+module taffy.filtering.mojom;
+
+import "services/network/public/mojom/fetch_api.mojom";
+import "third_party/blink/public/mojom/tokens/tokens.mojom";
+import "url/mojom/url.mojom";
+
+// The renderer asks one question and learns one fact. Profile lookup, the
+// current ruleset and posture, site exceptions, document attribution, and
+// blocked-count publication all remain private to the browser implementation.
+interface RequestFilter {
+  Check(blink.mojom.LocalFrameToken? frame_token,
+        url.mojom.Url request_url,
+        network.mojom.RequestDestination destination) => (bool blocked);
+
+  // A throttle provider is cloned onto loader sequences. Each clone receives
+  // its own pipe so no sequence shares a bound Remote.
+  Clone(pending_receiver<RequestFilter> receiver);
+};

@@ -1,0 +1,26 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// Associated hide-stylesheet seam for Ads and trackers (decision 0086).
+// Inverse of BIP: the renderer holds the AssociatedRemote, the browser
+// implements. Cosmetics stay in the filtering plane; they never enter BIP,
+// the Core API, or the journal.
+
+module taffy.filtering.mojom;
+
+// Hide selectors and flags for one committed document. Exceptions stay in
+// the browser and are never sent on this wire.
+struct CosmeticResources {
+  array<string> hide_selectors;
+  bool generichide;
+  bool enabled;
+};
+
+interface CosmeticFilterHost {
+  GetUrlCosmeticResources() => (CosmeticResources resources);
+  HiddenClassIdSelectors(array<string> classes, array<string> ids)
+      => (array<string> selectors);
+};

@@ -1,0 +1,321 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/bootstrap — install and verify the dependencies of one environment.
+#
+# Idempotent: safe to re-run after a TOOLCHAIN.md bump. Every privileged step
+# is announced and requires --yes (or an interactive confirmation).
+#
+# Environments: docs-only, android (portable/Compose host loop), chromium (shipping).
+# Contract: docs/development/development-setup.md sections 2, 6, 7 and 11.
+#
+# The Android profile's steps live in lib/bootstrap_android.sh; this file is the
+# command: options, order, and the state it writes.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/versions.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/android.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/node.sh"
+
+PROFILE=''
+WORKSPACE=''
+DRY_RUN=0
+ASSUME_YES=0
+SKIP_BUILD_DEPS=0
+ONLY=''
+
+# Every step of the Android host-loop profile, in order.
+ANDROID_STEPS='tools rust node gradle android'
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/bootstrap --profile <docs|android|chromium> [options]
+
+Profiles:
+  docs        docs-only environment: verify the checks in ./tools/check docs
+  android     Compose/portable host loop (macOS, x86-64 Linux, WSL2)
+  chromium    the Chromium build environment (x86-64 Linux only)
+
+Options:
+  --only STEPS       run only these steps (comma or space separated)
+  --workspace PATH   where the Chromium checkout, git cache, and depot_tools live
+                     (chromium profile; also TAFFY_CHROMIUM_WORKSPACE)
+  --skip-build-deps  do not run Chromium's install-build-deps.sh
+  --dry-run          print every command instead of running it
+  --yes              do not ask before privileged or licence-bearing steps
+  -h, --help         show this help
+
+Android steps:
+  tools    check the host prerequisites against the pins
+  rust     select the pinned portable host toolchain
+  node     enable the pinned pnpm and install the workspace with a frozen lockfile
+  gradle   validate the wrapper and materialise its checksum-pinned distribution
+  android  require the SDK platform recorded in gradle/libs.versions.toml
+
+Re-run after changing TOOLCHAIN.md or tools/pins/*. Nothing here is silent:
+each step prints the command it runs and why.
+USAGE
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --profile) PROFILE=${2:-}; shift ;;
+    --profile=*) PROFILE=${1#*=} ;;
+    --only) ONLY=${2:-}; shift ;;
+    --only=*) ONLY=${1#*=} ;;
+    --workspace) WORKSPACE=${2:-}; shift ;;
+    --workspace=*) WORKSPACE=${1#*=} ;;
+    --skip-build-deps) SKIP_BUILD_DEPS=1 ;;
+    --dry-run) DRY_RUN=1 ;;
+    --yes|-y) ASSUME_YES=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage >&2; die "unknown option: $1" ;;
+  esac
+  shift
+done
+
+[ -n "$PROFILE" ] || { usage >&2; die "--profile is required"; }
+
+ONLY=$(printf '%s' "$ONLY" | tr ',' ' ')
+for step_name in $ONLY; do
+  case " $ANDROID_STEPS " in
+    *" $step_name "*) : ;;
+    *) die "unknown step: $step_name" "Known Android steps: $ANDROID_STEPS" ;;
+  esac
+done
+
+# step_enabled <name> — honours --only.
+step_enabled() {
+  [ -z "$ONLY" ] && return 0
+  case " $ONLY " in *" $1 "*) return 0 ;; *) return 1 ;; esac
+}
+
+run() {
+  if [ "$DRY_RUN" = 1 ]; then
+    printf '  %s[dry-run]%s %s\n' "$C_DIM" "$C_RESET" "$*" >&2
+    return 0
+  fi
+  note "\$ $*"
+  "$@"
+}
+
+# `ok` for work that actually happened. Under --dry-run nothing ran, so claiming
+# a result would be a lie the [dry-run] line above it already contradicts.
+ran_ok() { [ "$DRY_RUN" = 1 ] || ok "$*"; return 0; }
+
+confirm() { # confirm <what>
+  [ "$ASSUME_YES" = 1 ] && return 0
+  [ "$DRY_RUN" = 1 ] && return 0
+  if [ ! -t 0 ]; then
+    die "$1 needs confirmation but stdin is not a terminal" "Re-run with --yes to accept."
+  fi
+  printf '%s [y/N] ' "$1" >&2
+  local answer; read -r answer
+  case "$answer" in y|Y|yes|YES) return 0 ;; *) return 1 ;; esac
+}
+
+# The Android steps. Sourced after `run`, `confirm` and the step filter exist,
+# which they use.
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/bootstrap_android.sh"
+
+# --- docs -------------------------------------------------------------------
+
+bootstrap_docs() {
+  step "docs-only environment"
+  have git || die "git is required"
+  ok "git $(git --version | awk '{print $3}')"
+  if have rg; then ok "ripgrep present (fast doc search)"; else
+    note "ripgrep not found — ./tools/check docs falls back to grep, which is slower but equivalent"
+  fi
+  taffy_state_set profile docs
+  ok "state written to $(taffy_state_file)"
+  info ""
+  info "Next: ./tools/check docs"
+}
+
+# --- Android host loop -------------------------------------------------------
+
+# The Android product Kotlin is consumed through gitignored symlinks under
+# taffy-core/app/android/kotlin/. They are host state, not tree state: a
+# module added to the mount contract on one host has no link on another until
+# --mount runs there, and until it does the component graph attributes that
+# module's sources to app.android and the architecture and mount lanes both
+# fail. --mount is idempotent and writes only under the gitignored directory.
+mount_android_sources() {
+  step "Android source mounts (taffy-core/app/android/kotlin/)"
+  run python3 "$TAFFY_ROOT/taffy-core/app/android/tools/kotlin_mounts.py" --mount
+}
+
+bootstrap_android() {
+  local name
+  for name in $ANDROID_STEPS; do
+    step_enabled "$name" || continue
+    "android_step_$name"
+  done
+  mount_android_sources
+
+  taffy_state_set profile android
+  info ""
+  ok "state written to $(taffy_state_file)"
+  info ""
+  info "Next: ./tools/check fast   (./tools/doctor reports which lanes this host can run)"
+  return 0
+}
+
+# --- chromium ---------------------------------------------------------------
+
+resolve_workspace() {
+  [ -n "$WORKSPACE" ] || WORKSPACE=${TAFFY_CHROMIUM_WORKSPACE:-}
+  [ -n "$WORKSPACE" ] || WORKSPACE=$(taffy_state_get chromium_workspace "")
+  [ -n "$WORKSPACE" ] || die \
+    "no Chromium workspace chosen" \
+    "The checkout lives outside this repository and is 100+ GB with its caches," \
+    "so the path is the builder's choice, never a default under \$HOME." \
+    "Pick a volume with >= 400 GB free and re-run:" \
+    "  ./tools/bootstrap --profile chromium --workspace /srv/chromium-taffy"
+  case "$WORKSPACE" in
+    /*) : ;;
+    *) WORKSPACE=$(cd "$(dirname "$WORKSPACE")" && pwd -P)/$(basename "$WORKSPACE") ;;
+  esac
+  taffy_reject_windows_mount "$WORKSPACE"
+}
+
+install_depot_tools() {
+  local dt="$WORKSPACE/depot_tools" url rev
+  url=$(taffy_pin depot_tools url)
+  rev=$(taffy_pin depot_tools revision)
+
+  if [ ! -d "$dt/.git" ]; then
+    step "installing depot_tools into $dt"
+    run git clone "$url" "$dt"
+  else
+    step "updating depot_tools in $dt"
+    run git -C "$dt" fetch --quiet origin
+  fi
+
+  if [ "$rev" = "$TAFFY_UNPINNED" ] || [ -z "$rev" ]; then
+    warn "tools/pins/depot_tools has no revision yet — leaving depot_tools on its default branch"
+    note "SP-01 records the depot_tools commit that built the pinned Chromium milestone."
+  else
+    run git -C "$dt" checkout --quiet --detach "$rev"
+    ran_ok "depot_tools pinned at $rev"
+  fi
+
+  # Pinning depot_tools is precisely what makes this step necessary.
+  # `DEPOT_TOOLS_UPDATE=0` — which the pin requires, and which this script tells
+  # the developer to export — makes `update_depot_tools` skip the bootstrap that
+  # materialises depot_tools' bundled Python and CIPD packages. But
+  # `depot_tools/gn` execs `depot_tools/python-bin/python3` directly, so without
+  # that bootstrap the first `gn gen` dies with "python3_bin_reldir.txt not
+  # found" — long after this script has reported success.
+  #
+  # `ensure_bootstrap` does that work against the *current* checkout and states
+  # that it will not update or sync the depot_tools repository, so the pin
+  # survives. Confirmed at SP-01 (milestone 152): the pinned commit was
+  # unchanged afterwards, and `gn gen` then succeeded.
+  if [ -x "$dt/ensure_bootstrap" ]; then
+    step "bootstrapping depot_tools' bundled python and cipd packages"
+    run env DEPOT_TOOLS_UPDATE=0 "$dt/ensure_bootstrap"
+    ran_ok "depot_tools bootstrap complete — gn can find its interpreter"
+  else
+    warn "no ensure_bootstrap in $dt — the first 'gn gen' may fail to find its interpreter"
+  fi
+
+  taffy_state_set depot_tools "$dt"
+}
+
+install_build_caches() {
+  local ccache_size sccache_size
+  ccache_size=$(taffy_pin build-cache ccache_max_size)
+  sccache_size=$(taffy_pin build-cache sccache_cache_size)
+
+  if have ccache; then
+    ok "ccache present"
+    run ccache --max-size="${ccache_size:-100G}" >/dev/null || warn "could not set the ccache size"
+  elif confirm "install ccache with the system package manager (needs sudo)?"; then
+    if have apt-get; then run sudo apt-get install -y ccache
+    elif have dnf; then run sudo dnf install -y ccache
+    else warn "no supported package manager found — install ccache manually"; fi
+  else
+    warn "ccache not installed — clang warm rebuilds will be slower (Siso's cache still applies)"
+  fi
+
+  if have sccache; then
+    ok "sccache present"
+  elif have cargo; then
+    step "installing sccache with cargo"
+    run cargo install sccache --locked
+  else
+    warn "sccache not installed and cargo is unavailable — Rust rebuilds will be slower"
+  fi
+  [ -n "$sccache_size" ] && note "set SCCACHE_CACHE_SIZE=$sccache_size in your shell profile"
+  return 0
+}
+
+run_install_build_deps() {
+  local script="$WORKSPACE/src/build/install-build-deps.sh"
+  if [ "$SKIP_BUILD_DEPS" = 1 ]; then
+    note "skipping install-build-deps.sh (--skip-build-deps)"
+    return 0
+  fi
+  if [ ! -f "$script" ]; then
+    note "install-build-deps.sh needs the checkout; ./tools/chromium/sync runs it after the first fetch"
+    return 0
+  fi
+  if confirm "run Chromium's install-build-deps.sh --android (needs sudo)?"; then
+    step "installing Chromium's Linux build dependencies"
+    run "$script" --android
+  else
+    warn "Chromium build dependencies not installed — the build will fail until they are"
+  fi
+}
+
+bootstrap_chromium() {
+  taffy_require_chromium_host
+  resolve_workspace
+  step "chromium environment at $WORKSPACE"
+
+  local free
+  run mkdir -p "$WORKSPACE"
+  free=$(taffy_free_gb "$WORKSPACE")
+  if [ -n "$free" ] && [ "$free" -lt 400 ] 2>/dev/null; then
+    warn "${free} GB free on the workspace volume; decision 0013 budgets >= 400 GB"
+    note "checkout + git cache + out dirs + Siso/ccache caches all live here"
+  fi
+
+  install_depot_tools
+  run mkdir -p "$WORKSPACE/.git-cache"
+  taffy_state_set git_cache "$WORKSPACE/.git-cache"
+  taffy_state_set chromium_workspace "$WORKSPACE"
+  taffy_state_set profile chromium
+
+  install_build_caches
+  run_install_build_deps
+  mount_android_sources
+
+  info ""
+  ok "workspace state written to $(taffy_state_file)"
+  info ""
+  info "Add depot_tools to your PATH (depot_tools self-update is disabled by the pin):"
+  info "  export PATH=\"\$PATH:$WORKSPACE/depot_tools\""
+  info "  export DEPOT_TOOLS_UPDATE=0"
+  info ""
+  info "Next: ./tools/chromium/sync"
+}
+
+case "$PROFILE" in
+  docs) bootstrap_docs ;;
+  android) bootstrap_android ;;
+  chromium) bootstrap_chromium ;;
+  *) die "unknown profile: $PROFILE" "Use docs, android, or chromium." ;;
+esac

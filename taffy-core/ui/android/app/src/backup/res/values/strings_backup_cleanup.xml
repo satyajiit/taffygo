@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<resources>
+    <string name="taffy_backup_delete_choose">Remove a backup file…</string>
+    <string name="taffy_backup_delete_choose_help">Choose an older backup or a file you restored from. No recovery key is needed. TaffyGo reads only the file name and asks you to confirm before deleting it.</string>
+    <string name="taffy_backup_delete_selected_name">Selected file: %1$s</string>
+    <string name="taffy_backup_delete_selected_help">This name comes from the storage app. TaffyGo has not checked the contents or whether this is a valid backup. Nothing has been deleted.</string>
+    <string name="taffy_backup_delete_selected_request">Remove this selected file…</string>
+    <string name="taffy_backup_delete_selected_warning">Delete this selected file? This can remove your only backup. Your current profile and recovery key will not be changed.</string>
+    <string name="taffy_backup_delete_reading_name">Reading the selected file name. Nothing is being deleted…</string>
+    <string name="taffy_backup_delete_selection_unavailable">TaffyGo could not prepare a named file for deletion. No file was deleted. Choose it again, or use the storage app.</string>
+    <string name="taffy_backup_delete_selection_cancelled">File selection was cancelled. No file was deleted.</string>
+    <string name="taffy_backup_copy_cleanup_help">You can remove the file just used for this export, including an incomplete copy. Leaving this screen does not delete it.</string>
+    <string name="taffy_backup_copy_delete_request">Remove this exported file…</string>
+    <string name="taffy_backup_copy_delete_warning">Delete the exact file chosen for this export? This can remove your only backup. Your current profile and recovery key will not be changed.</string>
+    <string name="taffy_backup_copy_retention">The storage app may retain the file in its trash or backups. Copies made elsewhere are not removed.</string>
+    <string name="taffy_backup_copy_delete_confirm">Delete this file</string>
+    <string name="taffy_backup_copy_keep">Keep this file</string>
+    <string name="taffy_backup_copy_deleting">Asking the storage app to delete the file and checking that it no longer opens…</string>
+    <string name="taffy_backup_copy_deleted">The storage app accepted deletion and the file no longer opens at its original location. It may still be retained in trash, backups or copies elsewhere.</string>
+    <string name="taffy_backup_copy_still_present">The file still opens. Deletion was not verified. Check it in the storage app.</string>
+    <string name="taffy_backup_copy_delete_unverified">Deletion could not be verified. The file may still exist. Check it in the storage app; TaffyGo will not retry automatically.</string>
+</resources>

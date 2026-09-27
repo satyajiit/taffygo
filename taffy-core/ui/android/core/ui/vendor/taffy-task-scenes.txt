@@ -1,0 +1,33 @@
+Taffy browsing and saved-flow scenes
+====================================
+
+Owner: Matterward Labs Private Limited / TaffyGo
+Licence: Reserved media, not licensed with the code; see TRADEMARKS.md.
+Created: 2026-09-09
+Generator: Codex built-in image_gen; original prompts, no input assets.
+Masters: vendor/task-scenes/masters/ (unaltered generated PNGs, 1448 by 1086).
+Shipping: src/main/res/drawable-nodpi/ (640 by 480 WebP).
+Encoder: cwebp -q 84 -m 6 -resize 640 480 -metadata none
+
+Original editorial gouache scenes commissioned for TaffyGo. The browsing
+scene is a person comparing two abstract phone cards; the saved-flow scene
+is a person's hands arranging three simple cards beside a phone and ribbon.
+The local Aster Premium, Web to App and WhatsApp Business pages informed the
+use of warm painted narrative imagery and category colour. No Aster image,
+mascot, third-party asset, site screenshot or personal document was copied.
+
+These are decorative, inert plates beside existing text. They do not depict
+current task state, price comparisons, permissions or successful outcomes.
+Live tab previews retain their browser-owned images. The welcome art leaves
+with the existing welcome when typing starts; larger text uses the full
+width for copy and controls. No network fetch or image inspection is involved.
+
+Prompts: the exact built-in generation briefs are kept in the maintainer's
+working tree (task-scenes/prompts.md there) and are not published.
+Replace by generating a new reviewed master and encoding it with the same
+recipe, then update both checksums. Never edit only the shipping bytes.
+
+sha256_taffy_scene_browsing_webp=cb35ff106cdadbdd9f6914a4e76d043d0fd776e48fdce40d0e601ea546924e8e
+bytes_taffy_scene_browsing_webp=49168
+sha256_taffy_scene_saved_flow_webp=6b45fc5a24e16433878d4832b5618f28c13128f299dc970ad17fad61ceb712de
+bytes_taffy_scene_saved_flow_webp=53976

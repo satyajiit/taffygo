@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Machine-translated (hi), pending native review. -->
+<resources>
+    <string name="taffy_task_notification_channel_name">Taffy के काम</string>
+    <string name="taffy_task_notification_channel_description">Taffy को दिए गए कामों की प्रगति और नियंत्रण।</string>
+    <string name="taffy_task_notification_active_title">Taffy काम कर रहा है</string>
+    <string name="taffy_task_notification_active_body">आप इसे यहाँ रोक या समाप्त कर सकते हैं।</string>
+    <string name="taffy_task_notification_waiting_title">Taffy आपका इंतज़ार कर रहा है</string>
+    <string name="taffy_task_notification_waiting_body">जारी रखने के लिए TaffyGo खोलें।</string>
+    <string name="taffy_task_notification_paused_title">काम रुका हुआ है</string>
+    <string name="taffy_task_notification_paused_body">तैयार होने पर फिर शुरू करें या समाप्त करें।</string>
+    <string name="taffy_task_notification_pause">रोकें</string>
+    <string name="taffy_task_notification_resume">फिर शुरू करें</string>
+    <string name="taffy_task_notification_stop">समाप्त करें</string>
+    <string name="taffy_task_notification_public_title">TaffyGo का काम</string>
+    <string name="taffy_task_notification_public_body">काम की जानकारी छिपी हुई है</string>
+</resources>

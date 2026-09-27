@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Shadows the upstream resource of the same name (the monochrome layer of both
+adaptive launcher icons) by resource-overlay precedence, so no Chromium
+glyph ships in the product (decision 0019; patch specification 0002 records
+the mechanism). The launcher reads this layer as a mask and recolours it, so
+the referenced bitmap carries the mark in its alpha channel only
+(generate_icons.py, monochrome_alpha).
+-->
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@mipmap/taffygo_themed_glyph"
+    android:gravity="center" />

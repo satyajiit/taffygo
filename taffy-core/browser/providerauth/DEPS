@@ -1,0 +1,42 @@
+# The provider sign-in plane: the browser-process network half of a vendor
+# subscription flow (decision 0081). It runs the device-authorization and
+# token-poll legs, the PKCE exchange behind the Custom Tab, the one refresh
+# leg, and best-effort revocation — the only place a vendor's OAuth wire
+# shapes exist. Admission and record keeping stay in the isolated core;
+# tokens are sealed on Android through the account plane's adapter.
+#
+# The parent directory's rules carry almost all of it. Two grants are local
+# for the reason the account plane states where it carries the same pair:
+# this subsystem is one of the few that make an outbound request, and the
+# grant should say so where it is used rather than at a level that would hand
+# it to every seam in //taffy/browser:
+#
+#   net/traffic_annotation         required of every request Chromium sends
+#   services/network/public/mojom  the typed shape a response head arrives in
+#
+# Three of the parent's grants are used here and are worth naming, because
+# this directory acquired the first two only when the redirect interceptor of
+# decision 0095 section 2 landed and a reader would otherwise wonder why a
+# sign-in broker reaches into the navigation stack at all:
+#
+#   content/public/browser              NavigationThrottle and its registry,
+#                                       the one seam that can stop a
+#                                       navigation before it connects
+#   chrome/browser/profiles/profile.h   the profile a navigation belongs to,
+#                                       for the profile-scoped broker
+#   net/base                            the query reader that takes a code and
+#                                       a state out of an intercepted address
+include_rules = [
+  "+net/traffic_annotation",
+  "+services/network/public/mojom",
+]
+
+specific_include_rules = {
+  # A fake loader factory rather than an embedded test server: these tests
+  # are about dictated vendor answers — authorization_pending, slow_down,
+  # invalid_grant, an oversized body — and each has to be dictated to be
+  # exercised.
+  ".*unittest\.(cc|h)": [
+    "+services/network/test",
+  ],
+}

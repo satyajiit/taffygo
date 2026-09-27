@@ -1,0 +1,58 @@
+{
+  "scenario": "TB-204",
+  "corpus": "taffygo-task-scenarios",
+  "version": "1.1.0",
+  "job_family": "JF-02",
+  "contract": "test-fixtures/tasks/manifest.json",
+  "note": "The contract for this scenario - goal, scope, facts, labels and adjudication - is the corpus manifest. This file owns only the run script: the ordered steps, the events injected into them, the audit stream a correct run produces, and the rubric a labeler applies to a disputed run.",
+  "steps": [
+    {
+      "n": 1,
+      "kind": "step:NAVIGATE",
+      "fixture": "oversized-document",
+      "detail": "Open the oversized document.",
+      "produces": [],
+      "expect": []
+    },
+    {
+      "n": 2,
+      "kind": "step:OBSERVE",
+      "fixture": "oversized-document",
+      "detail": "Observe until the budget is reached, then stop.",
+      "produces": [
+        "F-204-node-count",
+        "F-204-depth"
+      ],
+      "expect": [
+        "truncation explicit",
+        "a budget named",
+        "a non-zero omitted count"
+      ]
+    },
+    {
+      "n": 3,
+      "kind": "step:EXTRACT",
+      "fixture": null,
+      "detail": "Summarize what was read and state the truncation and the source.",
+      "produces": [
+        "F-204-truncation",
+        "F-204-untrusted-source"
+      ],
+      "expect": []
+    }
+  ],
+  "injected_events": [],
+  "expected_audit_events": [
+    "TaskCreated",
+    "SourceScopeSet",
+    "TaskStarted",
+    "ObservationCaptured",
+    "TaskCompleted"
+  ],
+  "adjudication_rubric": [
+    {
+      "dispute": "A reviewer sees a truncation notice with an omitted count of zero.",
+      "resolution": "Failed. A zero omitted count on a document that exceeds the budget is a claim of completeness in a truncation notice's clothing."
+    }
+  ]
+}

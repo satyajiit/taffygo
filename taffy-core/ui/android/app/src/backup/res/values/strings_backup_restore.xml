@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<resources>
+    <string name="taffy_backup_recovery_review">Review an interrupted restore</string>
+    <string name="taffy_backup_recovery_help">Check a restore that was interrupted in this profile. No recovery key is needed to review its saved result. This does not repeat the restore or choose Keep or Discard for you.</string>
+    <string name="taffy_backup_recovery_checking">Checking the saved restore record and its result…</string>
+    <string name="taffy_backup_recovery_saved_review">This review comes from the saved restore record. These counts describe the saved selection, not an inspection of its contents. Keeping or discarding the profile needs your new choice.</string>
+    <string name="taffy_backup_recovery_none">No interrupted restore was found for this profile.</string>
+    <string name="taffy_backup_recovery_source_unavailable">Return to the profile where you started the restore, and try again when it is ready. No new restore choice was made.</string>
+    <string name="taffy_backup_recovery_unavailable">TaffyGo could not check interrupted restores. No new restore choice was made. Try again when this profile is ready.</string>
+    <string name="taffy_backup_recovery_already_kept">The earlier restore was already kept. Its profile is available in Profiles. Your current profile has not changed.</string>
+    <string name="taffy_backup_recovery_already_discarded">The earlier restore was already discarded, and its new profile is no longer present. Your current profile and backup file have not changed.</string>
+    <string name="taffy_backup_recovery_closed">Review closed. Closing a review does not repeat, keep or discard a restore.</string>
+    <string name="taffy_backup_recovery_precommit">The saved record does not establish a completed restore. TaffyGo cannot offer Keep or Discard from this record. Do not repeat the restore to try to finish it.</string>
+    <string name="taffy_backup_recovery_details_missing">The saved review details are missing. TaffyGo cannot offer Keep or Discard without them. Do not repeat the restore to try to finish it.</string>
+    <string name="taffy_backup_recovery_format_mismatch">The saved restore uses a storage format this version cannot safely check. No Keep or Discard choice is available. Do not repeat the restore to try to finish it.</string>
+    <string name="taffy_backup_recovery_unknown">TaffyGo could not establish the result of the earlier restore. No Keep or Discard choice is available. Do not repeat the restore to try to finish it.</string>
+    <string name="taffy_backup_recovery_busy_or_changed">The saved restore is still in use, has changed, or could not be checked safely. No Keep or Discard choice is available. Try reviewing it again when this profile is ready.</string>
+    <string name="taffy_backup_restore">Restore a backup</string>
+    <string name="taffy_backup_restore_help">Restore the contents of a backup into a new profile. Your current profile stays separate. You review the saved selection before anything is restored.</string>
+    <string name="taffy_backup_restore_profile_name">Restored profile</string>
+    <string name="taffy_backup_restore_name_label">New profile name</string>
+    <string name="taffy_backup_restore_name_count">%1$d / %2$d</string>
+    <string name="taffy_backup_restore_file_checked">The file was checked with your recovery key. Review its saved selection to continue.</string>
+    <string name="taffy_backup_restore_review">Review backup</string>
+    <string name="taffy_backup_restore_review_title">Review what will be restored</string>
+    <string name="taffy_backup_restore_target_named">Destination: %1$s (new profile)</string>
+    <string name="taffy_backup_restore_selection">Saved selection</string>
+    <string name="taffy_backup_restore_count">%1$s: %2$d</string>
+    <string name="taffy_backup_restore_creates">Items to restore: %1$d</string>
+    <string name="taffy_backup_restore_deletions">Saved removals: %1$d</string>
+    <string name="taffy_backup_restore_unchanged">Items already present: %1$d</string>
+    <string name="taffy_backup_restore_newer">Newer items kept: %1$d</string>
+    <string name="taffy_backup_restore_blocked">Items kept removed: %1$d</string>
+    <string name="taffy_backup_restore_conflicts">Items needing another choice: %1$d</string>
+    <string name="taffy_backup_restore_conflict_help">This selection needs another choice before it can be restored. Nothing has been restored.</string>
+    <string name="taffy_backup_restore_prepare">Confirm selection and prepare</string>
+    <string name="taffy_backup_restore_planning">Reading the saved selection and preparing a new profile…</string>
+    <string name="taffy_backup_restore_staging">Preparing and checking the selected contents…</string>
+    <string name="taffy_backup_restore_staged">The selected contents are prepared and checked. Restore them into the new profile?</string>
+    <string name="taffy_backup_restore_commit">Restore into the new profile</string>
+    <string name="taffy_backup_restore_committing">Restoring the selected contents. This step cannot be cancelled…</string>
+    <string name="taffy_backup_restore_candidate">The selected contents were restored and checked. The new profile is still hidden. Review this result, then choose whether to keep or discard it.</string>
+    <string name="taffy_backup_restore_keep">Keep this profile</string>
+    <string name="taffy_backup_restore_discard">Discard this profile</string>
+    <string name="taffy_backup_restore_discard_title">Discard the new profile?</string>
+    <string name="taffy_backup_restore_discard_help">This deletes only the new profile. Your current profile and the backup file stay unchanged.</string>
+    <string name="taffy_backup_restore_back_to_review">Back to review</string>
+    <string name="taffy_backup_restore_resolving">Finishing your choice and checking the result…</string>
+    <string name="taffy_backup_restore_choice_not_completed">Your choice did not complete. The new profile is still hidden. You can choose again when you are ready.</string>
+    <string name="taffy_backup_restore_kept">The restored profile is now available in Profiles. Your current profile has not changed.</string>
+    <string name="taffy_backup_restore_discarded">The new profile was deleted. Your current profile and the backup file were not changed.</string>
+    <string name="taffy_backup_restore_not_committed">Nothing was restored. The new profile is still hidden and needs cleanup. You can discard it below. Your current profile was not changed.</string>
+    <string name="taffy_backup_restore_needs_review">TaffyGo could not confirm the result. Your current profile was not changed. Do not repeat the restore to try to finish it.</string>
+    <string name="taffy_backup_restore_refused">This backup could not be prepared for restoration. No restored profile is available.</string>
+    <string name="taffy_backup_restore_stopped">Restore preparation stopped. Your current profile and the backup file were not changed.</string>
+</resources>

@@ -1,0 +1,41 @@
+From 39c31f1f4e8ddcc2f658dac59d3384667633b688 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Mon, 17 Aug 2026 20:37:28 +0530
+Subject: parse Kotlin enum class in compile_java.py's type check
+
+The top-level type expression knows Java's 'enum Foo' but not Kotlin's
+'enum class Foo': the enum alternative matches the keyword and the capture
+then takes the word 'class' as the type name, so the package/path check
+fails every Kotlin enumeration. One alternative gains an optional group;
+every previously matched shape keeps matching. Upstream has not hit this
+because its Kotlin allowlist contains no top-level enum class.
+
+Specified by chromium/patches/0011-parse-kotlin-enum-class-in-compile-java.md.
+
+Taffy-Patch: 0011
+
+diff --git a/build/android/gyp/compile_java.py b/build/android/gyp/compile_java.py
+index 614ec01141f6f..8a395212efadc 100755
+--- a/build/android/gyp/compile_java.py
++++ b/build/android/gyp/compile_java.py
+@@ -109,9 +109,18 @@ _TOP_LEVEL_CLASSES_RE = re.compile(
+     r'^(?:/\*.*\*/\s*)?'
+     # Annotations
+     r'(?:@\w+(?:\(.*\))\s+)*'
+-    r'(?:(?:public|protected|private)\s+)?'
++    # `private` is deliberately absent from the modifiers: a private top-level
++    # type is legal only in Kotlin and is never the file's public identity, so
++    # matching it would misname files whose public type follows a private
++    # helper. Java has no private top-level types, so nothing is lost there.
++    r'(?:(?:public|protected)\s+)?'
+     r'(?:(?:static|abstract|final|sealed)\s+)*'
+-    r'(?:class|@?interface|enum|record)\s+'
++    # `enum(?:\s+class)?` covers Kotlin's `enum class Foo` as well as Java's
++    # `enum Foo`; without the optional group the regex captures the word
++    # "class" as the type name and the path check rejects every Kotlin enum.
++    # `object` is Kotlin's singleton declaration and is a file's public
++    # identity the same way a class is.
++    r'(?:class|@?interface|enum(?:\s+class)?|record|object)\s+'
+     r'(\w+?)\b[^"]*?$',
+     flags=re.MULTILINE)
+ 

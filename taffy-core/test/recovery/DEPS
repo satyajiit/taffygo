@@ -1,0 +1,111 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# This test-only directory is an embedder composition root. It exercises the
+# production Chrome Profile and utility registry because Content Shell cannot
+# represent that crash boundary. Keep these grants local: //taffy/test remains
+# the portable cross-process harness, and production code never depends here.
+
+include_rules = [
+  "+chrome/browser/profiles",
+  "+chrome/browser/tab_list",
+  "+chrome/test/base",
+  "+components/tabs/public",
+  "+taffy/browser/android",
+  # The page-intelligence host test asserts the broker's destruction order
+  # against a real Chrome Profile, which Content Shell cannot represent.
+  "+taffy/components/filtering/browser",
+  "+taffy/components/intelligence/content",
+  "+taffy/components/security/browser",
+  "+taffy/contracts/core-api",
+  "+taffy/contracts/core-service",
+]
+
+specific_include_rules = {
+  # The page fixture configures ordinary download targeting, checks actual
+  # bytes/MIME and names blocked native stages with closed histogram buckets.
+  "errand_download_test_page\\.cc": [
+    "+chrome/browser/download/download_prefs.h",
+    "+chrome/browser/download/download_prompt_status.h",
+    "+chrome/common/pref_names.h",
+    "+components/download/public/common/download_item.h",
+    "+components/download/public/common/download_path_reservation_tracker.h",
+    "+components/prefs/pref_service.h",
+  ],
+  # The errand fixture configures only the browser's ordinary download target
+  # and verifies the completed file through the real profile DownloadManager.
+  "errand_download_vertical_browsertest\\.cc": [
+    "+components/download/public/common/download_item.h",
+  ],
+  # The restore fixture resolves Chrome's one live ProfileManager and Local
+  # State so it can prove the target never becomes last-used or Core-capable.
+  "backup_restore_profile_commit_browsertest\\.cc": [
+    "+chrome/browser/browser_process.h",
+    "+components/prefs/pref_service.h",
+  ],
+  # Restart discovery is proved across a real browser restart, so the test
+  # reads the durable reservation preference the way the product does.
+  "backup_restore_profile_discovery_browsertest\\.cc": [
+    "+chrome/browser/browser_process.h",
+    "+components/prefs/pref_service.h",
+  ],
+  "backup_restore_profile_discovery_reconciliation_browsertest\\.cc": [
+    "+chrome/browser/browser_process.h",
+    "+chrome/common/chrome_constants.h",
+    "+components/prefs/pref_service.h",
+  ],
+  "backup_restore_profile_discovery_terminal_browsertest\\.cc": [
+    "+chrome/browser/browser_process.h",
+    "+chrome/common/chrome_constants.h",
+    "+components/prefs/pref_service.h",
+  ],
+  "backup_restore_profile_lifecycle_browsertest\\.cc": [
+    "+chrome/browser/browser_process.h",
+  ],
+  "backup_restore_profile_precommit_cleanup_browsertest\\.cc": [
+    "+chrome/browser/browser_process.h",
+    "+components/prefs/pref_service.h",
+  ],
+  "backup_restore_profile_precommit_presentation_browsertest\\.cc": [
+    "+chrome/browser/browser_process.h",
+  ],
+  "backup_restore_profile_precommit_receipt_browsertest\\.cc": [
+    "+chrome/browser/browser_process.h",
+    "+chrome/common/chrome_paths_internal.h",
+    "+components/prefs/pref_service.h",
+  ],
+  "backup_restore_profile_presentation_browsertest\\.cc": [
+    "+chrome/browser/browser_process.h",
+  ],
+  "backup_restore_profile_reconciliation_browsertest\\.cc": [
+    "+chrome/browser/browser_process.h",
+    "+chrome/common/chrome_constants.h",
+    "+components/prefs/pref_service.h",
+  ],
+  "backup_restore_profile_resolution_browsertest\\.cc": [
+    "+chrome/browser/browser_process.h",
+    "+chrome/common/chrome_constants.h",
+    "+chrome/common/pref_names.h",
+    "+components/prefs/pref_service.h",
+  ],
+  "backup_restore_profile_resolution_test_support\\.cc": [
+    "+chrome/common/chrome_constants.h",
+    "+components/prefs/pref_service.h",
+  ],
+  # The factory test asserts the Core service manager's profile keying against
+  # a real Chrome Profile and the pref store that decides its capability.
+  "core_service_manager_factory_browsertest\\.cc": [
+    "+chrome/browser/browser_process.h",
+    "+components/prefs/pref_service.h",
+  ],
+  # A private tab's allowance must reach the off-the-record plane and no
+  # further, so the test reads the regular profile's own stored preference —
+  # the list screen SCR-206 draws and a `run-as` read would find — and asserts
+  # the private host is not in it (decision 0128).
+  "filtering_vertical_browsertest\\.cc": [
+    "+components/prefs/pref_service.h",
+  ],
+}

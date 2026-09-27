@@ -1,0 +1,33 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The delivery artifacts the package carries (decision 0202).
+#
+# Committed bytes, not a build step. Two of the four cannot be rebuilt from a
+# clean checkout at all and the other two only reproduce byte-for-byte on a
+# host whose zlib matches, so a GN rule that rebuilt them would produce a
+# digest the device refuses. `bundled/PROVENANCE.txt` records that reasoning
+# against this tree.
+#
+# `disable_compression` is required, not a size choice: `OpenApkAsset` hands
+# back a region of the APK to map, which only exists for an asset stored
+# rather than deflated. The same line and the same reason are in
+# //taffy/third_party/easylist for the uncompressed filter-list text. It costs
+# nothing here — every one of these is already a deflated zip, which aapt2
+# cannot compress further.
+
+import("//taffy/components/delivery/bundled_assets.gni")
+
+if (is_android) {
+  import("//build/config/android/rules.gni")
+
+  android_assets("bundled_delivery_assets") {
+    renaming_sources = taffy_bundled_asset_sources
+    renaming_destinations = taffy_bundled_asset_destinations
+    disable_compression = true
+    visibility = [ "//taffy/app/android:*" ]
+  }
+}

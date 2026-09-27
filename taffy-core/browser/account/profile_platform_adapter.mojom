@@ -1,0 +1,271 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+module taffy.browser.account.mojom;
+
+import "taffy/contracts/core-service/generated/mojom/core_service.mojom";
+
+const uint32 kMaxAuthorizationUrlBytes = 8192;
+const uint32 kMaxNativeServerClientIdBytes = 512;
+const uint32 kGoogleNonceHashHexBytes = 64;
+const uint32 kMaxAccountSessionMaterialBytes = 65536;
+
+// Browser-resolved, fixed-route authorization data. The Core Service never
+// supplies a URL and Android never receives provider credentials.
+struct ResolvedOAuthSurfacePlan {
+  string flow_id@0;
+  string authorization_url@1;
+};
+
+// Browser-resolved native credential configuration. Only the public hash
+// crosses to Android; the corresponding raw nonce remains behind a one-shot
+// browser handle for the pinned account-plane exchange.
+struct ResolvedNativeCredentialSurfacePlan {
+  string flow_id@0;
+  taffy.core_service.mojom.AccountAuthMethod auth_method@1;
+  string server_client_id@2;
+  string hashed_nonce@3;
+};
+
+// Browser-only encrypted-session operations. Android sees bounded bytes only
+// while sealing/unsealing them with the profile Keystore identity. No method
+// is reachable from Compose, renderer, Rust, or a tool worker.
+struct SessionMaterialWriteRequest {
+  string? previous_handle@0;
+  uint64 expected_rotation@1;
+  array<uint8> material@2;
+};
+
+struct SessionMaterialReadRequest {
+  string session_handle@0;
+  uint64 expected_rotation@1;
+};
+
+struct SessionMaterialWriteResult {
+  string session_handle@0;
+  uint64 rotation@1;
+};
+
+struct SessionMaterialReadResult {
+  uint64 rotation@0;
+  array<uint8> material@1;
+};
+
+struct SecretMaterialReadResult {
+  array<uint8> material@0;
+};
+
+// Metadata-only view of the one canonical encrypted session. Inspecting this
+// shape never opens the ciphertext or returns token bytes.
+struct SessionMaterialMetadata {
+  string session_handle@0;
+  uint64 rotation@1;
+};
+
+// One provider subscription's token triple, crossing the seam as typed fields
+// so only the Android store knows the persisted encoding (decision 0081).
+// Rotation is atomic because the triple is one value: a refresh replaces
+// access token, refresh token and expiry together or not at all.
+struct ProviderOauthRecord {
+  string token_type@0;
+  uint64 expires_at_epoch_ms@1;
+  // Space-joined granted scopes; empty when the vendor named none.
+  string scopes@2;
+  array<uint8> access_token@3;
+  array<uint8>? refresh_token@4;
+  // The https origin this particular credential's requests must go to, for
+  // the one vendor whose exchange issues the address together with the token.
+  // Absent for every other vendor, which is the ordinary case: their address
+  // is the one the catalog names and the same for everybody.
+  //
+  // It is sealed with the triple rather than held beside it because it is
+  // part of the same value — a rotated credential may name a different host,
+  // and a host that outlived the token it belongs to would address the next
+  // request to the previous account's server.
+  string? credential_host@5;
+};
+
+// What a model request may use for one provider right now. The freshness
+// decision is Android's, made inside the credential coordinator's critical
+// section where the sealed record and the clock are one moment.
+enum ProviderAccessKind {
+  // A pasted key; the material is the key bytes.
+  kRawKey,
+  // A subscription access token fresh past the resolve margin.
+  kAccessToken,
+  // The token is stale; the material is the refresh token for the one
+  // browser-run refresh leg. Store the rotated record, then resolve again.
+  kRefreshRequired,
+  // The record cannot be made usable without the person; no material.
+  kSignInRequired,
+};
+
+struct ProviderAccessResult {
+  ProviderAccessKind kind@0;
+  array<uint8> material@1;
+  // The access token's expiry when kind is kAccessToken, else zero.
+  uint64 expires_at_epoch_ms@2;
+  // The origin this credential's requests go to, when the sealed record
+  // carries one. Present only with kAccessToken: a pasted key is spent at the
+  // address the catalog names, and the two answers that carry no usable
+  // material have nowhere to send anything.
+  string? credential_host@3;
+};
+
+// One browser-reported sign-in or refresh progress fact. Carries no URI, no
+// code and no token: the verification URL and user code of a device flow are
+// the two values the vendor asks to be shown, and they are the only payload.
+enum ProviderFlowEventKind {
+  kAwaitingAuthorization,
+  kUserCodeReady,
+  kExchanging,
+  kCompleted,
+  kFailedDenied,
+  kFailedProvider,
+  kFailedDeadline,
+  kFailedUnavailable,
+  // The one refresh leg met a definitive invalid_grant; Android files
+  // NEEDS_SIGN_IN through the credential coordinator's section.
+  kRefreshSignInRequired,
+  // The one refresh leg failed transiently; Android files REFRESH_FAILED.
+  kRefreshFailed,
+};
+
+struct ProviderFlowEvent {
+  string provider_id@0;
+  string flow_id@1;
+  ProviderFlowEventKind kind@2;
+  string? verification_url@3;
+  string? user_code@4;
+};
+
+// One profile-owned Android adapter. A disconnect is terminal for every
+// outstanding callback; callers map it to kUnavailable exactly once.
+interface TaffyProfilePlatformAdapter {
+  GenerateEntropy(taffy.core_service.mojom.GenerateEntropyRequest request)
+      => (taffy.core_service.mojom.EffectStatus status,
+          taffy.core_service.mojom.GeneratedEntropyResult? result);
+
+  WriteTransient(taffy.core_service.mojom.WriteTransientSecretRequest request)
+      => (taffy.core_service.mojom.EffectStatus status,
+          taffy.core_service.mojom.TransientSecretWriteResult? result);
+
+  // Raw provider callbacks enter through the separate JNI backchannel. Only
+  // the browser may ask the platform vault to turn the validated code bytes
+  // into a one-shot handle.
+  WriteAuthorizationCode(string flow_id, array<uint8> material)
+      => (taffy.core_service.mojom.EffectStatus status,
+          string? secret_handle);
+
+  ConsumeTransient(string secret_handle)
+      => (taffy.core_service.mojom.EffectStatus status,
+          SecretMaterialReadResult? result);
+
+  DeleteSecret(taffy.core_service.mojom.DeleteSecretHandleRequest request)
+      => (taffy.core_service.mojom.EffectStatus status,
+          taffy.core_service.mojom.DeletedSecretHandleResult? result);
+
+  // Generation teardown wipes every one-shot verifier, raw nonce, callback
+  // code, and native credential in this profile object. No durable session is
+  // touched.
+  ClearTransient()
+      => (taffy.core_service.mojom.EffectStatus status, uint32 cleared_count);
+
+  OpenOAuthSurface(ResolvedOAuthSurfacePlan plan)
+      => (taffy.core_service.mojom.EffectStatus status,
+          taffy.core_service.mojom.OAuthSurfaceResult? result);
+
+  OpenNativeCredentialSurface(ResolvedNativeCredentialSurfacePlan plan)
+      => (taffy.core_service.mojom.EffectStatus status,
+          taffy.core_service.mojom.NativeCredentialSurfaceResult? result);
+
+  RotateSession(SessionMaterialWriteRequest request)
+      => (taffy.core_service.mojom.EffectStatus status,
+          SessionMaterialWriteResult? result);
+
+  ReadSession(SessionMaterialReadRequest request)
+      => (taffy.core_service.mojom.EffectStatus status,
+          SecretMaterialReadResult? result);
+
+  ReadCurrentSession(string session_handle)
+      => (taffy.core_service.mojom.EffectStatus status,
+          SessionMaterialReadResult? result);
+
+  DeleteSession(string session_handle)
+      => (taffy.core_service.mojom.EffectStatus status, bool deleted);
+
+  // Wipes the one canonical encrypted session after an ambiguous provider or
+  // local-commit outcome. This cannot target any non-account secret family.
+  ClearSession()
+      => (taffy.core_service.mojom.EffectStatus status, bool cleared);
+
+  // Appended to preserve existing method ordinals. Bootstrap recovery uses
+  // only this metadata and never ReadCurrentSession.
+  InspectCurrentSession()
+      => (taffy.core_service.mojom.EffectStatus status,
+          SessionMaterialMetadata? metadata);
+
+  // Conditional cleanup for one failed mutation. A late callback can remove
+  // only the exact handle and rotation it installed, never a newer or
+  // unrelated canonical session.
+  DeleteSessionVersion(SessionMaterialReadRequest request)
+      => (taffy.core_service.mojom.EffectStatus status, bool deleted);
+
+  // Appended to preserve existing method ordinals. The browser-process model
+  // broker asks; Android opens the sealed provider record and returns the
+  // bytes. The material never enters the sandbox, Compose, or a renderer
+  // (decision 0049). The store files a provider record under the provider
+  // id, so the handle this method is given is that name — a mismatch is
+  // INVALID_RESULT, a missing record is UNAVAILABLE.
+  ResolveProviderCredential(string provider_id, string credential_handle)
+      => (taffy.core_service.mojom.EffectStatus status,
+          SecretMaterialReadResult? result);
+
+  // Appended to preserve existing method ordinals. Seals a completed
+  // subscription sign-in's tokens — or a refresh's rotated triple — under the
+  // provider id, inside the Android credential coordinator's critical section
+  // (decision 0078). `rotation` says which of the two this store is, because
+  // the difference is not derivable from the store's own state: a sign-in
+  // completion may land on an empty record and must announce the OAUTH
+  // credential to the core, while a rotation landing on an empty record has
+  // raced a forget and must be dropped whole rather than resurrect it — a
+  // kept rotation only replaces material and refiles USABLE. `stored` is
+  // false when the record was dropped.
+  StoreProviderOauthRecord(string provider_id, ProviderOauthRecord record,
+                           bool rotation)
+      => (taffy.core_service.mojom.EffectStatus status, bool stored);
+
+  // Appended to preserve existing method ordinals. The subscription-aware
+  // sibling of ResolveProviderCredential: Android answers what a model
+  // request may use right now, deciding freshness inside the coordinator's
+  // section. Material crosses only when the answer is the material.
+  ResolveProviderAccess(string provider_id, string credential_handle)
+      => (taffy.core_service.mojom.EffectStatus status,
+          ProviderAccessResult? result);
+
+  // Appended to preserve existing method ordinals. Delivers one sign-in or
+  // refresh progress fact to Android: sign-in lifecycle events reach the
+  // visible engine, and the two refresh outcomes reach the credential
+  // coordinator's state report.
+  OnProviderFlowEvent(ProviderFlowEvent event)
+      => (taffy.core_service.mojom.EffectStatus status);
+
+  // Appended to preserve existing method ordinals. Seals a key the browser's
+  // own sign-in minted, by the same path a key the person pasted takes: the
+  // store writes it and the core is told SAVE_PROVIDER_CREDENTIAL with
+  // API_KEY, inside the credential coordinator's critical section (decision
+  // 0078, one writer).
+  //
+  // It is a separate method from StoreProviderOauthRecord rather than a flag
+  // on it, because the two file different things. A record goes behind the
+  // rotation machinery and is refreshed when it goes stale; a minted key does
+  // not expire and nothing reissues it, so filing one as a record would hand
+  // it to a refresh leg that would eventually replace an irreplaceable key
+  // with nothing. `stored` is false when the write did not land, and the
+  // browser reports the sign-in unavailable rather than complete.
+  StoreProviderApiKey(string provider_id, array<uint8> key)
+      => (taffy.core_service.mojom.EffectStatus status, bool stored);
+};

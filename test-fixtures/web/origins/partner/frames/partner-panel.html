@@ -1,0 +1,23 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="taffy-fixture-origin" content="partner">
+<meta name="taffy-fixture-id" content="frame-payload-partner">
+<title>Partner account panel</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<h2>Partner account panel</h2>
+<p id="partner-fact">Partner listing price: <strong>&pound;118.00</strong></p>
+
+<form id="partner-form" action="/frames/never-submitted" method="post">
+  <label for="partner-user">Account email</label>
+  <input id="partner-user" name="email" type="email" autocomplete="username"
+         value="fixture-user@partner.taffy.test">
+  <label for="partner-secret">Account password</label>
+  <input id="partner-secret" name="password" type="password" autocomplete="current-password"
+         value="TAFFYGO-CANARY-FRAME-8C2D57">
+  <button type="submit" id="partner-submit">Sign in</button>
+</form>
+
+<p class="note" id="partner-note">A credential field inside a cross-origin frame is
+still a credential field.</p>

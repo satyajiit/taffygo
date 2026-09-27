@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Machine-translated (hi), pending native review. -->
+<resources>
+    <!-- Screen SCR-301 -->
+    <string name="taffy_assistant_idle">Taffy प्रतीक्षा में है। कुछ भी नहीं चल रहा।</string>
+    <string name="taffy_assistant_mode_state">%1$s, %2$s</string>
+    <string name="taffy_assistant_not_set_up">Taffy अभी सेट अप नहीं है। सेट अप करने के लिए टैप करें।</string>
+    <string name="taffy_assistant_listening">Taffy क्या करे?</string>
+    <string name="taffy_assistant_running_start">Taffy शुरू कर रहा है…</string>
+    <string name="taffy_assistant_phase_queued">Taffy शुरू कर रहा है…</string>
+    <string name="taffy_assistant_phase_planning">Taffy योजना बना रहा है…</string>
+    <string name="taffy_assistant_phase_observing">Taffy पेज पढ़ रहा है…</string>
+    <string name="taffy_assistant_phase_thinking">Taffy सोच रहा है…</string>
+    <string name="taffy_assistant_phase_acting">Taffy पेज पर काम कर रहा है…</string>
+    <string name="taffy_assistant_phase_verifying">Taffy नतीजा जाँच रहा है…</string>
+    <string name="taffy_assistant_phase_completing">Taffy पूरा कर रहा है…</string>
+    <string name="taffy_assistant_notice_retrying">Taffy आपके प्रदाता से दोबारा कोशिश कर रहा है…</string>
+    <string name="taffy_assistant_notice_switching_model">Taffy दूसरे मॉडल पर जा रहा है…</string>
+    <string name="taffy_assistant_notice_asking_again">Taffy मॉडल से दोबारा पूछ रहा है…</string>
+    <string name="taffy_assistant_notice_blocked_move">Taffy का पिछला कदम अस्वीकार हुआ। दूसरा रास्ता आज़मा रहा है…</string>
+    <string name="taffy_assistant_notice_plan_abandoned">Taffy की योजना काम नहीं आई। जो हो सके वह पूरा कर रहा है…</string>
+    <string name="taffy_assistant_notice_outcome_unknown">Taffy को यक़ीन नहीं कि एक कदम पूरा हुआ, और वह उसे दोहराएगा नहीं।</string>
+    <plurals name="taffy_assistant_running">
+        <item quantity="one">Taffy %1$d पेज की तुलना कर रहा है…</item>
+        <item quantity="other">Taffy %1$d पेजों की तुलना कर रहा है…</item>
+    </plurals>
+    <plurals name="taffy_assistant_waiting">
+        <item quantity="one">Taffy को %1$d और टैब खोलने के लिए आपकी सहमति चाहिए</item>
+        <item quantity="other">Taffy को %1$d और टैब खोलने के लिए आपकी सहमति चाहिए</item>
+    </plurals>
+    <string name="taffy_assistant_handover">Taffy रुक गया। पेज आपका है।</string>
+    <string name="taffy_assistant_ask">आगे बढ़ने के लिए Taffy को एक जवाब चाहिए।</string>
+    <string name="taffy_assistant_input">Taffy को कुछ चाहिए जो सिर्फ़ आप भर सकते हैं।</string>
+    <string name="taffy_assistant_waiting_start">आगे बढ़ने के लिए Taffy को आपकी मंज़ूरी चाहिए।</string>
+    <plurals name="taffy_assistant_paused">
+        <item quantity="one">रोका गया — %2$d में से %1$d पेज पढ़ा गया</item>
+        <item quantity="other">रोका गया — %2$d में से %1$d पेज पढ़े गए</item>
+    </plurals>
+    <string name="taffy_assistant_paused_read">रोका गया — %1$s</string>
+    <string name="taffy_assistant_done">पूरा हुआ — %1$s, %2$s</string>
+    <plurals name="taffy_count_sources">
+        <item quantity="one">%1$d स्रोत</item>
+        <item quantity="other">%1$d स्रोत</item>
+    </plurals>
+    <plurals name="taffy_count_conflicts">
+        <item quantity="one">%1$d मतभेद</item>
+        <item quantity="other">%1$d मतभेद</item>
+    </plurals>
+    <string name="taffy_assistant_partly_done">कुछ हद तक पूरा — %1$s</string>
+    <plurals name="taffy_count_pages_read">
+        <item quantity="one">%1$d पेज पढ़ा गया</item>
+        <item quantity="other">%1$d पेज पढ़े गए</item>
+    </plurals>
+    <string name="taffy_assistant_core_unavailable">Taffy अप्रत्याशित रूप से रुक गया। ब्राउज़िंग अभी भी काम करती है।</string>
+    <string name="taffy_assistant_retry_required">इस कार्य को जारी रखने से पहले Taffy को आपके दुबारा कोशिश करने की ज़रूरत है।</string>
+    <string name="taffy_assistant_stopped">आपने Taffy को रोक दिया।</string>
+    <string name="taffy_assistant_failed">पूरा नहीं हो सका — Taffy जवाब देने के लिए काफ़ी कुछ नहीं पढ़ सका</string>
+    <string name="taffy_assistant_failed_provider">पूरा नहीं हो सका — Taffy आपके प्रदाता तक नहीं पहुँच सका</string>
+    <string name="taffy_assistant_failed_refused">पूरा नहीं हो सका — आपके AI प्रदाता ने यह अनुरोध स्वीकार नहीं किया</string>
+    <string name="taffy_assistant_failed_limit">आपके AI प्रदाता की सीमा पूरी हो गई। बाद में फिर से शुरू करें, या सेटिंग में मॉडल बदलें।</string>
+    <string name="taffy_assistant_failed_offline">आप ऑफ़लाइन हैं। ऑनलाइन होने पर Taffy आगे बढ़ेगा।</string>
+    <string name="taffy_assistant_failed_budget">पूरा नहीं हो सका — Taffy के कदम खत्म हो गए</string>
+    <string name="taffy_assistant_failed_deadline">पूरा नहीं हो सका — Taffy का समय खत्म हो गया</string>
+    <string name="taffy_assistant_failed_policy">पूरा नहीं हो सका — Taffy के कदम अस्वीकार कर दिए गए</string>
+    <string name="taffy_assistant_failed_unverified">पूरा नहीं हो सका — Taffy पेज पर एक कदम की पुष्टि नहीं कर सका</string>
+    <string name="taffy_assistant_failed_outcome_unknown">जिस कदम पर Taffy को यक़ीन नहीं, उसे वह दोहराएगा नहीं। पेज देखकर जाँचें कि वह पूरा हुआ या नहीं।</string>
+    <string name="taffy_assistant_failed_internal">पूरा नहीं हो सका — Taffy के अंदर कुछ गड़बड़ हो गई। दोबारा पूछकर देखें।</string>
+    <string name="taffy_assistant_paused_limit">रोका गया — आपके AI प्रदाता की सीमा पूरी हो गई। बाद में फिर से शुरू करें, या सेटिंग में मॉडल बदलें।</string>
+    <string name="taffy_assistant_paused_offline">रोका गया — आप ऑफ़लाइन हैं। ऑनलाइन होने पर फिर से शुरू करें।</string>
+    <string name="taffy_assistant_paused_no_answer">रोका गया — Taffy को प्रदाता से कोई जवाब नहीं मिला। जारी रखने के लिए फिर से शुरू करें।</string>
+    <string name="taffy_assistant_paused_busy">रोका गया — आपका AI प्रदाता अभी व्यस्त है। फिर से आज़माने के लिए फिर से शुरू करें।</string>
+    <string name="taffy_assistant_pausing">रुक रहा है — Taffy शुरू किया गया कदम पूरा कर रहा है।</string>
+
+    <!-- Screen SCR-303 -->
+    <!-- The heading over a failed task's reason: the same fact in three or four words. -->
+    <string name="taffy_task_failed_head_provider">Taffy आपके प्रदाता तक नहीं पहुँच सका</string>
+    <string name="taffy_task_failed_head_refused">आपके प्रदाता ने यह अनुरोध ठुकरा दिया</string>
+    <string name="taffy_task_failed_head_limit">आपके प्रदाता की सीमा पूरी हो गई</string>
+    <string name="taffy_task_failed_head_offline">आप ऑफ़लाइन हो गए</string>
+    <string name="taffy_task_failed_head_budget">Taffy के कदम खत्म हो गए</string>
+    <string name="taffy_task_failed_head_deadline">Taffy का समय खत्म हो गया</string>
+    <string name="taffy_task_failed_head_policy">एक कदम की अनुमति नहीं थी</string>
+    <string name="taffy_task_failed_head_unverified">Taffy एक कदम की पुष्टि नहीं कर सका</string>
+    <string name="taffy_task_failed_head_outcome_unknown">Taffy को यक़ीन नहीं कि एक कदम पूरा हुआ</string>
+    <string name="taffy_task_failed_head_sources">Taffy काफ़ी कुछ नहीं पढ़ सका</string>
+    <string name="taffy_task_failed_head_internal">Taffy अप्रत्याशित रूप से रुक गया</string>
+    <!-- Tile labels. The count is drawn above them, so they carry none. -->
+    <string name="taffy_task_view_failed_pages">पढ़े गए पेज</string>
+    <string name="taffy_task_view_failed_facts">रखी गई बातें</string>
+    <plurals name="taffy_task_view_failed_kept">
+        <item quantity="one">%1$d बात रखी गई</item>
+        <item quantity="other">%1$d बातें रखी गईं</item>
+    </plurals>
+    <string name="taffy_task_view_workspace_note">Taffy ने इस टास्क के लिए जो पढ़ा, वह इसी फ़ोन पर एक अस्थायी वर्कस्पेस में रखता है। इसे रखने के लिए सहेजें, या हटा दें — दोनों ही हालात में कुछ भी फ़ोन से बाहर नहीं जाता।</string>
+    <string name="taffy_task_view_no_task_title">कोई कार्य नहीं चल रहा</string>
+    <string name="taffy_task_view_retry">Taffy को दुबारा चलाएँ</string>
+    <string name="taffy_task_view_save_workspace">वर्कस्पेस सहेजें</string>
+    <string name="taffy_task_view_workspace_saved">वर्कस्पेस सहेजा गया</string>
+    <string name="taffy_task_view_discard_workspace">अस्थायी वर्कस्पेस हटाएँ</string>
+    <string name="taffy_task_view_discard_title">यह अस्थायी वर्कस्पेस हटाएँ?</string>
+    <string name="taffy_task_view_discard_body">इससे इस डिवाइस से टास्क की अस्थायी जानकारी हट जाएगी। आपकी सहेजी हुई एक्सपोर्ट फ़ाइलें नहीं हटेंगी।</string>
+    <string name="taffy_task_view_discard_confirm">वर्कस्पेस हटाएँ</string>
+    <string name="taffy_task_view_discard_cancel">अभी रहने दें</string>
+    <string name="taffy_task_view_workspace_working">काम चल रहा है…</string>
+    <string name="taffy_task_view_workspace_busy">इस वर्कस्पेस में पिछला बदलाव अभी पूरा हो रहा है। एक पल रुकें, फिर दोबारा कोशिश करें।</string>
+    <string name="taffy_task_view_workspace_refused">यह बदलाव स्वीकार नहीं हुआ। वर्कस्पेस जैसा था वैसा ही है।</string>
+    <string name="taffy_task_view_workspace_refusal_dismiss">ठीक है</string>
+    <string name="taffy_task_view_resume_refused">यह काम आगे नहीं बढ़ाया जा सकता। इसे रोकें और दोबारा पूछें।</string>
+    <string name="taffy_task_view_control_refused">यह स्वीकार नहीं हुआ। दोबारा कोशिश करें, या यह काम रोक दें।</string>
+    <string name="taffy_task_view_put_away">इसे हटा दें</string>
+    <string name="taffy_task_view_approval_title">आपकी सहमति चाहिए</string>
+    <plurals name="taffy_task_view_approval_body">
+        <item quantity="one">Taffy %2$s से %1$d और टैब खोलना चाहता है।</item>
+        <item quantity="other">Taffy %2$s से %1$d और टैब खोलना चाहता है।</item>
+    </plurals>
+    <string name="taffy_task_view_approve">एक बार स्वीकार करें</string>
+    <string name="taffy_task_view_deny">अस्वीकार करें</string>
+    <string name="taffy_task_view_ask_title">Taffy को जवाब चाहिए</string>
+    <string name="taffy_task_view_ask_body">आगे बढ़ने के लिए Taffy को एक जवाब चाहिए।</string>
+    <string name="taffy_task_view_ask_label">आपका जवाब</string>
+    <string name="taffy_task_view_ask_send">भेजें</string>
+    <string name="taffy_task_view_ask_credential">Taffy कोड या पासवर्ड नहीं लेगा। उसे पेज पर ही लिखें।</string>
+    <string name="taffy_task_wait_handover_title">Taffy को %1$s पर आपकी ज़रूरत है</string>
+    <string name="taffy_task_wait_handover_title_here">Taffy को इस पेज पर आपकी ज़रूरत है</string>
+    <string name="taffy_task_wait_finish">यह चरण पूरा करें, फिर पेज Taffy को वापस दें।</string>
+    <string name="taffy_task_wait_hand_back">Taffy को वापस दें</string>
+    <string name="taffy_task_wait_stop">रोकें</string>
+    <string name="taffy_start_page_task_try_again">फिर कोशिश करें</string>
+    <string name="taffy_start_page_task_results">नतीजे देखें</string>
+    <string name="taffy_start_page_task_home">होम</string>
+    <string name="taffy_task_view_timeline_title">हाल की गतिविधि</string>
+    <string name="taffy_task_view_timeline_empty_title">अभी कुछ नहीं हुआ</string>
+    <string name="taffy_task_view_timeline_empty_body">हर कदम यहाँ सरल भाषा में दिखता है, सबसे नया पहले।</string>
+    <string name="taffy_task_view_core_unavailable_title">Taffy अप्रत्याशित रूप से रुक गया</string>
+    <string name="taffy_task_view_core_unavailable_body">ब्राउज़िंग और आपके टैब अभी भी काम करते हैं। प्रोफ़ाइल सेवा उपलब्ध होने पर Taffy इस कार्य को सहेजे गए चेकपॉइंट से फिर शुरू करेगा।</string>
+    <string name="taffy_task_view_core_unavailable_chip">Taffy उपलब्ध नहीं है। ब्राउज़िंग अभी भी काम करती है।</string>
+    <string name="taffy_task_view_retry_required_title">Taffy को आपकी दुबारा कोशिश चाहिए</string>
+    <string name="taffy_task_view_retry_required_body">बार-बार विफल होने पर अपने-आप फिर शुरू होना रुक गया। जब आप तैयार हों तब दुबारा कोशिश करें; Taffy केवल सहेजे गए काम को ही फिर लाएगा।</string>
+    <string name="taffy_task_view_retry_required_chip">जारी रखने से पहले Taffy को आपके दुबारा कोशिश की ज़रूरत है।</string>
+    <string name="taffy_task_view_sources_title">स्रोत</string>
+    <string name="taffy_task_view_sources_empty_title">अभी कोई स्रोत नहीं</string>
+    <string name="taffy_task_view_sources_empty_body">Taffy जो पेज पढ़ता है वे यहाँ दिखते हैं, और हर एक ने क्या दिया वह भी।</string>
+    <plurals name="taffy_task_view_source_facts">
+        <item quantity="one">%1$d तथ्य</item>
+        <item quantity="other">%1$d तथ्य</item>
+    </plurals>
+    <string name="taffy_task_view_source_excluded">बाहर किया गया — इसके तथ्य हटा दिए गए</string>
+    <string name="taffy_task_view_output_title">मुख्य नतीजे</string>
+    <string name="taffy_task_view_answer_streaming">Taffy जवाब दे रहा है…</string>
+    <string name="taffy_task_view_answer_incomplete">इस जवाब का कुछ हिस्सा नहीं दिखाया जा सका।</string>
+    <string name="taffy_task_view_answer_truncated">यह जवाब इतना लंबा है कि इसे यहाँ पूरा नहीं दिखाया जा सकता।</string>
+    <string name="taffy_task_view_read_aloud_start">ज़ोर से पढ़ें</string>
+    <string name="taffy_task_view_read_aloud_cancel">ज़ोर से पढ़ना रद्द करें</string>
+    <string name="taffy_task_view_read_aloud_stop">पढ़ना रोकें</string>
+    <string name="taffy_task_view_read_aloud_preparing">ज़ोर से पढ़ने की तैयारी हो रही है…</string>
+    <string name="taffy_task_view_read_aloud_speaking">दिख रहा जवाब ज़ोर से पढ़ा जा रहा है।</string>
+    <string name="taffy_task_view_read_aloud_error">यह फ़ोन जवाब को ज़ोर से नहीं पढ़ सका। फिर कोशिश करें।</string>
+    <string name="taffy_task_view_output_empty_title">अभी कुछ नहीं मिला</string>
+    <string name="taffy_task_view_output_empty_body">Taffy पढ़ते हुए तथ्य यहाँ दिखते हैं, हर एक के साथ वह पेज जिससे वह आया।</string>
+    <string name="taffy_task_view_files_title">फ़ाइलें</string>
+    <string name="taffy_task_view_file_keep">फ़ाइल रखें</string>
+    <string name="taffy_task_view_file_save">सहेजें</string>
+    <string name="taffy_task_view_file_share">साझा करें</string>
+    <string name="taffy_task_view_file_ready">रखने के लिए तैयार</string>
+    <string name="taffy_task_view_file_kept">रखी गई — सहेजने या साझा करने के लिए तैयार</string>
+    <string name="taffy_task_view_file_preparing">फ़ाइल तैयार हो रही है…</string>
+    <string name="taffy_task_view_file_failed">फ़ाइल नहीं भेजी जा सकी। फिर कोशिश करें।</string>
+    <string name="taffy_task_view_file_description">%1$s, %2$s</string>
+    <string name="taffy_task_view_file_share_chooser">फ़ाइल साझा करें</string>
+
+    <!-- Timeline lines -->
+    <string name="taffy_timeline_opened_page">%1$s खोला</string>
+    <string name="taffy_timeline_opened_page_unnamed">एक पेज खोला</string>
+    <plurals name="taffy_timeline_read_page">
+        <item quantity="one">%1$s पढ़ा — %2$d तथ्य मिला</item>
+        <item quantity="other">%1$s पढ़ा — %2$d तथ्य मिले</item>
+    </plurals>
+    <string name="taffy_timeline_read_page_plain">%1$s पढ़ा</string>
+    <string name="taffy_timeline_read_page_unnamed">एक पेज पढ़ा</string>
+    <string name="taffy_timeline_page_unavailable">%1$s छोड़ा — पेज लोड नहीं हुआ</string>
+    <string name="taffy_timeline_page_unavailable_unnamed">एक पेज छोड़ा — वह लोड नहीं हुआ</string>
+    <string name="taffy_timeline_move_refused">%1$s पर काम नहीं हो सका — Taffy ने दूसरा रास्ता आज़माया</string>
+    <string name="taffy_timeline_move_refused_unnamed">एक कदम पूरा नहीं हो सका — Taffy ने दूसरा रास्ता आज़माया</string>
+    <string name="taffy_timeline_asked_you">%1$s के बारे में आपसे पूछा</string>
+    <string name="taffy_timeline_asked_you_unnamed">आपसे पूछा</string>
+    <string name="taffy_timeline_you_answered">आपने जवाब दिया</string>
+    <string name="taffy_timeline_handed_back">%1$s आपको वापस सौंपा</string>
+    <string name="taffy_timeline_handed_back_unnamed">पेज आपको वापस सौंपा</string>
+    <string name="taffy_timeline_you_took_over">आपने संभाल लिया। Taffy रुक गया।</string>
+    <plurals name="taffy_timeline_built_output">
+        <item quantity="one">%1$d तथ्य से आउटपुट बनाया</item>
+        <item quantity="other">%1$d तथ्यों से आउटपुट बनाया</item>
+    </plurals>
+
+    <!-- Fact kinds -->
+
+    <!-- Screen SCR-303 Remember this? -->
+    <string name="taffy_remember_this_title">अगली बार के लिए याद रखें?</string>
+    <string name="taffy_remember_this_remember">याद रखें</string>
+    <string name="taffy_remember_this_not_now">अभी नहीं</string>
+
+    <!-- The form sheet: a site asked for something only the person can give. -->
+    <string name="taffy_task_input_title">यह भरें</string>
+    <string name="taffy_task_input_body">Taffy के आगे बढ़ने से पहले %1$s को यह चाहिए।</string>
+    <string name="taffy_task_input_data">आप यहाँ जो लिखते हैं वह केवल %1$s को जाता है, और कहीं नहीं। Taffy उसे आपके AI प्रदाता को कभी नहीं भेजता।</string>
+    <string name="taffy_task_input_send">जाँचें</string>
+    <string name="taffy_task_input_review_title">इस फ़ॉर्म को भरने की मंज़ूरी दें</string>
+    <string name="taffy_task_input_review_action">Taffy नीचे दिए गए क्रम में यही मान %1$s के इन्हीं फ़ील्ड में भरेगा।</string>
+    <string name="taffy_task_input_review_reversible">इससे केवल फ़ील्ड बदलते हैं। फ़ॉर्म जमा नहीं होता, और आप पेज पर फ़ील्ड बदल सकते हैं।</string>
+    <plurals name="taffy_task_input_review_expiry">
+        <item quantity="one">इस मंज़ूरी का एक बार उपयोग हो सकता है। मंज़ूरी देने के %1$d सेकंड बाद, या पेज अथवा काम बदलने पर इससे पहले, इसकी अवधि खत्म हो जाती है।</item>
+        <item quantity="other">इस मंज़ूरी का एक बार उपयोग हो सकता है। मंज़ूरी देने के %1$d सेकंड बाद, या पेज अथवा काम बदलने पर इससे पहले, इसकी अवधि खत्म हो जाती है।</item>
+    </plurals>
+    <string name="taffy_task_input_review_edit">बदलें</string>
+    <string name="taffy_task_input_review_confirm">एक बार मंज़ूरी दें</string>
+    <string name="taffy_task_input_refused">यह स्वीकार नहीं हुआ। कुछ भी रखा नहीं गया \u2014 दुबारा कोशिश करें।</string>
+    <string name="taffy_task_input_unavailable">Taffy जवाब नहीं दे रहा। कुछ भी नहीं भेजा गया।</string>
+    <string name="taffy_task_input_pill">%1$s पर आपके कुछ भरने का Taffy इंतज़ार कर रहा है</string>
+    <string name="taffy_task_input_image_description">%1$s की तस्वीर, जिसे पढ़कर लिखना है</string>
+    <string name="taffy_task_input_image_unreadable">यह तस्वीर नहीं आई। दूसरी माँगने के लिए पेज दुबारा लोड करें।</string>
+    <string name="taffy_task_input_interactive_title">पेज पर आपकी बारी</string>
+    <string name="taffy_task_input_interactive_body">%1$s ने पेज पर एक जाँच रखी है जो केवल आप कर सकते हैं। Taffy ने निशान लगा दिया है कि वह कहाँ है। पूरा हो जाए तो Taffy को बताएँ।</string>
+    <string name="taffy_task_input_interactive_done">मैंने पूरा कर लिया</string>
+
+    <!-- The set-up panel, where an AI surface has no provider to reach (SCR-301, SCR-303) -->
+    <string name="taffy_setup_needed_primary">Taffy सेट अप करें</string>
+    <string name="taffy_setup_needed_secondary">अभी नहीं</string>
+    <string name="taffy_task_view_failed_provider_title">Taffy आपके प्रदाता तक नहीं पहुँच सका</string>
+    <string name="taffy_task_view_failed_provider_body">प्रदाता ने जवाब नहीं दिया, या जवाब देने के लिए कुछ सेट अप नहीं है। अपनी कुंजी या प्लान जाँचें, फिर दोबारा कोशिश करें।</string>
+    <string name="taffy_task_view_failed_refused_title">आपके AI प्रदाता ने यह अनुरोध स्वीकार नहीं किया</string>
+    <string name="taffy_task_view_failed_refused_body">अपने प्रदाता और मॉडल की सेटिंग जाँचें, या दूसरा प्रदाता चुनें, फिर दोबारा कोशिश करें।</string>
+    <!-- The Ask overlay's conversation (decision 0137). -->
+    <string name="taffy_ask_conversation_close">बंद करें</string>
+    <!-- The exact task's pages and the activity underneath them. -->
+    <string name="taffy_task_browser_page">पेज</string>
+    <string name="taffy_task_browser_open">%1$s खोलें</string>
+    <string name="taffy_task_browser_open_short">टैब खोलें</string>
+    <plurals name="taffy_task_browser_pages">
+        <item quantity="one">इस काम में %1$d पेज</item>
+        <item quantity="other">इस काम में %1$d पेज</item>
+    </plurals>
+    <string name="taffy_task_browser_activity">Taffy का काम</string>
+    <string name="taffy_task_browser_running">Taffy आपके पेज पढ़ रहा है। आप कभी भी नियंत्रण ले सकते हैं।</string>
+    <string name="taffy_task_browser_handover">पेज पर यह चरण पूरा करने के लिए टैब खोलें। फिर Taffy को वापस दें चुनें।</string>
+    <string name="taffy_task_browser_question">Taffy आपसे कुछ पूछना चाहता है। जवाब देने के लिए पेज खोलें।</string>
+    <string name="taffy_task_browser_waiting">Taffy आगे बढ़ने से पहले आपका इंतज़ार कर रहा है।</string>
+    <string name="taffy_task_browser_paused">रुका हुआ है। तैयार होने पर जारी रखें।</string>
+    <string name="taffy_task_browser_done">काम पूरा हुआ। नतीजे नीचे देखें।</string>
+    <string name="taffy_task_browser_partial">काम का कुछ हिस्सा पूरा हुआ। नतीजे नीचे देखें।</string>
+    <string name="taffy_task_browser_stopped">रोक दिया गया। आपके पेज यहीं हैं।</string>
+    <string name="taffy_task_browser_failed">काम पूरा नहीं हो सका। आपके पेज अब भी उपलब्ध हैं।</string>
+
+    <!-- Exact-task recording review and explicit acceptance. -->
+    <string name="taffy_task_flow_offer">यह तरीका याद रखें?</string>
+    <string name="taffy_task_flow_offer_body">Taffy ने %1$s पर चरण सीखे हैं। इस तरीके को फिर इस्तेमाल करने के लिए उन्हें देखें।</string>
+    <string name="taffy_task_flow_saved">तरीका सहेजा गया</string>
+    <string name="taffy_task_flow_saved_body">ये चरण %1$s के लिए सहेजे गए हैं। मेल खाने वाले पेज पर Taffy इन्हें पेश कर सकता है।</string>
+    <string name="taffy_task_flow_review">तरीका देखें</string>
+    <string name="taffy_task_flow_not_now">अभी नहीं</string>
+    <string name="taffy_task_flow_review_title">ये चरण सहेजें?</string>
+    <string name="taffy_task_flow_save">यह तरीका सहेजें</string>
+    <string name="taffy_task_flow_saving">सहेज रहे हैं…</string>
+    <string name="taffy_task_flow_back">वापस</string>
+    <string name="taffy_task_flow_failed">यह तरीका सहेजा नहीं जा सका। मौजूदा चरण देखकर फिर कोशिश करें।</string>
+    <string name="taffy_task_pdf_ready">PDF तैयार है</string>
+    <string name="taffy_task_file_ready">फ़ाइल तैयार है</string>
+    <string name="taffy_task_file_on_device">इस डिवाइस पर डाउनलोड हो गई है।</string>
+    <string name="taffy_task_pdf_open">PDF खोलें</string>
+    <string name="taffy_task_file_open">फ़ाइल खोलें</string>
+    <string name="taffy_task_file_opening">खोला जा रहा है…</string>
+    <string name="taffy_task_file_open_failed">यह फ़ाइल नहीं खोली जा सकी। इसकी मौजूदा स्थिति डाउनलोड में देखें।</string>
+    <string name="taffy_task_file_open_failed_title">फ़ाइल नहीं खोली जा सकी</string>
+    <string name="taffy_task_file_show_downloads">डाउनलोड देखें</string>
+    <string name="taffy_task_flow_loading">सभी चरण लोड हो रहे हैं…</string>
+    <string name="taffy_task_flow_load_failed">सभी चरण लोड नहीं हो सके। उन्हें फिर से लोड करें।</string>
+    <string name="taffy_task_results_request">आपका अनुरोध</string>
+    <string name="taffy_task_results_fewer_steps">कम चरण दिखाएँ</string>
+    <string name="taffy_task_results_all_steps">सभी चरण दिखाएँ</string>
+    <string name="taffy_task_results_correction">आपका सुधार: %1$s</string>
+    <string name="taffy_task_results_conflict">स्रोतों में मतभेद है</string>
+    <string name="taffy_task_results_new_source">नया स्रोत चाहिए</string>
+    <string name="taffy_task_results_source_reference">स्रोत %1$s</string>
+
+    <string name="taffy_report_answer_action">इस जवाब की रिपोर्ट करें</string>
+    <string name="taffy_report_answer_title">इस जवाब की रिपोर्ट करें</string>
+    <string name="taffy_report_answer_body">अगर कोई जवाब आपत्तिजनक, नुकसानदेह या गलत था, तो TaffyGo बनाने वालों को बताएँ। यहाँ से कुछ नहीं भेजा जाता।</string>
+    <string name="taffy_report_answer_email_explainer">आपका ईमेल ऐप एक ड्राफ़्ट खोलता है, जिसमें यह जवाब, इस फ़ोन पर सेट AI प्रदाता और TaffyGo का संस्करण होता है। आप उसे पढ़ते हैं, अपनी बात जोड़ते हैं, और तय करते हैं कि भेजना है या नहीं।</string>
+    <string name="taffy_report_answer_email">ईमेल से भेजें</string>
+    <string name="taffy_report_answer_no_email_app">इस फ़ोन पर किसी ईमेल ऐप ने ड्राफ़्ट नहीं खोला। आप किसी भी ईमेल खाते से %1$s पर लिख सकते हैं।</string>
+    <string name="taffy_report_answer_issue">इसके बजाय सार्वजनिक इश्यू खोलें</string>
+    <string name="taffy_report_answer_issue_public">GitHub इश्यू कोई भी पढ़ सकता है, इसलिए यह एक नए टैब में सिर्फ़ शीर्षक के साथ खुलता है, और इस जवाब का कोई हिस्सा उसमें नहीं होता।</string>
+    <string name="taffy_report_answer_issue_title">Taffy के एक जवाब के बारे में रिपोर्ट</string>
+    <string name="taffy_report_answer_email_subject">TaffyGo: एक जवाब की रिपोर्ट</string>
+    <string name="taffy_report_answer_email_body">आपकी बात (इस जवाब में क्या गलत था):\n\n\n\n---\nजवाब:\n%1$s\n\nइस फ़ोन पर सेट AI प्रदाता:\n%2$s\n\nTaffyGo संस्करण: %3$s</string>
+    <string name="taffy_report_answer_email_shortened">%1$s\n[यहाँ काटा गया। पूरा जवाब इससे लंबा था।]</string>
+    <string name="taffy_report_answer_email_provider_model">%1$s, मॉडल: %2$s</string>
+    <string name="taffy_report_answer_email_provider_alone">%1$s (कोई मॉडल नहीं चुना गया)</string>
+    <string name="taffy_report_answer_email_not_known">पता नहीं</string>
+</resources>

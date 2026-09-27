@@ -1,0 +1,5 @@
+subject,detail,value,unit,how_it_was_found,confidence_basis_points,observed_at,sensitivity,sources,source_locators
+"Model A","note","I already own the charger","","You entered it","9000","2026-08-17T09:05:00Z","PUBLIC","",""
+"Model A","price","1299","USD","Read from the page","9000","2026-08-17T09:05:00Z","PUBLIC","1 2","example.test/model-a example.test/model-b"
+"Model A","summary","[Best value](javascript:alert(1)) | fast gnp.exe","","Summarized from the page","9000","2026-08-17T09:05:00Z","PUBLIC","1","example.test/model-a"
+"Model B","battery life","'=SUM(A1:A9)","hours","Read from the page","9000","2026-08-17T09:05:00Z","PUBLIC","2","example.test/model-b"

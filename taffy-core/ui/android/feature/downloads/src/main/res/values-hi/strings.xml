@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<resources>
+    <string name="taffy_downloads_title">डाउनलोड</string>
+    <string name="taffy_downloads_tab_yours">आपके</string>
+    <string name="taffy_downloads_tab_taffys">टैफ़ी के</string>
+    <string name="taffy_downloads_tabs_description">कौन-से डाउनलोड दिखाने हैं</string>
+
+    <string name="taffy_downloads_search">फ़ाइल के नाम और साइट खोजें</string>
+    <string name="taffy_downloads_search_clear">डाउनलोड खोज साफ़ करें</string>
+    <string name="taffy_downloads_filter_label">दिखाएँ</string>
+    <string name="taffy_downloads_filter_all">सभी</string>
+    <string name="taffy_downloads_filter_active">चालू</string>
+    <string name="taffy_downloads_filter_complete">सहेजे गए</string>
+    <string name="taffy_downloads_filter_failed">समस्याएँ</string>
+    <string name="taffy_downloads_sort_label">क्रम</string>
+    <string name="taffy_downloads_sort_newest">नए पहले</string>
+    <string name="taffy_downloads_sort_name">नाम</string>
+    <string name="taffy_downloads_sort_largest">बड़े पहले</string>
+    <string name="taffy_downloads_sort_source">साइट</string>
+    <string name="taffy_downloads_group_label">समूह</string>
+    <string name="taffy_downloads_group_none">कोई नहीं</string>
+    <string name="taffy_downloads_group_status">स्थिति</string>
+    <string name="taffy_downloads_group_type">फ़ाइल प्रकार</string>
+    <string name="taffy_downloads_group_source">साइट</string>
+
+    <string name="taffy_downloads_status_loading">इस प्रोफ़ाइल के डाउनलोड लोड हो रहे हैं</string>
+    <string name="taffy_downloads_status_unavailable">इस प्रोफ़ाइल की पूरी डाउनलोड सूची उपलब्ध नहीं है</string>
+    <plurals name="taffy_downloads_status_limited">
+        <item quantity="one">सबसे नया %1$d डाउनलोड दिख रहा है। इससे पुराने डाउनलोड भी हो सकते हैं।</item>
+        <item quantity="other">सबसे नए %1$d डाउनलोड दिख रहे हैं। इससे पुराने डाउनलोड भी हो सकते हैं।</item>
+    </plurals>
+    <plurals name="taffy_downloads_status_count">
+        <item quantity="one">%2$d में से %1$d डाउनलोड दिख रहा है</item>
+        <item quantity="other">%2$d में से %1$d डाउनलोड दिख रहे हैं</item>
+    </plurals>
+    <string name="taffy_downloads_loading_title">डाउनलोड लोड हो रहे हैं</string>
+    <string name="taffy_downloads_loading_body">TaffyGo इस प्रोफ़ाइल की डाउनलोड सूची पढ़ रहा है।</string>
+    <string name="taffy_downloads_unavailable_title">डाउनलोड उपलब्ध नहीं हैं</string>
+    <string name="taffy_downloads_unavailable_body">TaffyGo इस प्रोफ़ाइल की डाउनलोड सूची नहीं पढ़ सका। आपकी फ़ाइलों और चल रहे डाउनलोड में कोई बदलाव नहीं हुआ है।</string>
+    <string name="taffy_downloads_empty_title">कोई डाउनलोड नहीं</string>
+    <string name="taffy_downloads_empty_body">आपकी डाउनलोड की गई फ़ाइलें डिवाइस पर सहेजी जाती हैं और यहाँ दिखती हैं।</string>
+    <string name="taffy_downloads_no_matches_title">कोई मिलता-जुलता डाउनलोड नहीं</string>
+    <string name="taffy_downloads_no_matches_body">दूसरी फ़ाइलें देखने के लिए खोज, फ़िल्टर या समूह बदलें।</string>
+    <string name="taffy_downloads_action_unavailable">यह काम अब इस डाउनलोड के लिए उपलब्ध नहीं है।</string>
+    <string name="taffy_downloads_dismiss">हटाएँ</string>
+
+    <string name="taffy_downloads_pause">रोकें</string>
+    <string name="taffy_downloads_resume">फिर शुरू करें</string>
+    <string name="taffy_downloads_cancel">डाउनलोड रद्द करें</string>
+    <string name="taffy_downloads_open">खोलें</string>
+    <string name="taffy_downloads_share">शेयर करें</string>
+    <string name="taffy_downloads_remove">हटाएँ</string>
+    <string name="taffy_downloads_action_description">%2$s को %1$s</string>
+    <string name="taffy_downloads_keep">रखें</string>
+    <string name="taffy_downloads_cancel_confirm_title">डाउनलोड रद्द करें?</string>
+    <string name="taffy_downloads_cancel_confirm_body">%1$s को डाउनलोड करना रोकें? इसे तभी फिर शुरू किया जा सकेगा जब साइट और आपका ब्राउज़र अनुमति दें।</string>
+    <string name="taffy_downloads_remove_confirm_title">डाउनलोड हटाएँ?</string>
+    <string name="taffy_downloads_remove_confirm_body">%1$s और इसकी डाउनलोड की गई फ़ाइल को इस प्रोफ़ाइल से हटाएँ? इसे यहाँ वापस नहीं लाया जा सकता।</string>
+
+    <string name="taffy_downloads_progress">%1$d%%</string>
+    <string name="taffy_downloads_progress_unknown">आकार अज्ञात</string>
+    <string name="taffy_downloads_supporting">%1$s · %2$s</string>
+    <string name="taffy_downloads_description">%1$s, %2$s से, %3$s, %4$s</string>
+    <string name="taffy_downloads_source_unknown">अज्ञात साइट</string>
+    <string name="taffy_downloads_type_documents">दस्तावेज़</string>
+    <string name="taffy_downloads_type_images">तस्वीरें</string>
+    <string name="taffy_downloads_type_audio">ऑडियो</string>
+    <string name="taffy_downloads_type_video">वीडियो</string>
+    <string name="taffy_downloads_type_archives">संकुचित फ़ाइलें</string>
+    <string name="taffy_downloads_type_other">अन्य फ़ाइलें</string>
+
+    <string name="taffy_parts_empty_title">अलग से कोई हिस्सा नहीं</string>
+    <string name="taffy_parts_empty_body">TaffyGo के इस संस्करण में ज़रूरी सब कुछ पहले से शामिल है।</string>
+    <string name="taffy_parts_unsupported_title">इस डिवाइस के लिए कुछ नहीं</string>
+    <string name="taffy_parts_unsupported_body">इस तरह के डिवाइस के लिए कोई हिस्सा प्रकाशित नहीं है, इसलिए टैफ़ी कुछ नहीं लाएगा।</string>
+    <string name="taffy_parts_purpose_python_library">Python लाइब्रेरी</string>
+    <string name="taffy_parts_purpose_python_packages">अतिरिक्त Python पैकेज</string>
+    <string name="taffy_parts_purpose_model">डिवाइस पर चलने वाला मॉडल</string>
+    <string name="taffy_parts_purpose_model_tokenizer">डिवाइस पर चलने वाले मॉडल का पाठ पाठक</string>
+    <string name="taffy_parts_purpose_block_list">विज्ञापन और ट्रैकर सूची</string>
+    <string name="taffy_parts_purpose_country_flags">देशों के झंडे</string>
+    <string name="taffy_parts_purpose_start_scenes">आरंभ पृष्ठ की कलाकृति</string>
+    <string name="taffy_parts_state_ready">तैयार</string>
+    <string name="taffy_parts_state_checking">जाँच हो रही है</string>
+    <string name="taffy_parts_state_downloading">डाउनलोड हो रहा है</string>
+    <string name="taffy_parts_state_missing">इंतज़ार में</string>
+    <string name="taffy_parts_state_not_needed">अभी ज़रूरत नहीं</string>
+    <string name="taffy_parts_hold_not_available">इस डिवाइस के लिए उपलब्ध नहीं</string>
+    <string name="taffy_parts_hold_not_published">अभी प्रकाशित नहीं</string>
+    <string name="taffy_parts_hold_attempts_spent">पूरा नहीं हो सका</string>
+    <string name="taffy_parts_hold_wrong_contents">जो आया वह सही नहीं था</string>
+    <string name="taffy_parts_hold_connection">कनेक्शन का इंतज़ार</string>
+    <string name="taffy_parts_hold_turned_off">बंद किया गया</string>
+    <string name="taffy_parts_hold_product_defect">Taffy के इस हिस्से में कुछ गड़बड़ है</string>
+    <string name="taffy_parts_supporting">%1$s · %2$s</string>
+    <string name="taffy_parts_description">%1$s, %2$s, %3$s</string>
+    <string name="taffy_parts_remove">मिटाएँ</string>
+</resources>

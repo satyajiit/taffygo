@@ -1,0 +1,16 @@
+{
+  "operation_kind": 7,
+  "bundled_python": null,
+  "local_model": null,
+  "media_probe": null,
+  "audio_extract": null,
+  "frame_sample": null,
+  "transcode": null,
+  "signed_wasm": null,
+  "local_embedding": {
+    "dimensions": 4,
+    "element_kind": 0,
+    "values": [0, 0, 0, 63, 0, 0, 0, 191, 0, 0, 128, 62, 0, 0, 0, 0],
+    "input_tokens": 3
+  }
+}

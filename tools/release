@@ -1,0 +1,447 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/release — the artifact manifest, the dependency inventory, and the
+# rollback rehearsal.
+#
+#   ./tools/release sbom      software bill of materials + license inventory
+#   ./tools/release inventory Chromium-track inputs for that inventory
+#   ./tools/release manifest  assemble an artifact manifest, then verify it
+#   ./tools/release verify    verify an existing manifest end to end
+#   ./tools/release schema    the committed manifest schema
+#   ./tools/release rollback  halt criteria, rollback package, rehearsal
+#   ./tools/release self-test every self-check this command owns
+#
+# Authority: docs/development/testing-and-delivery.md sections 9.5, 12, 13 and
+# 16; docs/development/release-and-incident-runbook.md for the procedure around
+# it. Requirements: PAR-SEC-002, PAR-SEC-004 and PAR-SEC-010 in
+# docs/product/browser-parity-matrix.md.
+#
+# It never signs anything, never uploads anything, never reads a credential and
+# never contacts a network service. It records what is true about an artifact
+# and refuses to record what it cannot check.
+#
+# Exit codes: 0 = the command succeeded, 1 = it found a problem, 2 = it could
+# not run.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/release.d/collect.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/release.d/rollback.sh"
+
+RELEASE_D="$TAFFY_ROOT/tools/release.d"
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/release <command> [options]
+
+Commands:
+  sbom      Generate the CycloneDX bill of materials and the license inventory
+            for every ecosystem this repository owns, and report the coverage
+            of the two the Chromium track fills in.
+  inventory Produce those two Chromium-track inputs from the upstream shipped-
+            only license traversal and the complete built product APK.
+  manifest  Assemble an artifact manifest from the repository's own facts, the
+            fragments the build and signing jobs wrote, and the files being
+            attested — then verify the result before writing it.
+  verify    Verify an existing manifest end to end: schema, agreement with this
+            checkout, every artifact digest, inventory coverage, signing
+            separation and provenance.
+  schema    Print the committed manifest schema, or its field table.
+  rollback  Halt criteria, the rollback package contents, and the rehearsal.
+  self-test Run every self-check this command owns; installs nothing.
+
+Options for `sbom`:
+  --out DIR                       write sbom.cdx.json and licenses.json here
+  --summary FILE                  also write the manifest fragment here
+  --product-version X             version recorded in the document metadata
+  --gradle-report FILE            resolved `./gradlew dependencies` output; the
+                                  version catalog alone is the declared set,
+                                  not the transitive closure
+  --chromium-inventory FILE       the Chromium track's third-party inventory
+  --android-native-inventory FILE the packaged native library inventory
+
+Options for `inventory`:
+  --out DIR                       write chromium-inventory.json and
+                                  android-native-inventory.json here
+  --profile NAME                  built Chromium profile (default release-arm64)
+  --chromium-src DIR              Chromium src checkout; defaults to the
+                                  workspace recorded by bootstrap
+  --apk FILE                      exact non-incremental product APK; defaults
+                                  to the path recorded by its build graph
+
+Options for `manifest`:
+  --out DIR                       directory to write manifest.json into
+  --kind development|drill|candidate  which evidence set is mandatory
+  --profile NAME                  committed GN args profile (chromium/args/)
+  --artifact KIND:PATH[:ABI]      a file to attest; repeatable
+  --fragment FILE                 facts observed by a job; repeatable, applied
+                                  in order, last one wins
+  --unsigned                      compose the committed unsigned-development
+                                  fragment: no signing job, no credential
+  --sbom                          generate the inventory into --out and attest it
+  --product-version X             passed through to the inventory
+  (plus the three inventory import options above)
+
+Options for `verify`:
+  <manifest>                      the file to verify
+  --profile KIND                  judge it against another profile
+  --artifacts-dir DIR             where the attested files are
+  --require-approvals             also require the five named approvals for a
+                                  development or drill manifest; candidate
+                                  verification always requires them
+  --json                          machine-readable findings
+
+Options for `rollback`:
+  --criteria                      print the halt criteria
+  --package DIR                   check a rollback package's contents
+  --rehearse                      run the rehearsal steps
+  --require-complete              a step this host cannot run fails the command
+
+Every command prints what it resolved before it acts, and every failure names
+the exact item and the next step.
+USAGE
+}
+
+# --- shared helpers ---------------------------------------------------------
+
+require_python() {
+  have python3 || die "python3 is required by ./tools/release" \
+    "It is already a prerequisite of the docs gate and of depot_tools." \
+    "This is unrelated to decision 0007's sandboxed Python utility service."
+}
+
+release_python() { # <module> [args...]
+  local module=$1; shift
+  ( cd "$TAFFY_ROOT" && python3 "$RELEASE_D/$module" "$@" )
+}
+
+# --- sbom -------------------------------------------------------------------
+
+cmd_sbom() {
+  local out='' summary='' product_version='0.0.0-development'
+  local gradle_report='' chromium_inventory='' native_inventory=''
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --out) out=${2:-}; shift ;;
+      --out=*) out=${1#*=} ;;
+      --summary) summary=${2:-}; shift ;;
+      --summary=*) summary=${1#*=} ;;
+      --product-version) product_version=${2:-}; shift ;;
+      --product-version=*) product_version=${1#*=} ;;
+      --gradle-report) gradle_report=${2:-}; shift ;;
+      --gradle-report=*) gradle_report=${1#*=} ;;
+      --chromium-inventory) chromium_inventory=${2:-}; shift ;;
+      --chromium-inventory=*) chromium_inventory=${1#*=} ;;
+      --android-native-inventory) native_inventory=${2:-}; shift ;;
+      --android-native-inventory=*) native_inventory=${1#*=} ;;
+      -h|--help) usage; exit 0 ;;
+      *) usage >&2; die "unknown option for sbom: $1" ;;
+    esac
+    shift
+  done
+  [ -n "$out" ] || { usage >&2; die "sbom: --out is required" \
+    "The inventory is an artifact; it needs somewhere to be written."; }
+  require_python
+
+  step "sbom: dependency and license inventory (PAR-SEC-010)"
+  mkdir -p "$out"
+  release_python sbom.py --root "$TAFFY_ROOT" --out "$out" \
+    --product-version "$product_version" \
+    ${summary:+--summary "$summary"} \
+    ${gradle_report:+--gradle-report "$gradle_report"} \
+    ${chromium_inventory:+--chromium-inventory "$chromium_inventory"} \
+    ${native_inventory:+--android-native-inventory "$native_inventory"}
+}
+
+# --- Chromium-track inventory ----------------------------------------------
+
+cmd_inventory() {
+  local out='' profile='release-arm64' src='' apk=''
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --out) out=${2:-}; shift ;;
+      --out=*) out=${1#*=} ;;
+      --profile) profile=${2:-}; shift ;;
+      --profile=*) profile=${1#*=} ;;
+      --chromium-src) src=${2:-}; shift ;;
+      --chromium-src=*) src=${1#*=} ;;
+      --apk) apk=${2:-}; shift ;;
+      --apk=*) apk=${1#*=} ;;
+      -h|--help) usage; exit 0 ;;
+      *) usage >&2; die "unknown option for inventory: $1" ;;
+    esac
+    shift
+  done
+  [ -n "$out" ] || { usage >&2; die "inventory: --out is required"; }
+  if [ -z "$src" ]; then
+    local workspace
+    workspace=$(taffy_state_get chromium_workspace "")
+    [ -n "$workspace" ] || die "inventory: no Chromium checkout was supplied or recorded" \
+      "Run ./tools/bootstrap --profile chromium --workspace <path>, or pass" \
+      "--chromium-src <path>/src."
+    src="$workspace/src"
+  fi
+  require_python
+  step "inventory: Chromium target and packaged native libraries (PAR-SEC-010)"
+  local args=(--chromium-src "$src" --profile "$profile" --out "$out")
+  args+=(--upstream-revision "$(taffy_chromium_pin commit)")
+  [ -z "$apk" ] || args+=(--apk "$apk")
+  release_python track_inventory.py "${args[@]}" || die \
+    "the Chromium-track inventory could not be produced" \
+    "Build the complete non-incremental product target in that profile, then" \
+    "run this command again. It never treats an incremental installer as the package."
+}
+
+# --- manifest ---------------------------------------------------------------
+
+cmd_manifest() {
+  local out='' kind='development' profile='dev-x64' unsigned=0 with_sbom=0
+  local product_version='0.0.0-development'
+  local gradle_report='' chromium_inventory='' native_inventory=''
+  local artifacts=() fragments=()
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --out) out=${2:-}; shift ;;
+      --out=*) out=${1#*=} ;;
+      --kind) kind=${2:-}; shift ;;
+      --kind=*) kind=${1#*=} ;;
+      --profile) profile=${2:-}; shift ;;
+      --profile=*) profile=${1#*=} ;;
+      --artifact) artifacts+=("${2:-}"); shift ;;
+      --artifact=*) artifacts+=("${1#*=}") ;;
+      --fragment) fragments+=("${2:-}"); shift ;;
+      --fragment=*) fragments+=("${1#*=}") ;;
+      --unsigned) unsigned=1 ;;
+      --sbom) with_sbom=1 ;;
+      --product-version) product_version=${2:-}; shift ;;
+      --product-version=*) product_version=${1#*=} ;;
+      --gradle-report) gradle_report=${2:-}; shift ;;
+      --gradle-report=*) gradle_report=${1#*=} ;;
+      --chromium-inventory) chromium_inventory=${2:-}; shift ;;
+      --chromium-inventory=*) chromium_inventory=${1#*=} ;;
+      --android-native-inventory) native_inventory=${2:-}; shift ;;
+      --android-native-inventory=*) native_inventory=${1#*=} ;;
+      -h|--help) usage; exit 0 ;;
+      *) usage >&2; die "unknown option for manifest: $1" ;;
+    esac
+    shift
+  done
+
+  [ -n "$out" ] || { usage >&2; die "manifest: --out is required"; }
+  case "$kind" in
+    development|drill|candidate) : ;;
+    *) die "unknown release kind: $kind" "Known kinds: development, drill, candidate" ;;
+  esac
+  if [ "$unsigned" = 1 ] && [ "$kind" != development ]; then
+    die "--unsigned is only valid for a development manifest" \
+      "The committed fragment records promotable:false and no release credential." \
+      "A drill or candidate needs facts from its own signing job."
+  fi
+  [ -f "$TAFFY_ROOT/chromium/args/$profile.gn" ] || die \
+    "unknown build profile: $profile" \
+    "A profile is a committed file in chromium/args/. Available here:" \
+    "$(find "$TAFFY_ROOT/chromium/args" -name '*.gn' -exec basename {} .gn \; | sort | tr '\n' ' ')" \
+    "GN args are never typed by hand (decision 0013)."
+  require_python
+
+  local work
+  work=$(mktemp -d "${TMPDIR:-/tmp}/taffy-release.XXXXXX")
+  # shellcheck disable=SC2064  # $work is expanded now on purpose
+  trap "rm -rf '$work'" EXIT
+  mkdir -p "$out"
+
+  step "manifest: resolved state"
+  note "kind             $kind"
+  note "build profile    $profile"
+  note "output           ${out#"$TAFFY_ROOT"/}"
+  note "artifacts        ${#artifacts[@]} attested file(s)"
+  note "fragments        ${#fragments[@]} job fragment(s)"
+
+  step "manifest: repository facts"
+  release_repository_fragment "$work/repository.json" "$profile" "$kind"
+  ok "revision, Chromium pin, patch queue, pins, lockfiles"
+
+  local compose=(--fragment "$work/repository.json")
+  if [ "$unsigned" = 1 ]; then
+    compose+=(--fragment "$RELEASE_D/fragments/unsigned-development.json")
+  fi
+
+  if [ "$with_sbom" = 1 ]; then
+    step "manifest: dependency inventory"
+    release_python sbom.py --root "$TAFFY_ROOT" --out "$out" \
+      --product-version "$product_version" --summary "$work/sbom.json" \
+      ${gradle_report:+--gradle-report "$gradle_report"} \
+      ${chromium_inventory:+--chromium-inventory "$chromium_inventory"} \
+      ${native_inventory:+--android-native-inventory "$native_inventory"}
+    compose+=(--fragment "$work/sbom.json")
+    artifacts+=("sbom:$out/sbom.cdx.json" "license-inventory:$out/licenses.json")
+  fi
+
+  if [ "${#artifacts[@]}" -gt 0 ]; then
+    step "manifest: hashing ${#artifacts[@]} artifact(s)"
+    local args=(--base "$out" --out "$work/artifacts.json")
+    local entry
+    for entry in "${artifacts[@]}"; do args+=(--artifact "$entry"); done
+    release_python artifact_fragment.py "${args[@]}" \
+      || die "an artifact could not be hashed" \
+           "The message above names the file. A manifest never lists a file it" \
+           "has not read."
+    compose+=(--fragment "$work/artifacts.json")
+    ok "digest and size recorded for each"
+  fi
+
+  local fragment
+  for fragment in ${fragments[@]+"${fragments[@]}"}; do
+    [ -f "$fragment" ] || die "no such fragment: $fragment" \
+      "The job that observed those facts must write it before the manifest is" \
+      "composed. See ./tools/release --help."
+    compose+=(--fragment "$fragment")
+  done
+
+  step "manifest: composing"
+  release_python assemble.py --out "$out/manifest.json" --report "${compose[@]}"
+
+  step "manifest: verifying what was just written"
+  cmd_verify "$out/manifest.json" --profile "$kind" --artifacts-dir "$out" \
+    || die "the manifest this command just wrote does not verify" \
+         "Every finding above names the job that owns the missing fact." \
+         "The manifest was written so it can be inspected; it is not evidence."
+  info ""
+  ok "manifest: ${out#"$TAFFY_ROOT"/}/manifest.json"
+}
+
+# --- verify -----------------------------------------------------------------
+
+cmd_verify() {
+  local manifest=''
+  local args=()
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --profile|--artifacts-dir) args+=("$1" "${2:-}"); shift ;;
+      --profile=*|--artifacts-dir=*) args+=("$1") ;;
+      --json) args+=(--json) ;;
+      --require-approvals) args+=(--require-approvals) ;;
+      -h|--help) usage; exit 0 ;;
+      -*) usage >&2; die "unknown option for verify: $1" ;;
+      *) [ -z "$manifest" ] || die "one manifest at a time"; manifest=$1 ;;
+    esac
+    shift
+  done
+  [ -n "$manifest" ] || { usage >&2; die "verify: name the manifest to verify"; }
+  require_python
+  release_python verify.py "$manifest" --root "$TAFFY_ROOT" ${args[@]+"${args[@]}"}
+}
+
+# --- schema -----------------------------------------------------------------
+
+cmd_schema() {
+  require_python
+  case "${1:-}" in
+    --fields) release_python manifest.py fields ;;
+    ''|--print) cat "$RELEASE_D/manifest-schema.json" ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage >&2; die "unknown option for schema: $1" ;;
+  esac
+}
+
+# --- rollback ---------------------------------------------------------------
+
+cmd_rollback() {
+  local package='' rehearse=0 criteria=0 require_complete=0
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --package) package=${2:-}; shift ;;
+      --package=*) package=${1#*=} ;;
+      --rehearse) rehearse=1 ;;
+      --criteria) criteria=1 ;;
+      --require-complete) require_complete=1 ;;
+      -h|--help) usage; exit 0 ;;
+      *) usage >&2; die "unknown option for rollback: $1" ;;
+    esac
+    shift
+  done
+  if [ "$criteria" = 0 ] && [ "$rehearse" = 0 ] && [ -z "$package" ]; then
+    criteria=1; rehearse=1; package="$TAFFY_ROOT/artifacts/rollback"
+  fi
+
+  if [ "$criteria" = 1 ]; then release_rollback_criteria; fi
+  if [ -n "$package" ]; then release_rollback_check_package "$package"; fi
+  if [ "$rehearse" = 1 ]; then
+    release_rollback_rehearse "${package:-$TAFFY_ROOT/artifacts/rollback}"
+  fi
+
+  info ""
+  if [ "$TAFFY_ROLLBACK_FAIL" -gt 0 ]; then
+    die "$TAFFY_ROLLBACK_FAIL rollback check(s) failed, $TAFFY_ROLLBACK_BLOCKED blocked" \
+      "Each failure above names what is missing. A rollback package assembled" \
+      "during an incident is a rollback that does not happen."
+  fi
+  if [ "$TAFFY_ROLLBACK_BLOCKED" -gt 0 ] && [ "$require_complete" = 1 ]; then
+    die "$TAFFY_ROLLBACK_BLOCKED rehearsal step(s) could not run on this host" \
+      "--require-complete was given, so a blocked step is a failure. Run the" \
+      "rehearsal where the named environment exists; the M8 launch-readiness" \
+      "exit review requires all eight (PAR-SEC-005, OD-062)."
+  fi
+  ok "rollback checks passed — $TAFFY_ROLLBACK_BLOCKED step(s) need an environment this host does not have"
+}
+
+# --- self-test --------------------------------------------------------------
+
+cmd_self_test() {
+  require_python
+  local failed=0 module
+  step "release: python modules compile"
+  for module in "$RELEASE_D"/*.py; do
+    python3 -m py_compile "$module" 2>/dev/null || { bad "syntax: ${module#"$TAFFY_ROOT"/}"; failed=1; }
+  done
+  rm -rf "$RELEASE_D/__pycache__"
+  [ "$failed" -eq 0 ] && ok "$(find "$RELEASE_D" -name '*.py' | wc -l | tr -d ' ') module(s)"
+
+  step "release: the manifest schema and its fixtures"
+  release_python manifest.py self-test || failed=1
+
+  step "release: fragment composition"
+  release_python assemble.py --self-test || failed=1
+
+  step "release: promotion policy"
+  release_python promotion_policy_selftest.py || failed=1
+
+  step "release: artifact verification"
+  release_python verify_artifacts.py --self-test || failed=1
+
+  step "release: the dependency inventory"
+  release_python sbom.py --root "$TAFFY_ROOT" --self-test || failed=1
+
+  step "release: Chromium-track inventory producers"
+  release_python track_inventory.py --self-test || failed=1
+
+  info ""
+  [ "$failed" -eq 0 ] || die "release self-test failed" \
+    "Fix the failing case above; these are the checks that keep the manifest" \
+    "schema and the inventory honest."
+  ok "release self-test passed"
+}
+
+# --- dispatch ---------------------------------------------------------------
+
+COMMAND=${1:-}
+[ $# -gt 0 ] && shift
+case "$COMMAND" in
+  sbom) cmd_sbom "$@" ;;
+  inventory) cmd_inventory "$@" ;;
+  manifest) cmd_manifest "$@" ;;
+  verify) cmd_verify "$@" ;;
+  schema) cmd_schema "$@" ;;
+  rollback) cmd_rollback "$@" ;;
+  self-test) cmd_self_test "$@" ;;
+  -h|--help|'') usage; exit 0 ;;
+  *) usage >&2; die "unknown command: $COMMAND" ;;
+esac

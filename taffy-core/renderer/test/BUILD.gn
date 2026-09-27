@@ -1,0 +1,58 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The renderer tests that need a renderer.
+#
+# The split from //taffy/renderer:unit_tests is deliberate and is
+# about cost, not tidiness. Node identity, redaction classification,
+# capability honesty, action decoding and delta drop order are provable
+# without a document, and those tests must never be skipped for being slow.
+# What is here can only be proved against a parsed document: the composed
+# tree, layout geometry, a live selection, and the accessibility tree.
+#
+# The fixture corpus is a data dependency rather than a copy. The corpus is
+# versioned and immutable, and a test with its expectations retyped into it
+# would keep passing after the corpus rotated - which is precisely when a leak
+# would be introduced.
+
+source_set("tests") {
+  testonly = true
+
+  sources = [
+    "adapter_budget_render_view_test.cc",
+    "adapter_render_view_test.cc",
+    "challenge_adapter_render_view_test.cc",
+    "endpoint_test_harness.cc",
+    "endpoint_test_harness.h",
+    "fixture_corpus.cc",
+    "fixture_corpus.h",
+    "form_action_select_render_view_test.cc",
+    "form_adapter_render_view_test.cc",
+    "form_identity_render_view_test.cc",
+    "redaction_canary_render_view_test.cc",
+  ]
+
+  deps = [
+    "//base",
+    "//content/public/renderer",
+    "//content/test:test_support",
+    "//taffy/contracts/bip/mojom",
+    "//taffy/renderer",
+    "//taffy/test:corpus",
+    "//testing/gtest",
+    "//third_party/blink/public:blink_headers",
+  ]
+
+  # The corpus must be present at
+  # //taffy/test/data/web/manifest.json when these run. The overlay
+  # tooling mounts taffy-core at src/taffy;
+  # test-fixtures/web needs the same treatment. Until it does, every test here
+  # fails at FixtureCorpus::Load() with the expected path in the message -
+  # which is the correct behaviour. A leak test that skipped because it could
+  # not find the secrets it was supposed to look for would produce the
+  # evidence without the assurance.
+  data = [ "//taffy/test/data/web/" ]
+}

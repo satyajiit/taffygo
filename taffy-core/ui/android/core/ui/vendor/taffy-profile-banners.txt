@@ -1,0 +1,113 @@
+Taffy profile banners
+=====================
+
+Owner:            Matterward Labs Private Limited / TaffyGo. OpenAlly is the
+                  same owner's platform, so these are first-party bytes served
+                  from a first-party host, not a third party's artwork.
+Licence:          Reserved media, not licensed with the code; see TRADEMARKS.md.
+Origin:           https://cdn.openally.ai/app-assets/v1/features/settings/profile/banners/{id}.webp
+Ids:              a1–a10, b1–b10, c1–c10, plus fallback.webp (byte-identical to a1).
+Fetched:          2026-08-29
+
+These are identity tiles the person picks, not Taffy. Persist the id, never a URL.
+Do not put a Grok (or any generator) mark on derivatives.
+
+The origin above is where the bytes were fetched from, and it is the reason
+this record used to read as though they were someone else's: a URL at another
+product's domain looks like a third-party import whichever way it is written.
+It is not one. TaffyGo operates no server (decision 0200) and will not rehost
+these anywhere — the committed WebP is the only copy the product reads, and the
+checksums below are the reviewable link to it.
+
+sha256_a1_webp=09adab761768c1613ca0bb261472675d34793678ab1c4e3b5db1923ea232d9fb
+bytes_a1_webp=10522
+
+sha256_a10_webp=7bba4bdb09047a9151b13d8de637262af959c348060fd3de0c5b4e067debc268
+bytes_a10_webp=8204
+
+sha256_a2_webp=3fbc527a830b243f523c16cda6ecb1b1c72bd44c511763b2a42f7ef40853b2da
+bytes_a2_webp=9112
+
+sha256_a3_webp=91ce9779756b0d896b2b8a62821579fd0f62e4be9f0440220ba180b40c2f8b9d
+bytes_a3_webp=10086
+
+sha256_a4_webp=9774557f03e7d688f5e98d172d4522aeea5c5113ae1b5005f088272215ab6b6b
+bytes_a4_webp=10162
+
+sha256_a5_webp=176634333a37b5c19140528456875d36876447af373a2909c976356b23f198b8
+bytes_a5_webp=10314
+
+sha256_a6_webp=46dcb0a44dfae8e57b6586af94054496ae3ca0ea7f9c7ca9de11aa9dcea894c1
+bytes_a6_webp=10116
+
+sha256_a7_webp=5abbb1d8d89e7030cc74bd79d78c9af30f64499300b74af0bee97e3adf979066
+bytes_a7_webp=11776
+
+sha256_a8_webp=03e4e2ce0a705e383092ca99841703ab3a4463ee60e56b61b15b0197a598de7f
+bytes_a8_webp=10490
+
+sha256_a9_webp=650d73c17c1409fe4b15fcf3e633b46554398b9944e5241b90009a05d54958d8
+bytes_a9_webp=9316
+
+sha256_b1_webp=dfcb8ba9b864144172b23641b750b8621394ee6352c680126d04221f81dbdfe3
+bytes_b1_webp=9538
+
+sha256_b10_webp=989832546e8b549123eeffbe59ae652e2554925e0d3f1b7eabefb5988d6d7f56
+bytes_b10_webp=11168
+
+sha256_b2_webp=f7b00ff0d60f50646521178c70e071dc1dd6aa60cf9945963582a6af0c652c3e
+bytes_b2_webp=8606
+
+sha256_b3_webp=23639f410b09a20378599071974848a6ea48cbb6573073a1811c18c1c31b13c6
+bytes_b3_webp=8962
+
+sha256_b4_webp=d7a8cade043b033b1cebed5aa7ee6cd3cef6db9cec6bd0fa7a014a6735fa83c0
+bytes_b4_webp=9422
+
+sha256_b5_webp=2b47a33b893b15c71574ddfc56a069a4a1772897fd1a2672e33b41d7bcbaca84
+bytes_b5_webp=9054
+
+sha256_b6_webp=a2231b24d4fe2027c1287509ce6818f3aa914dce35f41f29c2482728be192528
+bytes_b6_webp=9844
+
+sha256_b7_webp=e8a97bd60e5df523309dc9ae0d4b0890e1c7cd43a45e6002f828c2ba2efe60bf
+bytes_b7_webp=9782
+
+sha256_b8_webp=df070645a3bb6ac9947419c38755aad2f530060a0b5715917037072093898bb6
+bytes_b8_webp=8184
+
+sha256_b9_webp=d77f6f23ecff38c954a8cfde4600520363edfe3c96108ff5658c8b877fe4be85
+bytes_b9_webp=9452
+
+sha256_c1_webp=b35087e1a116fa389756cfee291bd03ff88ce54fac7284d114e0804fcd035214
+bytes_c1_webp=9342
+
+sha256_c10_webp=2ee837fbe18be3e8703ee120b68bb7763254b399cecd6bf6869c071e6533c645
+bytes_c10_webp=8904
+
+sha256_c2_webp=5346f77c38a5df3fd54717669652d04715d54e2eb5f68b4b35de44cb640c0e25
+bytes_c2_webp=8488
+
+sha256_c3_webp=89dd6a15dc607fe1af8a3818ce35b78e2912d7b39427735889a6610d863f20a3
+bytes_c3_webp=9382
+
+sha256_c4_webp=c25ed71ffd1b049abda6869f84bf78a1325ea50080924d95ddabe484c59223db
+bytes_c4_webp=10214
+
+sha256_c5_webp=a4c1966d77aef676ac05c0968ba59994fa6fb365e50eb407119a1b5b3e72039b
+bytes_c5_webp=8182
+
+sha256_c6_webp=690bd03db0e1ddba50f4b9ff2501e403cbfd6aa13d99c5b1dcb25e9ea4956973
+bytes_c6_webp=9178
+
+sha256_c7_webp=dfc9819b7443a505c8192cf3e6b5dabb468c3027ebf9a66a1627ebe48fc25a9f
+bytes_c7_webp=9098
+
+sha256_c8_webp=446a1170fcfb6900dfa57d2931c95d3a05b4e1af4fa04651a73bcc80e20c17dd
+bytes_c8_webp=8790
+
+sha256_c9_webp=97c3a04bba04af078291212993efba03dda90af1e9a6482cdd7c1727f5596bcf
+bytes_c9_webp=8344
+
+sha256_fallback_webp=09adab761768c1613ca0bb261472675d34793678ab1c4e3b5db1923ea232d9fb
+bytes_fallback_webp=10522

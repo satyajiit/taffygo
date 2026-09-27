@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Machine-translated (hi), pending native review. -->
+<resources>
+    <!-- Screen SCR-304 -->
+    <string name="taffy_workspace_list_title">वर्कस्पेस</string>
+    <string name="taffy_workspace_list_search">लक्ष्य और स्रोत खोजें</string>
+    <string name="taffy_workspace_list_profile">%1$s में</string>
+    <string name="taffy_workspace_list_create">नया वर्कस्पेस</string>
+    <string name="taffy_workspace_list_supporting">%1$s · %2$s · %3$s</string>
+    <string name="taffy_workspace_list_loading">वर्कस्पेस लोड हो रहे हैं</string>
+    <string name="taffy_workspace_unavailable_title">वर्कस्पेस अभी उपलब्ध नहीं हैं</string>
+    <string name="taffy_workspace_unavailable_body">आपकी सेव की गई रिसर्च सुरक्षित है। Taffy पूरी सूची लोड कर पाएगा तो यह फिर दिखाई देगी।</string>
+    <plurals name="taffy_workspace_list_sources">
+        <item quantity="one">%1$d स्रोत</item>
+        <item quantity="other">%1$d स्रोत</item>
+    </plurals>
+    <plurals name="taffy_workspace_list_conflicts">
+        <item quantity="one">%1$d मतभेद</item>
+        <item quantity="other">%1$d मतभेद</item>
+    </plurals>
+    <string name="taffy_workspace_list_description">%1$s, %2$s, %3$s</string>
+    <string name="taffy_workspace_list_empty_title">अभी कोई वर्कस्पेस नहीं</string>
+    <string name="taffy_workspace_list_empty_body">Taffy आपके लिए जो रिसर्च करता है वह यहाँ रखी जाती है, उसी स्थिति के साथ जहाँ तक वह सच में पहुँची।</string>
+    <string name="taffy_workspace_list_no_matches_title">कुछ भी मेल नहीं खाया</string>
+    <string name="taffy_workspace_list_no_matches_body">किसी भी वर्कस्पेस के लक्ष्य या स्रोतों में ऐसा कुछ नहीं है।</string>
+    <string name="taffy_workspace_pane_empty_title">एक वर्कस्पेस चुनें</string>
+    <string name="taffy_workspace_pane_empty_body">सूची से एक वर्कस्पेस चुनें। उसका आउटपुट और स्रोत यहाँ खुलते हैं।</string>
+
+    <!-- Screen SCR-305 -->
+    <string name="taffy_workspace_detail_loading">यह वर्कस्पेस लोड हो रहा है</string>
+    <string name="taffy_workspace_detail_missing_title">वह वर्कस्पेस अब नहीं है</string>
+    <string name="taffy_workspace_detail_missing_body">इसे हटा दिया गया है या यह अब इस डिवाइस पर उपलब्ध नहीं है।</string>
+    <plurals name="taffy_workspace_detail_conflicts">
+        <item quantity="one">%1$d तथ्य जिस पर आपके स्रोत सहमत नहीं हैं</item>
+        <item quantity="other">%1$d तथ्य जिन पर आपके स्रोत सहमत नहीं हैं</item>
+    </plurals>
+    <plurals name="taffy_workspace_detail_needs_sources">
+        <item quantity="one">%1$d सेल को नए स्रोत की ज़रूरत है</item>
+        <item quantity="other">%1$d सेल को नए स्रोत की ज़रूरत है</item>
+    </plurals>
+    <string name="taffy_workspace_detail_export">एक्सपोर्ट करें</string>
+    <string name="taffy_workspace_rename_action">नाम बदलें</string>
+    <string name="taffy_workspace_delete_action">वर्कस्पेस हटाएँ</string>
+    <string name="taffy_workspace_rename_title">वर्कस्पेस का नाम बदलें</string>
+    <string name="taffy_workspace_rename_label">वर्कस्पेस का नाम</string>
+    <string name="taffy_workspace_rename_confirm">नाम सहेजें</string>
+    <string name="taffy_workspace_delete_title">यह वर्कस्पेस हटाएँ?</string>
+    <string name="taffy_workspace_delete_body">यह वर्कस्पेस और इसकी सहेजी हुई जानकारी हटाएँ? इस डिवाइस से हटने वाले रिकॉर्ड — स्रोत: %1$d; तथ्य: %2$d; एक्सपोर्ट: %3$d; सहायक इंडेक्स: %4$d। आपकी सहेजी हुई एक्सपोर्ट फ़ाइलें नहीं हटेंगी।</string>
+    <string name="taffy_workspace_delete_confirm">वर्कस्पेस हटाएँ</string>
+    <string name="taffy_workspace_lifecycle_cancel">रद्द करें</string>
+    <string name="taffy_workspace_detail_output">आउटपुट</string>
+    <string name="taffy_workspace_detail_fact_description">%1$s %2$s है, %3$s</string>
+    <string name="taffy_workspace_detail_source_chip">स्रोत: %1$s</string>
+    <string name="taffy_workspace_detail_sources">स्रोत</string>
+    <plurals name="taffy_workspace_detail_source_facts">
+        <item quantity="one">%1$d तथ्य</item>
+        <item quantity="other">%1$d तथ्य</item>
+    </plurals>
+    <string name="taffy_workspace_detail_source_excluded">बाहर किया गया — इसके तथ्य हटा दिए गए</string>
+    <string name="taffy_workspace_detail_source_description">%1$s, %2$s</string>
+    <string name="taffy_workspace_detail_exclude">बाहर करें</string>
+
+    <!-- Fact kinds -->
+
+    <!-- Screen SCR-306 -->
+    <string name="taffy_source_viewer_loading">यह पेज लोड हो रहा है</string>
+    <string name="taffy_source_viewer_missing_title">वह स्रोत अब नहीं है</string>
+    <string name="taffy_source_viewer_missing_body">वर्कस्पेस अब उसे सूचीबद्ध नहीं करता।</string>
+    <string name="taffy_source_viewer_host">पेज</string>
+    <string name="taffy_source_viewer_read">पढ़ा गया</string>
+    <string name="taffy_source_viewer_facts">इस पेज के तथ्य</string>
+    <string name="taffy_source_viewer_method">इसे कैसे पढ़ा गया</string>
+    <string name="taffy_source_viewer_method_value">पेज की संरचना और एक्सेसिबिलिटी ट्री</string>
+    <string name="taffy_source_viewer_in_scope">दायरे में</string>
+    <string name="taffy_source_viewer_included">हाँ</string>
+    <string name="taffy_source_viewer_excluded">नहीं, आपने इसे बाहर किया</string>
+    <string name="taffy_source_viewer_open_live">लाइव पेज खोलें</string>
+
+    <!-- Screen SCR-307 -->
+    <string name="taffy_fact_correction_title">इसे ठीक करें</string>
+    <string name="taffy_fact_correction_loading">यह तथ्य लोड हो रहा है</string>
+    <string name="taffy_fact_correction_missing_title">वह तथ्य अब नहीं है</string>
+    <string name="taffy_fact_correction_missing_body">वर्कस्पेस के पास अब वह नहीं है।</string>
+    <string name="taffy_fact_correction_field">फ़ील्ड</string>
+    <string name="taffy_fact_correction_page_value">पेज ने क्या कहा</string>
+    <string name="taffy_fact_correction_your_value">आप क्या कहते हैं</string>
+    <string name="taffy_fact_correction_notice">आपका मान पेज के मान के बगल में दर्ज होता है, उसके ऊपर कभी नहीं। %1$s</string>
+    <plurals name="taffy_fact_correction_downstream">
+        <item quantity="one">%1$d अन्य सेल उन्हीं स्रोतों पर टिका है और फिर से निकाला जाएगा।</item>
+        <item quantity="other">%1$d अन्य सेल उन्हीं स्रोतों पर टिके हैं और फिर से निकाले जाएँगे।</item>
+    </plurals>
+    <string name="taffy_fact_correction_save">सहेजें</string>
+    <string name="taffy_fact_correction_cancel">रद्द करें</string>
+
+    <!-- Screen SCR-309 -->
+    <string name="taffy_export_title">एक्सपोर्ट</string>
+    <string name="taffy_export_loading">एक्सपोर्ट लोड हो रहा है</string>
+    <string name="taffy_export_missing_title">एक्सपोर्ट करने के लिए कुछ नहीं</string>
+    <string name="taffy_export_missing_body">वह वर्कस्पेस अब नहीं है।</string>
+    <string name="taffy_export_format_markdown">Markdown</string>
+    <string name="taffy_export_format_comma_separated">कॉमा से अलग किया हुआ</string>
+    <string name="taffy_export_destination">फ़ाइल कहाँ सहेजनी है, चुनें। कुछ भी अपलोड नहीं होता।</string>
+    <string name="taffy_export_preview">क्या लिखा जाएगा</string>
+    <string name="taffy_export_action">%1$s के रूप में एक्सपोर्ट करें</string>
+    <string name="taffy_export_choosing_destination">फ़ाइल कहाँ सहेजनी है, चुनें</string>
+    <string name="taffy_export_writing">फ़ाइल सहेजी जा रही है…</string>
+    <string name="taffy_export_succeeded">फ़ाइल सहेज दी गई</string>
+    <string name="taffy_export_failed">फ़ाइल सहेजी नहीं जा सकी। फ़िर कोशिश करें।</string>
+    <string name="taffy_export_cancelled">एक्सपोर्ट रद्द हो गया</string>
+</resources>

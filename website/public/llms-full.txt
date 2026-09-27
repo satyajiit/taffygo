@@ -1,0 +1,43 @@
+# TaffyGo
+
+> TaffyGo is a free, open-source Chromium browser for Android that blocks ads and trackers. Its built-in assistant, Taffy, works with the AI provider you connect. There is no account, and Matterward Labs runs no server for it.
+
+This file describes every page on taffygo.com and the app itself. The site and the app are published by Matterward Labs Private Limited.
+
+## Home: https://taffygo.com/
+
+What the app does, shown on screens captured from an Android phone: ad and tracker blocking with a switch for each site, Taffy answering from the page you are on with its sources, errands across a few sites, connecting your own AI provider, and what stays on the phone.
+
+## Hand Taffy an errand: https://taffygo.com/product/
+
+One errand in three screens. You type the request and attach the pages Taffy may read; Taffy works in its own tabs while Take over, Pause and Stop stay in reach; the result puts the answer first, then what each page said, with its source.
+
+## Built for phones: https://taffygo.com/built-for-phones/
+
+Back, forward, Ask Taffy and your tabs sit in one row at the bottom of every page. Tabs Taffy opens are grouped apart from yours. The app follows the phone's light or dark setting unless you choose one under Settings, Appearance. It runs on Android 10 or later, on a 64-bit ARM processor.
+
+## Contact: https://taffygo.com/contact/
+
+Bugs go to GitHub Issues, questions to GitHub Discussions, and security problems to GitHub's private vulnerability reporting. There is no support inbox and no form.
+
+## Privacy policy: https://taffygo.com/privacy/
+
+History, bookmarks, tabs, saved sign-ins, workspaces and AI provider keys stay on the phone. Pages load from their own sites. When you ask Taffy something, the text it needs and your request go straight from the phone to the provider you connected. Nothing goes to Matterward Labs, which collects nothing. The app is left out of Android's own backups; a backup is an encrypted file you make yourself.
+
+## Delete your data: https://taffygo.com/delete-my-data/
+
+There is nothing on our side to delete. In the app, Settings, Privacy, Delete everything erases what TaffyGo keeps. Clearing the app's storage in Android or uninstalling it does the same.
+
+## Terms of use: https://taffygo.com/terms/
+
+The source is under the Mozilla Public License 2.0 and comes without warranty. The AI provider you connect and the sites you visit have their own terms. The TaffyGo name, logo and the Taffy character are not covered by the licence.
+
+## Open-source licences: https://taffygo.com/licenses/
+
+The app's notices are inside the app, under Settings, About and help, Licences. The website's notices are linked from the page.
+
+## Get it
+
+Google Play: https://play.google.com/store/apps/details?id=com.taffygo.browser
+APK: https://github.com/satyajiit/taffygo/releases/latest
+Source: https://github.com/satyajiit/taffygo

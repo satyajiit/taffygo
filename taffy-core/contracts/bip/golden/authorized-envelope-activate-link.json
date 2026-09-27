@@ -1,0 +1,119 @@
+{
+  "schema_version": "0.1",
+  "dispatch_id": "disp_01",
+  "action_id": "act_01",
+  "action_digest": {
+    "algorithm": "SHA_256",
+    "value": "0d40f9a9b327e97f232aa63284c61aec61a44ebfc0b8bf2a743b4f106a020e55"
+  },
+  "capability_reference": "cap_01",
+  "approval_receipt_reference": "appr_01",
+  "action_type": "ACTIVATE",
+  "target_handle": {
+    "tab_id": "tab_01",
+    "frame_id": "frame_main",
+    "page_epoch": "epoch_a1",
+    "graph_revision": 3,
+    "node_id": "n_link",
+    "expected_origin": {
+      "kind": "TUPLE",
+      "serialization": "https://docs.example.test"
+    }
+  },
+  "required_graph_revision": 3,
+  "preconditions": [
+    {
+      "kind": "EXACT_PAGE_EPOCH",
+      "page_epoch": "epoch_a1"
+    },
+    {
+      "kind": "ACCEPTABLE_GRAPH_REVISION",
+      "min_graph_revision": 3
+    },
+    {
+      "kind": "DOCUMENT_ACTIVE"
+    },
+    {
+      "kind": "EXACT_ORIGIN",
+      "origin": {
+        "kind": "TUPLE",
+        "serialization": "https://docs.example.test"
+      }
+    },
+    {
+      "kind": "NODE_EXISTS"
+    },
+    {
+      "kind": "NODE_ROLE_UNCHANGED",
+      "expected_role": "LINK"
+    },
+    {
+      "kind": "NODE_ACTION_AVAILABLE",
+      "expected_action_type": "ACTIVATE"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "VISIBLE"
+    },
+    {
+      "kind": "NODE_STATE_ABSENT",
+      "node_state": "OBSCURED"
+    },
+    {
+      "kind": "EXPECTED_DESTINATION",
+      "expected_destination": {
+        "url_metadata": {
+          "origin": {
+            "kind": "TUPLE",
+            "serialization": "https://docs.example.test"
+          },
+          "disclosure": "ORIGIN_AND_PATH",
+          "has_query": false,
+          "has_fragment": false,
+          "path": "/deletion-request"
+        },
+        "is_cross_origin": false,
+        "opens_new_tab": false,
+        "is_download": false
+      }
+    },
+    {
+      "kind": "NOT_SENSITIVE_FIELD",
+      "max_sensitivity": "NOT_SENSITIVE"
+    },
+    {
+      "kind": "NO_USER_INTERACTION_SINCE_LEASE"
+    },
+    {
+      "kind": "BUDGET_REMAINING"
+    }
+  ],
+  "expected_postconditions": [
+    {
+      "kind": "COMMITTED_NAVIGATION",
+      "expected_destination": {
+        "url_metadata": {
+          "origin": {
+            "kind": "TUPLE",
+            "serialization": "https://docs.example.test"
+          },
+          "disclosure": "ORIGIN_AND_PATH",
+          "has_query": false,
+          "has_fragment": false,
+          "path": "/deletion-request"
+        },
+        "is_cross_origin": false,
+        "opens_new_tab": false,
+        "is_download": false
+      },
+      "allowed_origins": [
+        {
+          "kind": "TUPLE",
+          "serialization": "https://docs.example.test"
+        }
+      ],
+      "timeout_ms": 8000
+    }
+  ],
+  "absolute_deadline_monotonic_ms": 12000
+}

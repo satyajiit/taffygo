@@ -1,0 +1,48 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="popup-opener">
+<title>Popup opener</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Popup opener</h1>
+  <p class="who">Opens a second tab on the partner origin. The new tab is a
+  separate navigable with its own epoch.</p>
+</header>
+
+<p>
+  <button type="button" id="open-partner">Open the partner popup</button>
+  <button type="button" id="open-unactivated">Open without user activation (after 1 second)</button>
+</p>
+<p>
+  <a id="target-blank-link" target="_blank" rel="noopener"
+     data-taffy-origin="partner" data-taffy-path="/popup/popup.html">Open the partner popup in a new tab</a>
+</p>
+
+<p class="note" id="opener-log">No popup opened yet.</p>
+
+<script>
+  (function () {
+    "use strict";
+    function popupUrl() {
+      return window.taffyFixture.url("partner", "/popup/popup.html");
+    }
+    function log(text) {
+      document.getElementById("opener-log").textContent = text;
+    }
+    document.getElementById("open-partner").addEventListener("click", function () {
+      var handle = window.open(popupUrl(), "taffy-fixture-popup", "noopener");
+      log(handle ? "Popup requested with user activation." : "Popup request was blocked.");
+    });
+    document.getElementById("open-unactivated").addEventListener("click", function () {
+      log("A popup will be requested in one second, without user activation.");
+      setTimeout(function () {
+        var handle = window.open(popupUrl(), "taffy-fixture-popup-delayed", "noopener");
+        log(handle ? "Delayed popup opened." : "Delayed popup was blocked, as a popup blocker should.");
+      }, 1000);
+    });
+  })();
+</script>

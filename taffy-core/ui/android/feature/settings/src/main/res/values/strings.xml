@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Every string the settings surfaces show. -->
+<resources>
+    <!-- Screen SCR-401 -->
+    <string name="taffy_settings_title">Settings</string>
+    <string name="taffy_settings_search">Search settings</string>
+    <string name="taffy_settings_search_close">Close search</string>
+    <string name="taffy_settings_no_matches_title">Nothing matched</string>
+    <string name="taffy_settings_no_matches_body">No setting here matches that search.</string>
+    <string name="taffy_settings_section_description">%1$s. %2$s</string>
+    <string name="taffy_settings_ai_title">AI and providers</string>
+    <string name="taffy_settings_ai_summary">Model access and provider keys</string>
+    <string name="taffy_settings_blocking_title">Ads and trackers</string>
+    <string name="taffy_settings_blocking_summary">On for every site, minus the ones you allow</string>
+    <plurals name="taffy_settings_blocking_summary_week">
+        <item quantity="one">%1$d blocked this week</item>
+        <item quantity="other">%1$d blocked this week</item>
+    </plurals>
+    <string name="taffy_settings_notifications_title">Notifications</string>
+    <string name="taffy_settings_notifications_summary">Task progress and downloads</string>
+    <string name="taffy_settings_appearance_title">Appearance</string>
+    <string name="taffy_settings_appearance_summary">Theme, language and text size</string>
+    <string name="taffy_settings_pane_empty_title">Choose a section</string>
+    <string name="taffy_settings_pane_empty_body">Pick something from the list. It opens here.</string>
+    <string name="taffy_settings_you_opens">%1$s. Opens You.</string>
+    <string name="taffy_settings_you_search">You profile name picture password</string>
+    <string name="taffy_settings_memory_search">Memory remember note</string>
+    <string name="taffy_settings_saved_sign_ins_search">password passwords passkey</string>
+    <string name="taffy_settings_saved_details_search">saved details name address email</string>
+    <string name="taffy_settings_skills_search">skill skills abilities</string>
+    <string name="taffy_settings_taffy_search">Taffy Personality skills</string>
+    <string name="taffy_settings_library_search">Library keep this</string>
+    <string name="taffy_settings_time_on_sites_search">time on sites time this week</string>
+    <string name="taffy_settings_what_happened_search">What happened Taffy did</string>
+    <string name="taffy_settings_blocking_search">ads trackers blocking</string>
+    <string name="taffy_settings_ai_search">AI providers your keys key</string>
+    <string name="taffy_settings_personality_search">Personality how Taffy talks</string>
+    <string name="taffy_settings_backup_search">backup restore recovery key encrypted file</string>
+
+    <!-- Screen SCR-206 -->
+    <string name="taffy_filtering_title">Ads and trackers</string>
+    <string name="taffy_filtering_hero_eyebrow">Built into this browser</string>
+    <string name="taffy_filtering_hero_on">Ads and trackers are on</string>
+    <string name="taffy_filtering_hero_off">Ads and trackers are off</string>
+    <string name="taffy_filtering_hero_body">Pages usually load faster. Sites have less to follow you with.</string>
+    <string name="taffy_filtering_master_toggle">Block ads and trackers</string>
+    <string name="taffy_filtering_master_summary">Applies to every site, minus the ones you allow.</string>
+    <string name="taffy_filtering_master_summary_off">Off for every site.</string>
+    <string name="taffy_filtering_counts_eyebrow">Counts</string>
+    <string name="taffy_filtering_week_heading">This week</string>
+    <string name="taffy_filtering_sites_heading">At least this many sites</string>
+    <string name="taffy_filtering_week_unknown">Not counted</string>
+    <string name="taffy_filtering_week_unavailable">This week is not counted yet. Lifetime blocked requests are still shown.</string>
+    <plurals name="taffy_filtering_lifetime_caption">
+        <item quantity="one">%1$d blocked in all</item>
+        <item quantity="other">%1$d blocked in all</item>
+    </plurals>
+    <string name="taffy_filtering_why_eyebrow">Why</string>
+    <string name="taffy_filtering_why_heading">Why this is on</string>
+    <string name="taffy_filtering_why_body">Pages usually load faster. Sites have less to follow you with.</string>
+    <string name="taffy_filtering_exceptions_eyebrow">Allowed</string>
+    <string name="taffy_filtering_exceptions">Sites you allowed</string>
+    <string name="taffy_filtering_no_exceptions">No exceptions. Ads and trackers are on for every site.</string>
+    <string name="taffy_filtering_no_exceptions_off">No exceptions. Ads and trackers are off for every site.</string>
+    <string name="taffy_filtering_exceptions_off">Blocking is off for every site, so these can\'t be changed. Turn blocking on to block one of them again.</string>
+    <string name="taffy_filtering_no_exceptions_how">A site is added here from Ads and trackers in the page\'s menu.</string>
+    <plurals name="taffy_filtering_exceptions_count">
+        <item quantity="one">%1$d site allowed</item>
+        <item quantity="other">%1$d sites allowed</item>
+    </plurals>
+    <string name="taffy_filtering_remove_failed">%1$s couldn\'t be blocked again. It is still allowed.</string>
+    <string name="taffy_filtering_removing">Blocking %1$s again…</string>
+    <string name="taffy_filtering_remove">Block again</string>
+    <string name="taffy_filtering_remove_exception">Turn ads and trackers back on for %1$s</string>
+    <string name="taffy_filtering_remove_exception_off">Ads and trackers are allowed on %1$s. Blocking is off for every site, so this can\'t be changed.</string>
+
+    <!-- Screen SCR-406 -->
+    <string name="taffy_notifications_title">Notifications</string>
+    <string name="taffy_notifications_topics_heading">Topics</string>
+    <string name="taffy_notifications_task_progress">Task progress</string>
+    <string name="taffy_notifications_task_progress_summary">One ongoing notification with pause and stop.</string>
+    <string name="taffy_notifications_downloads">Downloads</string>
+    <string name="taffy_notifications_downloads_summary">Progress and completion.</string>
+    <string name="taffy_notifications_permission_first_request">Turn on a topic to let Android ask whether TaffyGo may show notifications.</string>
+    <string name="taffy_notifications_permission_requesting">Waiting for Android to record your notification choice…</string>
+    <string name="taffy_notifications_permission_rationale">Android did not allow notifications. Turn on a topic again if you want to ask once more.</string>
+    <string name="taffy_notifications_permission_blocked">Android is blocking notifications for TaffyGo. You can change this in system settings.</string>
+    <string name="taffy_notifications_permission_unavailable">Android could not open notification permission. Notification topics stay off.</string>
+    <string name="taffy_notifications_open_settings">Open system settings</string>
+    <string name="taffy_notifications_absent">Monitoring alerts are not here yet. They are left out rather than shown switched off.</string>
+
+    <!-- Screen SCR-407 -->
+    <string name="taffy_appearance_title">Appearance</string>
+    <string name="taffy_appearance_tab_theme">Theme</string>
+    <string name="taffy_appearance_tab_language">Language</string>
+    <string name="taffy_appearance_theme">Theme</string>
+    <string name="taffy_appearance_theme_system">System</string>
+    <string name="taffy_appearance_theme_light">Light</string>
+    <string name="taffy_appearance_theme_dark">Dark</string>
+    <string name="taffy_appearance_dark_sites_title">Dark sites</string>
+    <string name="taffy_appearance_dark_sites_body">When a site has no dark look, draw the page dark.</string>
+    <string name="taffy_appearance_language">Language</string>
+    <string name="taffy_appearance_language_system">Follow the system</string>
+    <string name="taffy_appearance_language_system_note">Whatever your phone is set to. English if TaffyGo has no words for that language.</string>
+    <string name="taffy_appearance_language_english">English</string>
+    <string name="taffy_appearance_language_english_note">TaffyGo\'s own words in English</string>
+    <!-- Language rows name themselves (handoff screen 12b): Hindi in Hindi. -->
+    <string name="taffy_appearance_language_hindi">हिन्दी</string>
+    <string name="taffy_appearance_language_hindi_note">TaffyGo\'s own words in Hindi</string>
+    <string name="taffy_appearance_language_footnote">This choice is TaffyGo\'s own words. It does not translate web pages.</string>
+    <string name="taffy_appearance_country_change">Choose a country</string>
+    <string name="taffy_appearance_country_note">Search, prices and units follow this.</string>
+    <string name="taffy_appearance_country_picker_title">Country or region</string>
+    <string name="taffy_appearance_country_picker_body">English and Hindi stay available in every country. This choice is for search, prices and units.</string>
+    <string name="taffy_appearance_country_picker_search">Search countries or codes</string>
+    <string name="taffy_appearance_pair">%1$s, %2$s</string>
+    <string name="taffy_appearance_text_size">Text size</string>
+    <string name="taffy_appearance_text_size_note">Text follows your device setting, up to twice its size. Change it in your device settings.</string>
+    <string name="taffy_appearance_pseudo_title">Check the text fits</string>
+    <string name="taffy_appearance_pseudo_body">Stretch every line so you can see what would spill in another language.</string>
+
+    <!-- Screen SCR-402 -->
+    <string name="taffy_general_title">General</string>
+    <string name="taffy_general_search_engine">Search engine</string>
+    <string name="taffy_general_search_engine_unavailable">Choosing a search engine isn\'t available on this phone yet. The address bar still opens what you type.</string>
+    <string name="taffy_general_downloads">Download location</string>
+    <string name="taffy_general_downloads_unavailable">TaffyGo uses this phone\'s default download folder. Choosing another isn\'t available yet.</string>
+    <string name="taffy_general_downloads_loading">Checking available locations…</string>
+    <string name="taffy_general_downloads_choose">Choose download location</string>
+    <string name="taffy_general_downloads_device">On this device</string>
+    <string name="taffy_general_downloads_removable">Removable storage</string>
+    <string name="taffy_general_downloads_selected">%1$s, selected</string>
+    <string name="taffy_general_downloads_selection_failed">That download location is no longer available. Choose another.</string>
+    <string name="taffy_general_downloads_write_failed">TaffyGo couldn\'t save that download location. Try again.</string>
+    <string name="taffy_general_downloads_readback_failed">TaffyGo couldn\'t confirm which download location is selected. Check again before downloading.</string>
+    <string name="taffy_general_text_size">Text size</string>
+    <string name="taffy_general_text_size_note">Text follows your device setting. Appearance has the note, and a way to check that the words still fit.</string>
+
+    <!-- Screen SCR-403 -->
+    <string name="taffy_privacy_title">Privacy</string>
+    <string name="taffy_privacy_hero_body">What\'s stored, where a request goes, and how long it stays.</string>
+    <string name="taffy_privacy_stored_heading">What\'s kept on this phone</string>
+    <string name="taffy_privacy_stored_body">History of pages you opened, cookies sites set, files you downloaded, Memory you can see, and workspaces. Private tabs are forgotten when they close.</string>
+    <string name="taffy_privacy_inventory_heading">Current totals</string>
+    <string name="taffy_privacy_inventory_workspaces">Saved workspaces</string>
+    <string name="taffy_privacy_inventory_library">Library items</string>
+    <string name="taffy_privacy_inventory_memory">Memory items</string>
+    <string name="taffy_privacy_inventory_providers">Saved provider connections</string>
+    <string name="taffy_privacy_inventory_downloads">Recent downloads shown</string>
+    <string name="taffy_privacy_inventory_sites">Sites with changed settings</string>
+    <string name="taffy_privacy_inventory_loading">Checking…</string>
+    <string name="taffy_privacy_inventory_unavailable">Not available</string>
+    <string name="taffy_privacy_inventory_exact">%1$d</string>
+    <string name="taffy_privacy_inventory_at_least">%1$d+</string>
+    <string name="taffy_privacy_inventory_row">%1$s: %2$s</string>
+    <string name="taffy_privacy_route_heading">Where requests go</string>
+    <string name="taffy_privacy_route_none">Nowhere. No provider is set up, so nothing leaves this device.</string>
+    <string name="taffy_privacy_route_direct">Directly to your provider.</string>
+    <string name="taffy_privacy_route_no_model">Stays on this phone. This task does not send anything to an AI provider.</string>
+    <string name="taffy_privacy_retention_heading">How long it stays</string>
+    <string name="taffy_privacy_retention_body">History and cookies stay until you clear them. Workspaces stay until you delete them. Taffy forgets private tabs when they close.</string>
+    <string name="taffy_privacy_site_settings">Site settings</string>
+    <string name="taffy_privacy_site_settings_summary">Sites you\'ve changed, and what they may use</string>
+    <string name="taffy_privacy_clear">Clear browsing data</string>
+    <string name="taffy_privacy_clear_summary">History, cookies, and cached files</string>
+    <string name="taffy_privacy_what_happened">What happened</string>
+    <string name="taffy_privacy_what_happened_summary">Task outcomes and blocking totals, no page content</string>
+    <string name="taffy_privacy_manage_heading">On this browser</string>
+    <string name="taffy_privacy_copy_heading">Your data</string>
+    <string name="taffy_privacy_export">Export everything</string>
+    <string name="taffy_privacy_delete">Delete everything</string>
+    <string name="taffy_privacy_workspaces_stay">Clearing browsing data never deletes workspaces, Library, Memory, or saved sign-ins.</string>
+    <string name="taffy_privacy_export_scope">Your export includes saved Taffy work, visible Saved sign-ins and Saved details records, history, bookmarks, recent download records, site and blocking settings, Time on sites, and app choices. It never includes passwords, your keys, cookies, cached pages, open tabs, or anything that lets an open task keep working.</string>
+    <string name="taffy_privacy_external_copies">Deleting this browser\'s data cannot delete downloaded or exported files, copies in another app, drive, message, or recipient\'s hands, or data held by websites and AI providers.</string>
+    <string name="taffy_privacy_export_choosing">Choose where Android should create the export.</string>
+    <string name="taffy_privacy_export_writing">Writing the checked export…</string>
+    <string name="taffy_privacy_export_succeeded">Export complete. The copy you chose is now outside TaffyGo and will not be removed if you delete this browser\'s data.</string>
+    <string name="taffy_privacy_export_failed">Nothing complete was exported. Check the destination and try again.</string>
+    <string name="taffy_privacy_export_cancelled">Export cancelled. No destination was written.</string>
+    <string name="taffy_privacy_delete_confirm_title">Delete all data on this phone?</string>
+    <string name="taffy_privacy_delete_confirm_body">TaffyGo will first stop open tasks and close access to Saved sign-ins and your keys. Android will then close the app and erase all data it stores, including browsing data, workspaces, Library, Memory, settings, and cached files. This cannot be undone.</string>
+    <string name="taffy_privacy_delete_external_limit">Downloaded files and earlier exports belong to their destinations. This does not delete copies held by another app, drive, recipient, website, AI provider, or online account.</string>
+    <string name="taffy_privacy_delete_confirm">Delete and close TaffyGo</string>
+    <string name="taffy_privacy_delete_keep">Keep my data</string>
+    <string name="taffy_privacy_delete_starting">Closing live access before Android erases the app\'s data…</string>
+    <string name="taffy_privacy_delete_started">Android accepted the erase request. TaffyGo will close. The welcome screen on your next launch is the check that this phone\'s app data is gone.</string>
+    <string name="taffy_privacy_delete_failed">Android did not accept the erase request. TaffyGo closed its live profile first. Restart the app, then try again.</string>
+
+    <!-- Screen SCR-205 -->
+    <string name="taffy_site_settings_title">Site settings</string>
+    <string name="taffy_site_settings_loading">Loading site settings</string>
+    <string name="taffy_site_settings_empty_title">No site settings yet</string>
+    <string name="taffy_site_settings_empty_body">Sites you\'ve changed will show here.</string>
+    <string name="taffy_site_settings_unavailable_title">Site settings aren\'t available right now</string>
+    <string name="taffy_site_settings_unavailable_body">This phone can\'t list or change site permissions yet.</string>
+    <string name="taffy_site_settings_defaults">Defaults</string>
+    <string name="taffy_site_settings_defaults_unavailable">No supported global defaults could be read. Per-site changes are still listed below.</string>
+    <string name="taffy_site_settings_exceptions">Sites you changed</string>
+    <string name="taffy_site_settings_update_failed">That default did not change. The value shown is still Chromium\'s current value.</string>
+    <string name="taffy_site_settings_reset_title">Reset this site?</string>
+    <string name="taffy_site_settings_reset_body">Remove every saved permission choice for %1$s. The site will use your defaults and can ask again.</string>
+    <string name="taffy_site_settings_reset_confirm">Reset permissions</string>
+    <string name="taffy_site_settings_reset_cancel">Keep changes</string>
+    <string name="taffy_site_settings_resetting">Resetting permissions for %1$s…</string>
+    <string name="taffy_site_settings_reset_failed">Some settings for %1$s could not be reset. The current changes are still shown below.</string>
+    <string name="taffy_site_settings_managed">Controlled by policy</string>
+    <string name="taffy_site_settings_blocked">Blocked by default</string>
+    <string name="taffy_site_settings_allowed">Allowed by default</string>
+    <string name="taffy_site_settings_location">Location</string>
+    <string name="taffy_site_settings_location_ask">Sites can ask for your location</string>
+    <string name="taffy_site_settings_camera">Camera</string>
+    <string name="taffy_site_settings_camera_ask">Sites can ask to use the camera</string>
+    <string name="taffy_site_settings_microphone">Microphone</string>
+    <string name="taffy_site_settings_microphone_ask">Sites can ask to use the microphone</string>
+    <string name="taffy_site_settings_notifications">Notifications</string>
+    <string name="taffy_site_settings_notifications_ask">Sites can ask to send notifications</string>
+    <string name="taffy_site_settings_javascript">JavaScript</string>
+    <string name="taffy_site_settings_pop_ups">Pop-ups and redirects</string>
+    <string name="taffy_site_settings_automatic_downloads">Automatic downloads</string>
+    <string name="taffy_site_settings_downloads_ask">Sites can ask to download more than one file</string>
+    <string name="taffy_site_settings_clipboard">Copied text</string>
+    <string name="taffy_site_settings_clipboard_ask">Sites must ask before reading text you copied. This setting does not give Taffy access.</string>
+    <string name="taffy_site_settings_sensors">Motion sensors</string>
+    <string name="taffy_site_settings_sensors_ask">Sites can ask to use motion sensors</string>
+    <string name="taffy_site_settings_sound">Sound</string>
+    <plurals name="taffy_site_settings_changed_permissions">
+        <item quantity="one">%1$d permission changed</item>
+        <item quantity="other">%1$d permissions changed</item>
+    </plurals>
+
+    <!-- Screen SCR-207 -->
+    <string name="taffy_clear_title">Clear browsing data</string>
+    <string name="taffy_clear_range_heading">How far back</string>
+    <string name="taffy_clear_range_hour">Last hour</string>
+    <string name="taffy_clear_range_day">Last 24 hours</string>
+    <string name="taffy_clear_range_week">Last 7 days</string>
+    <string name="taffy_clear_range_all">All time</string>
+    <string name="taffy_clear_classes_heading">What to clear</string>
+    <string name="taffy_clear_class_history">History</string>
+    <string name="taffy_clear_class_cookies">Cookies</string>
+    <string name="taffy_clear_class_cache">Cached files</string>
+    <string name="taffy_clear_class_time">Time on sites</string>
+    <string name="taffy_clear_workspaces_stay">Workspaces stay. Library, Memory, and saved sign-ins stay.</string>
+    <string name="taffy_clear_unavailable">Clearing isn\'t available on this phone yet.</string>
+    <string name="taffy_clear_failed">Some data may have been cleared, but not all of it. Try again.</string>
+    <string name="taffy_clear_confirm">Clear</string>
+    <string name="taffy_clear_confirm_title">Clear this data?</string>
+    <string name="taffy_clear_confirm_body">This cannot be undone. Workspaces, Library, Memory, and saved sign-ins are not cleared.</string>
+    <string name="taffy_clear_keep">Keep</string>
+    <string name="taffy_clear_class_on">On</string>
+    <string name="taffy_clear_class_off">Off</string>
+
+    <!-- Screen SCR-408 -->
+    <string name="taffy_about_title">About</string>
+    <string name="taffy_about_facts_heading">This browser</string>
+    <string name="taffy_about_more_heading">More</string>
+    <string name="taffy_about_version">Version</string>
+    <string name="taffy_about_version_unknown">Version isn\'t listed on this phone yet.</string>
+    <string name="taffy_about_chromium_version">Chromium version</string>
+    <string name="taffy_about_help">Help and feedback</string>
+    <string name="taffy_about_help_summary">What works here, and how to reach us</string>
+    <string name="taffy_about_licences">Licences</string>
+    <string name="taffy_about_licences_summary">The software this app is built from, and its terms</string>
+    <string name="taffy_about_source">Source code</string>
+
+    <!-- Screen SCR-409 -->
+    <string name="taffy_help_title">Help and feedback</string>
+    <string name="taffy_help_reach_heading">How to reach us</string>
+    <string name="taffy_help_feedback_body">Tell the people who make TaffyGo what works and what doesn\'t. Nothing is sent from here. Your email app opens a draft, or GitHub opens in a new tab, and you decide whether to send it.</string>
+    <string name="taffy_help_feedback_email">Send feedback by email</string>
+    <string name="taffy_help_feedback_issue">Open an issue on GitHub</string>
+    <string name="taffy_help_feedback_issue_public">Issues on GitHub are public. Anyone can read what you write there.</string>
+    <string name="taffy_help_feedback_no_email_app">No email app on this phone opened the draft. You can write to %1$s from any email account.</string>
+    <!-- The subject and body of the email draft. The person reads and edits both before sending. -->
+    <string name="taffy_help_feedback_email_subject">TaffyGo feedback</string>
+    <string name="taffy_help_feedback_email_body">Your feedback:\n\n\n\n---\nTaffyGo version: %1$s</string>
+    <string name="taffy_help_feedback_version_unknown">not known</string>
+    <string name="taffy_help_limits_heading">What this is</string>
+    <string name="taffy_help_limits_body">Taffy is the only assistant. Taffy never sends passwords, card numbers, or saved details to an AI provider. Ads and trackers are blocked by default, minus the sites you allow.</string>
+    <string name="taffy_help_limit_assistant">Taffy</string>
+    <string name="taffy_help_limit_assistant_detail">The only assistant</string>
+    <string name="taffy_help_limit_blocking">Ads and trackers</string>
+    <string name="taffy_help_limit_blocking_detail">Blocked by default, minus the sites you allow</string>
+    <string name="taffy_help_limit_secrets">Saved details</string>
+    <string name="taffy_help_limit_secrets_detail">Taffy never sends passwords, card numbers, or saved details to an AI provider</string>
+
+    <!-- Explicit acceptance of a recorded flow. -->
+    <string name="taffy_skill_review_open">Review</string>
+    <string name="taffy_skill_review_title">Review the recorded flow</string>
+    <string name="taffy_skill_review_missing">Load the full steps to review this saved flow. Loading does not turn it on.</string>
+    <string name="taffy_skill_review_save">Save this flow</string>
+    <string name="taffy_skill_review_saving">Saving…</string>
+    <string name="taffy_skill_review_failed">The flow could not be saved. Review the current steps and try again.</string>
+    <string name="taffy_skill_review_load">Load full review</string>
+    <string name="taffy_skill_review_loading">Loading full review…</string>
+    <string name="taffy_skill_review_load_failed">The full steps could not be loaded. Try loading them again.</string>
+</resources>

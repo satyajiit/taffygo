@@ -1,0 +1,580 @@
+[
+  {
+    "name": "a development manifest cannot be relabeled as a candidate",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/release/kind",
+        "value": "development"
+      }
+    ],
+    "expect": {
+      "item": "release.kind",
+      "contains": "verification requested"
+    }
+  },
+  {
+    "name": "a candidate must explicitly be promotable",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/release/promotable",
+        "value": false
+      }
+    ],
+    "expect": {
+      "item": "release.promotable",
+      "contains": "does not explicitly say true"
+    }
+  },
+  {
+    "name": "a development artifact is explicitly non-promotable",
+    "profile": "development",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/release/kind",
+        "value": "development"
+      },
+      {
+        "op": "set",
+        "pointer": "/release/promotable",
+        "value": true
+      }
+    ],
+    "expect": {
+      "item": "release.promotable",
+      "contains": "does not explicitly say false"
+    }
+  },
+  {
+    "name": "a named candidate suite cannot be absent",
+    "patch": [
+      {
+        "op": "remove",
+        "pointer": "/tests/suites/0"
+      }
+    ],
+    "expect": {
+      "item": "tests.suites.check-docs",
+      "contains": "has no result"
+    }
+  },
+  {
+    "name": "a failed suite cannot promote",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/suites/0/result",
+        "value": "fail"
+      }
+    ],
+    "expect": {
+      "item": "tests.suites.check-docs.result",
+      "contains": "not \"pass\""
+    }
+  },
+  {
+    "name": "a skipped suite cannot promote",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/suites/0/result",
+        "value": "skipped"
+      }
+    ],
+    "expect": {
+      "item": "tests.suites.check-docs.result",
+      "contains": "not \"pass\""
+    }
+  },
+  {
+    "name": "a suite that did not run cannot promote",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/suites/0/result",
+        "value": "not-run"
+      }
+    ],
+    "expect": {
+      "item": "tests.suites.check-docs.result",
+      "contains": "not \"pass\""
+    }
+  },
+  {
+    "name": "a flaky result cannot promote",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/suites/0/result",
+        "value": "flaky"
+      }
+    ],
+    "expect": {
+      "item": "tests.suites.check-docs.result",
+      "contains": "not \"pass\""
+    }
+  },
+  {
+    "name": "a passing suite cannot hide skipped child checks",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/suites/1/skipped",
+        "value": 1
+      }
+    ],
+    "expect": {
+      "item": "tests.suites.check-fast.skipped",
+      "contains": "1 skipped"
+    }
+  },
+  {
+    "name": "a passing retry is flaky evidence",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/suites/2/retries",
+        "value": 1
+      }
+    ],
+    "expect": {
+      "item": "tests.suites.taffy_unittests.retries",
+      "contains": "1 retry"
+    }
+  },
+  {
+    "name": "a suite result must identify an attested report",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/suites/3/report_path",
+        "value": "missing.xml"
+      }
+    ],
+    "expect": {
+      "item": "tests.suites.taffy_browsertests.report_path",
+      "contains": "does not name"
+    }
+  },
+  {
+    "name": "candidate device evidence cannot be empty",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/devices",
+        "value": []
+      }
+    ],
+    "expect": {
+      "item": "tests.devices",
+      "contains": "no approved device"
+    }
+  },
+  {
+    "name": "an arbitrary attached phone is not an approved matrix row",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/devices/0/approved",
+        "value": false
+      }
+    ],
+    "expect": {
+      "item": "tests.devices.0.approved",
+      "contains": "not an approved"
+    }
+  },
+  {
+    "name": "one matrix row cannot be relabeled as three devices",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/devices/1/matrix_row",
+        "value": "physical-low-api29"
+      },
+      {
+        "op": "set",
+        "pointer": "/tests/devices/2/matrix_row",
+        "value": "physical-low-api29"
+      }
+    ],
+    "expect": {
+      "item": "tests.devices",
+      "contains": "same approved matrix row"
+    }
+  },
+  {
+    "name": "an emulator-only matrix cannot promote",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/devices/0/tier",
+        "value": "emulator"
+      },
+      {
+        "op": "set",
+        "pointer": "/tests/devices/1/tier",
+        "value": "emulator"
+      },
+      {
+        "op": "set",
+        "pointer": "/tests/devices/2/tier",
+        "value": "emulator"
+      }
+    ],
+    "expect": {
+      "item": "tests.devices",
+      "contains": "only on emulators"
+    }
+  },
+  {
+    "name": "physical device evidence must identify its tier",
+    "patch": [
+      {
+        "op": "remove",
+        "pointer": "/tests/devices/0/tier"
+      },
+      {
+        "op": "set",
+        "pointer": "/tests/devices/1/tier",
+        "value": "emulator"
+      },
+      {
+        "op": "set",
+        "pointer": "/tests/devices/2/tier",
+        "value": "emulator"
+      }
+    ],
+    "expect": {
+      "item": "tests.devices",
+      "contains": "missing approved physical tier"
+    }
+  },
+  {
+    "name": "a physical matrix cannot omit the mid tier",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/devices/1/tier",
+        "value": "high"
+      }
+    ],
+    "expect": {
+      "item": "tests.devices",
+      "contains": "mid"
+    }
+  },
+  {
+    "name": "an unmeasured benchmark cannot promote",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/benchmark_measured",
+        "value": false
+      }
+    ],
+    "expect": {
+      "item": "tests.benchmark_evidence",
+      "contains": "measured=False"
+    }
+  },
+  {
+    "name": "an empty benchmark run set is not evidence",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/benchmark_runs",
+        "value": 0
+      }
+    ],
+    "expect": {
+      "item": "tests.benchmark_evidence",
+      "contains": "0 run"
+    }
+  },
+  {
+    "name": "an empty benchmark scenario set is not evidence",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/benchmark_scenarios",
+        "value": 0
+      }
+    ],
+    "expect": {
+      "item": "tests.benchmark_evidence",
+      "contains": "0 scenario"
+    }
+  },
+  {
+    "name": "benchmark evidence needs its owner's approval",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/benchmark_approved",
+        "value": false
+      }
+    ],
+    "expect": {
+      "item": "tests.benchmark_evidence",
+      "contains": "approved=False"
+    }
+  },
+  {
+    "name": "benchmark metadata must link to its artifact",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/benchmark_evidence",
+        "value": "other.json"
+      }
+    ],
+    "expect": {
+      "item": "tests.benchmark_evidence",
+      "contains": "does not identify"
+    }
+  },
+  {
+    "name": "development capability authority cannot promote",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/identity/capability_profile/name",
+        "value": "development"
+      }
+    ],
+    "expect": {
+      "item": "identity.capability_profile.name",
+      "contains": "rather than \"candidate\""
+    }
+  },
+  {
+    "name": "an internal milestone is not the one public release",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/identity/capability_profile/accepted_milestone",
+        "value": "M7"
+      }
+    ],
+    "expect": {
+      "item": "identity.capability_profile.accepted_milestone",
+      "contains": "rather than \"M8\""
+    }
+  },
+  {
+    "name": "the capability digest must match this checkout",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/identity/capability_profile/projection_sha256",
+        "value": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "expect": {
+      "item": "identity.capability_profile.projection_sha256",
+      "contains": "does not match"
+    }
+  },
+  {
+    "name": "an M8 candidate cannot keep delegated task start disabled",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/identity/capability_profile/delegated_task_start",
+        "value": false
+      }
+    ],
+    "expect": {
+      "item": "identity.capability_profile.delegated_task_start",
+      "contains": "rather than True"
+    }
+  },
+  {
+    "name": "an M8 candidate must expose the M8 task surface",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/identity/capability_profile/task_milestone",
+        "value": "M7"
+      }
+    ],
+    "expect": {
+      "item": "identity.capability_profile.task_milestone",
+      "contains": "rather than 'M8'"
+    }
+  },
+  {
+    "name": "the M8 task surface must use the ratified M7 policy",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/identity/capability_profile/policy_milestone",
+        "value": "M6"
+      }
+    ],
+    "expect": {
+      "item": "identity.capability_profile.policy_milestone",
+      "contains": "rather than 'M7'"
+    }
+  },
+  {
+    "name": "the evidence index belongs to the candidate revision",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/identity/evidence_index/source_revision",
+        "value": "1111111111111111111111111111111111111111"
+      }
+    ],
+    "expect": {
+      "item": "identity.evidence_index.source_revision",
+      "contains": "does not match"
+    }
+  },
+  {
+    "name": "the evidence index metadata links to its artifact",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/identity/evidence_index/path",
+        "value": "other-index.json"
+      }
+    ],
+    "expect": {
+      "item": "identity.evidence_index",
+      "contains": "does not identify"
+    }
+  },
+  {
+    "name": "a vulnerability finding blocks promotion",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/dependencies/vulnerability_scan/status",
+        "value": "findings"
+      },
+      {
+        "op": "set",
+        "pointer": "/dependencies/vulnerability_scan/findings",
+        "value": 1
+      }
+    ],
+    "expect": {
+      "item": "dependencies.vulnerability_scan.status",
+      "contains": "findings=1"
+    }
+  },
+  {
+    "name": "rollback must have run and passed",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/rollback/result",
+        "value": "not-run"
+      }
+    ],
+    "expect": {
+      "item": "rollback.result",
+      "contains": "not-run"
+    }
+  },
+  {
+    "name": "every named approval is mandatory",
+    "patch": [
+      {
+        "op": "remove",
+        "pointer": "/approvals/0"
+      }
+    ],
+    "expect": {
+      "item": "approvals",
+      "contains": "no product approval"
+    }
+  },
+  {
+    "name": "approval roles need accountable separation",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/approvals/1/identity",
+        "value": "one-person"
+      },
+      {
+        "op": "set",
+        "pointer": "/approvals/2/identity",
+        "value": "one-person"
+      },
+      {
+        "op": "set",
+        "pointer": "/approvals/3/identity",
+        "value": "one-person"
+      },
+      {
+        "op": "set",
+        "pointer": "/approvals/4/identity",
+        "value": "one-person"
+      }
+    ],
+    "expect": {
+      "item": "approvals",
+      "contains": "2 distinct"
+    }
+  },
+  {
+    "name": "the AAB is mandatory even when an APK exists",
+    "patch": [
+      {
+        "op": "remove",
+        "pointer": "/artifacts/2"
+      }
+    ],
+    "expect": {
+      "item": "artifacts.bundle",
+      "contains": "no \"bundle\""
+    }
+  },
+  {
+    "name": "the test APK is a separate required artifact",
+    "patch": [
+      {
+        "op": "remove",
+        "pointer": "/artifacts/1"
+      }
+    ],
+    "expect": {
+      "item": "artifacts.test-apk",
+      "contains": "no \"test-apk\""
+    }
+  },
+  {
+    "name": "an empty required artifact is not evidence",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/artifacts/0/size_bytes",
+        "value": 0
+      }
+    ],
+    "expect": {
+      "item": "artifacts.apk",
+      "contains": "is empty"
+    }
+  },
+  {
+    "name": "duplicate suite fragments cannot hide one another",
+    "patch": [
+      {
+        "op": "set",
+        "pointer": "/tests/suites/1/name",
+        "value": "check-docs"
+      }
+    ],
+    "expect": {
+      "item": "tests.suites.check-docs",
+      "contains": "appears 2 times"
+    }
+  }
+]

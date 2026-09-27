@@ -1,0 +1,66 @@
+{
+  "operation": {
+    "operation_id": "policy-evaluation-1",
+    "service_generation": 4,
+    "task_revision": 9,
+    "deadline_monotonic_ms": 120000,
+    "idempotency_key": "policy-task-9-action-3"
+  },
+  "now_monotonic_ms": 118000,
+  "now_utc_ms": 1770000118000,
+  "action_id": "action-3",
+  "task_id": "task-9",
+  "principal": {
+    "kind": 0,
+    "skill_version_id": null
+  },
+  "action_class": 0,
+  "proposal_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "scope": {
+    "profile_id": "profile-regular-1",
+    "tab_id": "tab-4",
+    "frame_id": "frame-7",
+    "page_epoch": "epoch-12",
+    "origin": {
+      "kind": 0,
+      "serialization": "https://example.test",
+      "opaque_id": null
+    },
+    "node_id": null,
+    "destination_scope": null,
+    "required_graph_revision": 11,
+    "allowed_redirects": [],
+    "destination_address": null
+  },
+  "data_classes": [0],
+  "context_risk": 0,
+  "expires_at_monotonic_ms": 119000,
+  "actor_lease": {
+    "lease_id": "lease-profile-1-tab-4",
+    "service_generation": 4,
+    "task_id": "task-9",
+    "profile_id": "profile-regular-1",
+    "tab_id": "tab-4",
+    "control_mode": 1,
+    "expires_at_monotonic_ms": 119500,
+    "authority_subject": {
+      "kind": 0,
+      "authority_subject_id": "task-9"
+    }
+  },
+  "approval": null,
+  "context": 0,
+  "authority_subject": {
+    "kind": 0,
+    "authority_subject_id": "task-9"
+  },
+  "policy_version": 7,
+  "operation_kind": 9,
+  "canonical_intent_digest": [
+    1, 2, 3, 4, 5, 6, 7, 8,
+    9, 10, 11, 12, 13, 14, 15, 16,
+    17, 18, 19, 20, 21, 22, 23, 24,
+    25, 26, 27, 28, 29, 30, 31, 32
+  ],
+  "discovery": null
+}

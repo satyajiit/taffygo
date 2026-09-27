@@ -1,0 +1,42 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The retained M1 seam suites have their own target family and source
+# lifecycle. Keep them apart from the browser/core-service source lists so
+# later feature work cannot make the product list grow with legacy seam tests.
+
+taffy_m1_seams_unit_test_sources = [
+  "browser_navigation_record_unittest.cc",
+  "credential_boundary_unittest.cc",
+  "download_command_router_unittest.cc",
+  "download_state_machine_unittest.cc",
+  "lifecycle_continuity_ledger_unittest.cc",
+  "manual_browsing_guarantee_unittest.cc",
+  "navigation_error_classifier_unittest.cc",
+  "oauth_continuity_tracker_unittest.cc",
+  "oauth_return_facts_unittest.cc",
+  "omnibox_input_classifier_unittest.cc",
+  "renderer_text_rescan_unittest.cc",
+  "restored_task_record_unittest.cc",
+  "scrubbing_serializer_unittest.cc",
+  "secret_shape_scanner_unittest.cc",
+  "security_posture_evaluator_unittest.cc",
+  "security_posture_report_unittest.cc",
+  "seeded_secret_leak_unittest.cc",
+  "sensitive_name_list_unittest.cc",
+  "session_recovery_planner_unittest.cc",
+  "tab_session_registry_unittest.cc",
+]
+
+taffy_m1_seams_browser_test_sources = [
+  "ai_unavailable_browsertest.cc",
+  "credential_isolation_browsertest.cc",
+  "download_command_router_browsertest.cc",
+  "lifecycle_continuity_browsertest.cc",
+  "navigation_lifecycle_tracker_browsertest.cc",
+  "security_posture_probe_browsertest.cc",
+  "tab_session_registry_browsertest.cc",
+]

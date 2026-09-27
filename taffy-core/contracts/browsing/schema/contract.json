@@ -1,0 +1,331 @@
+{
+  "contract": "browsing",
+  "namespace": "taffy.browsing",
+  "version": {"major": 1, "minor": 1},
+  "projections": ["rust", "typescript", "mojom", "cpp"],
+  "limits": {
+    "MAX_TABS": 256,
+    "MAX_DOWNLOADS": 256,
+    "MAX_IDENTIFIER_BYTES": 256,
+    "MAX_HOST_BYTES": 253,
+    "MAX_TITLE_BYTES": 1024,
+    "MAX_FILE_NAME_BYTES": 512
+  },
+  "forbidden_field_substrings": [
+    "capability",
+    "authorization_grant",
+    "raw_url",
+    "full_url",
+    "filesystem_path",
+    "cookie"
+  ],
+  "required_envelope_fields": [],
+  "enums": [
+    {
+      "name": "TabOwner",
+      "description": "Who a tab belongs to. An unattributed tab is the user's, because the rules that protect a user's tab are the stricter ones.",
+      "members": [
+        {"name": "UNKNOWN", "wire": 0, "description": "Unattributed, and therefore treated as the user's."},
+        {"name": "USER", "wire": 1, "description": "The person opened it."},
+        {"name": "ASSISTANT", "wire": 2, "description": "Taffy opened it inside an approved task scope."}
+      ]
+    },
+    {
+      "name": "TabPrivacy",
+      "description": "Whether a tab forgets everything when it closes.",
+      "members": [
+        {"name": "NORMAL", "wire": 0, "description": "An ordinary tab."},
+        {"name": "PRIVATE", "wire": 1, "description": "A private tab; nothing about it is a source and nothing about it is kept."}
+      ]
+    },
+    {
+      "name": "NavigationFailure",
+      "description": "What a failed navigation was, in the vocabulary the parity matrix uses. A member this build does not name fails closed as a failure and never as a load.",
+      "members": [
+        {"name": "NONE", "wire": 0, "description": "The navigation committed a real document."},
+        {"name": "DNS_FAILURE", "wire": 1, "description": "The host could not be resolved."},
+        {"name": "OFFLINE", "wire": 2, "description": "The device has no usable network; the retry advice differs from a lost connection."},
+        {"name": "CONNECTION_FAILURE", "wire": 3, "description": "The connection could not be established or was lost mid-flight."},
+        {"name": "TIMEOUT", "wire": 4, "description": "The server did not answer in time."},
+        {"name": "TLS_FAILURE", "wire": 5, "description": "The handshake or the certificate failed."},
+        {"name": "HTTP_ERROR_STATUS", "wire": 6, "description": "A 4xx or 5xx whose body committed: a real document, but not the requested one."},
+        {"name": "BLOCKED_BY_CLIENT", "wire": 7, "description": "A client-side policy stopped it."},
+        {"name": "BLOCKED_BY_SAFE_BROWSING", "wire": 8, "description": "Safe Browsing stopped it; never reclassified, because the parity row exists to catch that."},
+        {"name": "ABORTED", "wire": 9, "description": "The person or the browser cancelled it. Never reported as an error."},
+        {"name": "UNKNOWN_FAILURE", "wire": 10, "description": "A failure this table does not name; the page did not load."}
+      ]
+    },
+    {
+      "name": "InterstitialKind",
+      "description": "Which trusted browser surface stood between the person and the content.",
+      "members": [
+        {"name": "NONE", "wire": 0, "description": "Nothing did."},
+        {"name": "CERTIFICATE_ERROR", "wire": 1, "description": "A certificate interstitial."},
+        {"name": "SAFE_BROWSING", "wire": 2, "description": "A Safe Browsing interstitial."},
+        {"name": "BLOCKED_BY_POLICY", "wire": 3, "description": "A policy interstitial."},
+        {"name": "OTHER", "wire": 4, "description": "One this build does not recognise; that a trusted surface is showing is the part no caller may lose."}
+      ]
+    },
+    {
+      "name": "DownloadState",
+      "description": "Where a download has got to, mirroring the download system's own lifecycle plus the paused sub-state it reports separately.",
+      "members": [
+        {"name": "CREATED", "wire": 0, "description": "Created and not yet given a target. Nothing is on disk."},
+        {"name": "IN_PROGRESS", "wire": 1, "description": "Bytes are arriving."},
+        {"name": "PAUSED", "wire": 2, "description": "Held by the person or by the system."},
+        {"name": "INTERRUPTED", "wire": 3, "description": "Stopped by a failure; whether it can resume is a separate field."},
+        {"name": "COMPLETE", "wire": 4, "description": "The file is on the device."},
+        {"name": "CANCELLED", "wire": 5, "description": "Ended before it finished, deliberately."}
+      ]
+    },
+    {
+      "name": "DownloadFailure",
+      "description": "Why a download stopped, translated from the download system's interrupt reason and never invented.",
+      "members": [
+        {"name": "NONE", "wire": 0, "description": "It did not stop."},
+        {"name": "NETWORK", "wire": 1, "description": "The network failed."},
+        {"name": "SERVER", "wire": 2, "description": "The server failed."},
+        {"name": "FILE_SYSTEM", "wire": 3, "description": "Writing the file failed."},
+        {"name": "INSUFFICIENT_SPACE", "wire": 4, "description": "There is not enough room."},
+        {"name": "PERMISSION_DENIED", "wire": 5, "description": "The platform refused the write."},
+        {"name": "BLOCKED_BY_SECURITY_CHECK", "wire": 6, "description": "A security check stopped it; reported honestly and never worked around."},
+        {"name": "CANCELLED_BY_USER", "wire": 7, "description": "The person stopped it."},
+        {"name": "BROWSER_SHUTDOWN", "wire": 8, "description": "The browser went away."},
+        {"name": "UNKNOWN", "wire": 9, "description": "A reason this translation does not name; treated as a failure, never a success."}
+      ]
+    },
+    {
+      "name": "DownloadDestination",
+      "description": "Where the bytes are going, as a kind rather than a path: a record that may reach a log carries no profile directory layout.",
+      "members": [
+        {"name": "UNDECIDED", "wire": 0, "description": "No target yet."},
+        {"name": "DEFAULT_DIRECTORY", "wire": 1, "description": "The platform's downloads directory."},
+        {"name": "USER_CHOSEN_LOCATION", "wire": 2, "description": "A location the person picked."},
+        {"name": "APPLICATION_PRIVATE_DIRECTORY", "wire": 3, "description": "The application's own private storage."}
+      ]
+    },
+    {
+      "name": "DownloadCommand",
+      "description": "What a person may ask of a download. Which of these is legal in which state is the browser's decision, not the surface's.",
+      "members": [
+        {"name": "PAUSE", "wire": 0, "description": "Hold it."},
+        {"name": "RESUME", "wire": 1, "description": "Continue an authorized transfer."},
+        {"name": "CANCEL", "wire": 2, "description": "End it."},
+        {"name": "RETRY", "wire": 3, "description": "Start a fresh request, which is a fresh decision and not a resume."},
+        {"name": "OPEN_WHEN_COMPLETE", "wire": 4, "description": "Open it once the bytes have finished arriving."},
+        {"name": "OPEN_NOW", "wire": 5, "description": "Open it now; legal only for a finished download."}
+      ]
+    },
+    {
+      "name": "BrowsingStatus",
+      "description": "One terminal verdict for one browsing intent. It says whether the browser took the request, never whether the page loaded.",
+      "members": [
+        {"name": "ACCEPTED", "wire": 0, "description": "The browser took the request and owns it from here."},
+        {"name": "INVALID_REQUEST", "wire": 1, "description": "A field was absent, malformed, or over a declared bound."},
+        {"name": "UNKNOWN_TAB", "wire": 2, "description": "No tab of this profile carries that identity."},
+        {"name": "UNKNOWN_DOWNLOAD", "wire": 3, "description": "No download of this profile carries that identity."},
+        {"name": "ILLEGAL_IN_STATE", "wire": 4, "description": "The request is well formed and the thing it names is not in a state that admits it."},
+        {"name": "REFUSED_BY_POLICY", "wire": 5, "description": "A browser rule refused it — the assistant may not close a person's tab, or take focus from what they are reading."},
+        {"name": "NO_HISTORY", "wire": 6, "description": "There is nowhere to go in that direction."},
+        {"name": "UNAVAILABLE", "wire": 7, "description": "No browser window is attached to answer this profile right now."}
+      ]
+    }
+  ],
+  "structs": [
+    {
+      "name": "TabView",
+      "description": "One open tab as a surface sees it. No browser object and no full location crosses this record.",
+      "fields": [
+        {"name": "tab_id", "type": "string", "ordinal": 0, "description": "Opaque tab identity, unique within a profile."},
+        {"name": "title", "type": "string", "ordinal": 1, "description": "The page title as the page gave it."},
+        {"name": "host", "type": "string", "ordinal": 2, "description": "The host, shown instead of a location."},
+        {"name": "has_been_nowhere", "type": "bool", "ordinal": 3, "description": "Whether this tab has been to no page at all. Carried rather than inferred from an empty host, because a data: or file: page has no host either and a surface that read blankness as emptiness would draw over content the web served."},
+        {"name": "owner", "type": "TabOwner", "ordinal": 4, "description": "Who the tab belongs to."},
+        {"name": "privacy", "type": "TabPrivacy", "ordinal": 5, "description": "Whether it forgets everything when it closes."},
+        {"name": "selected", "type": "bool", "ordinal": 6, "description": "Whether this is the tab the person is looking at."}
+      ]
+    },
+    {
+      "name": "NavigationView",
+      "description": "What the selected tab is showing. A failure is a state of the navigation rather than a separate screen: the engine owns the behaviour and the product owns the wording.",
+      "fields": [
+        {"name": "host", "type": "string", "ordinal": 0, "description": "The host of the committed document."},
+        {"name": "title", "type": "string", "ordinal": 1, "description": "The page title as the page gave it."},
+        {"name": "can_go_back", "type": "bool", "ordinal": 2, "description": "Whether there is history behind this page."},
+        {"name": "can_go_forward", "type": "bool", "ordinal": 3, "description": "Whether there is history ahead of it."},
+        {"name": "is_loading", "type": "bool", "ordinal": 4, "description": "Whether the page is still arriving."},
+        {"name": "failure", "type": "NavigationFailure", "ordinal": 5, "description": "Why the page did not load, or NONE."},
+        {"name": "interstitial", "type": "InterstitialKind", "ordinal": 6, "description": "Which trusted surface is showing instead of the page, or NONE."},
+        {"name": "http_status_code", "type": "u32", "ordinal": 7, "description": "The committed response code, or zero when nothing committed."},
+        {"name": "filtering_active", "type": "bool", "ordinal": 8, "description": "Whether ad and tracker blocking is acting on this page: the master setting is on and no site exception names this host."},
+        {"name": "blocked_request_count", "type": "u32", "ordinal": 9, "description": "How many requests filtering has blocked on the committed page so far. Publication is coalesced, so the number may jump, never lie; it resets when a navigation commits."}
+      ]
+    },
+    {
+      "name": "DownloadView",
+      "description": "One download. Sizes are bytes and the surface formats them; the full target path is deliberately absent.",
+      "fields": [
+        {"name": "download_id", "type": "string", "ordinal": 0, "description": "Opaque download identity, allocated by the download system."},
+        {"name": "file_name", "type": "string", "ordinal": 1, "description": "Base name only, as the download system settled it after any uniquifying."},
+        {"name": "host", "type": "string", "ordinal": 2, "description": "The host the file came from."},
+        {"name": "received_bytes", "type": "u64", "ordinal": 3, "description": "Bytes written so far."},
+        {"name": "total_bytes", "type": "u64", "ordinal": 4, "description": "Total size, meaningful only when total_known is true."},
+        {"name": "total_known", "type": "bool", "ordinal": 5, "description": "Whether the server said how large the file is. A surface that shows a bar rather than a spinner has to know which it has, and a sentinel in the size would be read as a size."},
+        {"name": "state", "type": "DownloadState", "ordinal": 6, "description": "Where the download has got to."},
+        {"name": "failure", "type": "DownloadFailure", "ordinal": 7, "description": "Why it stopped, or NONE."},
+        {"name": "destination", "type": "DownloadDestination", "ordinal": 8, "description": "Where the bytes are going, as a kind."},
+        {"name": "resumable", "type": "bool", "ordinal": 9, "description": "Whether the download system reports it can continue from where it stopped."},
+        {"name": "requires_danger_confirmation", "type": "bool", "ordinal": 10, "description": "Whether the danger checks want an explicit confirmation before the file is opened or kept."}
+      ]
+    },
+    {
+      "name": "BrowsingStateView",
+      "description": "Everything a browsing surface draws, in one snapshot, so that two of its three lists can never disagree about which tab is selected.",
+      "fields": [
+        {"name": "tabs", "type": "list<TabView>", "ordinal": 0, "description": "Every open tab, in the order a switcher shows them."},
+        {"name": "navigation", "type": "NavigationView", "ordinal": 1, "description": "What the selected tab is showing."},
+        {"name": "downloads", "type": "list<DownloadView>", "ordinal": 2, "description": "Every download this profile knows about."}
+      ]
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "TaffyBrowsingObserver",
+      "description": "The surface half of the browsing seam. It receives whole snapshots and never a delta, because a delta is a second description of the same state and the two drift.",
+      "methods": [
+        {
+          "name": "OnBrowsingState",
+          "ordinal": 0,
+          "description": "One complete description of what the surface should be drawing.",
+          "params": [
+            {"name": "state", "type": "BrowsingStateView", "ordinal": 0, "description": "Tabs, navigation and downloads together."}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TaffyBrowsingSurface",
+      "description": "The whole of what a surface may ask of the browser about tabs, navigation and downloads. No browser object crosses it, and a surface cannot reach past it: what a command is allowed to do is decided behind this seam, never in front of it.",
+      "methods": [
+        {
+          "name": "Observe",
+          "ordinal": 0,
+          "description": "Hand the browser the observer this surface will receive snapshots on.",
+          "params": [
+            {"name": "observer", "type": "pending_remote<TaffyBrowsingObserver>", "ordinal": 0, "description": "The surface's observer, bound for the life of the connection."}
+          ]
+        },
+        {
+          "name": "OpenTab",
+          "ordinal": 1,
+          "description": "Open a tab on a host and select it.",
+          "params": [
+            {"name": "host", "type": "string", "ordinal": 0, "description": "The host to open."},
+            {"name": "privacy", "type": "TabPrivacy", "ordinal": 1, "description": "Whether the new tab forgets everything when it closes."}
+          ],
+          "response": [
+            {"name": "status", "type": "BrowsingStatus", "ordinal": 0, "description": "Terminal verdict."},
+            {"name": "tab_id", "type": "string", "ordinal": 1, "description": "The identity of the new tab, empty unless the status is ACCEPTED."}
+          ]
+        },
+        {
+          "name": "SelectTab",
+          "ordinal": 2,
+          "description": "Bring an existing tab forward.",
+          "params": [
+            {"name": "tab_id", "type": "string", "ordinal": 0, "description": "Tab identity taken from a snapshot."}
+          ],
+          "response": [
+            {"name": "status", "type": "BrowsingStatus", "ordinal": 0, "description": "Terminal verdict."}
+          ]
+        },
+        {
+          "name": "CloseTab",
+          "ordinal": 3,
+          "description": "Close a tab. Closing the last of the person's tabs opens a new one, as a browser does.",
+          "params": [
+            {"name": "tab_id", "type": "string", "ordinal": 0, "description": "Tab identity taken from a snapshot."}
+          ],
+          "response": [
+            {"name": "status", "type": "BrowsingStatus", "ordinal": 0, "description": "Terminal verdict."}
+          ]
+        },
+        {
+          "name": "NavigateTo",
+          "ordinal": 4,
+          "description": "Navigate the selected tab to a host.",
+          "params": [
+            {"name": "host", "type": "string", "ordinal": 0, "description": "The host to navigate to."}
+          ],
+          "response": [
+            {"name": "status", "type": "BrowsingStatus", "ordinal": 0, "description": "Terminal verdict."}
+          ]
+        },
+        {
+          "name": "GoBack",
+          "ordinal": 5,
+          "description": "Go back in the selected tab.",
+          "params": [],
+          "response": [
+            {"name": "status", "type": "BrowsingStatus", "ordinal": 0, "description": "Terminal verdict; NO_HISTORY when there is nowhere to go."}
+          ]
+        },
+        {
+          "name": "GoForward",
+          "ordinal": 6,
+          "description": "Go forward in the selected tab.",
+          "params": [],
+          "response": [
+            {"name": "status", "type": "BrowsingStatus", "ordinal": 0, "description": "Terminal verdict; NO_HISTORY when there is nowhere to go."}
+          ]
+        },
+        {
+          "name": "Reload",
+          "ordinal": 7,
+          "description": "Ask for the page again.",
+          "params": [],
+          "response": [
+            {"name": "status", "type": "BrowsingStatus", "ordinal": 0, "description": "Terminal verdict."}
+          ]
+        },
+        {
+          "name": "RunDownloadCommand",
+          "ordinal": 8,
+          "description": "Ask something of one download. Whether the command is legal in the download's current state is answered here, so no surface carries a copy of that table.",
+          "params": [
+            {"name": "download_id", "type": "string", "ordinal": 0, "description": "Download identity taken from a snapshot."},
+            {"name": "command", "type": "DownloadCommand", "ordinal": 1, "description": "What is being asked."}
+          ],
+          "response": [
+            {"name": "status", "type": "BrowsingStatus", "ordinal": 0, "description": "Terminal verdict; ILLEGAL_IN_STATE when the state does not admit the command."}
+          ]
+        },
+        {
+          "name": "SetFilteringEnabled",
+          "ordinal": 9,
+          "description": "Turn ad and tracker blocking on or off for the whole profile. A person configuring their own browser: no assistant authority moves, so this is a browsing command and never a core-service one.",
+          "params": [
+            {"name": "enabled", "type": "bool", "ordinal": 0, "description": "Whether blocking is on."}
+          ],
+          "response": [
+            {"name": "status", "type": "BrowsingStatus", "ordinal": 0, "description": "Terminal verdict."}
+          ]
+        },
+        {
+          "name": "SetSiteFilteringException",
+          "ordinal": 10,
+          "description": "Record or remove one site's exception from blocking. The site is a host, never a location, for the same reason nothing else on this seam carries one.",
+          "params": [
+            {"name": "host", "type": "string", "ordinal": 0, "description": "The host the exception names."},
+            {"name": "allow", "type": "bool", "ordinal": 1, "description": "True records the exception, so blocking stands down on that site; false removes it."}
+          ],
+          "response": [
+            {"name": "status", "type": "BrowsingStatus", "ordinal": 0, "description": "Terminal verdict; INVALID_REQUEST for a host over the declared bound."}
+          ]
+        }
+      ]
+    }
+  ],
+  "tagged_unions": [],
+  "conditional_presence": []
+}

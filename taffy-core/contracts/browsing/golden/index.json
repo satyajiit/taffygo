@@ -1,0 +1,6 @@
+[
+  {"file": "two-tabs-one-selected.json", "type": "BrowsingStateView"},
+  {"file": "a-page-that-did-not-load.json", "type": "NavigationView"},
+  {"file": "a-download-of-unknown-size.json", "type": "DownloadView"},
+  {"file": "an-assistant-tab.json", "type": "TabView"}
+]

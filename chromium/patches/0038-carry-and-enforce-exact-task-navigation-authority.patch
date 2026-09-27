@@ -1,0 +1,83 @@
+From 29ad1ac6815897ecac4fb16194ea2b449467ffd9 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sun, 30 Aug 2026 14:11:58 +0530
+Subject: carry and enforce exact task navigation authority
+
+Carry the browser-issued exact destination in ChromeNavigationUIData before NavigationRequest startup, then register the downstream throttle that admits only that first request and refuses every redirect.
+
+This closes the timing window that exists when authority is attached to the handle returned after LoadURLWithParams.
+
+Specified by chromium/patches/0038-enforce-exact-task-navigation-before-network.md.
+
+Taffy-Patch: 0038
+
+diff --git a/chrome/browser/chrome_content_browser_client.cc b/chrome/browser/chrome_content_browser_client.cc
+index 127081580c1ec..48d471fac58b6 100644
+--- a/chrome/browser/chrome_content_browser_client.cc
++++ b/chrome/browser/chrome_content_browser_client.cc
+@@ -424,6 +424,7 @@
+ #include "services/network/public/mojom/websocket.mojom.h"
+ #include "taffy/browser/filtering_throttles.h"
+ #include "taffy/browser/providerauth/provider_auth_redirect_throttle.h"
++#include "taffy/browser/task_navigation_throttle.h"
+ #include "third_party/blink/public/common/chrome_debug_urls.h"
+ #include "third_party/blink/public/common/features.h"
+ #include "third_party/blink/public/common/loader/url_loader_throttle.h"
+@@ -5598,6 +5599,7 @@ void ChromeContentBrowserClient::CreateThrottlesForNavigation(
+     content::NavigationThrottleRegistry& registry) {
+   CreateAndAddChromeThrottlesForNavigation(registry);
+   taffy::ProviderAuthRedirectThrottle::MaybeCreateAndAdd(registry);
++  taffy::TaskNavigationThrottle::MaybeCreateAndAdd(registry);
+ }
+ 
+ std::vector<std::unique_ptr<content::CommitDeferringCondition>>
+diff --git a/chrome/browser/renderer_host/chrome_navigation_ui_data.cc b/chrome/browser/renderer_host/chrome_navigation_ui_data.cc
+index 8337d6c0a985c..96d9224f699a4 100644
+--- a/chrome/browser/renderer_host/chrome_navigation_ui_data.cc
++++ b/chrome/browser/renderer_host/chrome_navigation_ui_data.cc
+@@ -117,6 +117,7 @@ std::unique_ptr<content::NavigationUIData> ChromeNavigationUIData::Clone() {
+ #endif
+   copy->actor_task_id_ = actor_task_id_;
+   copy->navigation_initiated_from_sync_ = navigation_initiated_from_sync_;
++  copy->taffy_task_navigation_target_ = taffy_task_navigation_target_;
+ 
+   return std::move(copy);
+ }
+diff --git a/chrome/browser/renderer_host/chrome_navigation_ui_data.h b/chrome/browser/renderer_host/chrome_navigation_ui_data.h
+index 89b3a8434b90e..c0584df574424 100644
+--- a/chrome/browser/renderer_host/chrome_navigation_ui_data.h
++++ b/chrome/browser/renderer_host/chrome_navigation_ui_data.h
+@@ -8,6 +8,7 @@
+ #include <memory>
+ #include <optional>
+ #include <string>
++#include <utility>
+ 
+ #include "build/build_config.h"
+ #include "components/actor/core/task_id.h"
+@@ -101,6 +102,16 @@ class ChromeNavigationUIData : public content::NavigationUIData {
+     navigation_initiated_from_sync_ = navigation_initiated_from_sync;
+   }
+ 
++  // Exact destination carried only by a Taffy task-issued navigation. The
++  // downstream throttle consumes it before the first request and refuses all
++  // redirects. A string keeps this carrier independent of downstream types.
++  const std::optional<std::string>& taffy_task_navigation_target() const {
++    return taffy_task_navigation_target_;
++  }
++  void set_taffy_task_navigation_target(std::string target) {
++    taffy_task_navigation_target_ = std::move(target);
++  }
++
+  private:
+ #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
+   // Manages the lifetime of optional ExtensionNavigationUIData information.
+@@ -145,6 +156,8 @@ class ChromeNavigationUIData : public content::NavigationUIData {
+   // navigation.
+   bool navigation_initiated_from_sync_ = false;
+ 
++  std::optional<std::string> taffy_task_navigation_target_;
++
+   // Id of the actor task active during this navigation. Set only if actor was
+   // acting on the tab when the navigation started.
+   actor::TaskId actor_task_id_;

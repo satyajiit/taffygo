@@ -1,0 +1,31 @@
+From 0f3f8b1b9e609730a525c48f9b752751442a2cd8 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Tue, 18 Aug 2026 04:14:18 +0530
+Subject: build no popular-sites source for the NTP tiles
+
+A fresh profile's first launch fetched a Google-curated site list and then
+requested an icon from every site on it. A null popular-sites source is
+legal by MostVisitedSites' contract: the user's own most-visited tiles keep
+working and the default slots stay empty until there is history.
+
+Taffy-Patch: 0019
+
+diff --git a/chrome/browser/ntp_tiles/chrome_popular_sites_factory.cc b/chrome/browser/ntp_tiles/chrome_popular_sites_factory.cc
+index 90e98a8366f50..18ddf051d5393 100644
+--- a/chrome/browser/ntp_tiles/chrome_popular_sites_factory.cc
++++ b/chrome/browser/ntp_tiles/chrome_popular_sites_factory.cc
+@@ -12,9 +12,9 @@
+ 
+ std::unique_ptr<ntp_tiles::PopularSites>
+ ChromePopularSitesFactory::NewForProfile(Profile* profile) {
+-  return std::make_unique<ntp_tiles::PopularSitesImpl>(
+-      profile->GetPrefs(), TemplateURLServiceFactory::GetForProfile(profile),
+-      g_browser_process->variations_service(),
+-      profile->GetDefaultStoragePartition()
+-          ->GetURLLoaderFactoryForBrowserProcess());
++  // Taffy: no popular-sites source. A fresh profile fetched a curated site
++  // list and fanned out icon requests to every listed site; a null source is
++  // legal by MostVisitedSites' contract and leaves only the user's own
++  // tiles. chromium/patches/0019-build-no-popular-sites-source.md
++  return nullptr;
+ }

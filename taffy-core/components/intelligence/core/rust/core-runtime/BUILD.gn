@@ -1,0 +1,33 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//build/rust/rust_static_library.gni")
+import("//taffy/build/capabilities/generated/product-capabilities.gni")
+import("//taffy/services/core/crate_sources.gni")
+
+rust_static_library("core_runtime") {
+  crate_name = "core_runtime"
+  crate_root = taffy_core_runtime_crate_root
+  sources = taffy_core_runtime_sources
+  edition = "2021"
+  rustflags = taffy_capability_rustflags
+  deps = [
+    "//taffy/components/delivery/core/rust/asset-plane:asset_plane",
+    "//taffy/components/intelligence/core/rust/file-engine:file_engine",
+    "//taffy/components/intelligence/core/rust/loop-kernel:loop_kernel",
+    "//taffy/components/intelligence/core/rust/model-router:model_router",
+    "//taffy/components/intelligence/core/rust/procedure-engine:procedure_engine",
+    "//taffy/components/intelligence/core/rust/task-engine:task_engine",
+    "//taffy/components/security/core/rust/audit-engine:audit_engine",
+    "//taffy/components/security/core/rust/policy-engine:policy_engine",
+    "//taffy/components/storage/core/rust/storage-domain:taffy_storage",
+    "//taffy/components/tools/core/rust/tool-entrypoints:tool_entrypoints",
+    "//taffy/contracts/bip/rust/bip-types:bip_types",
+    "//taffy/contracts/core-api/rust/core-api-types:core_api_types",
+    "//taffy/contracts/core-service/rust/core-service-types:core_service_types",
+  ]
+  visibility = [ "//taffy/services/core:*" ]
+}

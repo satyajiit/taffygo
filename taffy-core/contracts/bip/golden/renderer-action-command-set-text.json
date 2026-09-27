@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.8",
+  "command_id": "cmd_20",
+  "frame_id": "frame_main",
+  "page_epoch": "epoch_d4",
+  "required_graph_revision": 11,
+  "node_id": "n_shipping_city",
+  "operation": "SET_TEXT",
+  "input": {
+    "kind": "TEXT",
+    "sensitivity": "PERSONAL",
+    "text": "Shrewsbury"
+  },
+  "renderer_preconditions": [
+    {
+      "kind": "NODE_EXISTS"
+    },
+    {
+      "kind": "NODE_ROLE_UNCHANGED",
+      "expected_role": "TEXT_FIELD"
+    },
+    {
+      "kind": "NODE_ACTION_AVAILABLE",
+      "expected_action_type": "SET_TEXT"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "EDITABLE"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "ENABLED"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "VISIBLE"
+    },
+    {
+      "kind": "NODE_STATE_ABSENT",
+      "node_state": "OBSCURED"
+    },
+    {
+      "kind": "NOT_SENSITIVE_FIELD",
+      "max_sensitivity": "PERSONAL"
+    }
+  ],
+  "deadline_ms": 1500
+}

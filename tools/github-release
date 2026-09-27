@@ -1,0 +1,411 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/github-release — attach a signed TaffyGo APK to a GitHub release, by hand.
+#
+# Authority: docs/decisions/0252-taffygo-1-0-ships-on-play-production-and-
+# github-releases.md. docs/development/release-and-incident-runbook.md section
+# 12 is the procedure around it. `--help` lists the commands and options.
+#
+# WHAT EACH STEP IS FOR
+#
+#   prepare  reads the release-arm64 outputs of ./tools/chromium/build: the APK
+#            and the signed bundle. It refuses unless both carry the configured
+#            key's certificate, both carry one version code above the last one
+#            Play accepted (tools/github-release.d/version-floor), the version
+#            name is the pinned Chromium, and the notes for the version exist.
+#            Only then does it write the APK, SHA256SUMS and release-notes.md,
+#            plus receipt.json for draft. The bundle is checked and not copied:
+#            it is for Play, and checking it here is what ties the GitHub APK
+#            to the build Play receives.
+#   draft    re-reads what prepare wrote, refuses if a byte of it changed or if
+#            the tag or the release already exists, then creates the release as
+#            a draft with gh. A draft is visible to the repository's owners
+#            only.
+#   publish  makes that draft public, and only with --yes.
+#
+# The signing key is resolved exactly as ./tools/chromium/build resolves it
+# (tools/chromium/lib/signing.sh), from the environment or from an untracked
+# env file, never from this repository. Its password reaches keytool through
+# the environment and is never an argument and never printed.
+#
+# No lane runs this command, and nothing runs draft or publish for you.
+#
+# Exit codes: 0 = succeeded, 1 = a refusal or a problem, 2 = it could not run.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
+# shellcheck disable=SC1091
+. "$TAFFY_ROOT/tools/lib/android.sh"
+# shellcheck disable=SC1091
+. "$TAFFY_ROOT/tools/chromium/lib/chromium.sh"
+# shellcheck disable=SC1091
+. "$TAFFY_ROOT/tools/github-release.d/selftest.sh"
+
+RELEASE_D="$TAFFY_ROOT/tools/github-release.d"
+PROFILE=release-arm64
+# Python writes no bytecode beside the helpers: the tree stays what Git has.
+export PYTHONDONTWRITEBYTECODE=1
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/github-release <command> [options]
+
+  prepare --version X.Y.Z [--out DIR] [--build-log FILE] [--min-version-code N]
+          [--apks DIR] [--notes FILE]
+      Check the release-arm64 APK and signed bundle, then write
+      TaffyGo-X.Y.Z-arm64.apk, SHA256SUMS and release-notes.md into DIR.
+      Writes nothing when any check fails, and names every failed check.
+  draft --version X.Y.Z --repo OWNER/NAME [--out DIR]
+      Create release vX.Y.Z on OWNER/NAME as a draft, with the APK and
+      SHA256SUMS attached and release-notes.md as its text.
+  publish --version X.Y.Z --repo OWNER/NAME --yes [--out DIR]
+      Make the draft vX.Y.Z public. Refuses without --yes.
+  self-test
+      Every refusal above, end to end, against throwaway keys and artifacts
+      and a stand-in for gh. Reaches no network.
+
+Options:
+  --out DIR              the prepared release; default
+                         $HOME/taffygo-publish/release/X.Y.Z, or
+                         $TAFFY_GITHUB_RELEASE_OUT/X.Y.Z when that is set.
+                         Refused inside this repository
+  --build-log FILE       the log of the build that wrote the artifacts; it must
+                         end with BUILD_EXIT=0 and hold no FAILED: line
+  --min-version-code N   refuse a version code at or below N as well as at or
+                         below tools/github-release.d/version-floor
+  --apks DIR             where TaffyGo.apk and TaffyGo.signed.aab are; default
+                         out/release-arm64/apks in the recorded Chromium checkout
+  --notes FILE           the release notes; default
+                         tools/github-release.d/notes/X.Y.Z.md
+
+Tools: apksigner and aapt2 from the highest installed Android SDK build-tools,
+keytool and jarsigner from a JDK on PATH, bundletool on PATH, and gh for draft
+and publish.
+USAGE
+}
+
+# The same guard ./tools/play runs first in every two-word option arm: without
+# it a flag given as the last word shifts twice and `set -e` ends the script
+# with no message at all.
+needs_value() {
+  [ "$1" -ge 2 ] && return 0
+  die "$2 needs a value" "Run: ./tools/github-release --help"
+}
+
+# Could not run, as opposed to refused: exit 2, in die's own words.
+unable() { ( die "$@" ) || exit 2; }
+
+require_version() {
+  printf '%s\n' "$1" | grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' \
+    || die "--version must be X.Y.Z, three whole numbers: '${1}'" \
+      "One release line and no suffix (decision 0008)."
+}
+
+require_repo() {
+  printf '%s\n' "$1" | grep -Eq '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$' \
+    || die "--repo must be OWNER/NAME: '${1}'" \
+      "Name it every time. A default would be a public destination nobody typed."
+}
+
+require_python() {
+  have python3 || unable "python3 is not installed" \
+    "The release checks are standard-library Python 3.11 or later."
+}
+
+default_out() {
+  printf '%s/%s\n' "${TAFFY_GITHUB_RELEASE_OUT:-$HOME/taffygo-publish/release}" "$1"
+}
+
+# One name from the branding authority, read the way ./tools/chromium/build
+# reads it, so the file this looks for is the file the build wrote.
+branding_name() {
+  local value
+  value=$(sed -n "s/^$1 = \"\\([^\"]*\\)\"\$/\\1/p" \
+    "$TAFFY_ROOT/taffy-core/resources/branding/taffy_branding.gni")
+  [ -n "$value" ] || unable "$1 is missing from taffy-core/resources/branding/taffy_branding.gni"
+  printf '%s\n' "$value"
+}
+
+# The one place the attached file's name is decided. The ABI is the release
+# profile's: release-arm64 builds arm64-v8a and nothing else.
+release_apk_file() {
+  printf '%s-%s-arm64.apk\n' "$(branding_name taffy_apk_name)" "$1"
+}
+
+# The highest installed build-tools release that carries <name>. apksigner is
+# not on PATH on the Chromium builder, and Chromium's own copy lives in a
+# checkout this command may not have.
+build_tool() {
+  local sdk version
+  sdk=$(taffy_android_sdk_root 2>/dev/null) || sdk=$(taffy_android_sdk_conventional 2>/dev/null) \
+    || return 1
+  version=$(find "$sdk/build-tools" -mindepth 2 -maxdepth 2 -type f -name "$1" -perm -u+x \
+      2>/dev/null | awk -F/ '{print $(NF-1)}' | sort -t. -k1,1n -k2,2n -k3,3n | tail -n 1)
+  [ -n "$version" ] || return 1
+  printf '%s/build-tools/%s/%s\n' "$sdk" "$version" "$1"
+}
+
+jdk_tool() {
+  if have "$1"; then command -v "$1"
+  elif [ -n "${JAVA_HOME:-}" ] && [ -x "$JAVA_HOME/bin/$1" ]; then printf '%s\n' "$JAVA_HOME/bin/$1"
+  else return 1; fi
+}
+
+# TAFFY_GH names another gh; the self-test points it at its stand-in.
+require_gh() {
+  # shellcheck disable=SC2031  # the self-test sets it in a subshell on purpose
+  local gh=${TAFFY_GH:-$(command -v gh || true)}
+  if [ -z "$gh" ] || [ ! -x "$gh" ]; then
+    unable "gh is not installed" "Install the GitHub CLI and run: gh auth login"
+  fi
+  printf '%s\n' "$gh"
+}
+
+command_prepare() {
+  local version='' out='' build_log='' min_code=0 apks='' notes=''
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --version) needs_value "$#" --version; version=$2; shift ;;
+      --version=*) version=${1#*=} ;;
+      --out) needs_value "$#" --out; out=$2; shift ;;
+      --out=*) out=${1#*=} ;;
+      --build-log) needs_value "$#" --build-log; build_log=$2; shift ;;
+      --build-log=*) build_log=${1#*=} ;;
+      --min-version-code) needs_value "$#" --min-version-code; min_code=$2; shift ;;
+      --min-version-code=*) min_code=${1#*=} ;;
+      --apks) needs_value "$#" --apks; apks=$2; shift ;;
+      --apks=*) apks=${1#*=} ;;
+      --notes) needs_value "$#" --notes; notes=$2; shift ;;
+      --notes=*) notes=${1#*=} ;;
+      *) die "unknown option for prepare: $1" "Run: ./tools/github-release --help" ;;
+    esac
+    shift
+  done
+  require_version "$version"
+  case "$min_code" in ''|*[!0-9]*) die "--min-version-code takes a whole number: '$min_code'" ;; esac
+  require_python
+  [ -n "$out" ] || out=$(default_out "$version")
+  [ -n "$notes" ] || notes="$RELEASE_D/notes/$version.md"
+  [ -n "$apks" ] || apks="$(chromium_out_dir "$PROFILE")/apks"
+
+  local apk_name bundle_name apk_file
+  apk_name=$(branding_name taffy_apk_name)
+  bundle_name=$(branding_name taffy_bundle_name)
+  apk_file=$(release_apk_file "$version")
+
+  local apksigner aapt2 keytool jarsigner bundletool
+  apksigner=$(build_tool apksigner) || unable "no Android SDK build-tools with apksigner" \
+    "Set ANDROID_HOME, and install build-tools with sdkmanager."
+  aapt2=$(build_tool aapt2) || unable "no Android SDK build-tools with aapt2"
+  keytool=$(jdk_tool keytool) || unable "no keytool on PATH or under JAVA_HOME" \
+    "Put a JDK's bin directory on PATH."
+  jarsigner=$(jdk_tool jarsigner) || unable "no jarsigner on PATH or under JAVA_HOME"
+  bundletool=$(command -v bundletool || true)
+  [ -n "$bundletool" ] || unable "bundletool is not on PATH" \
+    "It reads the bundle's manifest, which is protobuf and not something to parse by hand."
+  info "tools: ${apksigner%/apksigner} (apksigner, aapt2), $(dirname "$keytool"), $bundletool"
+
+  # The identity is resolved by the build's own rule. A half-set one, or an
+  # env file other accounts can read, ends the run inside that function.
+  local -a key_args
+  if taffy_signing_resolve; then
+    key_args=(--key-store "$TAFFY_SIGNING_KEYSTORE" --key-alias "$TAFFY_SIGNING_ALIAS"
+      --key-source "$TAFFY_SIGNING_SOURCE")
+  else
+    key_args=(--no-key --key-source "$(taffy_signing_env_file)")
+  fi
+
+  TAFFY_RELEASE_KEY_PASSWORD=$TAFFY_SIGNING_PASSWORD python3 "$RELEASE_D/prepare.py" prepare \
+    --root "$TAFFY_ROOT" --version "$version" --out "$out" --notes "$notes" \
+    --apk "$apks/$apk_name.apk" --aab "$apks/$bundle_name.signed.aab" \
+    --apk-file "$apk_file" --min-version-code "$min_code" \
+    ${build_log:+--build-log} ${build_log:+"$build_log"} \
+    --apksigner "$apksigner" --aapt2 "$aapt2" --keytool "$keytool" \
+    --jarsigner "$jarsigner" --bundletool "$bundletool" "${key_args[@]}"
+}
+
+# absent, draft or published — or exit 2 when gh's answer is neither "found"
+# nor "not found", because a network or login failure is not an absence.
+release_state() { # <gh> <repo> <tag>
+  local answer
+  if answer=$("$1" release view "$3" --repo "$2" --json isDraft --jq .isDraft 2>&1); then
+    case "$answer" in
+      true) printf 'draft\n' ;;
+      false) printf 'published\n' ;;
+      *) unable "gh release view answered '$answer' for $3 on $2" ;;
+    esac
+  else
+    case "$answer" in
+      *"release not found"*) printf 'absent\n' ;;
+      *) unable "gh could not say whether release $3 exists on $2" "$answer" ;;
+    esac
+  fi
+}
+
+tag_state() { # <gh> <repo> <tag>
+  local answer
+  if answer=$("$1" api "repos/$2/git/ref/tags/$3" --jq .ref 2>&1); then
+    printf 'present\n'
+  else
+    case "$answer" in
+      *"Not Found"*|*"HTTP 404"*) printf 'absent\n' ;;
+      *) unable "gh could not say whether tag $3 exists on $2" "$answer" ;;
+    esac
+  fi
+}
+
+file_sha256() {
+  if have sha256sum; then sha256sum "$1" | cut -d' ' -f1
+  else shasum -a 256 "$1" | cut -d' ' -f1; fi
+}
+
+# name<TAB>size<TAB>digest for each asset. GitHub reports a digest for assets
+# uploaded since mid-2025; an empty one is compared by size alone, and says so.
+release_assets() { # <gh> <repo> <tag>
+  "$1" release view "$3" --repo "$2" --json assets \
+    --jq '.assets[] | [.name, (.size | tostring), (.digest // "")] | @tsv'
+}
+
+# Every prepared file is on the release, the same size, and the same digest
+# where GitHub gives one.
+check_assets() { # <gh> <repo> <tag> <out> <apk file>
+  local listing name size digest want_size want_sha failed=0
+  listing=$(release_assets "$1" "$2" "$3") || unable "gh could not list the assets of $3 on $2"
+  for name in "$5" SHA256SUMS; do
+    size=$(printf '%s\n' "$listing" | awk -F'\t' -v n="$name" '$1 == n {print $2}')
+    digest=$(printf '%s\n' "$listing" | awk -F'\t' -v n="$name" '$1 == n {print $3}')
+    if [ -z "$size" ]; then
+      bad "$3 on $2 has no asset named $name"; failed=1; continue
+    fi
+    if [ ! -f "$4/$name" ]; then
+      warn "$name is attached; $4/$name is not here to compare it with"; continue
+    fi
+    want_size=$(wc -c < "$4/$name" | tr -d ' ')
+    want_sha=$(file_sha256 "$4/$name")
+    if [ "$size" != "$want_size" ]; then
+      bad "$name on GitHub is $size bytes and the prepared one is $want_size"; failed=1
+    elif [ -n "$digest" ] && [ "$digest" != "sha256:$want_sha" ]; then
+      bad "$name on GitHub has digest $digest and the prepared one sha256:$want_sha"; failed=1
+    elif [ -n "$digest" ]; then
+      ok "$name: $size bytes, $digest, as prepared"
+    else
+      ok "$name: $size bytes, as prepared (GitHub gave no digest to compare)"
+    fi
+  done
+  return "$failed"
+}
+
+parse_remote_options() { # sets version, repo, out, yes
+  version='' repo='' out='' yes=0
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --version) needs_value "$#" --version; version=$2; shift ;;
+      --version=*) version=${1#*=} ;;
+      --repo) needs_value "$#" --repo; repo=$2; shift ;;
+      --repo=*) repo=${1#*=} ;;
+      --out) needs_value "$#" --out; out=$2; shift ;;
+      --out=*) out=${1#*=} ;;
+      --yes) yes=1 ;;
+      *) die "unknown option: $1" "Run: ./tools/github-release --help" ;;
+    esac
+    shift
+  done
+  require_version "$version"
+  [ -n "$repo" ] || die "--repo is required" \
+    "Name it every time. A default would be a public destination nobody typed."
+  require_repo "$repo"
+  [ -n "$out" ] || out=$(default_out "$version")
+}
+
+# Each state is assigned before it is compared. Written as `case "$(...)"`, a
+# gh failure inside the substitution would not end the script: the case would
+# read an empty word and report "already exists" for a network error.
+command_draft() {
+  local version repo out yes gh tag facts title apk_file expected state
+  parse_remote_options "$@"
+  [ "$yes" = 0 ] || die "draft takes no --yes: a draft is not public, and publish is the step that asks"
+  require_python
+  tag="v$version"
+  expected=$(release_apk_file "$version")
+  step "the prepared files in $out"
+  facts=$(python3 "$RELEASE_D/prepare.py" check-prepared --out "$out" --version "$version") \
+    || die "draft refuses files prepare did not write, or that changed since"
+  title=$(printf '%s\n' "$facts" | sed -n 1p)
+  apk_file=$(printf '%s\n' "$facts" | sed -n 2p)
+  [ "$apk_file" = "$expected" ] \
+    || die "the prepared APK is $apk_file, and this version's name is $expected"
+
+  gh=$(require_gh)
+  step "github: $repo, branch main, and no $tag yet"
+  "$gh" api "repos/$repo/branches/main" --jq .name >/dev/null 2>&1 \
+    || unable "gh cannot see a main branch on $repo" \
+      "The repository must exist and hold the export before a release can target it."
+  state=$(release_state "$gh" "$repo" "$tag")
+  [ "$state" = absent ] || die "a release $tag already exists on $repo" \
+    "Read it on GitHub. This command creates releases and never replaces one."
+  ok "no release $tag"
+  state=$(tag_state "$gh" "$repo" "$tag")
+  [ "$state" = absent ] || die "the tag $tag already exists on $repo" \
+    "A release is created with its tag, at main, when it is published. A tag" \
+    "made some other way names a commit nobody checked."
+  ok "no tag $tag"
+
+  step "gh release create $tag --draft"
+  "$gh" release create "$tag" --repo "$repo" --target main --draft --title "$title" \
+    --notes-file "$out/release-notes.md" "$out/$apk_file" "$out/SHA256SUMS"
+  state=$(release_state "$gh" "$repo" "$tag")
+  [ "$state" = draft ] \
+    || die "gh reported success, and $tag on $repo is not a draft; read it on GitHub now"
+  check_assets "$gh" "$repo" "$tag" "$out" "$apk_file" \
+    || die "the draft's files are not the prepared ones; delete the draft and run draft again"
+  ok "draft $tag on $repo: \"$title\""
+  note "It is not public. Read it on GitHub, download the APK from it and check it, then:"
+  note "  ./tools/github-release publish --version $version --repo $repo --yes"
+}
+
+command_publish() {
+  local version repo out yes gh tag apk_file state
+  parse_remote_options "$@"
+  tag="v$version"
+  [ "$yes" = 1 ] || die "publishing makes $tag public on $repo, and needs --yes" \
+    "Read the draft on GitHub and check the APK you download from it first."
+  apk_file=$(release_apk_file "$version")
+  gh=$(require_gh)
+  step "github: $tag on $repo"
+  state=$(release_state "$gh" "$repo" "$tag")
+  case "$state" in
+    draft) ok "$tag is a draft" ;;
+    published) die "$tag on $repo is already public" ;;
+    *) die "there is no release $tag on $repo" \
+         "Run: ./tools/github-release draft --version $version --repo $repo" ;;
+  esac
+  check_assets "$gh" "$repo" "$tag" "$out" "$apk_file" \
+    || die "the draft's files are not the prepared ones, so this does not publish it"
+  step "gh release edit $tag --draft=false"
+  "$gh" release edit "$tag" --repo "$repo" --draft=false
+  state=$(release_state "$gh" "$repo" "$tag")
+  [ "$state" = published ] \
+    || die "gh reported success, and $tag on $repo is still not public; read it on GitHub now"
+  ok "$tag is public on $repo"
+}
+
+main() {
+  local command="${1:-}"
+  if [ $# -gt 0 ]; then shift; fi
+  case "$command" in
+    ""|-h|--help|help) usage; return 0 ;;
+    prepare)   command_prepare "$@" ;;
+    draft)     command_draft "$@" ;;
+    publish)   command_publish "$@" ;;
+    self-test) command_self_test ;;
+    *) printf 'taffy: unknown command %s\n\n' "$command" >&2; usage >&2; return 2 ;;
+  esac
+}
+
+main "$@"

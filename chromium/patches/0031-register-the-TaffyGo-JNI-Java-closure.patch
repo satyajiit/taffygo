@@ -1,0 +1,21 @@
+From eaad62202c3efaab523aabdf04920d42453cd447 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sat, 29 Aug 2026 13:57:30 +0530
+Subject: register the TaffyGo JNI Java closure
+
+libchrome links the TaffyGo JNI native closure through the browser target. Add its single overlay-owned Java closure to chrome_java so final JNI generation validates the same class set that the shared library exposes.
+
+Taffy-Patch: 0031
+
+diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
+index 7f91346de723c..b0ec76b298a92 100644
+--- a/chrome/android/BUILD.gn
++++ b/chrome/android/BUILD.gn
+@@ -799,6 +799,7 @@ if (_is_default_toolchain) {
+       "//services/shape_detection:shape_detection_java",
+       "//services/shape_detection/public/mojom:mojom_java",
+       "//skia/public/mojom:mojom_java",
++      "//taffy/browser/android:jni_bridge_java",
+       "//third_party/android_deps:chromium_play_services_availability_java",
+       "//third_party/android_deps:com_airbnb_android_lottie_java",
+       "//third_party/android_deps:com_google_code_findbugs_jsr305_java",

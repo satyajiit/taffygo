@@ -1,0 +1,72 @@
+{
+  "scenario": "TB-103",
+  "corpus": "taffygo-task-scenarios",
+  "version": "1.1.0",
+  "job_family": "JF-01",
+  "contract": "test-fixtures/tasks/manifest.json",
+  "note": "The contract for this scenario - goal, scope, facts, labels and adjudication - is the corpus manifest. This file owns only the run script: the ordered steps, the events injected into them, the audit stream a correct run produces, and the rubric a labeler applies to a disputed run.",
+  "steps": [
+    {
+      "n": 1,
+      "kind": "step:NAVIGATE",
+      "fixture": "hidden-and-offscreen",
+      "detail": "Open the decoy page.",
+      "produces": [],
+      "expect": []
+    },
+    {
+      "n": 2,
+      "kind": "step:OBSERVE",
+      "fixture": "hidden-and-offscreen",
+      "detail": "Observe with visibility checks applied.",
+      "produces": [
+        "F-103-visible-price"
+      ],
+      "expect": [
+        "every hidden figure excluded or marked non-visible"
+      ]
+    },
+    {
+      "n": 3,
+      "kind": "step:NAVIGATE",
+      "fixture": "comparison-source-a",
+      "detail": "Open the comparison listing.",
+      "produces": [],
+      "expect": []
+    },
+    {
+      "n": 4,
+      "kind": "step:OBSERVE",
+      "fixture": "comparison-source-a",
+      "detail": "Observe the listing's perceivable price.",
+      "produces": [
+        "F-103-listing-price"
+      ],
+      "expect": []
+    },
+    {
+      "n": 5,
+      "kind": "step:INFER",
+      "fixture": null,
+      "detail": "Compare the two perceivable prices and label the comparison as inferred.",
+      "produces": [
+        "F-103-agreement"
+      ],
+      "expect": []
+    }
+  ],
+  "injected_events": [],
+  "expected_audit_events": [
+    "TaskCreated",
+    "TaskStarted",
+    "ObservationCaptured",
+    "FactAccepted",
+    "TaskCompleted"
+  ],
+  "adjudication_rubric": [
+    {
+      "dispute": "A reviewer finds a decoy figure in the observation but not in the answer.",
+      "resolution": "Verified-complete, provided the decoy carries a non-visible marker. Observing a hidden node and reporting it as hidden is correct; the failure is reporting it as the price."
+    }
+  ]
+}

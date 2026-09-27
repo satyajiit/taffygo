@@ -1,0 +1,512 @@
+{
+  "contract": "tool_runtime",
+  "namespace": "taffy.tool_runtime",
+  "version": {"major": 2, "minor": 4},
+  "projections": ["rust", "kotlin", "typescript", "mojom", "cpp"],
+  "limits": {
+    "MAX_JOB_INPUT_BYTES": 16777216,
+    "MAX_JOB_OUTPUT_BYTES": 16777216,
+    "MAX_JOB_ID_BYTES": 128,
+    "MAX_OPERATION_ID_BYTES": 128,
+    "MAX_IDEMPOTENCY_KEY_BYTES": 128,
+    "MAX_TOOL_VERSION_BYTES": 64,
+    "MAX_CONVERSATION_ID_BYTES": 128,
+    "MAX_JOB_MEMORY_BYTES": 4294967296,
+    "MAX_JOB_CPU_MS": 600000,
+    "MAX_JOB_TEMPORARY_BYTES": 1073741824,
+    "MAX_JOB_WALL_TIME_MS": 600000,
+    "MAX_OUTPUT_CHUNK_BYTES": 65536,
+    "MAX_OUTPUT_CHUNKS": 256,
+    "MAX_PROGRESS_EVENTS": 256,
+    "MAX_TOOL_ID_BYTES": 128,
+    "MAX_ENTRYPOINT_ID_BYTES": 128,
+    "MAX_HANDLE_ID_BYTES": 256,
+    "MAX_PRESET_ID_BYTES": 128,
+    "MAX_INLINE_PAYLOAD_BYTES": 262144,
+    "MAX_STREAM_OUTPUT_CHUNKS": 65536,
+    "MAX_STREAM_CHUNK_BYTES": 4096,
+    "MAX_MODEL_ID_BYTES": 128,
+    "MAX_MODEL_REVISION_BYTES": 64,
+    "MAX_MODEL_ARTIFACT_BYTES": 2147483648,
+    "MAX_EMBEDDING_DIMENSIONS": 4096,
+    "MAX_EMBEDDING_VALUE_BYTES": 16384,
+    "MAX_PYTHON_LIBRARY_ID_BYTES": 128,
+    "MAX_PYTHON_LIBRARY_VERSION_BYTES": 64,
+    "MAX_PYTHON_LIBRARY_BYTES": 134217728
+  },
+  "forbidden_field_substrings": ["capability", "argv", "source_code", "filesystem_path", "destination_url", "sandbox"],
+  "required_envelope_fields": [
+    "operation_id",
+    "service_generation",
+    "task_revision",
+    "deadline_monotonic_ms",
+    "idempotency_key"
+  ],
+  "enums": [
+    {
+      "name": "ToolRuntimeKind",
+      "description": "Compile-time runtime families with separate process sandboxes.",
+      "members": [
+        {"name": "PYTHON", "wire": 0, "description": "A fresh process running one bundled allowlisted Python entrypoint."},
+        {"name": "LOCAL_MODEL", "wire": 1, "description": "A profile-partitioned local model service."},
+        {"name": "MEDIA", "wire": 2, "description": "A fresh process running one closed media operation."},
+        {"name": "WASM", "wire": 3, "description": "A reserved isolated WASI runtime family."}
+      ]
+    },
+    {
+      "name": "ToolOperation",
+      "description": "Closed operations; workers never receive command lines or executable source.",
+      "members": [
+        {"name": "RUN_BUNDLED_PYTHON_MODULE", "wire": 0, "description": "Run a reviewed bundled pure-Python module entrypoint."},
+        {"name": "GENERATE_LOCAL_MODEL", "wire": 1, "description": "Generate bounded local-model output."},
+        {"name": "PROBE_MEDIA", "wire": 2, "description": "Read bounded media metadata."},
+        {"name": "EXTRACT_AUDIO", "wire": 3, "description": "Extract audio using an approved preset."},
+        {"name": "SAMPLE_FRAMES", "wire": 4, "description": "Sample bounded frames using an approved preset."},
+        {"name": "TRANSCODE_PRESET", "wire": 5, "description": "Run one reviewed transcode preset."},
+        {"name": "RUN_SIGNED_WASM_TRANSFORM", "wire": 6, "description": "Reserved operation for a reviewed signed transform."},
+        {"name": "EMBED_LOCAL_MODEL", "wire": 7, "description": "Embed bounded text with a registered local model and return one vector."}
+      ]
+    },
+    {
+      "name": "ToolModelArtifactKind",
+      "description": "Closed on-device model artifact formats the browser knows how to open; a worker never names a format the browser did not register.",
+      "members": [
+        {"name": "LITERT_TFLITE", "wire": 0, "description": "A LiteRT/TensorFlow Lite flatbuffer artifact."},
+        {"name": "ONNX_RUNTIME", "wire": 1, "description": "An ONNX Runtime graph artifact."},
+        {"name": "GGUF", "wire": 2, "description": "A GGUF weight artifact."}
+      ]
+    },
+    {
+      "name": "ToolInputTransport",
+      "description": "Closed ways bounded job input reaches a worker. The browser chooses from the declared length; a worker opens nothing itself.",
+      "members": [
+        {"name": "INLINE", "wire": 0, "description": "The bytes ride inside the argument record, bounded by MAX_INLINE_PAYLOAD_BYTES."},
+        {"name": "SHARED_MEMORY", "wire": 1, "description": "The bytes arrive as one browser-mapped read-only region attached to the job, and the argument record carries none."}
+      ]
+    },
+    {
+      "name": "ToolOutputTransport",
+      "description": "Closed ways bounded job output leaves a worker, decided by the browser before the job starts.",
+      "members": [
+        {"name": "INLINE_CHUNKS", "wire": 0, "description": "Ordered chunks the browser buffers until the terminal completion; the historic shape."},
+        {"name": "STREAM_CHUNKS", "wire": 1, "description": "Ordered chunks forwarded as each one arrives, ending at the chunk that marks itself final."},
+        {"name": "DATA_PIPE", "wire": 2, "description": "Bulk bytes through one browser-held pipe; the chunk stream then carries no bytes of its own."}
+      ]
+    },
+    {
+      "name": "EmbeddingElementKind",
+      "description": "Closed element encoding of an embedding vector, stated so two processes never disagree about width or byte order.",
+      "members": [
+        {"name": "FLOAT32_LE", "wire": 0, "description": "Little-endian IEEE-754 binary32, four bytes per element."}
+      ]
+    },
+    {
+      "name": "ToolChunkKind",
+      "description": "Closed streaming output representations.",
+      "members": [
+        {"name": "TEXT_UTF8", "wire": 0, "description": "A validated UTF-8 text chunk."},
+        {"name": "BINARY", "wire": 1, "description": "A bounded binary output chunk."}
+      ]
+    },
+    {
+      "name": "LocalModelFinishReason",
+      "description": "Closed local-model terminal reasons that do not expose provider details.",
+      "members": [
+        {"name": "STOP", "wire": 0, "description": "Generation reached a normal stop condition."},
+        {"name": "TOKEN_LIMIT", "wire": 1, "description": "Generation reached the submitted token budget."}
+      ]
+    },
+    {
+      "name": "ToolTerminalStatus",
+      "description": "Closed content-free worker terminal outcomes.",
+      "members": [
+        {"name": "COMPLETED", "wire": 0, "description": "The job completed with validated typed output."},
+        {"name": "CANCELLED", "wire": 1, "description": "The broker cancelled and killed the job."},
+        {"name": "DEADLINE_EXCEEDED", "wire": 2, "description": "The wall deadline expired."},
+        {"name": "RESOURCE_LIMIT", "wire": 3, "description": "CPU, memory, temporary storage or output limits were exceeded."},
+        {"name": "RUNTIME_CRASHED", "wire": 4, "description": "The isolated runtime disconnected unexpectedly."},
+        {"name": "INVALID_INPUT", "wire": 5, "description": "The worker rejected the typed input."},
+        {"name": "UNSUPPORTED", "wire": 6, "description": "The runtime or operation is unavailable on this platform."},
+        {"name": "OUTCOME_UNKNOWN", "wire": 7, "description": "A consequential output commit may have happened."},
+        {"name": "MODEL_ARTIFACT_MISSING", "wire": 8, "description": "No verified registered model artifact matched the job's exact identity and revision."},
+        {"name": "MODEL_ARTIFACT_INCOMPATIBLE", "wire": 9, "description": "The verified model artifact facts do not match the job or a compiled runtime adapter."},
+        {"name": "LOCAL_RUNTIME_UNAVAILABLE", "wire": 10, "description": "This build has no sandboxed local-model runtime adapter."}
+      ]
+    },
+    {
+      "name": "ToolAdmissionStatus",
+      "description": "Immediate broker admission for a bounded tool job.",
+      "members": [
+        {"name": "ACCEPTED", "wire": 0, "description": "The job was admitted to its runtime-specific worker."},
+        {"name": "UNSUPPORTED", "wire": 1, "description": "The runtime, tool or operation is not packaged on this platform."},
+        {"name": "INVALID_JOB", "wire": 2, "description": "The job failed structural or registry validation."},
+        {"name": "BACKPRESSURE", "wire": 3, "description": "The profile runtime limit refused additional work."},
+        {"name": "DEADLINE_EXCEEDED", "wire": 4, "description": "The job deadline had already expired."},
+        {"name": "MODEL_ARTIFACT_MISSING", "wire": 5, "description": "No verified registered model artifact matched the job's exact identity and revision."},
+        {"name": "MODEL_ARTIFACT_INCOMPATIBLE", "wire": 6, "description": "The verified model artifact facts do not match the job or this runtime adapter."},
+        {"name": "LOCAL_RUNTIME_UNAVAILABLE", "wire": 7, "description": "This build has no sandboxed local-model runtime adapter."}
+      ]
+    }
+  ],
+  "structs": [
+    {
+      "name": "OperationEnvelope",
+      "description": "Identity and recovery metadata shared with the core-service contract.",
+      "fields": [
+        {"name": "operation_id", "type": "string", "ordinal": 0, "description": "Opaque parent operation identity."},
+        {"name": "service_generation", "type": "u64", "ordinal": 1, "description": "Profile core generation used to reject stale jobs."},
+        {"name": "task_revision", "type": "u64", "ordinal": 2, "description": "Expected task revision."},
+        {"name": "deadline_monotonic_ms", "type": "u64", "ordinal": 3, "description": "Absolute wall deadline enforced by the broker."},
+        {"name": "idempotency_key", "type": "string", "ordinal": 4, "description": "Opaque logical job identity."}
+      ]
+    },
+    {
+      "name": "ResourceBudget",
+      "description": "Hard per-job limits enforced outside the worker and checked inside it.",
+      "fields": [
+        {"name": "max_input_bytes", "type": "u64", "ordinal": 0, "description": "Maximum accepted input bytes."},
+        {"name": "max_output_bytes", "type": "u64", "ordinal": 1, "description": "Maximum returned output bytes across chunks and the terminal body."},
+        {"name": "max_memory_bytes", "type": "u64", "ordinal": 2, "description": "Maximum resident memory attributed to the job."},
+        {"name": "max_cpu_ms", "type": "u64", "ordinal": 3, "description": "Maximum CPU time."},
+        {"name": "max_temporary_bytes", "type": "u64", "ordinal": 4, "description": "Maximum broker-owned temporary storage."},
+        {"name": "max_output_chunks", "type": "u32", "ordinal": 5, "description": "Maximum number of streamed output chunks."}
+      ]
+    },
+    {
+      "name": "ToolModelArtifact",
+      "description": "The registered on-device model the browser resolved and opened for this job. The record names the artifact; the opened resource itself is attached beside the job, so a worker can neither choose an artifact nor look one up.",
+      "fields": [
+        {"name": "model_id", "type": "string", "ordinal": 0, "description": "Registered model identity the browser resolved against its own register; never a path."},
+        {"name": "model_revision", "type": "string", "ordinal": 1, "description": "Pinned revision of that registered model."},
+        {"name": "kind", "type": "ToolModelArtifactKind", "ordinal": 2, "description": "Closed artifact format the worker must load the attached resource as."},
+        {"name": "artifact_bytes", "type": "u64", "ordinal": 3, "description": "Exact length of the attached artifact, bounded by MAX_MODEL_ARTIFACT_BYTES."},
+        {"name": "artifact_digest", "type": "bytes32", "ordinal": 4, "description": "SHA-256 of the attached artifact, so a worker refuses a resource that is not the one this record declares."},
+        {"name": "adapter_id", "type": "string", "ordinal": 5, "description": "Registered adapter identity, or empty when the job runs the base model alone."},
+        {"name": "adapter_bytes", "type": "u64", "ordinal": 6, "description": "Exact length of the attached adapter, or zero when there is none."},
+        {"name": "adapter_digest", "type": "bytes32", "ordinal": 7, "description": "SHA-256 of the attached adapter, or thirty-two zero bytes when there is none."}
+      ]
+    },
+    {
+      "name": "ToolPythonLibrary",
+      "description": "The bundled Python standard library the browser resolved and opened for this job. An interpreter that starts with an empty import path and no archive imports nothing at all, so this is the record that makes a Python job able to run rather than an extra it may do without. It names and measures the archive; the opened read-only descriptor travels beside the job, because a worker whose process denies it the filesystem could not check a path and must never be handed one. Every field is empty or zero when no library was resolved, which is the only shape the runtimes that do not run an interpreter ever carry.",
+      "fields": [
+        {"name": "library_id", "type": "string", "ordinal": 0, "description": "Registered bundled library identity the browser resolved against its own register, or empty when this job runs no interpreter; never a path."},
+        {"name": "library_version", "type": "string", "ordinal": 1, "description": "Pinned version of that registered library, or empty when there is none."},
+        {"name": "archive_bytes", "type": "u64", "ordinal": 2, "description": "Exact length of the attached archive, bounded by MAX_PYTHON_LIBRARY_BYTES, or zero when there is none."},
+        {"name": "archive_digest", "type": "bytes32", "ordinal": 3, "description": "SHA-256 of the attached archive, so a worker refuses a resource that is not the one this record declares, or thirty-two zero bytes when there is none."}
+      ]
+    },
+    {
+      "name": "ToolPayloadInput",
+      "description": "How this job's bounded input reaches the worker, and what it must measure once it arrives.",
+      "fields": [
+        {"name": "transport", "type": "ToolInputTransport", "ordinal": 0, "description": "Closed input transport the browser chose from the declared length."},
+        {"name": "byte_length", "type": "u64", "ordinal": 1, "description": "Exact input length, whichever transport carries it, never above the job budget."},
+        {"name": "digest", "type": "bytes32", "ordinal": 2, "description": "SHA-256 of the input bytes, or thirty-two zero bytes when the length is zero."}
+      ]
+    },
+    {
+      "name": "ToolPayloadOutput",
+      "description": "How this job's bounded output leaves the worker. A worker never selects its own transport, because the transport decides what the browser has to hold.",
+      "fields": [
+        {"name": "transport", "type": "ToolOutputTransport", "ordinal": 0, "description": "Closed output transport chosen by the browser before the job starts."},
+        {"name": "max_byte_length", "type": "u64", "ordinal": 1, "description": "Hard total output length across every transport, never above the job budget."}
+      ]
+    },
+    {
+      "name": "BundledPythonArguments",
+      "description": "Arguments for one reviewed bundled pure-Python entrypoint.",
+      "fields": [
+        {"name": "entrypoint_id", "type": "string", "ordinal": 0, "description": "Allowlisted entrypoint inside the bundled module."},
+        {"name": "input", "type": "bytes", "ordinal": 1, "description": "Bounded module input validated against the registered tool descriptor."}
+      ]
+    },
+    {
+      "name": "LocalModelArguments",
+      "description": "Arguments for one bounded disposable local-model conversation.",
+      "fields": [
+        {"name": "conversation_id", "type": "string", "ordinal": 0, "description": "Opaque conversation identity partitioned to one profile generation."},
+        {"name": "prompt_utf8", "type": "bytes", "ordinal": 1, "description": "Bounded UTF-8 model input."},
+        {"name": "max_output_tokens", "type": "u32", "ordinal": 2, "description": "Hard output-token limit checked by the broker and worker."},
+        {"name": "model", "type": "ToolModelArtifact", "ordinal": 3, "description": "The registered artifact the browser opened for this conversation."}
+      ]
+    },
+    {
+      "name": "LocalEmbeddingArguments",
+      "description": "Arguments for one bounded embedding of validated text. Pooling belongs to the registered model rather than to the caller, so there is no field for it.",
+      "fields": [
+        {"name": "model", "type": "ToolModelArtifact", "ordinal": 0, "description": "The registered embedding artifact the browser opened."},
+        {"name": "input_utf8", "type": "bytes", "ordinal": 1, "description": "Bounded UTF-8 text to embed."},
+        {"name": "max_input_tokens", "type": "u32", "ordinal": 2, "description": "Hard input-token limit checked by the broker and the worker."},
+        {"name": "normalize", "type": "bool", "ordinal": 3, "description": "Whether the worker returns the unit-length vector."}
+      ]
+    },
+    {
+      "name": "MediaProbeArguments",
+      "description": "Arguments for metadata inspection of one broker-owned input.",
+      "fields": [
+        {"name": "input_handle", "type": "string", "ordinal": 0, "description": "Opaque broker-owned read handle; never an ambient path."}
+      ]
+    },
+    {
+      "name": "AudioExtractArguments",
+      "description": "Arguments for one approved audio extraction preset.",
+      "fields": [
+        {"name": "input_handle", "type": "string", "ordinal": 0, "description": "Opaque broker-owned read handle."},
+        {"name": "output_handle", "type": "string", "ordinal": 1, "description": "Opaque broker-owned output handle."},
+        {"name": "preset_id", "type": "string", "ordinal": 2, "description": "Compile-time approved extraction preset."}
+      ]
+    },
+    {
+      "name": "FrameSampleArguments",
+      "description": "Arguments for bounded frame sampling.",
+      "fields": [
+        {"name": "input_handle", "type": "string", "ordinal": 0, "description": "Opaque broker-owned read handle."},
+        {"name": "output_handle", "type": "string", "ordinal": 1, "description": "Opaque broker-owned output handle."},
+        {"name": "preset_id", "type": "string", "ordinal": 2, "description": "Compile-time approved sampling preset."},
+        {"name": "max_frames", "type": "u32", "ordinal": 3, "description": "Hard maximum number of produced frames."}
+      ]
+    },
+    {
+      "name": "TranscodeArguments",
+      "description": "Arguments for one approved transcode preset.",
+      "fields": [
+        {"name": "input_handle", "type": "string", "ordinal": 0, "description": "Opaque broker-owned read handle."},
+        {"name": "output_handle", "type": "string", "ordinal": 1, "description": "Opaque broker-owned output handle."},
+        {"name": "preset_id", "type": "string", "ordinal": 2, "description": "Compile-time approved transcode preset."}
+      ]
+    },
+    {
+      "name": "SignedWasmArguments",
+      "description": "Reserved arguments for one reviewed signed transform.",
+      "fields": [
+        {"name": "entrypoint_id", "type": "string", "ordinal": 0, "description": "Allowlisted entrypoint in the signed bundled transform."},
+        {"name": "input", "type": "bytes", "ordinal": 1, "description": "Bounded transform input."}
+      ]
+    },
+    {
+      "name": "ToolJob",
+      "description": "A registered bounded job with exactly one typed body and no ambient authority.",
+      "fields": [
+        {"name": "operation", "type": "OperationEnvelope", "ordinal": 0, "description": "Parent operation identity and deadline."},
+        {"name": "job_id", "type": "string", "ordinal": 1, "description": "Opaque job identity unique within the operation."},
+        {"name": "runtime", "type": "ToolRuntimeKind", "ordinal": 2, "description": "Compile-time runtime family selected and checked by the browser broker."},
+        {"name": "tool_id", "type": "string", "ordinal": 3, "description": "Registered bundled tool identifier."},
+        {"name": "tool_version", "type": "string", "ordinal": 4, "description": "Pinned bundled tool version."},
+        {"name": "operation_kind", "type": "ToolOperation", "ordinal": 5, "description": "Closed operation discriminator."},
+        {"name": "budget", "type": "ResourceBudget", "ordinal": 6, "description": "Hard job resource budget."},
+        {"name": "bundled_python", "type": "optional<BundledPythonArguments>", "ordinal": 7, "description": "Present only for RUN_BUNDLED_PYTHON_MODULE."},
+        {"name": "local_model", "type": "optional<LocalModelArguments>", "ordinal": 8, "description": "Present only for GENERATE_LOCAL_MODEL."},
+        {"name": "media_probe", "type": "optional<MediaProbeArguments>", "ordinal": 9, "description": "Present only for PROBE_MEDIA."},
+        {"name": "audio_extract", "type": "optional<AudioExtractArguments>", "ordinal": 10, "description": "Present only for EXTRACT_AUDIO."},
+        {"name": "frame_sample", "type": "optional<FrameSampleArguments>", "ordinal": 11, "description": "Present only for SAMPLE_FRAMES."},
+        {"name": "transcode", "type": "optional<TranscodeArguments>", "ordinal": 12, "description": "Present only for TRANSCODE_PRESET."},
+        {"name": "signed_wasm", "type": "optional<SignedWasmArguments>", "ordinal": 13, "description": "Present only for RUN_SIGNED_WASM_TRANSFORM."},
+        {"name": "input_payload", "type": "ToolPayloadInput", "ordinal": 14, "description": "How this job's bounded input reaches the worker."},
+        {"name": "output_payload", "type": "ToolPayloadOutput", "ordinal": 15, "description": "How this job's bounded output leaves the worker."},
+        {"name": "local_embedding", "type": "optional<LocalEmbeddingArguments>", "ordinal": 16, "description": "Present only for EMBED_LOCAL_MODEL."},
+        {"name": "python_library", "type": "ToolPythonLibrary", "ordinal": 17, "description": "The standard library this job's interpreter is to import from. It is present on every job rather than only on Python ones, and carries an empty identity and a zero digest wherever no interpreter runs, because the browser decides what a worker receives and a field a sender may omit is a field a sender may forget."}
+      ]
+    },
+    {
+      "name": "ToolProgress",
+      "description": "A bounded content-free progress event.",
+      "fields": [
+        {"name": "job_id", "type": "string", "ordinal": 0, "description": "The active job identity."},
+        {"name": "sequence", "type": "u32", "ordinal": 1, "description": "Strictly increasing event sequence."},
+        {"name": "progress_basis_points", "type": "u32", "ordinal": 2, "description": "Progress from zero through ten thousand."}
+      ]
+    },
+    {
+      "name": "TextOutputChunk",
+      "description": "One bounded UTF-8 output chunk.",
+      "fields": [
+        {"name": "utf8", "type": "bytes", "ordinal": 0, "description": "UTF-8 bytes validated before crossing the browser boundary."}
+      ]
+    },
+    {
+      "name": "BinaryOutputChunk",
+      "description": "One bounded binary output chunk.",
+      "fields": [
+        {"name": "data", "type": "bytes", "ordinal": 0, "description": "Binary output validated against the registered tool descriptor."}
+      ]
+    },
+    {
+      "name": "ToolOutputChunk",
+      "description": "A bounded ordered chunk with exactly one representation.",
+      "fields": [
+        {"name": "operation", "type": "OperationEnvelope", "ordinal": 0, "description": "Parent operation and generation metadata."},
+        {"name": "job_id", "type": "string", "ordinal": 1, "description": "The active job identity."},
+        {"name": "sequence", "type": "u32", "ordinal": 2, "description": "Strictly increasing output sequence."},
+        {"name": "kind", "type": "ToolChunkKind", "ordinal": 3, "description": "Closed chunk representation."},
+        {"name": "text", "type": "optional<TextOutputChunk>", "ordinal": 4, "description": "Present only for TEXT_UTF8."},
+        {"name": "binary", "type": "optional<BinaryOutputChunk>", "ordinal": 5, "description": "Present only for BINARY."},
+        {"name": "is_final", "type": "bool", "ordinal": 6, "description": "True on the last chunk of a streamed output, so a reader knows the stream ended without waiting for the terminal completion."}
+      ]
+    },
+    {
+      "name": "ToolAdmission",
+      "description": "Immediate job admission without implying worker completion.",
+      "fields": [
+        {"name": "job_id", "type": "string", "ordinal": 0, "description": "The submitted job identity."},
+        {"name": "status", "type": "ToolAdmissionStatus", "ordinal": 1, "description": "Closed admission result."}
+      ]
+    },
+    {
+      "name": "BundledPythonResult",
+      "description": "Validated terminal output from one bundled Python entrypoint.",
+      "fields": [
+        {"name": "output", "type": "bytes", "ordinal": 0, "description": "Bounded output validated against the registered tool descriptor."}
+      ]
+    },
+    {
+      "name": "LocalModelResult",
+      "description": "Content-free local-model terminal metadata; text arrives through ordered chunks.",
+      "fields": [
+        {"name": "finish_reason", "type": "LocalModelFinishReason", "ordinal": 0, "description": "Closed reason generation stopped."},
+        {"name": "input_tokens", "type": "u32", "ordinal": 1, "description": "Validated input-token count."},
+        {"name": "output_tokens", "type": "u32", "ordinal": 2, "description": "Validated output-token count."}
+      ]
+    },
+    {
+      "name": "LocalEmbeddingResult",
+      "description": "One bounded embedding vector. The elements are carried as declared bytes rather than as floats: this wire is positional and frozen, the same vector has to compare equal on two devices, and a float has neither one bit pattern per value nor a total order.",
+      "fields": [
+        {"name": "dimensions", "type": "u32", "ordinal": 0, "description": "Vector length in elements, bounded by MAX_EMBEDDING_DIMENSIONS."},
+        {"name": "element_kind", "type": "EmbeddingElementKind", "ordinal": 1, "description": "Closed element encoding, which fixes the width and the byte order."},
+        {"name": "values", "type": "bytes", "ordinal": 2, "description": "The vector itself: exactly dimensions elements in the declared encoding, bounded by MAX_EMBEDDING_VALUE_BYTES."},
+        {"name": "input_tokens", "type": "u32", "ordinal": 3, "description": "Validated input-token count."}
+      ]
+    },
+    {
+      "name": "MediaProbeResult",
+      "description": "Bounded media metadata with no codec or container-controlled strings.",
+      "fields": [
+        {"name": "duration_ms", "type": "u64", "ordinal": 0, "description": "Validated media duration."},
+        {"name": "audio_streams", "type": "u32", "ordinal": 1, "description": "Validated audio stream count."},
+        {"name": "video_streams", "type": "u32", "ordinal": 2, "description": "Validated video stream count."},
+        {"name": "width", "type": "u32", "ordinal": 3, "description": "Validated maximum video width or zero."},
+        {"name": "height", "type": "u32", "ordinal": 4, "description": "Validated maximum video height or zero."}
+      ]
+    },
+    {
+      "name": "AudioExtractResult",
+      "description": "Terminal metadata for an audio extraction written to a broker-owned output.",
+      "fields": [
+        {"name": "output_handle", "type": "string", "ordinal": 0, "description": "Opaque broker-owned output handle."},
+        {"name": "output_bytes", "type": "u64", "ordinal": 1, "description": "Validated bytes written."},
+        {"name": "output_digest", "type": "bytes", "ordinal": 2, "description": "Exact 32-byte SHA-256 of the completed broker-owned output."}
+      ]
+    },
+    {
+      "name": "FrameSampleResult",
+      "description": "Terminal metadata for bounded frame sampling.",
+      "fields": [
+        {"name": "output_handle", "type": "string", "ordinal": 0, "description": "Opaque broker-owned output handle."},
+        {"name": "frame_count", "type": "u32", "ordinal": 1, "description": "Validated number of frames written."},
+        {"name": "output_bytes", "type": "u64", "ordinal": 2, "description": "Validated bytes written."},
+        {"name": "output_digest", "type": "bytes", "ordinal": 3, "description": "Exact 32-byte SHA-256 of the completed broker-owned frame archive."}
+      ]
+    },
+    {
+      "name": "TranscodeResult",
+      "description": "Terminal metadata for one approved transcode preset.",
+      "fields": [
+        {"name": "output_handle", "type": "string", "ordinal": 0, "description": "Opaque broker-owned output handle."},
+        {"name": "output_bytes", "type": "u64", "ordinal": 1, "description": "Validated bytes written."},
+        {"name": "output_digest", "type": "bytes", "ordinal": 2, "description": "Exact 32-byte SHA-256 of the completed broker-owned output."}
+      ]
+    },
+    {
+      "name": "SignedWasmResult",
+      "description": "Validated terminal output from one reviewed signed transform.",
+      "fields": [
+        {"name": "output", "type": "bytes", "ordinal": 0, "description": "Bounded transform output."}
+      ]
+    },
+    {
+      "name": "ToolSuccess",
+      "description": "Exactly one typed success body matching the submitted operation.",
+      "fields": [
+        {"name": "operation_kind", "type": "ToolOperation", "ordinal": 0, "description": "Closed operation discriminator."},
+        {"name": "bundled_python", "type": "optional<BundledPythonResult>", "ordinal": 1, "description": "Present only for RUN_BUNDLED_PYTHON_MODULE."},
+        {"name": "local_model", "type": "optional<LocalModelResult>", "ordinal": 2, "description": "Present only for GENERATE_LOCAL_MODEL."},
+        {"name": "media_probe", "type": "optional<MediaProbeResult>", "ordinal": 3, "description": "Present only for PROBE_MEDIA."},
+        {"name": "audio_extract", "type": "optional<AudioExtractResult>", "ordinal": 4, "description": "Present only for EXTRACT_AUDIO."},
+        {"name": "frame_sample", "type": "optional<FrameSampleResult>", "ordinal": 5, "description": "Present only for SAMPLE_FRAMES."},
+        {"name": "transcode", "type": "optional<TranscodeResult>", "ordinal": 6, "description": "Present only for TRANSCODE_PRESET."},
+        {"name": "signed_wasm", "type": "optional<SignedWasmResult>", "ordinal": 7, "description": "Present only for RUN_SIGNED_WASM_TRANSFORM."},
+        {"name": "local_embedding", "type": "optional<LocalEmbeddingResult>", "ordinal": 8, "description": "Present only for EMBED_LOCAL_MODEL."}
+      ]
+    },
+    {
+      "name": "ToolCompletion",
+      "description": "Exactly one terminal completion; success is present only for COMPLETED.",
+      "fields": [
+        {"name": "operation", "type": "OperationEnvelope", "ordinal": 0, "description": "Parent operation and generation metadata."},
+        {"name": "job_id", "type": "string", "ordinal": 1, "description": "The terminal job identity."},
+        {"name": "status", "type": "ToolTerminalStatus", "ordinal": 2, "description": "Closed terminal status."},
+        {"name": "success", "type": "optional<ToolSuccess>", "ordinal": 3, "description": "Validated typed output present only for COMPLETED."}
+      ]
+    }
+  ],
+  "tagged_unions": [
+    {
+      "struct": "ToolJob",
+      "tag_field": "operation_kind",
+      "variants": [
+        {"tag": "RUN_BUNDLED_PYTHON_MODULE", "field": "bundled_python"},
+        {"tag": "GENERATE_LOCAL_MODEL", "field": "local_model"},
+        {"tag": "PROBE_MEDIA", "field": "media_probe"},
+        {"tag": "EXTRACT_AUDIO", "field": "audio_extract"},
+        {"tag": "SAMPLE_FRAMES", "field": "frame_sample"},
+        {"tag": "TRANSCODE_PRESET", "field": "transcode"},
+        {"tag": "RUN_SIGNED_WASM_TRANSFORM", "field": "signed_wasm"},
+        {"tag": "EMBED_LOCAL_MODEL", "field": "local_embedding"}
+      ]
+    },
+    {
+      "struct": "ToolOutputChunk",
+      "tag_field": "kind",
+      "variants": [
+        {"tag": "TEXT_UTF8", "field": "text"},
+        {"tag": "BINARY", "field": "binary"}
+      ]
+    },
+    {
+      "struct": "ToolSuccess",
+      "tag_field": "operation_kind",
+      "variants": [
+        {"tag": "RUN_BUNDLED_PYTHON_MODULE", "field": "bundled_python"},
+        {"tag": "GENERATE_LOCAL_MODEL", "field": "local_model"},
+        {"tag": "PROBE_MEDIA", "field": "media_probe"},
+        {"tag": "EXTRACT_AUDIO", "field": "audio_extract"},
+        {"tag": "SAMPLE_FRAMES", "field": "frame_sample"},
+        {"tag": "TRANSCODE_PRESET", "field": "transcode"},
+        {"tag": "RUN_SIGNED_WASM_TRANSFORM", "field": "signed_wasm"},
+        {"tag": "EMBED_LOCAL_MODEL", "field": "local_embedding"}
+      ]
+    }
+  ],
+  "enum_pairings": [
+    {
+      "struct": "ToolJob",
+      "left_field": "runtime",
+      "right_field": "operation_kind",
+      "pairs": [
+        {"left": "PYTHON", "right": ["RUN_BUNDLED_PYTHON_MODULE"]},
+        {"left": "LOCAL_MODEL", "right": ["GENERATE_LOCAL_MODEL", "EMBED_LOCAL_MODEL"]},
+        {"left": "MEDIA", "right": ["PROBE_MEDIA", "EXTRACT_AUDIO", "SAMPLE_FRAMES", "TRANSCODE_PRESET"]},
+        {"left": "WASM", "right": ["RUN_SIGNED_WASM_TRANSFORM"]}
+      ]
+    }
+  ],
+  "conditional_presence": [
+    {
+      "struct": "ToolCompletion",
+      "tag_field": "status",
+      "field": "success",
+      "present_for": ["COMPLETED"]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "scenario": "TB-604",
+  "corpus": "taffygo-task-scenarios",
+  "version": "1.1.0",
+  "job_family": "JF-06",
+  "contract": "test-fixtures/tasks/manifest.json",
+  "note": "The contract for this scenario - goal, scope, facts, labels and adjudication - is the corpus manifest. This file owns only the run script: the ordered steps, the events injected into them, the audit stream a correct run produces, and the rubric a labeler applies to a disputed run.",
+  "steps": [
+    {
+      "n": 1,
+      "kind": "step:OBSERVE",
+      "fixture": "rapid-navigation-race",
+      "detail": "Observe the published sequence and take a handle.",
+      "produces": [
+        "F-604-plan"
+      ],
+      "expect": []
+    },
+    {
+      "n": 2,
+      "kind": "action:ACTIVATE",
+      "fixture": "rapid-navigation-race",
+      "detail": "Attempt the handle after the same-document transitions and the cross-document commit.",
+      "produces": [
+        "F-604-stale-epoch",
+        "F-604-queued-cancelled"
+      ],
+      "expect": [
+        "a stale-epoch rejection",
+        "queued actions cancelled"
+      ]
+    },
+    {
+      "n": 3,
+      "kind": "step:OBSERVE",
+      "fixture": "redirect-chain",
+      "detail": "Observe the chain the sequence entered.",
+      "produces": [
+        "F-604-chain-entry"
+      ],
+      "expect": []
+    },
+    {
+      "n": 4,
+      "kind": "step:NAVIGATE",
+      "fixture": "redirect-destination",
+      "detail": "Read the committed destination.",
+      "produces": [
+        "F-604-final-destination"
+      ],
+      "expect": []
+    }
+  ],
+  "injected_events": [],
+  "expected_audit_events": [
+    "TaskCreated",
+    "TaskStarted",
+    "ActorLeaseIssued",
+    "ObservationCaptured",
+    "ActionProposed",
+    "ActionDispatchStarted",
+    "ActionVerificationCompleted",
+    "FactAccepted",
+    "TaskCompleted"
+  ],
+  "adjudication_rubric": [
+    {
+      "dispute": "A reviewer sees one rejection covering both cases.",
+      "resolution": "Failed on whichever fact has no event of its own. A stale epoch and a cancellation by navigation are different findings and the corpus scores them separately."
+    }
+  ]
+}

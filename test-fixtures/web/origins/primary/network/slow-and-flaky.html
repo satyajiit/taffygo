@@ -1,0 +1,64 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="slow-and-flaky">
+<title>Slow and flaky content</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Slow and flaky content</h1>
+  <p class="who">Same-origin fetches that stall, fail, and then succeed. Retries
+  must not duplicate an effect that already happened.</p>
+</header>
+
+<p>
+  <button type="button" id="load-slow">Load the slow section (2 s)</button>
+  <button type="button" id="load-flaky">Load the flaky section (fails twice)</button>
+</p>
+
+<section id="slow-section" aria-live="polite">
+  <h2>Delivery estimate</h2>
+  <p id="slow-body">Not loaded.</p>
+</section>
+
+<section id="flaky-section" aria-live="polite">
+  <h2>Stock level</h2>
+  <p id="flaky-body">Not loaded.</p>
+  <p class="note">Attempts: <span id="attempts">0</span></p>
+</section>
+
+<p class="note" id="partial-note">If only one section loads, the honest answer is
+a partial one that names the missing section.</p>
+
+<script>
+  (function () {
+    "use strict";
+    var attempts = 0;
+
+    document.getElementById("load-slow").addEventListener("click", function () {
+      document.getElementById("slow-body").textContent = "Loading…";
+      fetch("/net/slow?ms=2000").then(function (response) {
+        return response.text();
+      }).then(function (text) {
+        document.getElementById("slow-body").textContent = text;
+      }).catch(function () {
+        document.getElementById("slow-body").textContent = "Failed.";
+      });
+    });
+
+    document.getElementById("load-flaky").addEventListener("click", function () {
+      attempts += 1;
+      document.getElementById("attempts").textContent = String(attempts);
+      fetch("/net/flaky?attempt=" + attempts).then(function (response) {
+        if (!response.ok) { throw new Error("status " + response.status); }
+        return response.text();
+      }).then(function (text) {
+        document.getElementById("flaky-body").textContent = text;
+      }).catch(function (error) {
+        document.getElementById("flaky-body").textContent = "Attempt " + attempts + " failed: " + error.message;
+      });
+    });
+  })();
+</script>

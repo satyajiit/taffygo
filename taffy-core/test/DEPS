@@ -1,0 +1,102 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# The one directory in //taffy that may name both process halves.
+#
+# That is deliberate and it is the reason this directory exists. The layering
+# rule everywhere else is that the renderer never depends on the browser, and it
+# is a build error so that nobody has to notice. But a browser test binary
+# contains both halves by construction, and the corpus reader answers questions
+# both halves ask. Before this directory existed there were two readers, one in
+# each half, because neither could include the other's.
+#
+# The rule that keeps that from becoming an excuse: **everything here is
+# testonly, and nothing here is depended on by production code.** A production
+# target that named //taffy/test would be a layering violation
+# arriving through the back door, and the testonly marking on every target in
+# BUILD.gn is what makes it a build error rather than a review question.
+
+include_rules = [
+  "+base",
+  "+build",
+
+  # Both halves. See the note above for why this directory, and only this
+  # directory, may say so.
+  "+taffy/browser",
+  "+taffy/components/filtering/renderer",
+  "+taffy/contracts/bip/mojom",
+  "+taffy/contracts/tool-runtime",
+  "+taffy/common/public",
+  "+taffy/renderer",
+  "+taffy/services/tool-runtime/media",
+  "+taffy/test",
+
+  "+content/public/browser",
+  "+content/public/common",
+  "+content/public/test",
+  "+content/shell/browser",
+
+  "+mojo/public/cpp/bindings",
+  "+mojo/public/cpp/system",
+
+  # The four-origin fixture server, the mock resolver that points the corpus
+  # hostnames at the loopback interface, and the error-code table the parity
+  # suite classifies against.
+  "+net/base",
+  "+net/dns",
+  "+net/http",
+  "+net/test",
+
+  "+testing/gmock",
+  "+testing/gtest",
+
+  # The associated-interface provider, so the adversarial suite can bind a
+  # scripted endpoint in place of the real one, and the input event types the
+  # user-preemption race delivers.
+  "+third_party/blink/public/common",
+
+  # Shell::CreateNewWindow takes a window size.
+  "+ui/gfx/geometry",
+
+  "+url",
+]
+
+specific_include_rules = {
+  # The binary's own process setup (see ":browser_test_launcher"). These three
+  # files are the only ones here that install a client into a Chromium process
+  # rather than assert against one, so the paths that let them do it are scoped
+  # to them and no test acquires them by accident.
+  "taffy_content_renderer_client\\.(h|cc)": [
+    "+content/public/renderer",
+    "+content/shell/renderer",
+    "+taffy/components/filtering/renderer",
+  ],
+  "taffy_browser_test_main_delegate\\.(h|cc)": [
+    "+content/public/renderer",
+    "+content/public/utility",
+    "+content/shell/app",
+  ],
+  # The product's own utility service registry, installed into this binary's
+  # utility processes so a worker a suite launches is the worker the product
+  # launches. Scoped here because installing a client is not something a test
+  # may do for itself.
+  "taffy_content_utility_client\\.(h|cc)": [
+    "+content/public/utility",
+    "+taffy/utility",
+  ],
+  "taffy_browsertests_jni_onload\\.cc": [
+    "+content/public/app",
+    "+testing/android/native_test",
+  ],
+
+  # The download parity rows are asserted against Chromium's own download
+  # system rather than a fake, because the row is about that system's behaviour
+  # being preserved. Scoped to the one file that needs it so that no other test
+  # acquires an opinion about download mechanics.
+  "download_lifecycle_browsertest\\.cc": [
+    "+components/download/public/common",
+  ],
+}

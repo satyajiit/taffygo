@@ -1,0 +1,25 @@
+# Generated from taffy-core/build/components.toml. Do not edit.
+# path	component	layer	project-dir	api-surface	api-deps	implementation-deps
+:app	ui.android.app	60	ui/android/app	flat		:core:analytics,:core:api,:core:assets,:core:browser,:core:common,:core:credentials,:core:designsystem,:core:model,:core:page-intelligence,:core:preferences,:core:providerauth,:core:providers,:core:task,:core:ui,:core:workspace,:feature:assistant,:feature:browsing,:feature:downloads,:feature:onboarding,:feature:providers,:feature:settings,:feature:workspaces
+:core:analytics	ui.android.core.analytics	30	ui/android/core/analytics	split	:core:common,:core:model	
+:core:api	ui.android.core.api	30	ui/android/core/api	split	:core:common,:core:model	
+:core:assets	ui.android.core.assets	40	ui/android/core/assets	split	:core:common,:core:model	:core:api
+:core:browser	ui.android.core.browser	30	ui/android/core/browser	split	:core:model	:core:common
+:core:common	ui.android.core.common	20	ui/android/core/common	split		
+:core:credentials	ui.android.core.credentials	10	ui/android/core/credentials	split		
+:core:designsystem	ui.android.core.designsystem	30	ui/android/core/designsystem	split		:core:common
+:core:model	ui.android.core.model	10	ui/android/core/model	flat		
+:core:page-intelligence	ui.android.core.page-intelligence	40	ui/android/core/page-intelligence	split	:core:api	:core:common
+:core:preferences	ui.android.core.preferences	20	ui/android/core/preferences	split	:core:model	
+:core:providerauth	ui.android.core.providerauth	40	ui/android/core/providerauth	split	:core:api	:core:common
+:core:providers	ui.android.core.providers	40	ui/android/core/providers	split	:core:model	:core:api,:core:common
+:core:task	ui.android.core.task	40	ui/android/core/task	split	:core:api,:core:common,:core:model	:core:analytics
+:core:ui	ui.android.core.ui	40	ui/android/core/ui	split	:core:browser,:core:designsystem,:core:model	:core:common
+:core:workspace	ui.android.core.workspace	40	ui/android/core/workspace	split	:core:common,:core:model	:core:api
+:feature:assistant	ui.android.feature.assistant	50	ui/android/feature/assistant	flat		:core:analytics,:core:api,:core:browser,:core:common,:core:designsystem,:core:model,:core:page-intelligence,:core:preferences,:core:task,:core:ui
+:feature:browsing	ui.android.feature.browsing	50	ui/android/feature/browsing	flat		:core:analytics,:core:api,:core:assets,:core:browser,:core:common,:core:designsystem,:core:model,:core:page-intelligence,:core:task,:core:ui
+:feature:downloads	ui.android.feature.downloads	50	ui/android/feature/downloads	flat		:core:analytics,:core:assets,:core:common,:core:designsystem,:core:model,:core:ui
+:feature:onboarding	ui.android.feature.onboarding	50	ui/android/feature/onboarding	flat		:core:analytics,:core:api,:core:designsystem,:core:model,:core:preferences,:core:ui
+:feature:providers	ui.android.feature.providers	50	ui/android/feature/providers	flat		:core:analytics,:core:api,:core:browser,:core:credentials,:core:designsystem,:core:model,:core:preferences,:core:providerauth,:core:providers,:core:ui
+:feature:settings	ui.android.feature.settings	50	ui/android/feature/settings	flat		:core:analytics,:core:api,:core:assets,:core:browser,:core:common,:core:designsystem,:core:model,:core:preferences,:core:ui,:core:workspace
+:feature:workspaces	ui.android.feature.workspaces	50	ui/android/feature/workspaces	flat		:core:analytics,:core:api,:core:browser,:core:common,:core:designsystem,:core:model,:core:ui,:core:workspace

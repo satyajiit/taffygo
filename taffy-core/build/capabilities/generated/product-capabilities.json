@@ -1,0 +1,24 @@
+{
+  "accepted_milestone": "M7",
+  "chromium_profiles": {
+    "dev-arm64": "development",
+    "dev-x64": "development",
+    "diag-fuzz-x64": "development",
+    "diag-sanitizer-x64": "development",
+    "release-arm64": "candidate"
+  },
+  "configuration_fingerprint": "sha256:f72e05085633c2d0a1ac32ecf34ec37c00ecd27d80668c61cee0276bf35e4723",
+  "profiles": {
+    "candidate": {
+      "delegated_task_start": true,
+      "policy_milestone": "M7",
+      "task_milestone": "M7"
+    },
+    "development": {
+      "delegated_task_start": true,
+      "policy_milestone": "M7",
+      "task_milestone": "M7"
+    }
+  },
+  "schema_version": 1
+}

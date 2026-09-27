@@ -1,0 +1,324 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// Generated from schema/contract.json. Do not edit.
+// Contract tool_runtime 2.4.
+
+module taffy.tool_runtime.mojom;
+
+const uint64 kMaxJobInputBytes = 16777216;
+const uint64 kMaxJobOutputBytes = 16777216;
+const uint64 kMaxJobIdBytes = 128;
+const uint64 kMaxOperationIdBytes = 128;
+const uint64 kMaxIdempotencyKeyBytes = 128;
+const uint64 kMaxToolVersionBytes = 64;
+const uint64 kMaxConversationIdBytes = 128;
+const uint64 kMaxJobMemoryBytes = 4294967296;
+const uint64 kMaxJobCpuMs = 600000;
+const uint64 kMaxJobTemporaryBytes = 1073741824;
+const uint64 kMaxJobWallTimeMs = 600000;
+const uint64 kMaxOutputChunkBytes = 65536;
+const uint64 kMaxOutputChunks = 256;
+const uint64 kMaxProgressEvents = 256;
+const uint64 kMaxToolIdBytes = 128;
+const uint64 kMaxEntrypointIdBytes = 128;
+const uint64 kMaxHandleIdBytes = 256;
+const uint64 kMaxPresetIdBytes = 128;
+const uint64 kMaxInlinePayloadBytes = 262144;
+const uint64 kMaxStreamOutputChunks = 65536;
+const uint64 kMaxStreamChunkBytes = 4096;
+const uint64 kMaxModelIdBytes = 128;
+const uint64 kMaxModelRevisionBytes = 64;
+const uint64 kMaxModelArtifactBytes = 2147483648;
+const uint64 kMaxEmbeddingDimensions = 4096;
+const uint64 kMaxEmbeddingValueBytes = 16384;
+const uint64 kMaxPythonLibraryIdBytes = 128;
+const uint64 kMaxPythonLibraryVersionBytes = 64;
+const uint64 kMaxPythonLibraryBytes = 134217728;
+
+enum ToolRuntimeKind {
+  kPython = 0,
+  kLocalModel = 1,
+  kMedia = 2,
+  kWasm = 3,
+};
+
+enum ToolOperation {
+  kRunBundledPythonModule = 0,
+  kGenerateLocalModel = 1,
+  kProbeMedia = 2,
+  kExtractAudio = 3,
+  kSampleFrames = 4,
+  kTranscodePreset = 5,
+  kRunSignedWasmTransform = 6,
+  kEmbedLocalModel = 7,
+};
+
+enum ToolModelArtifactKind {
+  kLitertTflite = 0,
+  kOnnxRuntime = 1,
+  kGguf = 2,
+};
+
+enum ToolInputTransport {
+  kInline = 0,
+  kSharedMemory = 1,
+};
+
+enum ToolOutputTransport {
+  kInlineChunks = 0,
+  kStreamChunks = 1,
+  kDataPipe = 2,
+};
+
+enum EmbeddingElementKind {
+  kFloat32Le = 0,
+};
+
+enum ToolChunkKind {
+  kTextUtf8 = 0,
+  kBinary = 1,
+};
+
+enum LocalModelFinishReason {
+  kStop = 0,
+  kTokenLimit = 1,
+};
+
+enum ToolTerminalStatus {
+  kCompleted = 0,
+  kCancelled = 1,
+  kDeadlineExceeded = 2,
+  kResourceLimit = 3,
+  kRuntimeCrashed = 4,
+  kInvalidInput = 5,
+  kUnsupported = 6,
+  kOutcomeUnknown = 7,
+  kModelArtifactMissing = 8,
+  kModelArtifactIncompatible = 9,
+  kLocalRuntimeUnavailable = 10,
+};
+
+enum ToolAdmissionStatus {
+  kAccepted = 0,
+  kUnsupported = 1,
+  kInvalidJob = 2,
+  kBackpressure = 3,
+  kDeadlineExceeded = 4,
+  kModelArtifactMissing = 5,
+  kModelArtifactIncompatible = 6,
+  kLocalRuntimeUnavailable = 7,
+};
+
+struct OperationEnvelope {
+  string operation_id@0;
+  uint64 service_generation@1;
+  uint64 task_revision@2;
+  uint64 deadline_monotonic_ms@3;
+  string idempotency_key@4;
+};
+
+struct ResourceBudget {
+  uint64 max_input_bytes@0;
+  uint64 max_output_bytes@1;
+  uint64 max_memory_bytes@2;
+  uint64 max_cpu_ms@3;
+  uint64 max_temporary_bytes@4;
+  uint32 max_output_chunks@5;
+};
+
+struct ToolModelArtifact {
+  string model_id@0;
+  string model_revision@1;
+  ToolModelArtifactKind kind@2;
+  uint64 artifact_bytes@3;
+  array<uint8, 32> artifact_digest@4;
+  string adapter_id@5;
+  uint64 adapter_bytes@6;
+  array<uint8, 32> adapter_digest@7;
+};
+
+struct ToolPythonLibrary {
+  string library_id@0;
+  string library_version@1;
+  uint64 archive_bytes@2;
+  array<uint8, 32> archive_digest@3;
+};
+
+struct ToolPayloadInput {
+  ToolInputTransport transport@0;
+  uint64 byte_length@1;
+  array<uint8, 32> digest@2;
+};
+
+struct ToolPayloadOutput {
+  ToolOutputTransport transport@0;
+  uint64 max_byte_length@1;
+};
+
+struct BundledPythonArguments {
+  string entrypoint_id@0;
+  array<uint8> input@1;
+};
+
+struct LocalModelArguments {
+  string conversation_id@0;
+  array<uint8> prompt_utf8@1;
+  uint32 max_output_tokens@2;
+  ToolModelArtifact model@3;
+};
+
+struct LocalEmbeddingArguments {
+  ToolModelArtifact model@0;
+  array<uint8> input_utf8@1;
+  uint32 max_input_tokens@2;
+  bool normalize@3;
+};
+
+struct MediaProbeArguments {
+  string input_handle@0;
+};
+
+struct AudioExtractArguments {
+  string input_handle@0;
+  string output_handle@1;
+  string preset_id@2;
+};
+
+struct FrameSampleArguments {
+  string input_handle@0;
+  string output_handle@1;
+  string preset_id@2;
+  uint32 max_frames@3;
+};
+
+struct TranscodeArguments {
+  string input_handle@0;
+  string output_handle@1;
+  string preset_id@2;
+};
+
+struct SignedWasmArguments {
+  string entrypoint_id@0;
+  array<uint8> input@1;
+};
+
+struct ToolJob {
+  OperationEnvelope operation@0;
+  string job_id@1;
+  ToolRuntimeKind runtime@2;
+  string tool_id@3;
+  string tool_version@4;
+  ToolOperation operation_kind@5;
+  ResourceBudget budget@6;
+  BundledPythonArguments? bundled_python@7;
+  LocalModelArguments? local_model@8;
+  MediaProbeArguments? media_probe@9;
+  AudioExtractArguments? audio_extract@10;
+  FrameSampleArguments? frame_sample@11;
+  TranscodeArguments? transcode@12;
+  SignedWasmArguments? signed_wasm@13;
+  ToolPayloadInput input_payload@14;
+  ToolPayloadOutput output_payload@15;
+  LocalEmbeddingArguments? local_embedding@16;
+  ToolPythonLibrary python_library@17;
+};
+
+struct ToolProgress {
+  string job_id@0;
+  uint32 sequence@1;
+  uint32 progress_basis_points@2;
+};
+
+struct TextOutputChunk {
+  array<uint8> utf8@0;
+};
+
+struct BinaryOutputChunk {
+  array<uint8> data@0;
+};
+
+struct ToolOutputChunk {
+  OperationEnvelope operation@0;
+  string job_id@1;
+  uint32 sequence@2;
+  ToolChunkKind kind@3;
+  TextOutputChunk? text@4;
+  BinaryOutputChunk? binary@5;
+  bool is_final@6;
+};
+
+struct ToolAdmission {
+  string job_id@0;
+  ToolAdmissionStatus status@1;
+};
+
+struct BundledPythonResult {
+  array<uint8> output@0;
+};
+
+struct LocalModelResult {
+  LocalModelFinishReason finish_reason@0;
+  uint32 input_tokens@1;
+  uint32 output_tokens@2;
+};
+
+struct LocalEmbeddingResult {
+  uint32 dimensions@0;
+  EmbeddingElementKind element_kind@1;
+  array<uint8> values@2;
+  uint32 input_tokens@3;
+};
+
+struct MediaProbeResult {
+  uint64 duration_ms@0;
+  uint32 audio_streams@1;
+  uint32 video_streams@2;
+  uint32 width@3;
+  uint32 height@4;
+};
+
+struct AudioExtractResult {
+  string output_handle@0;
+  uint64 output_bytes@1;
+  array<uint8> output_digest@2;
+};
+
+struct FrameSampleResult {
+  string output_handle@0;
+  uint32 frame_count@1;
+  uint64 output_bytes@2;
+  array<uint8> output_digest@3;
+};
+
+struct TranscodeResult {
+  string output_handle@0;
+  uint64 output_bytes@1;
+  array<uint8> output_digest@2;
+};
+
+struct SignedWasmResult {
+  array<uint8> output@0;
+};
+
+struct ToolSuccess {
+  ToolOperation operation_kind@0;
+  BundledPythonResult? bundled_python@1;
+  LocalModelResult? local_model@2;
+  MediaProbeResult? media_probe@3;
+  AudioExtractResult? audio_extract@4;
+  FrameSampleResult? frame_sample@5;
+  TranscodeResult? transcode@6;
+  SignedWasmResult? signed_wasm@7;
+  LocalEmbeddingResult? local_embedding@8;
+};
+
+struct ToolCompletion {
+  OperationEnvelope operation@0;
+  string job_id@1;
+  ToolTerminalStatus status@2;
+  ToolSuccess? success@3;
+};

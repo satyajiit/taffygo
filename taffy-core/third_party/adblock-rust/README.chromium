@@ -1,0 +1,35 @@
+# For more information on these fields, see:
+# https://chromium.googlesource.com/chromium/src/+/HEAD/docs/adding_to_third_party.md#readme_chromium
+#
+# TaffyGo vendors this engine under //taffy rather than under Chromium's
+# //third_party/rust because the matching engine is a TaffyGo product
+# decision (0086), not an upstream one, and because Chromium's regex crate
+# is test-only while this plane needs it on the request path.
+
+Name: adblock-rust
+Short Name: adblock
+URL: https://github.com/brave/adblock-rust/
+Version: 0.13.3
+Update Mechanism: Manual
+License: MPL-2.0
+License File: vendor/adblock-v0_13/LICENSE
+Shipped: yes
+Security Critical: yes
+
+Description:
+The matching engine behind Ads and trackers: network-request blocking and
+cosmetic filtering for the EasyList family. Reached from filtering.core
+through a C ABI in c_abi/; TaffyGo's own Cargo workspace crates are not
+linked into the browser process. Transitive crates.io dependencies sit
+beside it under vendor/.
+
+User-facing copy does not name this crate, Brave, or Shields.
+
+Local Modifications:
+Cargo.toml drops the js/ and fuzz/ workspace members, disables the
+single-thread feature so Engine is Send+Sync, and leaves css-validation
+off. The C ABI and GN cargo_crate graph are first-party glue.
+`$genericblock` is parsed (no `gblock` alias), stored on its own network
+list, and causes matching to skip the generic bucket when the option is
+active; `$important` generic rules still match. `$generichide` is
+unchanged.

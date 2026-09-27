@@ -1,0 +1,34 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//mojo/public/tools/bindings/mojom.gni")
+
+mojom("browsing_types") {
+  sources = [ "generated/mojom/browsing.mojom" ]
+  public_deps = []
+}
+
+# The generated closed-enumeration decoders; see the same target under
+# //taffy/contracts/core-service for why C++ needs one and Rust does not.
+source_set("browsing_enums") {
+  sources = [ "generated/cpp/browsing_enums.h" ]
+  public_deps = [ ":browsing_types" ]
+}
+
+# Stable directory label for the browser-side projection and, when a second
+# platform surface exists, for whatever implements TaffyBrowsingSurface.
+#
+# There is no `generate_java` here and no Kotlin projection, which is
+# deliberate rather than unfinished: the Android surface drives the browser
+# through its own in-process Kotlin seam today, so a generated Java transport
+# would be a transport nothing sends on and three thousand lines of generated
+# Kotlin no target compiles. Decision 0043 section 4 records when it arrives.
+group("browsing") {
+  public_deps = [
+    ":browsing_enums",
+    ":browsing_types",
+  ]
+}

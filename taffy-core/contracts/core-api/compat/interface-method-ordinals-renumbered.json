@@ -1,0 +1,12 @@
+{
+  "interfaces": [
+    {
+      "name": "DeviantCoreApi",
+      "description": "A deviant interface whose two methods were swapped after release.",
+      "methods": [
+        {"name": "SignOut", "ordinal": 1, "description": "The second method, moved to the front of the list.", "params": []},
+        {"name": "RetryCore", "ordinal": 0, "description": "The first method, moved behind it.", "params": []}
+      ]
+    }
+  ]
+}

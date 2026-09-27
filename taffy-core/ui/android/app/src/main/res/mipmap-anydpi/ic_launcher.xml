@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  The launcher icon. Both raster layers are derived from the committed marks in
+  brand/png/ by taffy-core/ui/android/tools/icons/generate_launcher_icons.py and
+  live in mipmap-mdpi..xxxhdpi as lossless WebP.
+
+  There is no roundIcon and no legacy per-density ic_launcher.png: minSdk is 29,
+  so every supported launcher resolves this adaptive icon and masks it itself.
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+    <monochrome android:drawable="@mipmap/ic_launcher_monochrome" />
+</adaptive-icon>

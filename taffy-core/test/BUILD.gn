@@ -1,0 +1,630 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//taffy/utility/python_runtime_configuration.gni")
+
+# The shared test support and the three Taffy suites: parity and recovery
+# (work package WP-M1-06), page-intelligence correctness, and adversarial
+# validation (WP-M2-08).
+#
+# This directory sits below both process halves, which is the whole reason it
+# exists. //taffy/browser may not include //taffy/renderer and the reverse is a
+# build error, so anything both halves need — the corpus reader above all —
+# had nowhere to live. It lives here, and both may depend on it without either
+# depending on the other.
+#
+# The suites are separate targets rather than one because they run in different
+# places and answer to different owners. The parity suite is milestone-M1 exit
+# evidence and needs no renderer endpoint. The correctness suite is milestone-M2
+# and cannot run without one. The adversarial suite binds its own scripted
+# endpoint and needs neither.
+
+# ---------------------------------------------------------------------------
+# The corpus reader
+# ---------------------------------------------------------------------------
+
+# The single reader of test-fixtures/web/manifest.json, for both process halves.
+#
+# It replaces two readers written independently because no directory existed
+# that both halves could depend on: //taffy/browser/test answered the
+# browser's questions and //taffy/renderer/test answered the
+# renderer's. Retiring those two is a one-line edit in each of their BUILD.gn
+# files plus deleting the files, and it belongs to their owners; README.md
+# carries it as item 1 of the verification list so it cannot be forgotten.
+source_set("corpus") {
+  testonly = true
+
+  sources = [
+    "corpus/corpus_canary.cc",
+    "corpus/corpus_canary.h",
+    "corpus/corpus_expected_field.cc",
+    "corpus/corpus_expected_field.h",
+    "corpus/corpus_fixture.cc",
+    "corpus/corpus_fixture.h",
+    "corpus/corpus_manifest.cc",
+    "corpus/corpus_manifest.h",
+    "corpus/corpus_mount.cc",
+    "corpus/corpus_mount.h",
+    "corpus/corpus_origin.cc",
+    "corpus/corpus_origin.h",
+  ]
+
+  deps = [ "//base" ]
+
+  # The corpus must be present at //taffy/test/data/web when
+  # anything here runs. Until the fork tooling mounts it, every read fails at
+  # CorpusMount with the expected path in the message, which is the intended
+  # behaviour: see corpus/corpus_mount.h.
+  data = [ "//taffy/test/data/web/" ]
+}
+
+# ---------------------------------------------------------------------------
+# Shared support
+# ---------------------------------------------------------------------------
+
+# The independent graph-framing reader is useful to both browser unit tests
+# and the browser-test support closure. Keep it link-closed on its own: making
+# the unit binary depend on all of :support would also pull content_shell and
+# the browser-test launcher into a deterministic payload test.
+source_set("graph_payload_reader") {
+  testonly = true
+
+  sources = [
+    "support/bip_graph_payload_reader.cc",
+    "support/bip_graph_payload_reader.h",
+  ]
+
+  deps = [
+    "//base",
+    "//taffy/components/intelligence/content",
+  ]
+}
+
+# The immutable Task Benchmark input and output seam shared by the Content
+# Shell observation adapter and the Chrome-profile task adapter. It owns no
+# browser machinery: both binaries load the same joined scenario bytes and
+# emit the same fail-closed wire envelope through this small target.
+source_set("benchmark_support") {
+  testonly = true
+
+  sources = [
+    "support/task_benchmark_record.cc",
+    "support/task_benchmark_record.h",
+    "support/task_benchmark_scenario.cc",
+    "support/task_benchmark_scenario.h",
+  ]
+
+  public_deps = [ ":corpus" ]
+
+  deps = [
+    "//base",
+    "//crypto",
+  ]
+
+  # Provisioned like the sibling web corpus mount. The benchmark must read the
+  # selected bytes on the device; compiling an in-source copy would let the
+  # adapter and host scorer silently execute different scenarios.
+  data = [ "//taffy/test/data/tasks/" ]
+}
+
+# Conservative extraction proof for the observation benchmark adapter. It is
+# separate from :benchmark_support so the Chrome-profile task adapter does not
+# inherit the graph decoder and content-side test dependencies it never uses.
+source_set("benchmark_page_evidence") {
+  testonly = true
+
+  sources = [
+    "support/task_benchmark_page_evidence.cc",
+    "support/task_benchmark_page_evidence.h",
+  ]
+
+  public_deps = [
+    ":benchmark_support",
+    ":corpus",
+    ":graph_payload_reader",
+  ]
+
+  deps = [
+    "//base",
+    "//crypto",
+  ]
+}
+
+# Durable evidence stays out of the transport-only record layer above. This
+# target reads one exact task through the browser's sequenced storage seam and
+# decodes only its content-free audit projection from the contract-owned
+# binary schema. It remains test-only and links no Rust into the browser.
+source_set("benchmark_audit_decoder") {
+  testonly = true
+
+  sources = [
+    "support/task_benchmark_audit_reader.h",
+    "support/task_transaction_audit_decoder.cc",
+    "support/task_transaction_schema.cc",
+    "support/task_transaction_schema.h",
+  ]
+
+  public_deps = [ "//base" ]
+
+  data = [
+    "//taffy/contracts/core-service/schema/contract.json",
+    "//taffy/contracts/core-service/schema/task_transaction.json",
+  ]
+}
+
+source_set("benchmark_audit_support") {
+  testonly = true
+
+  sources = [ "support/task_benchmark_audit_reader.cc" ]
+
+  public_deps = [ ":benchmark_audit_decoder" ]
+
+  deps = [
+    "//taffy/browser:core_service_client",
+    "//taffy/components/storage/browser:storage",
+  ]
+}
+
+source_set("benchmark_unit_tests") {
+  testonly = true
+
+  sources = [
+    "support/task_benchmark_page_evidence_unittest.cc",
+    "support/task_benchmark_scenario_unittest.cc",
+  ]
+
+  deps = [
+    ":benchmark_audit_decoder",
+    ":benchmark_page_evidence",
+    ":benchmark_support",
+    "//base",
+    "//testing/gtest",
+  ]
+
+  data = [
+    "//taffy/contracts/core-service/compat/transaction-current-batch.hex",
+    "//taffy/contracts/core-service/golden/task-transaction-v14.hex",
+  ]
+}
+
+# The four-origin corpus server without the Content Shell test fixture around
+# it. Chrome-profile recovery tests use this same server so both benchmark
+# components see identical origins, dynamic endpoints, and exfiltration sink.
+source_set("fixture_server_support") {
+  testonly = true
+
+  sources = [
+    "support/exfiltration_sentinel.cc",
+    "support/exfiltration_sentinel.h",
+    "support/fixture_dynamic_endpoints.cc",
+    "support/fixture_dynamic_endpoints.h",
+    "support/fixture_origin_map.cc",
+    "support/fixture_origin_map.h",
+  ]
+
+  public_deps = [ ":corpus" ]
+
+  deps = [
+    "//base",
+    "//net",
+    "//net:test_support",
+    "//url",
+  ]
+}
+
+# The workspace snapshot is a private binary seam: Rust produces it in the
+# utility process and native storage validates it before committing the task.
+# Keep one test below both owners so a codec bump cannot pass each side's unit
+# tests independently while every real StartTask transaction is rejected.
+source_set("workspace_snapshot_compat_unit_tests") {
+  testonly = true
+
+  sources = [
+    "support/rust_skill_lifecycle_restore_unittest.cc",
+    "support/rust_workspace_snapshot_compat_test_support.cc",
+    "support/rust_workspace_snapshot_compat_test_support.h",
+    "support/rust_workspace_snapshot_compat_unittest.cc",
+    "support/rust_workspace_snapshot_observation_test_support.cc",
+  ]
+
+  deps = [
+    "//base",
+    "//base/test:test_support",
+    "//taffy/browser:core_service_client",
+    "//taffy/components/storage/browser:storage",
+    "//taffy/services/core:service",
+    "//testing/gtest",
+  ]
+}
+
+# Everything a Taffy browser test needs and should not write for itself: the
+# four-origin fixture server, the fixture base classes, the scripted client in
+# the core service's seat, the scripted renderer endpoint, deterministic time
+# and identifiers, and the assertions over the journal and the audit stream.
+source_set("support") {
+  testonly = true
+
+  # Upstream's browser-test define, on the source set rather than on the
+  # binary: content/public/test/browser_test.h refuses to compile without it
+  # ("Can't reliably terminate hanging event tests without OOP test runner"),
+  # and a `defines` on the test() target reaches only that target's own
+  # sources. //taffy/browser:browser_tests carries it for the same
+  # reason, and these sets were missing it because nothing ever compiled them.
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  sources = [
+    "support/audit_stream_assertions.cc",
+    "support/audit_stream_assertions.h",
+    "support/bip_request_builder.cc",
+    "support/bip_request_builder.h",
+    "support/canary_leak_scanner.cc",
+    "support/canary_leak_scanner.h",
+    "support/deterministic_clock.cc",
+    "support/deterministic_clock.h",
+    "support/deterministic_id_source.cc",
+    "support/deterministic_id_source.h",
+    "support/journal_assertions.cc",
+    "support/journal_assertions.h",
+    "support/recording_audit_stream.cc",
+    "support/recording_audit_stream.h",
+    "support/recording_journal.cc",
+    "support/recording_journal.h",
+    "support/renderer_endpoint_requirement.cc",
+    "support/renderer_endpoint_requirement.h",
+    "support/renderer_reply_plan.cc",
+    "support/renderer_reply_plan.h",
+    "support/scripted_bip_client.cc",
+    "support/scripted_bip_client.h",
+    "support/scripted_renderer_endpoint.cc",
+    "support/scripted_renderer_endpoint.h",
+    "support/scripted_reply_factory.cc",
+    "support/scripted_reply_factory.h",
+    "support/taffy_browser_test_base.cc",
+    "support/taffy_browser_test_base.h",
+    "support/taffy_observation_test_base.cc",
+    "support/taffy_observation_test_base.h",
+  ]
+
+  public_deps = [
+    ":benchmark_support",
+    ":corpus",
+    ":fixture_server_support",
+    ":graph_payload_reader",
+    "//taffy/browser:browser_shared",
+    "//taffy/common/public",
+    "//taffy/contracts/bip/mojom",
+  ]
+
+  deps = [
+    "//base",
+    "//base/test:test_support",
+    "//content/public/browser",
+    "//content/shell:content_shell_lib",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//mojo/public/cpp/bindings",
+    "//net:test_support",
+    "//taffy/components/intelligence/content",
+    "//testing/gtest",
+    "//third_party/blink/public/common",
+    "//url",
+  ]
+}
+
+# ---------------------------------------------------------------------------
+# The binary's own process setup
+# ---------------------------------------------------------------------------
+
+# The renderer client and the main delegate that install TaffyGo's render frame
+# observer in the processes `taffy_browsertests` starts.
+#
+# WHY IT IS A TARGET AT ALL. Until 2026-08-19 that binary was a plain
+# content_shell browser-test binary, so content_shell's own renderer client ran
+# in its renderer processes and no Taffy endpoint existed. The browser half
+# answers UNSUPPORTED when nothing answers negotiation and keeps answering it,
+# so every test in ":correctness_browser_tests" — and every adversarial test
+# whose subject is what the real endpoint produces — failed at
+# RendererEndpointRequirement::Require with the instruction that named this as
+# the missing piece.
+#
+# IT IS FINISHED, as of 2026-09-07. This target was always the half that
+# worked. What kept negotiation reporting UNSUPPORTED after it landed was a
+# stale copy of the protocol version in //taffy/renderer, two minor steps
+# behind the contract, which the browser half refuses by design — so the tests
+# above failed for a reason that had nothing to do with the renderer client.
+# See the header of taffy_content_renderer_client.h for what the search cost
+# and why its stated suspects were wrong.
+#
+# Separate from ":support" on purpose. ":support" is what a test links; this is
+# what the BINARY links, once, and nothing in a test may reach it. Keeping them
+# apart is also what keeps the process-half rule readable: this is the only
+# target under //taffy/test that names //taffy/renderer.
+source_set("browser_test_launcher") {
+  testonly = true
+
+  sources = [
+    "taffy_browser_test_main_delegate.cc",
+    "taffy_browser_test_main_delegate.h",
+    "taffy_content_renderer_client.cc",
+    "taffy_content_renderer_client.h",
+    "taffy_content_utility_client.cc",
+    "taffy_content_utility_client.h",
+  ]
+
+  if (is_android) {
+    # JNI_OnLoad. On Android this is the only place the ContentMainDelegate is
+    # chosen — ContentTestLauncherDelegate::CreateContentMainDelegate is
+    # compiled out under `#if !BUILDFLAG(IS_ANDROID)` — which is why the file
+    # is a copy of upstream's rather than a reference to it. Its header says so
+    # and says what to diff it against on a rebase.
+    sources += [ "android/taffy_browsertests_jni_onload.cc" ]
+  }
+
+  deps = [
+    "//base",
+    "//content/public/renderer",
+    "//content/public/utility",
+    "//content/shell:content_shell_lib",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//taffy/components/filtering/renderer",
+    "//taffy/renderer",
+    "//taffy/utility:registry",
+  ]
+
+  if (is_android) {
+    deps += [
+      "//content/public/app",
+      "//content/test:android_test_message_pump_support",
+      "//testing/android/native_test:native_test_support",
+    ]
+  }
+}
+
+# ---------------------------------------------------------------------------
+# The suites
+# ---------------------------------------------------------------------------
+
+# WP-M1-06. Every milestone-M1 Required parity row that is only observable in a
+# real browser: navigation and redirect, error and interstitial pages, tab
+# restore, eviction and crash recovery with no blind replay, rotation and
+# configuration change, foreground and background transitions, the download
+# lifecycle, and the guarantee that all of it works with the assistant
+# unavailable.
+#
+# TEST-INDEX.md maps every test in here to the requirement it proves.
+source_set("parity_browser_tests") {
+  testonly = true
+
+  # Upstream's browser-test define, on the source set rather than on the
+  # binary: content/public/test/browser_test.h refuses to compile without it
+  # ("Can't reliably terminate hanging event tests without OOP test runner"),
+  # and a `defines` on the test() target reaches only that target's own
+  # sources. //taffy/browser:browser_tests carries it for the same
+  # reason, and these sets were missing it because nothing ever compiled them.
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  sources = [
+    "parity/ai_unavailable_parity_browsertest.cc",
+    "parity/download_lifecycle_browsertest.cc",
+    "parity/error_and_interstitial_browsertest.cc",
+    "parity/lifecycle_and_rotation_browsertest.cc",
+    "parity/navigation_and_redirect_browsertest.cc",
+    "parity/renderer_crash_recovery_browsertest.cc",
+    "parity/tab_restore_and_recovery_browsertest.cc",
+    "parity/web_platform_and_session_browsertest.cc",
+  ]
+
+  deps = [
+    ":support",
+    "//base",
+
+    # The download parity rows are asserted against Chromium's own download
+    # system rather than a fake, because the row is about that system's
+    # behaviour being preserved.
+    "//components/download/public/common:public",
+    "//content/public/browser",
+    "//content/shell:content_shell_lib",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//net",
+    "//net:test_support",
+    "//testing/gtest",
+    "//ui/gfx/geometry",
+    "//url",
+  ]
+}
+
+# The milestone-M2 correctness suite. Every test here needs a real renderer
+# endpoint and says so: TaffyObservationTestBase refuses to run without one,
+# with a message naming the binary that has it. Without that refusal these
+# tests would report every observation as unsupported and pass.
+source_set("correctness_browser_tests") {
+  testonly = true
+
+  # Upstream's browser-test define, on the source set rather than on the
+  # binary: content/public/test/browser_test.h refuses to compile without it
+  # ("Can't reliably terminate hanging event tests without OOP test runner"),
+  # and a `defines` on the test() target reaches only that target's own
+  # sources. //taffy/browser:browser_tests carries it for the same
+  # reason, and these sets were missing it because nothing ever compiled them.
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  sources = [
+    "correctness/bfcache_and_redirect_browsertest.cc",
+    "correctness/delta_stream_browsertest.cc",
+    "correctness/form_action_browsertest.cc",
+    "correctness/form_action_test_base.cc",
+    "correctness/form_action_test_base.h",
+    "correctness/form_action_visibility_browsertest.cc",
+    "correctness/frames_and_oopif_browsertest.cc",
+    "correctness/mutation_race_browsertest.cc",
+    "correctness/node_action_browsertest.cc",
+    "correctness/popup_and_task_tab_browsertest.cc",
+    "correctness/shadow_dom_and_virtualized_browsertest.cc",
+    "correctness/spa_navigation_browsertest.cc",
+  ]
+
+  deps = [
+    ":support",
+    "//base",
+    "//content/public/browser",
+    "//content/shell:content_shell_lib",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//testing/gtest",
+    "//url",
+  ]
+}
+
+# WP-M2-08. Each test states the property it defends and fails closed.
+source_set("adversarial_browser_tests") {
+  testonly = true
+
+  # Upstream's browser-test define, on the source set rather than on the
+  # binary: content/public/test/browser_test.h refuses to compile without it
+  # ("Can't reliably terminate hanging event tests without OOP test runner"),
+  # and a `defines` on the test() target reaches only that target's own
+  # sources. //taffy/browser:browser_tests carries it for the same
+  # reason, and these sets were missing it because nothing ever compiled them.
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  sources = [
+    "adversarial/hidden_content_browsertest.cc",
+    "adversarial/malicious_renderer_browsertest.cc",
+    "adversarial/message_bounds_browsertest.cc",
+    "adversarial/navigation_race_browsertest.cc",
+    "adversarial/prompt_injection_browsertest.cc",
+    "adversarial/sensitive_zone_browsertest.cc",
+    "adversarial/stale_handle_browsertest.cc",
+  ]
+
+  deps = [
+    ":support",
+    "//base",
+    "//content/public/browser",
+    "//content/shell:content_shell_lib",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//mojo/public/cpp/bindings",
+    "//testing/gtest",
+    "//third_party/blink/public/common",
+    "//url",
+  ]
+}
+
+# All three suites, by reference.
+#
+# HOW THESE REACH A TEST BINARY — the SP-01 question. The answer is a dep from
+# `test("taffy_browsertests")` in //taffy/BUILD.gn, which is the
+# cheap option: no standalone test() target here, and no edit to a
+# Chromium-owned build file such as //chrome/test:browser_tests, which would
+# have cost a patch. The same item in //taffy/browser/BUILD.gn has
+# the same answer, and there it is already wired.
+#
+# THAT DEP IS LIVE as of 2026-08-19, and what it cost is the reason to read the
+# header of every target below before trusting it. Until that day GN never
+# loaded this file — a build file is loaded only when an already-loaded file
+# names a label in it — so `gn ls "//taffy/test:*"` returned nothing
+# and none of the twenty-two files below was compiled. Nothing failed; the suite
+# simply ran the browser/ tests and reported them all passing. Three build-file
+# defects and 79 compile errors had accumulated behind that silence, including
+# one assertion on a struct field that does not exist. They are fixed and the
+# suites run; the lesson is that this file was syntax-checked by GN exactly
+# once before then, and no gate could have said so. `./tools/chromium/
+# orphan-targets` is the check that now would.
+# The tool seam with its processes actually running. Everything below the seam
+# is provable without one; process isolation, the concurrency bound, and a
+# descriptor surviving the crossing are not.
+source_set("tool_browser_tests") {
+  testonly = true
+
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  sources = [ "tool/media_tool_worker_browsertest.cc" ]
+
+  if (taffy_python_runtime_in_current_toolchain) {
+    sources += [
+      "tool/python_tool_worker_browsertest.cc",
+      "tool/python_tool_worker_sp07_browsertest.cc",
+      "tool/python_tool_worker_sp07_test_support.cc",
+      "tool/python_tool_worker_sp07_test_support.h",
+    ]
+  }
+
+  deps = [
+    "//base",
+    "//base/test:test_support",
+    "//content/public/browser",
+    "//content/shell:content_shell_lib",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//crypto",
+    "//mojo/public/cpp/bindings",
+    "//taffy/browser:browser_shared",
+    "//taffy/contracts/tool-runtime:tool_runtime_mojom",
+    "//taffy/services/tool-runtime/media:test_support",
+    "//taffy/services/tool-runtime/supervisor",
+    "//testing/gtest",
+    "//third_party/zlib/google:zip",
+  ]
+}
+
+# The Task Benchmark's observation adapter.
+#
+# It is a suite of its own rather than a case inside another because it answers
+# to a different reader: `tools/benchmark.d/launcher.py` selects exactly one
+# case per scenario by name and recovers a record from each, so what these
+# tests print is a wire format, and its shape is owned by that launcher and by
+# `tools/benchmark.d/score.py`. A benchmark adapter mixed into a correctness
+# suite would be run by the correctness suite's own selections, which is how a
+# record comes to be emitted for a scenario nobody selected.
+source_set("benchmark_browser_tests") {
+  testonly = true
+
+  # Upstream's browser-test define, on the source set rather than on the
+  # binary, for the same reason as the sets above: browser_test.h refuses to
+  # compile without it.
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  sources = [ "benchmark/task_benchmark_observation_browsertest.cc" ]
+
+  # The same four as the browser-test sets above, for the same reason: the
+  # fixture derives from content::ContentBrowserTest, whose implementation the
+  # shell library carries. Naming them here rather than inheriting them from a
+  # sibling set keeps this one buildable on its own.
+  deps = [
+    ":benchmark_page_evidence",
+    ":benchmark_support",
+    ":support",
+    "//base",
+    "//content/public/browser",
+    "//content/shell:content_shell_lib",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//crypto",
+    "//testing/gtest",
+    "//url",
+  ]
+}
+
+group("browser_tests") {
+  testonly = true
+
+  deps = [
+    ":adversarial_browser_tests",
+    ":benchmark_browser_tests",
+    ":correctness_browser_tests",
+    ":parity_browser_tests",
+    ":tool_browser_tests",
+  ]
+}
+
+group("fuzzers") {
+  testonly = true
+
+  deps = [ "//taffy/test/fuzz:fuzzers" ]
+}

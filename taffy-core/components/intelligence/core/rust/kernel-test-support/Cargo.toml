@@ -1,0 +1,22 @@
+# Host-test doubles for the loop kernel's ports (decision 0072).
+#
+# This crate is test-only machinery: it is a dev-dependency of the crates it
+# serves, it is not named in `SHIPPING_CRATES`, and no GN target builds it. A
+# shipping dependency on it is a defect by definition.
+
+[package]
+name = "kernel-test-support"
+description = "Scripted host-test doubles for the Taffy core service's ports."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+bip-types = { workspace = true }
+core-runtime = { workspace = true }
+procedure-engine = { workspace = true }
+task-engine = { workspace = true }

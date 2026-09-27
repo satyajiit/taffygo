@@ -1,0 +1,25 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//build/rust/rust_static_library.gni")
+import("//taffy/services/core/crate_sources.gni")
+
+rust_static_library("loop_kernel") {
+  crate_name = "loop_kernel"
+  crate_root = taffy_loop_kernel_crate_root
+  sources = taffy_loop_kernel_sources
+  edition = "2021"
+  deps = [
+    "//taffy/components/intelligence/core/rust/model-router:model_router",
+    "//taffy/components/intelligence/core/rust/procedure-engine:procedure_engine",
+    "//taffy/components/intelligence/core/rust/task-engine:task_engine",
+    "//taffy/components/intelligence/core/rust/table-engine:table_engine",
+    "//taffy/components/security/core/rust/policy-engine:policy_engine",
+    "//taffy/contracts/bip/rust/bip-types:bip_types",
+    "//taffy/contracts/core-service/rust/core-service-types:core_service_types",
+  ]
+  visibility = [ "//taffy/components/intelligence/core/rust/core-runtime:*" ]
+}

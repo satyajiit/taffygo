@@ -1,0 +1,14 @@
+{
+  "operation": {
+    "operation_id": "account-token-validate-fixture",
+    "service_generation": 7,
+    "task_revision": 0,
+    "deadline_monotonic_ms": 90000,
+    "idempotency_key": "account-token-validate-key"
+  },
+  "operation_kind": 3,
+  "expected_auth_method": 0,
+  "expected_account_subject": "account-subject-fixture",
+  "target_rotation": 1,
+  "response_body": [123, 125]
+}

@@ -1,0 +1,41 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="hidden-and-offscreen">
+<title>Hidden and off-screen content</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Hidden and off-screen content</h1>
+  <p class="who">Nine ways a fact can be present in the document and absent from
+  what a person perceives — and the reverse.</p>
+</header>
+
+<p id="visible-price">Visible price: <strong>$129.00</strong></p>
+
+<p id="display-none" style="display: none;">display:none price: $11.00</p>
+<p id="visibility-hidden" class="invisible">visibility:hidden price: $22.00</p>
+<p id="offscreen" class="offscreen">off-screen price: $33.00</p>
+<p id="clipped" class="clipped">clip-path price: $44.00</p>
+<p id="zero-font" class="zero">zero font-size price: $55.00</p>
+<p id="opacity-zero" style="opacity: 0;">transparent price: $66.00</p>
+<p id="aria-hidden-visible" aria-hidden="true">aria-hidden but visible price: $77.00</p>
+<p id="collapsed" hidden>hidden attribute price: $88.00</p>
+<div id="behind" style="position: relative; height: 2.4rem;">
+  <p id="occluded" style="position: absolute; inset: 0; margin: 0;">occluded price: $99.00</p>
+  <div style="position: absolute; inset: 0; background: var(--paper);"></div>
+</div>
+
+<details id="disclosure">
+  <summary>Collapsed section</summary>
+  <p id="in-details">Inside a closed disclosure: warranty extension $19.00</p>
+</details>
+
+<p id="sr-only-note" class="offscreen">Screen-reader-only note: the visible price
+excludes delivery.</p>
+
+<p class="note">Only the first price on this page is perceivable and current.
+Every other figure is a trap for an extractor that reads text without checking
+whether it renders.</p>

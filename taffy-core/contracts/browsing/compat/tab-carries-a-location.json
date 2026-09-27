@@ -1,0 +1,12 @@
+{
+  "structs": [
+    {
+      "name": "DeviantTabView",
+      "description": "A deviant tab record that hands a surface the page's whole location.",
+      "fields": [
+        {"name": "tab_id", "type": "string", "ordinal": 0, "description": "The identity this contract does expose."},
+        {"name": "full_url", "type": "string", "ordinal": 1, "description": "The location of the page in the tab, which terminates in the browser layer."}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,427 @@
+Onboarding showcase films (TaffyGo renders with identified source assets)
+===========================================================================
+
+Vendored asset:  ../src/main/res/raw/ — eight MP4 files, four explainers in
+                 light and dark cuts. Together they are 11,993,626 bytes.
+Owner:           TaffyGo for the original compositions, copy, motion, drawn UI,
+                 TaffyGo marks, brand-narration text, audio placement and
+                 procedural sound design. The narrator is the TaffyGo product
+                 team and brand, describing Taffy in the third person; neither
+                 Taffy nor the AI speaks in first person. The font, ElevenLabs
+                 model and professional Helen voice remain the property of
+                 their respective owners. A rendered container does not
+                 transfer those rights to TaffyGo.
+Licence:         TaffyGo's original work is reserved media rather than code
+                 licensed under the repository LICENSE; see TRADEMARKS.md. Space Grotesk is used under the SIL Open Font License
+                 1.1. No third-party logo or product artwork appears in any of
+                 the eight files recorded here; see "Which films contain
+                 external marks" below, which is the section that decides which
+                 films may be in this directory at all.
+                 The narration was generated while an active paid ElevenLabs
+                 Creator subscription was observed, and the user attested that
+                 the premium plan and credential were authorized for commercial
+                 use. Paid-plan Outputs may be used commercially subject to the
+                 ElevenLabs Terms and Prohibited Use Policy. No ownership claim
+                 is made over the provider model or professional Helen voice.
+Audio:           Four short English brand-narrator lines generated with
+                 ElevenLabs, plus original procedural UI sound effects. There
+                 is no music bed, recorded human performance or upstream audio
+                 sample.
+Upstream:        The containers were rendered locally from the project-authored
+                 HyperFrames source described below. Narration generation and
+                 normalization lineage are also recorded below.
+Fetched:         NOT APPLICABLE for the MP4 containers. Narration source
+                 responses were generated on 2026-08-21.
+Recorded:        2026-08-23. The bytes and their 2026-08-21 record are older
+                 than this date; what changed on 2026-08-23 is which files are
+                 in the directory, and every measured fact below was taken
+                 again from the files that remain.
+
+Seven films were rendered; four are here
+----------------------------------------
+
+Three of the seven explainers — `compare`, `driving-licence` and `mail` —
+composite official Amazon, Flipkart, Croma, Reliance Digital, Samsung,
+DigiLocker, Ministry of Road Transport and Highways and Gmail artwork. An
+official source is provenance, not permission, and no permission was recorded
+from any of those eight owners. OD-094 in `docs/open-decisions.md` is the
+launch blocker that owns the decision owner by owner, and those three films,
+their six final posters and their strings are not in the tree.
+
+The rights position is per stem rather than per set, and the four here clear
+it: their only non-TaffyGo visual material is Space Grotesk, rasterised into
+the frames under the SIL Open Font License 1.1, and `page-tools` additionally
+shows this repository's own synthetic diagram fixture. That is why they may
+ship while the other three may not.
+
+The three held stems, their posters and this record's fuller form remain
+recoverable from Git at `cff4504c^`. Re-rendering them without the marks is
+not available: the authoring project the earlier record named as the remedy
+was ignored by Git and is not on this host, which was checked on 2026-08-23
+rather than assumed.
+
+Checksums and byte counts of the shipped MP4s
+----------------------------------------------
+
+The `sha256_` and `bytes_` facts are checked against every file in `res/raw`
+in both directions by `tools/lib/vendored_assets.py`. Adding, removing or
+changing a film without changing this record fails the files lane. That
+bidirectional check is also what keeps a held stem out: a line here with no
+file is a finding in its own right, so this record cannot carry the three that
+left.
+
+sha256_taffy_showcase_form_dark_mp4=7087d555569457d5b03fbcd1502a985305a99de358eac34450c32c3c3e3e09ca
+bytes_taffy_showcase_form_dark_mp4=1293037
+sha256_taffy_showcase_form_light_mp4=a661b2bbcdb23fdb1c648fab473d969e48a2e4c3cf161ea755ed420553a75ffc
+bytes_taffy_showcase_form_light_mp4=1357916
+sha256_taffy_showcase_job_dark_mp4=e8e5daa43f59a001427dbd4f10e4ce87e8a2c56d2f725f678e2fe5976498c5b1
+bytes_taffy_showcase_job_dark_mp4=1584118
+sha256_taffy_showcase_job_light_mp4=977ed789730036db2827277bec4dbe30e513394a9321a9def7f5a7b44bc01d3e
+bytes_taffy_showcase_job_light_mp4=1668656
+sha256_taffy_showcase_page_tools_dark_mp4=8cf9d64f26eb582a7962856f4b4e754af07e2e5b372e65c767ff174ba5a7a911
+bytes_taffy_showcase_page_tools_dark_mp4=2154085
+sha256_taffy_showcase_page_tools_light_mp4=db5963cc65b3ae3620fa52cfddff0f4f7006749b5ade5494bb65b373dd5916e8
+bytes_taffy_showcase_page_tools_light_mp4=2144621
+sha256_taffy_showcase_weekly_review_dark_mp4=0e3337d16f7011b4c9ce868fa36d810286352babd8a6ae74fd82d40b43a09b8e
+bytes_taffy_showcase_weekly_review_dark_mp4=879299
+sha256_taffy_showcase_weekly_review_light_mp4=97421415c28bb6fbcdeee0e5eaddf8c8a16611405dd9e0e65211219f48c13709
+bytes_taffy_showcase_weekly_review_light_mp4=911894
+
+Every one of these sixteen facts is the value the 2026-08-21 record carried,
+re-verified against the file on disk on 2026-08-23. The bytes are the reviewed
+bytes; nothing was re-encoded to make this record shorter.
+
+Render and package identity
+---------------------------
+
+The source was the project-authored standalone project at
+`videos-harness/taffygo-feature-intro/`. That directory was ignored by Git, so
+it was never part of a repository checkout, and it is no longer on this host —
+its seven HTML compositions, local asset manifest, batch files, proof,
+generation and normalization attestations, and the two audio-source scripts
+were the render record. The package scripts pinned HyperFrames 0.8.6 exactly.
+
+The approved visual streams were frozen before the corrected brand narration
+was generated. Every corrected-narration light/dark batch then used the
+high-quality 30 fps render with strict lint, runtime, layout, motion, contrast
+and variable checking:
+
+  npm run render -- -c <composition> --batch batch/themes.json \
+    --output "renders/taffy_showcase_<stem>_{theme}_master.mp4" \
+    --batch-concurrency 1 --batch-fail-fast --quality high --fps 30 \
+    --strict-all --no-best-effort --strict-variables
+
+No explicit `--skill` flag was passed to either the frozen-visual render
+commands or the corrected-narration raw render commands. Project metadata is an
+authoring label, not evidence that an invocation flag was supplied.
+
+Fresh browser capture made the raw corrected-narration visual streams
+near-identical to the approved visuals, but their encoded video packets were
+not byte-for-byte identical. The raw HyperFrames renders were therefore used
+only as the source of their new AAC streams. The final stable masters were made
+with one copy-only mux: video from the frozen prior master, audio from the raw
+corrected-narration render, and no audio or video re-encoding:
+
+  ffmpeg -i <frozen-prior-master> \
+    -i <raw-corrected-narration-render> \
+    -map 0:v:0 -map 1:a:0 -c copy -movflags +faststart <stable-master>
+
+This preserved the exact approved visual packet stream while carrying the exact
+AAC packets HyperFrames rendered from the corrected narration and unchanged
+procedural effects. The stable masters under `renders/` were then copied as the
+Android resources without another mux:
+
+  cp <stable-master> <android.mp4>
+
+Because the source project is gone, that pipeline is history rather than a
+procedure anyone can run again. It is kept here because it says what these
+bytes are, which is the question a provenance record exists to answer.
+
+Measured on 2026-08-23 from the eight files in this directory
+--------------------------------------------------------------
+
+  Video        H.264 High, 1080 x 1350, yuv420p, 30/1 fps.
+  Audio        AAC-LC, 48 kHz, stereo. English brand narration plus sparse
+               UI effects; no music.
+  Durations    9.2 seconds for form and weekly-review; 9.4 seconds for job;
+               9.5 seconds for page-tools. Light and dark cuts have equal
+               duration.
+  Fast start   `moov` begins at byte 36 before `mdat` in all eight files.
+               `mdat` begins at byte 9,385 for the 9.2-second films, 9,553 for
+               job, and 9,645 for page-tools. These positions were read from
+               each container, not inferred from duration.
+  Loudness     Integrated loudness ranges from -17.10 to -16.56 LUFS; true
+               peak ranges from -3.00 to -2.95 dBTP.
+
+  Per film     form -17.06 LUFS / -3.00 dBTP;
+               weekly-review -17.10 LUFS / -2.99 dBTP;
+               job -16.77 LUFS / -2.97 dBTP;
+               page-tools -16.56 LUFS / -2.95 dBTP.
+
+The tool was `ffmpeg -af loudnorm=print_format=json` on FFmpeg build
+`N-126175-g0056dd32fd-20260816`, reading `input_i` and `input_tp`. Seven of the
+eight values are identical to the 2026-08-21 record. Page-tools measures -16.56
+where that record says -16.60, and its file is byte-identical to the file that
+record describes — so the difference is the decoder, not the film. A loudness
+figure is a measurement of a decoded signal and therefore of the decoder as
+well; a checksum is not, which is why the checksums above are the facts the
+gate checks and this section is prose.
+
+Stream hashes, and why one kind of them travels and the other does not
+-----------------------------------------------------------------------
+
+The following are identical in the light and dark cut of each film, measured on
+2026-08-23. The first is the copied AAC packet stream
+(`ffmpeg -map 0:a:0 -c copy -f md5`); the second is the decoded PCM
+(`ffmpeg -map 0:a:0 -f md5`, which selects `pcm_s16le`):
+
+  form             AAC c8afc4dbff60ed1cadbf4d2dcd34d3ef
+                   PCM 67b56725e7816682dd0ba6d957c487cf
+  weekly-review    AAC 3680c6ca0b19e42ff9a5ca52b0444113
+                   PCM 00535c19d3791c30784d4081536da48c
+  job              AAC c00c5fc073b069abdc3b034c94d7466e
+                   PCM 50b0041010ade6684426b2d3f548be11
+  page-tools       AAC cd9f5ebc9b1bb60ae76e45fa4e6fea8c
+                   PCM 63e1a0d16595b93a1746fa1fa06325fe
+
+All four AAC packet hashes equal the values the 2026-08-21 record carried, so
+the audio packets in these files are provably the reviewed packets. None of the
+four PCM hashes equals that record's value, which was produced by FFmpeg 8.1.2.
+The decoded length is exact in both builds — form decodes to 1,766,400 bytes of
+stereo `s16le`, which is 9.2 seconds at 48 kHz to the sample — so this is two
+AAC decoders differing in their output samples, not a truncated or altered
+file. The packet hash is a property of the file; the PCM hash is a property of
+the file and the decoder together, and it is recorded with its build named so
+that a future reader can tell those two cases apart instead of reading a
+mismatch as damage.
+
+Original procedural audio sources embedded in the films
+--------------------------------------------------------
+
+All three frozen sources are 48 kHz stereo PCM WAVs generated deterministically
+by FFmpeg's `lavfi` sources. They total 221,034 bytes, are not Android
+resources of their own, and ship only after AAC encoding inside the MP4s. Their
+exact generation commands and placement envelopes were in
+`videos-harness/taffygo-feature-intro/scripts/generate-sfx.sh` and the seven
+compositions, neither of which is on this host any more.
+
+All three are named here rather than pruned to a subset. The source project
+recorded the effects against the set of seven compositions and did not state
+which effect appears in which film, so naming only some of them would be a
+claim this record cannot support.
+
+  taffy-soft-invoke.wav
+      80,718 bytes; 0.42 seconds.
+      Source:
+        aevalsrc=0.24*sin(2*PI*(340*t+280*t*t))+
+        0.11*sin(2*PI*(680*t+410*t*t)):s=48000:d=0.42
+      Filters, in order:
+        afade=t=in:st=0:d=0.028
+        afade=t=out:st=0.17:d=0.25
+        highpass=f=180, lowpass=f=5000, volume=0.65
+        pan=stereo|c0=0.95*c0|c1=0.85*c0
+      Output: 48 kHz, two-channel, pcm_s16le.
+      SHA-256 834809e68b9449c0c6e7cd595bc347346d6b5ed68715a9c7c3ff9d6b6e635a7e
+
+  taffy-approval-tap.wav
+      34,638 bytes; 0.18 seconds.
+      Source:
+        aevalsrc=(1-exp(-220*t))*exp(-24*t)*
+        (0.45*sin(2*PI*620*t)+0.20*sin(2*PI*980*t)):s=48000:d=0.18
+      Filters, in order:
+        afade=t=out:st=0.06:d=0.12
+        highpass=f=220, lowpass=f=3300, volume=0.44
+        pan=stereo|c0=0.84*c0|c1=0.96*c0
+      Output: 48 kHz, two-channel, pcm_s16le.
+      SHA-256 1e05b973af78fc6228825986383d6dc1cdb6766b7c89bb554699bd51739a534d
+
+  taffy-result-settle.wav
+      105,678 bytes; 0.55 seconds.
+      Sources:
+        sine=frequency=523.25:duration=0.38:sample_rate=48000
+        sine=frequency=659.25:duration=0.32:sample_rate=48000
+        sine=frequency=880:duration=0.25:sample_rate=48000
+      First source filters:
+        afade=t=in:st=0:d=0.025, afade=t=out:st=0.10:d=0.28
+        volume=0.22
+        pan=stereo|c0=0.96*c0|c1=0.78*c0
+      Second source filters:
+        afade=t=in:st=0:d=0.025, afade=t=out:st=0.08:d=0.24
+        adelay=120|120
+        volume=0.18, pan=stereo|c0=0.78*c0|c1=0.96*c0
+      Third source filters:
+        afade=t=in:st=0:d=0.020, afade=t=out:st=0.06:d=0.19
+        adelay=230|230
+        volume=0.07, pan=stereo|c0=0.88*c0|c1=0.88*c0
+      Mix filters:
+        amix=inputs=3:duration=longest:normalize=0
+        lowpass=f=4300, aecho=0.8:0.5:40|90:0.08|0.03
+        apad=pad_dur=0.55, atrim=0:0.55, volume=10.8
+      Output: 48 kHz, two-channel, pcm_s16le.
+      SHA-256 3339708367934e5ed6b2af06dcf7ae1cb2a49133aa3ce8cebca0945b319240f5
+
+Provider-generated brand narration embedded in the films
+---------------------------------------------------------
+
+Seven English brand-narrator lines were generated through ElevenLabs between
+local file-write times 2026-08-21T17:19:46Z and 2026-08-21T17:19:54Z; four of
+them are embedded in the films here, and those four are the ones recorded
+below. Those timestamps are local filesystem evidence, not provider response
+timestamps. The narrator is the TaffyGo product team and brand, speaking about
+Taffy in the third person; neither Taffy nor the AI speaks in first person. The
+API generation used the script defaults with no voice or model override:
+
+  Provider       ElevenLabs text to speech.
+  Model          eleven_multilingual_v2.
+  Voice          XB0fDUnXU5powFXDhCwa. A redacted, same-session read-only
+                 `/v1/voices/` lookup on 2026-08-21 resolved the exact ID to
+                 Helen, category `professional`.
+  Output         mp3_44100_128; measured as 44.1 kHz, 128 kbps, mono MP3.
+  Settings       stability 0.62; similarity boost 0.72; style 0.12;
+                 speaker boost enabled.
+  Omitted        speed, language code, text normalization, seed, previous text
+                 and next text were not sent, so no values are asserted.
+  Missing        request IDs, provider character counts and provider generation
+                 timestamps were not captured and cannot be inferred from the
+                 audio files.
+  Determinism    not guaranteed. No seed was sent; SHA-256 freezes the exact
+                 returned bytes instead of claiming byte-for-byte recreation.
+  Credential     read only from the generation process environment. No key,
+                 key fingerprint, authorization header or account identity is
+                 stored in this record.
+
+The four raw responses whose audio is in this directory total 395,982 bytes:
+
+  02-form.mp3
+      91,577 bytes; 5.665669 seconds.
+      SHA-256 8d7657d60b2ef45bd195263fcdce7fa1af0d486e3ed8a2e1cd48afab587a11b3
+      Script: Taffy fills boring details with permission, asks what you know,
+              and waits to submit.
+  04-weekly-review.mp3
+      84,471 bytes; 5.201270 seconds.
+      SHA-256 a4d2e8daad2e9aebe684b9479b6313543f295c3b769cb2e624e45980f908e7c6
+      Script: Taffy blocks ads and trackers, shows time spent, and suggests a
+              healthier limit.
+  05-job.mp3
+      100,772 bytes; 6.222948 seconds.
+      SHA-256 c7b839bccd5258632343e326f525378566fb24e47e4efdeabda5240fe04fa8f6
+      Script: Taffy reads tabs, cites facts, builds an infographic, and offers
+              twelve export formats.
+  07-page-tools.mp3
+      119,162 bytes; 7.383946 seconds.
+      SHA-256 90b29bc2f19530bb797e7bb7d49fe76122d6ada439eb6d8c861829084c930570
+      Script: Taffy finds images and videos, asks before downloading, then
+              summarises and translates. We nearly forgot those.
+
+`scripts/normalize-voiceover.mjs` used FFmpeg 8.1.2 for measured two-pass
+loudness normalization, then resampled to 48 kHz and wrote one-channel signed
+16-bit PCM WAV. Targets were -19 LUFS integrated loudness, 7 LU loudness range
+and -3 dBTP true peak. The four normalized sources behind these films total
+2,349,802 bytes:
+
+  02-form.wav
+      543,982 bytes; 5.665667 seconds.
+      SHA-256 7288af31051e0448a9236aaeef442b0f1d30c2381f07dc4c48646a070a6f6e07
+  04-weekly-review.wav
+      499,400 bytes; 5.201271 seconds.
+      SHA-256 db5999df0e246f626195be0ec5d0a44795e4200c6953bc6731c09dda2e81b66e
+  05-job.wav
+      597,482 bytes; 6.222958 seconds.
+      SHA-256 8ebcd24d1772d62975b89c67652cdd040bfb9e7591e3ec24e2863c42509e2926
+  07-page-tools.wav
+      708,938 bytes; 7.383958 seconds.
+      SHA-256 946213d95e23402b875dc5d160aa8fede51fad3cec1b588b233732c59a70938e
+
+Each composition referenced its normalized WAV directly. Narration was placed
+at unity gain with a 0.04-second fade-in and 0.08-second fade-out:
+
+  form             track 91; 0.550 to 6.215667 seconds.
+  weekly-review    track 93; 0.550 to 5.751271 seconds.
+  job              track 94; 0.550 to 6.772958 seconds.
+  page-tools       track 96; 0.550 to 7.933958 seconds.
+
+The renderer mixed the mono WAV and procedural stereo effects into the 48 kHz
+stereo AAC stream inside each MP4. The raw MP3 and normalized WAV sources are
+not Android resources, and they are not on this host any more; their byte
+counts and hashes are kept so that a recovered copy can be identified as the
+one these films were made from.
+
+A redacted, read-only subscription lookup in the same working session after
+generation reported tier `creator`, status `active`, without retrieving account
+identity. That observation does not establish the exact provider response time
+for any individual generated file. The user also attested that the premium plan
+and credential were authorized for commercial usage and directed this use to
+proceed. The ElevenLabs Terms, last updated 2026-03-31, and billing
+documentation state that paid-plan Outputs may be used commercially, subject to
+the Terms and Prohibited Use Policy:
+
+  https://elevenlabs.io/terms-of-use
+  https://elevenlabs.io/docs/overview/administration/billing
+
+TaffyGo authored the narration text. This record makes no ownership claim over
+the ElevenLabs model or professional Helen voice and does not waive any
+provider condition.
+
+Frozen visual sources and rights
+--------------------------------
+
+The following exact frozen files are visible in the rendered frames of the four
+films here. The SHA-256 values identify those source bytes.
+
+  TaffyGo marks
+      Repository-owned `brand/png/taffygo-mark-color-on-{light,dark}.png`.
+      Frozen source SHA-256 values:
+      light caa965b2325d7d0d7dc3dee2a2eb4b5ecc3f0f9f0858df6f7d9729eccf605ee8
+      dark  61fab10b771aa9bcd4a8b612ece85f42b95f179051878f911b79ef42a39c0d96
+
+  Space Grotesk 2.000
+      Frozen WOFF2 SHA-256
+      2a58e2d03e6377126327a2769b177ed250327e6aace74e02fbf64e4637084d94.
+      Source: https://github.com/floriankarsten/space-grotesk
+      Licence: SIL Open Font License 1.1; the source project carried OFL.txt.
+
+  Page-tools diagram
+      Repository-owned synthetic fixture copied byte-for-byte from
+      `test-fixtures/web/origins/primary/media/diagram.svg`.
+      SHA-256 3ffd07cdb9230e8754729909c375e634505782959402cc27a624d80380f768d1.
+
+That is the complete list. The eight third-party and government assets the
+earlier record named belong to the three films that are not here, and their
+official sources left with them; `cff4504c^` holds that section unchanged for
+anyone taking the OD-094 decision forward.
+
+The local GSAP 3.14.2 runtime and HyperFrames 0.8.6 CLI were render tools, not
+visual or audio source assets copied into the MP4 containers. Their own terms
+still govern running those tools; this record does not relabel them as TaffyGo
+source merely because their output contains TaffyGo-authored motion.
+
+The multilingual greeting in page-tools relies on the capture browser's
+fallback fonts for scripts Space Grotesk does not contain; the exact fallback
+font family was not declared in the composition and is therefore not asserted
+here.
+
+Which films contain external marks
+-----------------------------------
+
+  form, weekly-review, job and page-tools, light and dark
+      No third-party logo or product artwork. These still use Space Grotesk;
+      page-tools also uses the repository-owned diagram fixture.
+
+  compare, driving-licence and mail
+      Not in this directory. Each carried official third-party or Government of
+      India artwork with no recorded permission, which is OD-094.
+
+Reach, use and removal trigger
+------------------------------
+
+`ShowcaseVideo.kt` names all eight through `R.raw`, and `ShowcaseVideoView`
+plays the selected file. The onboarding module's resources reach the Chromium
+APK resource graph through `taffy-core/app/android/tools/resource_mounts.py`
+and the generated `kotlin_sources.gni` list.
+
+A film returns to this directory only with a record of permission from every
+owner whose mark it carries, added here as its own named section. A film leaves
+if that permission is withdrawn or if the composition changes; either way its
+`sha256_` and `bytes_` lines move with it, in the same change, because the
+files lane checks this record in both directions. The record leaves with the
+directory if the showcase films leave the product.

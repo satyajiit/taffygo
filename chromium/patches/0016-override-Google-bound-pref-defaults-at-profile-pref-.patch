@@ -1,0 +1,39 @@
+From a61f9465b4034804571c419e7a4ad0406ce9c5ef Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Tue, 18 Aug 2026 02:26:29 +0530
+Subject: override Google-bound pref defaults at profile-pref registration
+
+One call at the end of RegisterProfilePrefs sets the downstream defaults
+decision 0019 records: password leak detection off (the keyless service
+fails while the payload still leaves the device) and the Feed surface
+hidden. Defaults rather than forced values, so a user choice still reads
+as user-set and enterprise policy behaves unchanged. The list lives in
+//taffy/browser beside the feature posture.
+
+Taffy-Patch: 0016
+
+diff --git a/chrome/browser/profiles/pref_service_builder_utils.cc b/chrome/browser/profiles/pref_service_builder_utils.cc
+index 8986f4d47cc58..478b3bf254a14 100644
+--- a/chrome/browser/profiles/pref_service_builder_utils.cc
++++ b/chrome/browser/profiles/pref_service_builder_utils.cc
+@@ -34,6 +34,7 @@
+ #include "components/prefs/pref_value_store.h"
+ #include "components/supervised_user/core/browser/family_link_settings_service.h"
+ #include "components/sync_preferences/pref_service_syncable.h"
++#include "taffy/browser/feature_posture.h"
+ #include "components/variations/service/variations_service.h"
+ #include "content/public/browser/network_service_instance.h"
+ #include "services/preferences/public/mojom/tracked_preference_validation_delegate.mojom.h"
+@@ -77,6 +78,12 @@ void RegisterProfilePrefs(bool is_signin_profile,
+       pref_registry);
+   BrowserContextDependencyManager::GetInstance()
+       ->RegisterProfilePrefsForServices(pref_registry);
++
++  // Taffy: downstream pref defaults, after both dependency managers so that
++  // prefs registered by keyed-service factories (signin.allowed among them)
++  // exist before a default is replaced.
++  // chromium/patches/0016-override-google-bound-pref-defaults.md
++  taffy::OverrideProfilePrefDefaults(pref_registry);
+ }
+ 
+ std::unique_ptr<sync_preferences::PrefServiceSyncable> CreateProfilePrefService(

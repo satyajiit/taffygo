@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="iframe-same-origin">
+<title>Same-origin iframe</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Same-origin iframe</h1>
+  <p class="who">The frame below shares this document's origin. Its content is
+  reachable, and its own navigation invalidates only the frame.</p>
+</header>
+
+<p id="parent-fact">Parent document fact: the recommended price is $129.00.</p>
+
+<iframe id="same-origin-frame" title="Same-origin specification panel"
+        height="240" src="/frames/panel.html"></iframe>
+
+<p class="note">The frame carries the warranty term; the parent carries the price.
+A complete answer needs both, with the frame labelled as its own source.</p>

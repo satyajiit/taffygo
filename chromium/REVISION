@@ -1,0 +1,34 @@
+# TaffyGo Chromium pin — machine owner file for the "Chromium revision" and
+# related rows in TOOLCHAIN.md. See docs/development/chromium-fork-and-build.md
+# section 1.3 for the rebase cadence and the fork-debt budget.
+#
+# Format: `key=value`, one per line. `#` starts a comment. Consumed by
+# tools/chromium/sync, tools/doctor, and tools/check.
+#
+# `commit` is the immutable upstream commit of the Chromium stable-channel
+# milestone tag named by `tag` — never a branch, never "latest".
+#
+# Pinned 2026-08-16 (SP-01, selection step): 152.0.7977.42 is the current
+# Android stable release (shipped 2026-08-12). Verified against two
+# independent sources that agree on the commit:
+#   - ChromiumDash fetch_releases (channel=Stable, platform=Android)
+#   - `git ls-remote .../chromium/src.git refs/tags/152.0.7977.42`
+#
+# SP-01 build evidence: recorded in docs/development/chromium-fork-and-build.md
+# section 6, which is the home for spike evidence; there is no separate spike
+# report and no figure is repeated here. What that milestone now carries is a
+# TaffyGo build, not only an upstream one: `gn gen` loads //taffy,
+# taffy_public_apk builds for the dev-x64, dev-arm64 and release-arm64 profiles,
+# the dev-arm64 package installs and launches on a physical Android phone, and
+# taffy_unittests runs green on it, and taffy_browsertests is registered as an
+# Android test binary (patch 0021) and runnable via tools/chromium/test.
+# Applying this pin's patch queue is part of that; see
+# chromium/patches/README.md. Still pending at this pin: the milestone rebase
+# rehearsal (the queue has only been replayed textually, never built at a newer
+# milestone), every product measurement and benchmark, and the builder that
+# owns the evidence of record (OD-026) — a developer workstation is not that
+# builder.
+
+milestone=152
+tag=152.0.7977.42
+commit=db8ceb709fe92f3bb010fb982d6300e54de6dc6a

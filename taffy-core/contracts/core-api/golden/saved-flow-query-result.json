@@ -1,0 +1,36 @@
+{
+  "request_id": "saved-flow-read-1",
+  "service_generation": 7,
+  "availability": 0,
+  "flows": [
+    {
+      "skill_id": "flow.saved",
+      "origin": "https://example.test",
+      "provenance": 1,
+      "status": 1,
+      "active_version": 2,
+      "step_count": 1,
+      "installed_at_epoch_ms": 1735689600000,
+      "updated_at_epoch_ms": 1735689660000,
+      "recorded_from_task_id": "completed-task",
+      "reviewed_steps": [
+        {
+          "verb": "browser.navigate",
+          "arguments": [
+            {
+              "parameter": 0,
+              "kind": 5,
+              "value": 0,
+              "purpose": 0,
+              "public_address": "https://example.test/start",
+              "semantic_target": null
+            }
+          ],
+          "postcondition": 0,
+          "has_fill": false,
+          "fill_purpose": 0
+        }
+      ]
+    }
+  ]
+}

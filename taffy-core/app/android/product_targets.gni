@@ -1,0 +1,309 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//taffy/resources/branding/taffy_branding.gni")
+
+if (is_android) {
+  import("//build/config/android/rules.gni")
+  import("//chrome/android/chrome_public_apk_tmpl.gni")
+
+  # Everything the installable APK and the bundle's base module must agree
+  # about. Two spellings of this list is two products: the same sources with
+  # a different manifest package, a different target SDK or a different flags
+  # file is not "the bundle of the APK", it is a second browser that happens
+  # to share a name. So it is written once, forwarded into both, and the
+  # `chromium` lane of ./tools/check fast holds both targets to forwarding it.
+  #
+  # Private to this file on purpose: `import()` does not export a name that
+  # begins with an underscore, so no BUILD.gn can reach past the templates and
+  # set one of these itself.
+  #
+  # **Every template below copies it to a local before forwarding it**, and
+  # that line is load-bearing rather than a style. A template's body can read
+  # this file's scope, and the *target block* nested inside that body cannot:
+  # a target declaration is executed against the scope of the file that
+  # invoked the template, so a `forward_variables_from(_taffy_product_shared,
+  # "*")` written directly inside `chrome_public_apk_or_module_tmpl(...)`
+  # answers "Undefined identifier" and configures on no host at all. It was
+  # written that way and `gn gen` refused the graph before compiling anything.
+  # Renaming it public does not help, because privacy was never what was
+  # wrong. The copy is what carries it across.
+  # Chrome's feature modules as TaffyGo carries them: every one upstream lists
+  # except XR, in both the APK and the bundle. Decision 0019 turns every XR
+  # runtime off (//taffy/build/args/common.gni), and the XR module's Java brings
+  # the ARCore client anyway, whose manifest declares a minimum ARCore version.
+  # Play refuses that declaration without the `com.google.ar.core` one Chrome's
+  # manifest writes only when enable_arcore is on, and it refused the first
+  # bundle for exactly that.
+  _taffy_chrome_module_descs = []
+  foreach(_desc, chrome_module_descs) {
+    if (_desc.name != "xr") {
+      _taffy_chrome_module_descs += [ _desc ]
+    }
+  }
+
+  _taffy_product_shared = {
+    manifest_package = taffy_manifest_package
+
+    # The version catalog is the machine owner of this value. The Chromium
+    # template otherwise falls back to upstream's target SDK, which may lag
+    # the platform it already compiles against. tools/lib/android_sdk_agreement.py
+    # holds this projection equal to the owner before a build reaches a phone.
+    target_sdk_version = "37"
+    command_line_flags_file = "taffy-command-line"
+    jinja_input = "//taffy/app/android/AndroidManifest.xml.jinja2"
+
+    # Java, Kotlin, and resources only. The browser and utility native
+    # services enter libchrome through their native composition targets.
+    deps = [ "//taffy/app/android:taffy_java" ]
+  }
+
+  # Lint is the APK's, and that is upstream's answer rather than a preference.
+  # `android_app_bundle_module` does not forward `enable_lint` to
+  # `android_apk_or_module` at milestone 152 — the forward list in
+  # //build/config/android/rules.gni names it for the APK shape and not for
+  # the module shape — so setting it on the base module is an assignment GN
+  # refuses as unused before it builds anything. It is not the collision this
+  # file expected either: nothing runs twice, the argument is simply not one
+  # the module takes.
+  #
+  # Nothing is lost by it. Both targets compile exactly
+  # //taffy/app/android:taffy_java and nothing else, so the sources lint reads
+  # are the same sources either way, and the baseline it reads them against is
+  # the one file the `chromium` lane already holds to naming no TaffyGo
+  # source.
+  # What the module shape does not take, and therefore what the base module
+  # forwards past. Each name is here because `gn gen` refused it as an unused
+  # assignment, not because anybody decided the module should differ: the two
+  # targets still agree about every one of these values, because the *bundle*
+  # sets the one that matters to it from the same scope.
+  #
+  #   command_line_flags_file — an argument of `android_app_bundle`, which is
+  #     where `taffy_android_product_bundle` sets it, reading it back out of
+  #     the shared scope so there is still one literal in this file.
+  _taffy_module_declines = [ "command_line_flags_file" ]
+
+  _taffy_product_lint = {
+    enable_lint = true
+    lint_baseline_file = "//taffy/app/android/expectations/lint-baseline.xml"
+    lint_suppressions_file =
+        "//chrome/android/expectations/lint-suppressions.xml"
+  }
+
+  template("taffy_android_product") {
+    not_needed(invoker, "*")
+    _shared = _taffy_product_shared
+    _lint = _taffy_product_lint
+    _module_descs = _taffy_chrome_module_descs
+    chrome_public_apk_or_module_tmpl(target_name) {
+      forward_variables_from(_shared, "*")
+      forward_variables_from(_lint, "*")
+      target_type = "android_apk"
+      apk_name = taffy_apk_name
+      module_descs = _module_descs
+    }
+  }
+
+  # The base module of the distribution artifact. Play accepts an Android App
+  # Bundle and not an APK, so this — not taffy_public_apk — is what a store
+  # upload carries; the APK stays because it is what `./tools/chromium/run`
+  # installs and what every device suite runs against.
+  #
+  # It is deliberately the *same* template as the APK with one argument
+  # changed. Chromium's product template already speaks both shapes, which is
+  # why `target_type` exists at all, and going through it is what keeps the
+  # branding, the manifest, the flags file and the dependency graph identical
+  # between the thing that is tested and the thing that is shipped.
+  #
+  # The first `gn gen` that reached this target answered the questions this
+  # comment used to ask, and the answers are load-bearing rather than notes:
+  #
+  #   * `chrome_public_apk_or_module_tmpl` accepts
+  #     `target_type = "android_app_bundle_module"` and `is_base_module` at
+  #     milestone 152, spelled this way;
+  #   * `module_name` must **not** be set, though the first configure
+  #     accepted `"base"`. The template turns it into the resource step's
+  #     `--package-name`, and compile_resources reads that flag as "this is a
+  #     feature module": the root `gen.base_module.R` is generated extending
+  #     `gen.base_module.R`, itself, and the base module's Java header compile
+  #     fails with "cycle in class hierarchy" an hour into a release build.
+  #     Upstream's base module leaves it unset, and the build config names
+  #     the module "base" by default;
+  #   * lint is not an argument of the module shape at all, and it stays on
+  #     the APK — see `_taffy_product_lint` above;
+  #   * `command_line_flags_file` is an argument of `android_app_bundle`, not
+  #     of the module, and is set on the bundle from the same shared scope.
+  #
+  # What the template's bundle branch does not do outside `chrome_bundle` is
+  # declare `${target_name}__all_dfm_resources`. That declaration is below.
+  # `gn gen` fails loudly on an argument it does not recognise, which is the
+  # failure mode worth having. Each resolution is a one-line answer in
+  # docs/development/chromium-fork-and-build.md section 6.
+  template("taffy_android_product_base_module") {
+    not_needed(invoker, "*")
+    _shared = _taffy_product_shared
+
+    # The resource target the bundle branch of
+    # `chrome_public_apk_or_module_tmpl` depends on by name and does not
+    # declare. Upstream declares it in
+    # //chrome/android/modules/chrome_bundle_tmpl.gni, once per bundle, over
+    # the java deps of every module in it — so a base module built through
+    # the //chrome template outside a `chrome_bundle` has an unresolved
+    # dependency and the whole graph fails to configure, taking the APK with
+    # it. It did.
+    #
+    # This is that declaration, translated: TaffyGo ships one module, its java
+    # dep is the one in the shared scope, and `recursive_resource_deps` is
+    # what makes the resources of everything under it reachable. Upstream's
+    # comment says why it exists at all — macro resource types only work when
+    # every resource is in the same split (crbug.com/40208153).
+    #
+    # The label is written out rather than read from `_shared.deps`, and that
+    # is for the graph gate rather than for GN: `component_gn_graph.py` reads
+    # this file as source and cannot resolve a scope member, so it reports the
+    # target as having an unresolved dependency expression. A literal is what
+    # it can check against build/components.toml, and checking it is the point.
+    android_resources("${target_name}__all_dfm_resources") {
+      recursive_resource_deps = true
+      deps = [ "//taffy/app/android:taffy_java" ]
+    }
+
+    # What the APK takes from Chrome and a bundle module is not given.
+    # `chrome_public_apk_or_module_tmpl` adds `chrome_all_java` and every
+    # Chrome feature module's Java, manifest, JNI registration and loadable
+    # libraries to an APK itself, and adds none of them to a bundle module,
+    # because upstream's `chrome_bundle` spreads them over modules of its own.
+    # TaffyGo ships one module, so it takes them here, in the order the
+    # template's APK branch does. Without them the release build compiled and
+    # then stopped at the bundle's R8 step on twenty-odd missing
+    # `*Factory` classes — the internal implementations `chrome_all_java`
+    # carries and `chrome_java` deliberately does not — and a bundle that
+    # dropped them would not be the product the device suites test. A feature
+    # module whose classes are in the base counts as installed, because
+    # `ModuleEngine.isInstalled` asks the application class loader first.
+    #
+    # The lists are `_taffy_chrome_module_descs` — upstream's list without XR,
+    # the same modules the APK is given — written out, not read from it in a
+    # loop, for the same reason as the resource label above: the graph gate
+    # reads this file as source and cannot resolve a loop variable. The loop
+    # is still here, below, as an assertion rather than an input, so a pin
+    # that changes a module fails `gn gen` by name instead of shipping a
+    # bundle that quietly lost one. None of these modules carries a native
+    # library; XR was the only one that did.
+    _chrome_module_java = [
+      "//chrome/android/modules/on_demand:impl_java",
+      "//chrome/browser/ui/android/bricks/internal:java",
+      "//chrome/browser/ui/android/pdf/internal:java",
+      "//chrome/android/modules/stack_unwinder/internal:java",
+    ]
+    _chrome_module_manifests = [
+      "//chrome/android/modules/on_demand/java/AndroidManifest.xml",
+      "//chrome/android/modules/stack_unwinder/internal/java/AndroidManifest.xml",
+    ]
+
+    # Developer UI is a feature module of its own upstream, and its Java rides
+    # in the base here as it does in the APK, so its loader finds it installed
+    # rather than asking Play for a module this bundle does not have. What
+    # does not ride along is its pak: in a bundle module upstream leaves
+    # dev_ui_resources.pak out of the base for that module to carry
+    # (`chrome_paks` in //chrome/android/BUILD.gn), so Chromium's own
+    # chrome:// developer pages — net-internals, gpu, components and the rest
+    # — load empty on a Play install. Turning the split off is the upstream
+    # switch for this and does not configure at milestone 152:
+    # `//chrome/browser:core` depends on `//chrome/browser/dev_ui`, which is
+    # declared only while the split is on. No TaffyGo surface is among those
+    # pages. docs/development/chromium-fork-and-build.md section 6 records it.
+    if (dfmify_dev_ui) {
+      _chrome_module_java += [ "//chrome/android/features/dev_ui:java" ]
+      _chrome_module_manifests += [
+        "//chrome/android/features/dev_ui/internal/java/AndroidManifest.xml",
+      ]
+    }
+
+    _upstream_java = []
+    _upstream_manifests = []
+    foreach(_desc, _taffy_chrome_module_descs) {
+      _upstream_java += _desc.java_deps
+      if (defined(_desc.android_manifest)) {
+        _upstream_manifests += [ _desc.android_manifest ]
+      }
+      assert(!defined(_desc.jni_registration),
+             "Chrome module ${_desc.name} now registers JNI; add it here")
+      assert(!defined(_desc.loadable_modules) &&
+                 !defined(_desc.loadable_modules_32_bit) &&
+                 !defined(_desc.loadable_modules_64_bit),
+             "Chrome module ${_desc.name} now carries native libraries")
+    }
+    assert(_upstream_java == _chrome_module_java,
+           "upstream's Chrome module Java moved; rewrite the list above")
+    assert(_upstream_manifests == _chrome_module_manifests,
+           "upstream's Chrome module manifests moved; rewrite the list above")
+
+    chrome_public_apk_or_module_tmpl(target_name) {
+      forward_variables_from(_shared, "*", _taffy_module_declines)
+      target_type = "android_app_bundle_module"
+      is_base_module = true
+      deps += [ "//chrome/android:chrome_all_java" ] + _chrome_module_java
+      mergeable_android_manifests = _chrome_module_manifests
+    }
+  }
+
+  # The bundle itself. `android_app_bundle` comes from
+  # //build/config/android/rules.gni rather than from a //chrome template,
+  # because nothing here needs Chrome's module layout: TaffyGo ships one
+  # module and the base module above is it.
+  #
+  # Signing is not configured here and must not be. `android_keystore_path`,
+  # `_name` and `_password` are build arguments, and they are not in this
+  # repository at all: ./tools/chromium/build resolves an identity from the
+  # environment or from an untracked file and appends the three to the
+  # configured build's args.gn (decision 0203). Whatever it resolves is the
+  # upload key only. The key Play serves to
+  # devices is Google's, generated at enrolment, and its fingerprint has to be
+  # registered with the OAuth client before a Play-installed build can sign
+  # anybody in — see decision 0142 and the runbook. Nothing in GN can check
+  # that, and nothing here pretends to.
+  template("taffy_android_product_bundle") {
+    assert(defined(invoker.base_module_target),
+           "a bundle names the base module it packages")
+    _shared = _taffy_product_shared
+    android_app_bundle(target_name) {
+      base_module_target = invoker.base_module_target
+      bundle_name = taffy_bundle_name
+
+      # Read from the shared scope rather than spelled again. This is the
+      # bundle template's own argument — it names the file the generated
+      # install wrapper writes — but it has to be the *same* file the base
+      # module compiled against, and a second literal is how those two come
+      # to differ. `check_product_targets` in the `chromium` lane counts the
+      # literals; this is why there is one.
+      command_line_flags_file = _shared.command_line_flags_file
+
+      # R8 runs once over every module, and in a bundle that step is the
+      # bundle's rather than the module's; upstream's `chrome_bundle` sets
+      # exactly this pair. Without it the one profile a bundle is built on
+      # does not configure at all: an official build turns on
+      # `optimize_android_resources`, whose step for the base module depends
+      # on `${target_name}__dex`, and that target only exists when the bundle
+      # enables R8. Both dev profiles are `is_java_debug`, so both settings
+      # are off there and `gn gen` passed on them while `release-arm64`
+      # refused the graph with an unresolved dependency.
+      proguard_enabled = !is_java_debug
+      if (optimize_android_resources) {
+        resources_config_paths = [ "//chrome/android/aapt2.config" ]
+      }
+
+      # Off, deliberately, and not because splitting is wrong. A language
+      # split is a size win that adds a runtime failure mode — a locale that
+      # is not on the device when a surface asks for it — and the product has
+      # never run from a bundle at all. The APK ships every locale today; this
+      # keeps the first bundle the same product as the artifact the device
+      # suites have been passing against, and leaves the size decision to
+      # OD-018 with a measurement instead of a default.
+      enable_language_splits = false
+    }
+  }
+}

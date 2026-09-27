@@ -1,0 +1,44 @@
+From fef9e604f27c1137e6c07d6b761187c1fd8979dc Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Fri, 21 Aug 2026 23:48:42 +0530
+Subject: attach page intelligence to a tab's WebContents
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+AttachTabHelpers is the one place every tab's WebContents passes through,
+and PageIntelligenceBroker had no production caller before this line: no
+shipping build had ever bound a renderer endpoint. TaffyBrowserActivity owns
+no WebContents yet — decision 0024 transfers the tab model as its own step —
+so until that lands, the upstream helper list is the only site where a real
+tab exists to attach to.
+
+Rebase risk: low. One include and one call in a long helper list.
+
+Needed by: WP-M2-02.
+Retirement: replaced, not retired, when TaffyGo owns tab creation.
+
+Taffy-Patch: 0023
+
+diff --git a/chrome/browser/ui/tab_helpers.cc b/chrome/browser/ui/tab_helpers.cc
+index 692ebd4c087d9..e5892901ff33f 100644
+--- a/chrome/browser/ui/tab_helpers.cc
++++ b/chrome/browser/ui/tab_helpers.cc
+@@ -148,6 +148,7 @@
+ #include "components/site_engagement/content/site_engagement_helper.h"
+ #include "components/site_engagement/content/site_engagement_service.h"
+ #include "components/tabs/public/tab_interface.h"
++#include "taffy/browser/taffy_page_intelligence_host.h"
+ #include "components/tracing/common/tracing_switches.h"
+ #include "components/ukm/content/source_url_recorder.h"
+ #include "components/webapps/browser/installable/installable_manager.h"
+@@ -552,6 +553,9 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
+     pm_registry->SetPageType(web_contents, performance_manager::PageType::kTab);
+   }
+   permissions::PermissionRequestManager::CreateForWebContents(web_contents);
++  // Which WebContents this is actually allowed to observe is decided in
++  // //taffy/browser, not here.
++  taffy::TaffyPageIntelligenceHost::AttachIfEligible(web_contents);
+   permissions::PermissionRecoverySuccessRateTracker::CreateForWebContents(
+       web_contents);
+   // The PopupBlockerTabHelper has an implicit dependency on

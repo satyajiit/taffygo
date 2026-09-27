@@ -1,0 +1,64 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="international-content">
+<title>International content and mixed scripts</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>International content and mixed scripts</h1>
+  <p class="who">The same three product facts, written in five scripts and two
+  writing directions. A decoding regression renders acceptably and extracts
+  wrongly, so this page exists to make the difference observable.</p>
+</header>
+
+<section id="latin" lang="en">
+  <h2>English</h2>
+  <p id="text-en">The Lumen Arc desk lamp costs 129.00 USD and ships in two days.</p>
+</section>
+
+<section id="devanagari" lang="hi">
+  <h2>हिन्दी</h2>
+  <p id="text-hi">लुमेन आर्क डेस्क लैम्प की कीमत 129.00 अमेरिकी डॉलर है।</p>
+</section>
+
+<section id="cjk" lang="ja">
+  <h2>日本語</h2>
+  <p id="text-ja">ルーメン・アーク デスクライトの価格は 129.00 米ドルです。</p>
+</section>
+
+<section id="rtl-arabic" lang="ar" dir="rtl">
+  <h2>العربية</h2>
+  <p id="text-ar">سعر مصباح لومن آرك المكتبي هو 129.00 دولارًا أمريكيًا.</p>
+</section>
+
+<section id="rtl-hebrew" lang="he" dir="rtl">
+  <h2>עברית</h2>
+  <p id="text-he">מחיר מנורת השולחן לומן ארק הוא 129.00 דולר אמריקאי.</p>
+</section>
+
+<section id="mixed">
+  <h2>Mixed in one paragraph</h2>
+  <p id="text-mixed">Model <bdi lang="ja">ルーメン</bdi> / <bdi lang="ar">لومن</bdi>
+  &mdash; stock keeping unit LA-2600, 129.00&nbsp;USD.</p>
+</section>
+
+<section id="formats">
+  <h2>Number and date formats</h2>
+  <table id="formats-table">
+    <caption>The same value, four conventions</caption>
+    <thead>
+      <tr><th scope="col">Convention</th><th scope="col">Price</th><th scope="col">Date</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">en-US</th><td>1,299.50</td><td>02/11/2026</td></tr>
+      <tr><th scope="row">de-DE</th><td>1.299,50</td><td>11.02.2026</td></tr>
+      <tr><th scope="row">fr-FR</th><td>1 299,50</td><td>11/02/2026</td></tr>
+      <tr><th scope="row">en-IN</th><td>1,299.50</td><td>11-02-2026</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Every row is the same amount and the same day. A reader that
+  normalises by pattern rather than by convention gets two of the four wrong.</p>
+</section>

@@ -1,0 +1,59 @@
+{
+  "operation": {
+    "operation_id": "op-31",
+    "service_generation": 2,
+    "task_revision": 7,
+    "deadline_monotonic_ms": 60000,
+    "idempotency_key": "tool-op-31-1"
+  },
+  "job_id": "job-3",
+  "runtime": 1,
+  "tool_id": "embedding.passage",
+  "tool_version": "1",
+  "operation_kind": 7,
+  "budget": {
+    "max_input_bytes": 1048576,
+    "max_output_bytes": 65536,
+    "max_memory_bytes": 1073741824,
+    "max_cpu_ms": 30000,
+    "max_temporary_bytes": 0,
+    "max_output_chunks": 1
+  },
+  "bundled_python": null,
+  "local_model": null,
+  "media_probe": null,
+  "audio_extract": null,
+  "frame_sample": null,
+  "transcode": null,
+  "signed_wasm": null,
+  "input_payload": {
+    "transport": 1,
+    "byte_length": 3,
+    "digest": [3, 144, 88, 198, 242, 192, 203, 73, 44, 83, 59, 10, 77, 20, 239, 119, 204, 15, 120, 171, 204, 206, 213, 40, 125, 132, 161, 162, 1, 28, 251, 129]
+  },
+  "output_payload": {
+    "transport": 0,
+    "max_byte_length": 65536
+  },
+  "local_embedding": {
+    "model": {
+      "model_id": "embedding.passage.small",
+      "model_revision": "2026-08-01",
+      "kind": 0,
+      "artifact_bytes": 94371840,
+      "artifact_digest": [227, 176, 196, 66, 152, 252, 28, 20, 154, 251, 244, 200, 153, 111, 185, 36, 39, 174, 65, 228, 100, 155, 147, 76, 164, 149, 153, 27, 120, 82, 184, 85],
+      "adapter_id": "",
+      "adapter_bytes": 0,
+      "adapter_digest": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    },
+    "input_utf8": [],
+    "max_input_tokens": 512,
+    "normalize": true
+  },
+  "python_library": {
+    "library_id": "",
+    "library_version": "",
+    "archive_bytes": 0,
+    "archive_digest": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  }
+}

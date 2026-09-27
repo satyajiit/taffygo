@@ -1,0 +1,977 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "action.schema.json",
+  "title": "BIP action contract",
+  "description": "The proposal a task makes, the envelope the policy broker authorizes, the one-use command the renderer receives, and the verified result that comes back. Protocol specification sections 11 and 12.",
+  "x-bip-module": "action",
+  "$defs": {
+    "ActionType": {
+      "title": "ActionType",
+      "description": "What an action does to a node. Three read-oriented operations activate an ordinary link, move focus, and bring a target into view. SET_TEXT, SELECT_OPTION, TOGGLE, and SUBMIT_FORM write, and stopped being reserved wire values at 0.8: the protocol now states what each one does rather than only that it exists. Each is performed through the platform accessibility action path and through nothing else, so a submission goes through the control the page offered and the page's own validation and handlers run; a direct DOM setter, a synthesized event, and a programmatic form submission are all forbidden, because none of them is an act the page agreed to and none can be verified against a postcondition (decision 0059). Expressible is not authorized, and four independent gates keep the write surface shut: the tool that would name it belongs to milestone M5, every write action class is one no milestone has reached, the browser dispatcher refuses a form write, and no adapter offers one of these on any node, so a command naming one is refused for want of an available action. Protocol representation never implies product authorization, and the requirements and threat-model extension that would open it are [Open (OD-056)]. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "ACTIVATE",
+        "FOCUS",
+        "SCROLL_INTO_VIEW",
+        "SET_TEXT",
+        "SELECT_OPTION",
+        "TOGGLE",
+        "SUBMIT_FORM"
+      ]
+    },
+    "ActionInputKind": {
+      "title": "ActionInputKind",
+      "description": "The shape of an action's typed input. NONE is the kind every read-oriented action type takes, and the kind SUBMIT_FORM takes: the submit control is the target, so there is nothing left to say. TEXT and OPTION accompany SET_TEXT and SELECT_OPTION and stopped being reserved at 0.8; TOGGLE_STATE accompanies TOGGLE and names the state the control must end in, which is a decision about the control rather than content authored for it. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "NONE",
+        "TEXT",
+        "OPTION",
+        "TOGGLE_STATE"
+      ]
+    },
+    "ActionInput": {
+      "title": "ActionInput",
+      "description": "Typed, bounded, sensitivity-labelled action input, and the one place the protocol says who is allowed to have authored the bytes that enter a field. A value is either named or carried, never both: value_reference names a value the browser already holds and is the only form a proposal may use, while text and option_value carry the bytes themselves and appear only on the narrowed one-use command the browser builds after it has resolved the reference and spent it. That split is what makes \"the model never authors what enters a field\" a shape rule a checker can apply rather than a convention. An input whose sensitivity classifies it as a credential is refused outright, by name as well as by value: BIP carries no password, passcode, one-time code, recovery code, private key, or token value in either direction, and no reference to one either.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/ActionInputKind"
+        },
+        "sensitivity": {
+          "$ref": "snapshot.schema.json#/$defs/Sensitivity"
+        },
+        "value_reference": {
+          "description": "Names a value the browser holds. Never the value: it is minted by the browser from something a person supplied or confirmed, it is resolved and spent inside the browser process, and it is not forwarded to a renderer. A proposal that wants text in a field names one of these, which is how a model can ask for a field to be filled without ever having written what goes in it.",
+          "$ref": "identity.schema.json#/$defs/ValueReference"
+        },
+        "text": {
+          "description": "Bounded text for a text-entry action, already resolved from a value reference by the browser. Present only on a RendererActionCommand; a proposal or an authorized envelope carrying it is invalid, and it is never a value classified as a credential.",
+          "type": "string",
+          "maxLength": 4096
+        },
+        "option_value": {
+          "description": "Bounded option value for a selection action, already resolved from a value reference by the browser. Present only on a RendererActionCommand, for the same reason as text.",
+          "type": "string",
+          "maxLength": 1024
+        },
+        "checked": {
+          "description": "The state a toggle must end in. Carried by every message in the chain rather than resolved from a reference, because it is a decision about a control the page owns and not content authored for it: there are two possible values and the page already names both.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "sensitivity"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "NONE"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "text"
+                  ]
+                },
+                {
+                  "required": [
+                    "option_value"
+                  ]
+                },
+                {
+                  "required": [
+                    "checked"
+                  ]
+                },
+                {
+                  "required": [
+                    "value_reference"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "TEXT"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "allOf": [
+              {
+                "oneOf": [
+                  {
+                    "required": [
+                      "value_reference"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "text"
+                    ]
+                  }
+                ]
+              },
+              {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "option_value"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "checked"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "OPTION"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "allOf": [
+              {
+                "oneOf": [
+                  {
+                    "required": [
+                      "value_reference"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "option_value"
+                    ]
+                  }
+                ]
+              },
+              {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "text"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "checked"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "TOGGLE_STATE"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "allOf": [
+              {
+                "required": [
+                  "checked"
+                ]
+              },
+              {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "text"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "option_value"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "value_reference"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "sensitivity": {
+                "const": "CREDENTIAL"
+              }
+            },
+            "required": [
+              "sensitivity"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "text"
+                  ]
+                },
+                {
+                  "required": [
+                    "option_value"
+                  ]
+                },
+                {
+                  "required": [
+                    "value_reference"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "PrincipalKind": {
+      "title": "PrincipalKind",
+      "description": "Who proposed an action. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "ASSISTANT",
+        "SKILL"
+      ]
+    },
+    "Principal": {
+      "title": "Principal",
+      "description": "The proposing principal. A skill principal narrows authority; it never widens it.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/PrincipalKind"
+        },
+        "skill_version_id": {
+          "$ref": "identity.schema.json#/$defs/SkillVersionId"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "SKILL"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "skill_version_id"
+            ]
+          }
+        }
+      ]
+    },
+    "IdempotencyPolicy": {
+      "title": "IdempotencyPolicy",
+      "description": "How an action may be repeated after an ambiguous outcome. NON_IDEMPOTENT is never retried automatically after an ambiguous dispatch; reconciliation or human review is required. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "PURE_READ",
+        "IDEMPOTENT_WRITE",
+        "CONDITIONALLY_IDEMPOTENT",
+        "NON_IDEMPOTENT"
+      ]
+    },
+    "PreconditionKind": {
+      "title": "PreconditionKind",
+      "description": "A condition that must hold immediately before dispatch. The renderer endpoint and the browser broker both check: state can race between observation and dispatch, and a compromised renderer may lie, so browser-observable state stays necessary. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "x-bip-added-in": {
+        "DESTINATION_CLASS_ALLOWED": "0.5",
+        "CONTENT_TRUST_AT_LEAST": "0.5",
+        "PREPARED_EFFECT_UNCHANGED": "0.6",
+        "NO_UNDECLARED_EGRESS": "0.6"
+      },
+      "enum": [
+        "EXACT_PAGE_EPOCH",
+        "ACCEPTABLE_GRAPH_REVISION",
+        "EXACT_ORIGIN",
+        "ALLOWED_REDIRECT_SET",
+        "DOCUMENT_ACTIVE",
+        "NODE_EXISTS",
+        "NODE_ROLE_UNCHANGED",
+        "NODE_ACTION_AVAILABLE",
+        "NODE_STATE_ASSERTED",
+        "NODE_STATE_ABSENT",
+        "EXPECTED_DESTINATION",
+        "EXPECTED_VALUE_DIGEST",
+        "NOT_SENSITIVE_FIELD",
+        "NO_USER_INTERACTION_SINCE_LEASE",
+        "BUDGET_REMAINING",
+        "DESTINATION_CLASS_ALLOWED",
+        "CONTENT_TRUST_AT_LEAST",
+        "PREPARED_EFFECT_UNCHANGED",
+        "NO_UNDECLARED_EGRESS"
+      ]
+    },
+    "PreparedEffectBinding": {
+      "title": "PreparedEffectBinding",
+      "description": "What a commit says it is committing. A consequential effect is proposed twice: once to prepare, which shows a person exactly what would happen and causes nothing, and once to commit. This binding is the operand of PREPARED_EFFECT_UNCHANGED, and it names the prepare by identity and by digest so that a commit against an effect the person never saw is refused rather than performed. The gesture that authorized the commit is referenced by the monotonic time it was received, never by its contents: the receipt is opaque and no consumer parses it.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "prepared_action_id": {
+          "$ref": "identity.schema.json#/$defs/ActionId"
+        },
+        "prepared_effect_digest": {
+          "description": "A digest over the effect the prepare described, computed over the same bytes the person was shown. A commit whose effect digest differs is a different effect, whatever else matches.",
+          "$ref": "identity.schema.json#/$defs/ContentDigest"
+        },
+        "prepared_at_monotonic_ms": {
+          "description": "When the prepare completed, on the browser's monotonic clock.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "gesture_at_monotonic_ms": {
+          "description": "When the browser received the gesture that authorized the commit, on the same monotonic clock. A gesture that does not postdate the prepare cannot have been a response to it, so a commit carrying an earlier one is refused. This is what makes a programmatic commit impossible rather than merely unlikely.",
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "prepared_action_id",
+        "prepared_effect_digest",
+        "prepared_at_monotonic_ms",
+        "gesture_at_monotonic_ms"
+      ]
+    },
+    "Precondition": {
+      "title": "Precondition",
+      "description": "One precondition and its operand. The kind selects which operand applies; an operand that does not belong to the kind is ignored by a conforming checker and MUST NOT be treated as satisfied by default. A precondition a checker does not recognize fails the action closed.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/PreconditionKind"
+        },
+        "page_epoch": {
+          "$ref": "identity.schema.json#/$defs/PageEpoch"
+        },
+        "min_graph_revision": {
+          "$ref": "identity.schema.json#/$defs/GraphRevision"
+        },
+        "origin": {
+          "$ref": "identity.schema.json#/$defs/Origin"
+        },
+        "allowed_origins": {
+          "description": "The explicit redirect set an action may follow. An empty list forbids redirects.",
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "identity.schema.json#/$defs/Origin"
+          }
+        },
+        "expected_role": {
+          "$ref": "snapshot.schema.json#/$defs/SemanticRole"
+        },
+        "expected_action_type": {
+          "$ref": "#/$defs/ActionType"
+        },
+        "node_state": {
+          "$ref": "snapshot.schema.json#/$defs/NodeState"
+        },
+        "expected_destination": {
+          "$ref": "snapshot.schema.json#/$defs/Destination"
+        },
+        "expected_value_digest": {
+          "$ref": "identity.schema.json#/$defs/ContentDigest"
+        },
+        "max_sensitivity": {
+          "$ref": "snapshot.schema.json#/$defs/Sensitivity"
+        },
+        "min_content_trust": {
+          "$ref": "snapshot.schema.json#/$defs/ContentTrust"
+        },
+        "prepared_effect": {
+          "$ref": "#/$defs/PreparedEffectBinding"
+        }
+      },
+      "required": [
+        "kind"
+      ]
+    },
+    "PostconditionKind": {
+      "title": "PostconditionKind",
+      "description": "An effect the proposal declares it expects. The verifier uses browser-owned navigation and tab events plus a fresh or delta observation; a renderer acknowledgement alone is never enough. NODE_VALUE_CHANGED stopped being reserved at 0.8, because a write has to be able to say what it expects to have changed and a proposal with no declared effect is refused. BROWSER_FLOW_STARTED stays reserved: a download, a file chooser and a permission prompt are consequences of their own, owned by their own work and their own threat-model extension, and going through a page's submit control is not a licence to start one. DOCUMENT_ADVANCED is the mirror of NO_MUTATION and is what an ordinary activation claims: the browser cannot know what a page's own control does, so the only honest claim a synthetic click can make is that the document moved past the dispatch it was given. Until 0.14 an activation could declare nothing weaker than an exact node state, which meant a click was authorized only against a disclosure control and every ordinary button on the web was unreachable. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "x-bip-reserved": [
+        "BROWSER_FLOW_STARTED"
+      ],
+      "x-bip-reserved-milestone": "M5",
+      "x-bip-added-in": {
+        "LOADING_STOPPED": "0.13",
+        "DOCUMENT_ADVANCED": "0.14"
+      },
+      "enum": [
+        "NO_MUTATION",
+        "COMMITTED_NAVIGATION",
+        "NEW_TAB_CREATED",
+        "SECTION_VISIBLE",
+        "SEARCH_RESULT_STATE",
+        "NODE_STATE_CHANGED",
+        "NODE_VALUE_CHANGED",
+        "BROWSER_FLOW_STARTED",
+        "LOADING_STOPPED",
+        "DOCUMENT_ADVANCED"
+      ]
+    },
+    "Postcondition": {
+      "title": "Postcondition",
+      "description": "One expected effect and its operand.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/PostconditionKind"
+        },
+        "expected_destination": {
+          "$ref": "snapshot.schema.json#/$defs/Destination"
+        },
+        "allowed_origins": {
+          "description": "Origins a committed navigation may land on.",
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "identity.schema.json#/$defs/Origin"
+          }
+        },
+        "expected_node_state": {
+          "$ref": "snapshot.schema.json#/$defs/NodeState"
+        },
+        "timeout_ms": {
+          "$ref": "identity.schema.json#/$defs/DurationMillis"
+        }
+      },
+      "required": [
+        "kind"
+      ]
+    },
+    "VerifierKind": {
+      "title": "VerifierKind",
+      "description": "What observed the effect. RENDERER_ACKNOWLEDGEMENT alone yields DISPATCHED, never VERIFIED: a result is verified only when a browser-owned event or a fresh observation corroborates it. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "x-bip-added-in": {
+        "BROWSER_NETWORK_EVENT": "0.6"
+      },
+      "enum": [
+        "BROWSER_NAVIGATION_EVENT",
+        "BROWSER_TAB_EVENT",
+        "FRESH_SNAPSHOT",
+        "DELTA_OBSERVATION",
+        "RENDERER_ACKNOWLEDGEMENT",
+        "BROWSER_NETWORK_EVENT"
+      ]
+    },
+    "PostconditionOutcome": {
+      "title": "PostconditionOutcome",
+      "description": "Whether one declared effect actually happened, and what observed it.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "postcondition": {
+          "$ref": "#/$defs/Postcondition"
+        },
+        "satisfied": {
+          "type": "boolean"
+        },
+        "verifier": {
+          "$ref": "#/$defs/VerifierKind"
+        },
+        "observed_graph_revision": {
+          "$ref": "identity.schema.json#/$defs/GraphRevision"
+        },
+        "detail_code": {
+          "description": "Bounded machine-readable detail. Never a renderer-supplied string.",
+          "type": "string",
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "postcondition",
+        "satisfied",
+        "verifier"
+      ]
+    },
+    "ActionResultCode": {
+      "title": "ActionResultCode",
+      "description": "The terminal outcome of an action. Result codes are security-significant, so an unknown code fails closed and the text shown to a person is generated from trusted local templates rather than from a renderer error string. The order of this enumeration is normative and matches protocol specification section 11.7. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "x-bip-added-in": {
+        "EGRESS_NOT_AUTHORIZED": "0.5",
+        "DESTINATION_CLASS_RESTRICTED": "0.5",
+        "UNTRUSTED_CONTENT_ORIGIN": "0.5",
+        "PREPARED_EFFECT_CHANGED": "0.6",
+        "COMMIT_WITHOUT_PREPARE": "0.6",
+        "GRAPH_MOVED_DURING_PREFLIGHT": "0.7",
+        "VALUE_REFERENCE_UNKNOWN": "0.11"
+      },
+      "enum": [
+        "VERIFIED",
+        "DENIED_BY_POLICY",
+        "APPROVAL_REQUIRED",
+        "APPROVAL_DENIED",
+        "ACTOR_LEASE_MISSING",
+        "CAPABILITY_EXPIRED",
+        "TAB_GONE",
+        "FRAME_GONE",
+        "DOCUMENT_INACTIVE",
+        "STALE_PAGE_EPOCH",
+        "STALE_GRAPH",
+        "NODE_GONE",
+        "ORIGIN_CHANGED",
+        "ROLE_OR_ACTION_CHANGED",
+        "NOT_VISIBLE",
+        "OCCLUDED",
+        "NOT_ENABLED",
+        "NOT_EDITABLE",
+        "SENSITIVE_FIELD",
+        "DESTINATION_CHANGED",
+        "UNSUPPORTED",
+        "BUDGET_EXCEEDED",
+        "DISPATCH_FAILED",
+        "NAVIGATION_STARTED",
+        "POSTCONDITION_TIMEOUT",
+        "POSTCONDITION_FAILED",
+        "CANCELLED_BY_USER",
+        "CANCELLED_BY_NAVIGATION",
+        "RENDERER_CRASHED",
+        "OUTCOME_UNKNOWN",
+        "INTERNAL_ERROR",
+        "EGRESS_NOT_AUTHORIZED",
+        "DESTINATION_CLASS_RESTRICTED",
+        "UNTRUSTED_CONTENT_ORIGIN",
+        "PREPARED_EFFECT_CHANGED",
+        "COMMIT_WITHOUT_PREPARE",
+        "GRAPH_MOVED_DURING_PREFLIGHT",
+        "VALUE_REFERENCE_UNKNOWN"
+      ]
+    },
+    "ActionProposal": {
+      "title": "ActionProposal",
+      "description": "What the task runtime wants to do, and how it will know whether it worked. A proposal is a plan, never an authorization: the policy broker binds it to a capability only after scope, risk, destination, data, approval, and actor-lease checks pass.",
+      "type": "object",
+      "additionalProperties": true,
+      "x-bip-message": true,
+      "properties": {
+        "schema_version": {
+          "$ref": "identity.schema.json#/$defs/ProtocolVersion"
+        },
+        "action_id": {
+          "$ref": "identity.schema.json#/$defs/ActionId"
+        },
+        "task_id": {
+          "$ref": "identity.schema.json#/$defs/TaskId"
+        },
+        "principal": {
+          "$ref": "#/$defs/Principal"
+        },
+        "action_type": {
+          "$ref": "#/$defs/ActionType"
+        },
+        "target_handle": {
+          "$ref": "identity.schema.json#/$defs/NodeHandle"
+        },
+        "input": {
+          "$ref": "#/$defs/ActionInput"
+        },
+        "preconditions": {
+          "description": "Every precondition that must hold at dispatch. An exact page epoch and an active document are always among them.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/Precondition"
+          }
+        },
+        "expected_postconditions": {
+          "description": "At least one declared effect. An action with no declared effect cannot be verified and is refused.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/Postcondition"
+          }
+        },
+        "idempotency_policy": {
+          "$ref": "#/$defs/IdempotencyPolicy"
+        },
+        "deadline_monotonic_ms": {
+          "$ref": "identity.schema.json#/$defs/MonotonicMillis"
+        },
+        "user_visible_reason": {
+          "description": "The short sentence shown to a person when this action needs approval. It is composed from trusted local templates; page text and model text can never supply it.",
+          "type": "string",
+          "maxLength": 240
+        },
+        "proposal_digest": {
+          "$ref": "identity.schema.json#/$defs/ContentDigest"
+        }
+      },
+      "required": [
+        "schema_version",
+        "action_id",
+        "task_id",
+        "principal",
+        "action_type",
+        "target_handle",
+        "preconditions",
+        "expected_postconditions",
+        "idempotency_policy",
+        "deadline_monotonic_ms",
+        "user_visible_reason",
+        "proposal_digest"
+      ],
+      "allOf": [
+        {
+          "$comment": "A proposal names a value; it never carries one. The author of a proposal is the assistant runtime, and letting it spell out the bytes that will enter a field would make every other control on the path a matter of what the model chose to type. Refusing the shape is what makes value_reference load-bearing rather than merely available.",
+          "properties": {
+            "input": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "text"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "option_value"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "AuthorizedActionEnvelope": {
+      "title": "AuthorizedActionEnvelope",
+      "description": "The browser broker's instruction to act, carrying the evidence that the action was authorized. The broker validates the envelope, consumes or marks the capability in flight, and only then builds a narrower one-use renderer command. The capability reference is consumed in the browser process and is never forwarded onward.",
+      "type": "object",
+      "additionalProperties": true,
+      "x-bip-message": true,
+      "properties": {
+        "schema_version": {
+          "$ref": "identity.schema.json#/$defs/ProtocolVersion"
+        },
+        "dispatch_id": {
+          "$ref": "identity.schema.json#/$defs/DispatchId"
+        },
+        "action_id": {
+          "$ref": "identity.schema.json#/$defs/ActionId"
+        },
+        "action_digest": {
+          "$ref": "identity.schema.json#/$defs/ContentDigest"
+        },
+        "capability_reference": {
+          "$ref": "identity.schema.json#/$defs/CapabilityReference"
+        },
+        "approval_receipt_reference": {
+          "$ref": "identity.schema.json#/$defs/ApprovalReceiptReference"
+        },
+        "action_type": {
+          "$ref": "#/$defs/ActionType"
+        },
+        "target_handle": {
+          "$ref": "identity.schema.json#/$defs/NodeHandle"
+        },
+        "input": {
+          "$ref": "#/$defs/ActionInput"
+        },
+        "required_graph_revision": {
+          "$ref": "identity.schema.json#/$defs/GraphRevision"
+        },
+        "preconditions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/Precondition"
+          }
+        },
+        "expected_postconditions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/Postcondition"
+          }
+        },
+        "absolute_deadline_monotonic_ms": {
+          "$ref": "identity.schema.json#/$defs/MonotonicMillis"
+        }
+      },
+      "required": [
+        "schema_version",
+        "dispatch_id",
+        "action_id",
+        "action_digest",
+        "capability_reference",
+        "action_type",
+        "target_handle",
+        "required_graph_revision",
+        "preconditions",
+        "expected_postconditions",
+        "absolute_deadline_monotonic_ms"
+      ],
+      "allOf": [
+        {
+          "$comment": "The envelope is the broker's record that a proposal cleared policy, and it is bound to that proposal by action_digest. It therefore carries the input the proposal carried, unresolved: resolving the reference before the capability is spent would put the value in the record of the decision rather than in the act.",
+          "properties": {
+            "input": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "text"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "option_value"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "RendererActionCommand": {
+      "title": "RendererActionCommand",
+      "description": "The one-use command a renderer endpoint receives. It carries only the renderer-local target and operation. It carries no capability reference, no approval receipt, no task identity, no origin policy, and no reusable secret, so a compromised renderer that replays or forges one gains authority over nothing beyond the frame it already controls. The renderer rechecks the node and revision before it acts, and it acts only through the platform accessibility action path — never a DOM setter, never a synthesized event, and for a submission never anything but the default action on the control the page offered (decision 0059).",
+      "type": "object",
+      "additionalProperties": true,
+      "x-bip-message": true,
+      "properties": {
+        "schema_version": {
+          "$ref": "identity.schema.json#/$defs/ProtocolVersion"
+        },
+        "command_id": {
+          "$ref": "identity.schema.json#/$defs/CommandId"
+        },
+        "frame_id": {
+          "$ref": "identity.schema.json#/$defs/FrameId"
+        },
+        "page_epoch": {
+          "$ref": "identity.schema.json#/$defs/PageEpoch"
+        },
+        "required_graph_revision": {
+          "$ref": "identity.schema.json#/$defs/GraphRevision"
+        },
+        "node_id": {
+          "$ref": "identity.schema.json#/$defs/SemanticNodeId"
+        },
+        "operation": {
+          "$ref": "#/$defs/ActionType"
+        },
+        "input": {
+          "$ref": "#/$defs/ActionInput"
+        },
+        "renderer_preconditions": {
+          "description": "The subset of preconditions the renderer can and must recheck locally. The browser broker checks the rest and never delegates a security decision to a renderer.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/Precondition"
+          }
+        },
+        "deadline_ms": {
+          "$ref": "identity.schema.json#/$defs/DurationMillis"
+        }
+      },
+      "required": [
+        "schema_version",
+        "command_id",
+        "frame_id",
+        "page_epoch",
+        "required_graph_revision",
+        "node_id",
+        "operation",
+        "renderer_preconditions",
+        "deadline_ms"
+      ],
+      "allOf": [
+        {
+          "$comment": "The mirror image of the proposal rule. By the time a command is built the browser has resolved the reference and spent it, so the command carries the bytes and must not carry the reference: a renderer holding one could replay it, and a reference that survives its own use is a capability wearing a different name.",
+          "properties": {
+            "input": {
+              "not": {
+                "required": [
+                  "value_reference"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ActionResult": {
+      "title": "ActionResult",
+      "description": "The terminal outcome delivered to the caller. Exactly one terminal result is delivered per dispatch; a late renderer response after cancellation is ignored and counted. A VERIFIED result requires corroboration from a browser-owned event or a fresh observation, so it always names at least one verifier other than the renderer acknowledgement.",
+      "type": "object",
+      "additionalProperties": true,
+      "x-bip-message": true,
+      "properties": {
+        "schema_version": {
+          "$ref": "identity.schema.json#/$defs/ProtocolVersion"
+        },
+        "action_id": {
+          "$ref": "identity.schema.json#/$defs/ActionId"
+        },
+        "dispatch_id": {
+          "$ref": "identity.schema.json#/$defs/DispatchId"
+        },
+        "result_code": {
+          "$ref": "#/$defs/ActionResultCode"
+        },
+        "dispatched": {
+          "description": "Whether the command reached a renderer at all. A false value with an OUTCOME_UNKNOWN code means the side effect could not be ruled out.",
+          "type": "boolean"
+        },
+        "terminal": {
+          "description": "Always true on the wire: this message is the single terminal response for its dispatch.",
+          "type": "boolean",
+          "const": true
+        },
+        "verified_by": {
+          "description": "What observed the effect. An empty list is only valid for a result that never reached verification.",
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/VerifierKind"
+          }
+        },
+        "postcondition_outcomes": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/PostconditionOutcome"
+          }
+        },
+        "observed_page_epoch": {
+          "$ref": "identity.schema.json#/$defs/PageEpoch"
+        },
+        "observed_graph_revision": {
+          "$ref": "identity.schema.json#/$defs/GraphRevision"
+        },
+        "completed_at_monotonic_ms": {
+          "$ref": "identity.schema.json#/$defs/MonotonicMillis"
+        },
+        "detail_code": {
+          "description": "Bounded machine-readable detail for diagnostics. Never a renderer-supplied string and never page text.",
+          "type": "string",
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "schema_version",
+        "action_id",
+        "dispatch_id",
+        "result_code",
+        "dispatched",
+        "terminal",
+        "verified_by",
+        "postcondition_outcomes",
+        "completed_at_monotonic_ms"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "result_code": {
+                "const": "VERIFIED"
+              }
+            },
+            "required": [
+              "result_code"
+            ]
+          },
+          "then": {
+            "properties": {
+              "verified_by": {
+                "minItems": 1,
+                "contains": {
+                  "enum": [
+                    "BROWSER_NAVIGATION_EVENT",
+                    "BROWSER_TAB_EVENT",
+                    "FRESH_SNAPSHOT",
+                    "DELTA_OBSERVATION"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

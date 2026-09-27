@@ -1,0 +1,44 @@
+From 0a1327fc6e97392087a81e43c122ad0625a22177 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Mon, 17 Aug 2026 20:49:42 +0530
+Subject: keep .kotlin_module files in turbine header jars
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The kotlin-jar merge filters to .class entries only, which discards
+META-INF/main.kotlin_module — the file that maps packages to their file
+facades. Without it kotlinc resolves a dependency's Kotlin classes but none
+of its top-level declarations: every cross-target extension function or
+top-level composable fails as an unresolved reference while the facade class
+sits on the classpath with complete metadata. Isolated outside the build:
+the same probe compiles against the pre-merge ABI jar, fails against the
+merged header jar, and passes again with the one entry restored. Upstream
+has not hit this because no upstream Kotlin target consumes another's
+top-level API through a header jar.
+
+Specified by
+chromium/patches/0013-keep-kotlin-module-files-in-turbine-header-jars.md.
+
+Taffy-Patch: 0013
+
+diff --git a/build/android/gyp/turbine.py b/build/android/gyp/turbine.py
+index 07babde5e93e3..a69a0368bb27c 100755
+--- a/build/android/gyp/turbine.py
++++ b/build/android/gyp/turbine.py
+@@ -158,7 +158,14 @@ def main(argv):
+     logging.info('Header compilation took %ss', end)
+     if options.kotlin_jar_path:
+       with zipfile.ZipFile(output_jar.name, 'a') as out_zip:
+-        path_transform = lambda p: p if p.endswith('.class') else None
++        # META-INF/*.kotlin_module must survive alongside the classes: it maps
++        # packages to their file facades, and without it kotlinc cannot
++        # resolve a dependency's top-level Kotlin declarations (functions,
++        # properties) even though the facade classes and their metadata are
++        # all present. Dropping it breaks any Kotlin target that consumes
++        # another Kotlin target's top-level API through this header jar.
++        path_transform = lambda p: p if p.endswith('.class') or p.endswith(
++            '.kotlin_module') else None
+         zip_helpers.merge_zips(out_zip, [options.kotlin_jar_path],
+                                path_transform=path_transform)
+ 

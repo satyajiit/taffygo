@@ -1,0 +1,542 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/play — publish TaffyGo to Google Play from this machine, through gplay.
+#
+#   ./tools/play check                     the static half: listing and tracks
+#   ./tools/play doctor [--write-probe]    pin, checksum, credential, and what the key may do
+#   ./tools/play preflight <file.aab>      gplay's offline scanners, no credential
+#   ./tools/play sync-listing [--apply]    push the committed listing text
+#   ./tools/play sync-images [--apply]     push the committed listing images
+#   ./tools/play upload <file.aab> [--track internal]
+#   ./tools/play promote --from internal --to production --approved-by "<name>" --yes
+#   ./tools/play self-test                 every checker this command owns
+#   ./tools/play -- <gplay args...>        anything else, with the pin and package applied
+#
+# Authority: docs/decisions/0142-the-store-listing-and-its-upload-live-in-the-
+# repository.md, whose section 9 records why the client this replaced was
+# deleted. tools/play.d/store.toml is the listing and tools/pins/gplay is the
+# tool. Nothing here sells anything: TaffyGo operates no servers and charges
+# for nothing (decision 0200), so the product catalogue, its price book and
+# the one-way activation door left with the billing Worker they served.
+#
+# WHAT THIS WRAPPER IS FOR, GIVEN THAT GPLAY DOES THE WORK
+#
+# Four things, and none of them is something gplay could do for us:
+#
+#   1. It runs the pinned bytes. tools/pins/gplay records the SHA-256 of the
+#      release asset for each host, and every invocation below verifies the
+#      binary against the line for this one first. gplay ships a self-update
+#      that rewrites the binary in place and checks for new versions on
+#      startup; GPLAY_NO_UPDATE=1 turns that off, because a tool holding a
+#      credential that can publish to the public store must not change between
+#      two runs of the same pin.
+#   2. It applies the repository's own gates, which are about TaffyGo and not
+#      about Play: the package name held equal to the branding authority, and
+#      the listing copy run through the same banned-vocabulary table
+#      ./tools/check docs applies to every document.
+#   3. It refuses an approval-gated track without a named approver. That is a
+#      policy in tools/play.d/store.toml, not a gplay feature.
+#   4. It projects one authored listing into the many files gplay reads, so the
+#      copy has a home with comments and a schema.
+#
+# Everything else is gplay's. `./tools/play -- <args>` reaches all of it with
+# the pin, the package and the environment already applied; `gplay --help` is
+# the reference and this file deliberately does not restate it.
+#
+# Exit codes: 0 = succeeded, 1 = a problem or a refusal, 2 = it could not run.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
+
+CONFIG_HELPER="$TAFFY_ROOT/tools/lib/play_config.py"
+IMAGES_HELPER="$TAFFY_ROOT/tools/lib/play_images.py"
+LISTING_HELPER="$TAFFY_ROOT/tools/lib/play_listing.py"
+BUNDLE_HELPER="$TAFFY_ROOT/tools/lib/android_bundle_inspect.py"
+PIN_FILE="$TAFFY_ROOT/tools/pins/gplay"
+
+# gplay never updates itself here, and never asks the assistant driving it to
+# star its repository. Both are explained in tools/pins/gplay.
+export GPLAY_NO_UPDATE=1
+export GPLAY_NO_STAR_PROMPT=1
+
+# The credential is repository-local and read at run time, never installed into
+# gplay's own global config at ~/.gplay/. Two reasons: a machine that works on
+# more than one Play account should not have one of them silently in effect, and
+# a credential this repository names is a credential this repository's own gate
+# can prove is gitignored — which tools/lib/play_config.py does on every run.
+# $TAFFY_PLAY_CREDENTIAL overrides it; the default is untracked and 0600.
+#
+# The variable is GPLAY_SERVICE_ACCOUNT_JSON and it holds a *path*. gplay's
+# configuration page documents GPLAY_SERVICE_ACCOUNT; the binary does not read
+# it, and the failure is "no credentials found" with a correct credential
+# sitting right there. The tool's own error hint is the authority, not its docs.
+if [ -z "${GPLAY_SERVICE_ACCOUNT_JSON:-}" ]; then
+  TAFFY_PLAY_CREDENTIAL=${TAFFY_PLAY_CREDENTIAL:-$TAFFY_ROOT/.taffy/play-service-account.json}
+  if [ -f "$TAFFY_PLAY_CREDENTIAL" ]; then
+    export GPLAY_SERVICE_ACCOUNT_JSON="$TAFFY_PLAY_CREDENTIAL"
+  fi
+fi
+
+export GPLAY_PACKAGE="${GPLAY_PACKAGE:-com.taffygo.browser}"
+
+usage() {
+  # Read by content, never by line number. This block used to be extracted as
+  # a fixed line range, and the licence notice above it moved every line down
+  # five -- so `--help` printed the licence and half the summary, silently,
+  # because a range is always a valid range. The rule instead: print from the
+  # line that names this command, through the indented invocation lines, and
+  # stop at the first line after them that is not one.
+  awk -v cmd="./tools/play" '
+    index($0, "# " cmd " ") == 1 { p = 1 }
+    !p { next }
+    index($0, "#   " cmd " ") == 1 { seen = 1; print; next }
+    seen { exit }
+    { print }
+  ' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+}
+
+require_python() {
+  have python3 || die "python3 is not installed" \
+    "The repository's own Play checkers are standard-library-only Python 3.11+."
+}
+
+pin_value() { taffy_kv_get "$PIN_FILE" "$1"; }
+
+# The pin records one checksum per host. Name this one the way the release
+# assets are named, so a mismatch names a file somebody can go and look at.
+pin_asset_key() {
+  local os arch
+  os=$(taffy_os); arch=$(taffy_arch)
+  # taffy_arch answers "x86-64" with a hyphen. Spelling it "x86_64" here matched
+  # nothing on the one host that matters most — the x86-64 Linux Chromium
+  # builder — and the failure was a warning about an unpinned host rather than a
+  # refusal, which is the quiet direction to be wrong in.
+  case "$os/$arch" in
+    macos/arm64) printf 'darwin_arm64\n' ;;
+    macos/x86-64) printf 'darwin_amd64\n' ;;
+    linux/x86-64) printf 'linux_amd64\n' ;;
+    linux/arm64) printf 'linux_arm64\n' ;;
+    *) printf '\n' ;;
+  esac
+}
+
+sha256_of() {
+  if have sha256sum; then sha256sum "$1" | cut -d' ' -f1
+  elif have shasum; then shasum -a 256 "$1" | cut -d' ' -f1
+  else printf '\n'; fi
+}
+
+# Resolve gplay and prove it is the pinned build. Prints the path on stdout.
+require_gplay() {
+  local binary version want key expect actual
+  binary=${TAFFY_GPLAY:-$(command -v gplay || true)}
+  want=$(pin_value version)
+  if [ -z "$binary" ] || [ ! -x "$binary" ]; then
+    die "gplay is not installed" \
+      "It is pinned at $want in tools/pins/gplay. Install that exact release:" \
+      "  brew install tamtom/tap/gplay      # then check: gplay --version" \
+      "or take the release asset for this host from" \
+      "  https://github.com/$(pin_value repository)/releases/tag/v$want" \
+      "Set TAFFY_GPLAY to point at it if it is not on PATH."
+  fi
+  # `gplay --version` prints "0.10.0 (commit: ..., date: 2026-09-05T19:19:24Z)".
+  # Stripping non-digits from that whole line concatenates the commit and the
+  # timestamp onto the version and compares a 22-digit number against the pin,
+  # which fails every correct install with a message about a version bump. Take
+  # the first whitespace-separated token and nothing else.
+  version=$("$binary" --version 2>/dev/null </dev/null | head -n1 | awk '{print $1}' | sed 's/^v//')
+  if [ -n "$version" ] && [ "$version" != "$want" ]; then
+    die "gplay $version is installed and tools/pins/gplay pins $want" \
+      "A version bump is an edit to that file and its TOOLCHAIN.md row, one" \
+      "component per change, never a self-update. gplay's own updater is" \
+      "disabled by this command for the same reason."
+  fi
+  key=$(pin_asset_key)
+  if [ -z "$key" ]; then
+    warn "no checksum pinned for $(taffy_os)/$(taffy_arch); running an unverified gplay"
+  else
+    expect=$(pin_value "sha256_$key")
+    actual=$(sha256_of "$binary")
+    if [ -z "$actual" ]; then
+      warn "no sha256 tool on this host; gplay could not be verified"
+    elif [ -n "$expect" ] && [ "$expect" != "$actual" ]; then
+      die "gplay at $binary is not the pinned build" \
+        "  pinned:  $expect" \
+        "  on disk: $actual" \
+        "Either it self-updated, or it is a different asset. Reinstall v$want" \
+        "from the release named in tools/pins/gplay, or move the pin deliberately."
+    fi
+  fi
+  printf '%s\n' "$binary"
+}
+
+package_name() {
+  python3 - "$TAFFY_ROOT" <<'PY'
+import sys, tomllib, os
+root = sys.argv[1]
+with open(os.path.join(root, "tools", "play.d", "store.toml"), "rb") as handle:
+    print(tomllib.load(handle)["application"]["package"])
+PY
+}
+
+# needs_value <argc> <flag> [explanation line]...
+#
+# The guard every two-word option arm runs first. Without it `--flag` as the
+# last word on the line shifts twice from one argument: the arm's own `shift`
+# empties the positional parameters, the loop's trailing `shift` then fails, and
+# `set -e` ends the script there — rc=1, and not one byte on stdout or stderr.
+# A typo on a command that walks a one-way door is then indistinguishable from a
+# considered refusal, which is the failure this whole file is written to avoid.
+# `${2:-}` does not help: it makes the empty value survive and the trailing
+# `shift` still runs on an empty argument list.
+needs_value() {
+  [ "$1" -ge 2 ] && return 0
+  local flag=$2; shift 2
+  die "$flag needs a value" "$@"
+}
+
+# The track ladder is a repository policy. gplay will happily publish to
+# production; tools/play.d/store.toml says who may ask it to.
+guard_track() {
+  local track=$1; shift
+  python3 - "$TAFFY_ROOT" "$track" "${1:-}" "${2:-}" <<'PY'
+import sys, tomllib, os
+root, track, approved_by, yes = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+with open(os.path.join(root, "tools", "play.d", "store.toml"), "rb") as handle:
+    config = tomllib.load(handle)
+known = {t["id"]: t for t in config["tracks"]}
+if track not in known:
+    sys.exit(
+        f"play: {track!r} is not a declared track. Declared: {', '.join(known)}.\n"
+        "  A track Play knows and this repository does not is a configuration gap,\n"
+        "  not a flag to force: add it to tools/play.d/store.toml with a description."
+    )
+entry = known[track]
+if entry.get("requires_approval") and not (approved_by and yes):
+    sys.exit(
+        f"play: publishing to {track} needs an approval.\n"
+        f"  {entry['description']}\n"
+        '  Re-run with --approved-by "<name>" --yes once the release approvals in\n'
+        "  docs/development/release-and-incident-runbook.md section 3 are recorded.\n"
+        "  This command does not check them; it makes the claim explicit and\n"
+        "  attributable, which is a smaller thing than enforcement and is not the same."
+    )
+PY
+}
+
+# `gplay auth doctor` reports on gplay's own saved profiles and says "no
+# profiles configured" for a credential supplied through the environment, which
+# is how this repository supplies it — so on its own it answers a question
+# nobody asked. What a person wants to know here is whether the key Google holds
+# will let this repository publish, and the only way to find that out is to ask
+# Google. One read-only call does it, and the *shape* of the refusal is the
+# whole answer: a 404 means the credential was accepted and the app does not
+# exist yet; a 401 or 403 means it was not.
+command_doctor() {
+  require_python
+  local binary out
+  binary=$(require_gplay)
+  ok "gplay $(pin_value version) at $binary matches the pinned checksum"
+
+  if [ -z "${GPLAY_SERVICE_ACCOUNT_JSON:-}" ]; then
+    warn "no credential; looked for .taffy/play-service-account.json"
+    note "Runbook section 9.2 has the procedure. Nothing below this line ran."
+    return 1
+  fi
+  ok "credential: ${GPLAY_SERVICE_ACCOUNT_JSON#"$TAFFY_ROOT"/}"
+
+  step "one read-only call to Play, to find out what this key may do"
+  out=$("$binary" reviews list --package "$(package_name)" 2>&1 </dev/null || true)
+  case "$out" in
+    *"Package not found"*|*404*)
+      ok "Google accepted the credential"
+      note "The app does not exist in Play yet, so this cannot say whether the"
+      note "key may *write*. Create the app and grant the service account"
+      note "\"Release to testing tracks\" — runbook section 9.1 — then run this again."
+      ;;
+    *401*|*"authentication failed"*|*"no credentials"*)
+      bad "Google refused the credential"
+      printf '%s\n' "$out" | head -n 5 >&2
+      return 1 ;;
+    *403*|*"permission"*|*"does not have"*)
+      bad "the credential is valid and has no access to this app"
+      note "Play Console > Users and permissions > invite the service account."
+      printf '%s\n' "$out" | head -n 5 >&2
+      return 1 ;;
+    *) ok "the app is reachable and this key can read it" ;;
+  esac
+
+  # Reading is not publishing, and the two are granted separately. The only
+  # honest way to find out whether this key may write is to ask for a write,
+  # and an *edit* is the one write in this API that is free to take back: it
+  # changes nothing until it is committed, and an uncommitted one expires by
+  # itself. It is still a mutation, so it is opt-in rather than something every
+  # doctor run does behind the operator's back.
+  # The Play credential this repository is pointed at may live outside it, and
+  # then neither the `secrets` lane nor play_config.check_untracked can see
+  # anything about it. This says what it can see, and refuses nothing.
+  python3 "$CONFIG_HELPER" --credential-posture "$GPLAY_SERVICE_ACCOUNT_JSON"
+
+  if [ "${1:-}" != "--write-probe" ]; then
+    note "Whether this key may *write* is unproven. ./tools/play doctor --write-probe"
+    note "opens an edit and deletes it again, which is the only way to find out."
+    return 0
+  fi
+  step "write probe: open an edit, then delete it"
+  local edit
+  edit=$("$binary" edits create --package "$(package_name)" 2>/dev/null </dev/null \
+    | python3 -c 'import json,sys
+try: print(json.load(sys.stdin).get("id",""))
+except Exception: print("")')
+  if [ -z "$edit" ]; then
+    bad "the key cannot open an edit, so it cannot publish"
+    note "Play Console > Users and permissions > give it Release to testing tracks."
+    return 1
+  fi
+  "$binary" edits delete --package "$(package_name)" --edit "$edit" --confirm >/dev/null 2>&1 || true
+  ok "the key can open an edit, so it can publish (edit $edit was deleted again)"
+}
+
+command_check() {
+  require_python
+  local failed=0
+  python3 "$CONFIG_HELPER" || failed=1
+  python3 "$LISTING_HELPER" --check || failed=1
+  python3 "$IMAGES_HELPER" || failed=1
+  return "$failed"
+}
+
+command_self_test() {
+  require_python
+  local failed=0
+  step "play: store configuration checker"
+  python3 "$CONFIG_HELPER" --self-test || failed=1
+  step "play: listing projection"
+  python3 "$LISTING_HELPER" --self-test || failed=1
+  step "play: listing images"
+  python3 "$IMAGES_HELPER" --self-test || failed=1
+  step "play: bundle inspection"
+  python3 "$BUNDLE_HELPER" --self-test || failed=1
+  [ "$failed" -eq 0 ] || return 1
+  ok "every checker ./tools/play owns rejects its broken fixtures"
+}
+
+command_preflight() {
+  local file=${1:-}
+  [ -n "$file" ] || die "usage: ./tools/play preflight <file.aab>"
+  [ -f "$file" ] || die "no artifact at $file" \
+    "Build one: ./tools/chromium/build --profile release-arm64 taffy_public_bundle"
+  local binary; binary=$(require_gplay)
+  step "gplay preflight (offline, no credential)"
+  "$binary" preflight --file "$file"
+}
+
+# `gplay sync run` requires an existing edit and does not open one, so this
+# opens it, syncs into it and commits it. An edit that is never committed
+# changes nothing, which is why the failure path below deletes it rather than
+# leaving a half-applied listing behind.
+command_sync_listing() {
+  require_python
+  python3 "$LISTING_HELPER" --check || die \
+    "the committed listing metadata does not match tools/play.d/store.toml" \
+    "Run: python3 tools/lib/play_listing.py --write"
+  local binary dir package apply=0 edit
+  for arg in "$@"; do [ "$arg" = "--apply" ] && apply=1; done
+  binary=$(require_gplay)
+  dir=$(python3 "$LISTING_HELPER" --print-dir)
+  package=$(package_name)
+
+  if [ "$apply" = 0 ]; then
+    step "gplay sync diff-listings (nothing is written)"
+    "$binary" sync diff-listings --package "$package" --dir "$dir"
+    info "Re-run with --apply to push it."
+    return 0
+  fi
+
+  step "gplay edits create"
+  edit=$("$binary" edits create --package "$package" \
+    | python3 -c 'import json,sys; print(json.load(sys.stdin).get("id",""))')
+  [ -n "$edit" ] || die "gplay edits create returned no edit id"
+  info "edit $edit"
+  if ! "$binary" sync run --package "$package" --edit "$edit" --dir "$dir"; then
+    warn "the sync failed; discarding edit $edit so the listing is untouched"
+    "$binary" edits delete --package "$package" --edit "$edit" || true
+    return 1
+  fi
+  step "gplay edits commit"
+  "$binary" edits commit --package "$package" --edit "$edit"
+}
+
+# The images are the half of a listing no text gate can see, and they come from
+# a renderer outside this repository, so this checks the artifact before it goes
+# anywhere: play_images.py reads each file's header and holds it against Play's
+# published rules. gplay then compares local SHA-256 to remote and uploads only
+# what actually changed.
+command_sync_images() {
+  require_python
+  python3 "$IMAGES_HELPER" || die \
+    "the committed listing images do not satisfy Play's rules" \
+    "Fix the image, or re-render it, then run this again."
+  local binary dir package apply=0 edit
+  for arg in "$@"; do [ "$arg" = "--apply" ] && apply=1; done
+  binary=$(require_gplay)
+  dir=$(python3 "$LISTING_HELPER" --print-dir)
+  package=$(package_name)
+
+  if [ "$apply" = 0 ]; then
+    # `images plan` reads the remote hashes, so it needs an edit to read them
+    # through. An edit that is never committed changes nothing, so the dry run
+    # opens one, plans inside it, and deletes it whatever the plan says.
+    step "gplay images plan (a temporary edit; nothing is committed)"
+    edit=$("$binary" edits create --package "$package" \
+      | python3 -c 'import json,sys; print(json.load(sys.stdin).get("id",""))')
+    [ -n "$edit" ] || die "gplay edits create returned no edit id"
+    "$binary" images plan --package "$package" --edit "$edit" --dir "$dir" || true
+    "$binary" edits delete --package "$package" --edit "$edit" --confirm >/dev/null 2>&1 || true
+    info "Temporary edit deleted. Re-run with --apply to push them."
+    return 0
+  fi
+
+  step "gplay edits create"
+  edit=$("$binary" edits create --package "$package" \
+    | python3 -c 'import json,sys; print(json.load(sys.stdin).get("id",""))')
+  [ -n "$edit" ] || die "gplay edits create returned no edit id"
+  info "edit $edit"
+  if ! "$binary" images sync --package "$package" --edit "$edit" --dir "$dir"; then
+    warn "the sync failed; discarding edit $edit so the listing is untouched"
+    "$binary" edits delete --package "$package" --edit "$edit" --confirm || true
+    return 1
+  fi
+  step "gplay edits commit"
+  "$binary" edits commit --package "$package" --edit "$edit"
+}
+
+# gplay's own flags are --from and --to, which is what this passes through. The
+# guard is the repository's: tools/play.d/store.toml says which tracks need a
+# named approver, and gplay will publish anywhere it is told to.
+command_promote() {
+  require_python
+  local from='' to='' approved='' yes='' rollout=''
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --from)
+        needs_value "$#" --from "It names the track the release is promoted from."
+        from=$2; shift ;;
+      --from=*) from=${1#*=} ;;
+      --to)
+        needs_value "$#" --to "It names the track the release is promoted to." \
+          "tools/play.d/store.toml says which tracks need a named approver."
+        to=$2; shift ;;
+      --to=*) to=${1#*=} ;;
+      --rollout)
+        needs_value "$#" --rollout "It is the fraction of the track's users the" \
+          "release reaches, as gplay's own --rollout takes it."
+        rollout=$2; shift ;;
+      --rollout=*) rollout=${1#*=} ;;
+      --approved-by)
+        needs_value "$#" --approved-by "It is the only attribution a publication" \
+          "to an approval-gated track ever carries."
+        approved=$2; shift ;;
+      --approved-by=*) approved=${1#*=} ;;
+      --yes) yes=1 ;;
+      *) die "unknown option: $1" ;;
+    esac
+    shift
+  done
+  if [ -z "$from" ] || [ -z "$to" ]; then
+    die "usage: ./tools/play promote --from <track> --to <track>"
+  fi
+  guard_track "$from" '' ''
+  guard_track "$to" "$approved" "$yes"
+  [ -n "$approved" ] && info "approved by $approved for the $to track"
+  local binary; binary=$(require_gplay)
+  step "gplay promote --from $from --to $to"
+  if [ -n "$rollout" ]; then
+    "$binary" promote --package "$(package_name)" --from "$from" --to "$to" \
+      --rollout "$rollout"
+  else
+    "$binary" promote --package "$(package_name)" --from "$from" --to "$to"
+  fi
+}
+
+command_upload() {
+  require_python
+  local file='' track='' approved='' yes=''
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --track)
+        needs_value "$#" --track "It names the track to release to; without it" \
+          "the default_track in tools/play.d/store.toml is used."
+        track=$2; shift ;;
+      --track=*) track=${1#*=} ;;
+      --approved-by)
+        needs_value "$#" --approved-by "It is the only attribution a publication" \
+          "to an approval-gated track ever carries."
+        approved=$2; shift ;;
+      --approved-by=*) approved=${1#*=} ;;
+      --yes) yes=1 ;;
+      -*) die "unknown option: $1" ;;
+      *) file=$1 ;;
+    esac
+    shift
+  done
+  [ -n "$file" ] || die "usage: ./tools/play upload <file.aab> [--track <name>]"
+  # The track is resolved and guarded before the artifact is looked at. Both are
+  # refusals, but "that track needs an approval" is the one a person needs to
+  # read, and a missing file must not hide it.
+  [ -n "$track" ] || track=$(python3 - "$TAFFY_ROOT" <<'PY'
+import sys, tomllib, os
+with open(os.path.join(sys.argv[1], "tools", "play.d", "store.toml"), "rb") as h:
+    print(tomllib.load(h)["application"]["default_track"])
+PY
+)
+  guard_track "$track" "$approved" "$yes"
+  [ -n "$approved" ] && info "approved by $approved for the $track track"
+  [ -f "$file" ] || die "no artifact at $file" \
+    "Build one: ./tools/chromium/build --profile release-arm64 taffy_public_bundle"
+  # Play refuses an unsigned bundle, and Chromium's android_app_bundle writes
+  # one: ./tools/chromium/build signs a copy beside it, <name>.signed.aab, with
+  # the product key. Refuse here rather than after a 130 MB upload, and name the
+  # certificate so the log records which key signed what was sent.
+  local keytool_bin cert
+  keytool_bin=$(command -v keytool || true)
+  [ -n "$keytool_bin" ] || die "no keytool on PATH, so the bundle's signature cannot be read" \
+    "Put a JDK's bin directory on PATH; the Chromium checkout carries one at third_party/jdk/current/bin."
+  cert=$("$keytool_bin" -printcert -jarfile "$file" 2>/dev/null \
+    | sed -n 's/^[[:space:]]*SHA256: //p' | head -n 1)
+  [ -n "$cert" ] || die "$file is not signed, and Play refuses an unsigned bundle" \
+    "./tools/chromium/build --profile release-arm64 taffy_public_bundle writes a signed copy," \
+    "out/release-arm64/apks/TaffyGo.signed.aab, beside the unsigned one."
+  info "signed by the certificate with SHA-256 $cert"
+  local binary; binary=$(require_gplay)
+  step "gplay preflight before anything is sent"
+  "$binary" preflight --file "$file" || die "preflight refused this artifact"
+  step "gplay release --track $track"
+  "$binary" release --package "$(package_name)" --track "$track" --bundle "$file"
+}
+
+main() {
+  local command="${1:-}"
+  if [ $# -gt 0 ]; then shift; fi
+  case "$command" in
+    ""|-h|--help|help) usage; return 0 ;;
+    check)        command_check ;;
+    self-test)    command_self_test ;;
+    doctor)       command_doctor "$@" ;;
+    preflight)    command_preflight "$@" ;;
+    sync-listing) command_sync_listing "$@" ;;
+    sync-images)  command_sync_images "$@" ;;
+    upload)       command_upload "$@" ;;
+    promote)      command_promote "$@" ;;
+    --)           exec "$(require_gplay)" "$@" ;;
+    *) printf 'taffy: unknown command %s\n\n' "$command" >&2; usage >&2; return 2 ;;
+  esac
+}
+
+main "$@"

@@ -1,0 +1,37 @@
+{
+  "format_version": 1,
+  "sequence": 1,
+  "binding": {
+    "reservation_id": "reservation-1",
+    "owner_profile_id": "source-profile",
+    "target_kind": 0,
+    "target_profile_id": "target-profile",
+    "backup_id": "backup-1",
+    "snapshot_sha256": [
+      1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1
+    ],
+    "confirmation_sha256": [
+      2, 2, 2, 2, 2, 2, 2, 2,
+      2, 2, 2, 2, 2, 2, 2, 2,
+      2, 2, 2, 2, 2, 2, 2, 2,
+      2, 2, 2, 2, 2, 2, 2, 2
+    ],
+    "selection": [],
+    "record_count": 0,
+    "candidate_records_sha256": [
+      3, 3, 3, 3, 3, 3, 3, 3,
+      3, 3, 3, 3, 3, 3, 3, 3,
+      3, 3, 3, 3, 3, 3, 3, 3,
+      3, 3, 3, 3, 3, 3, 3, 3
+    ]
+  },
+  "fact_kind": 0,
+  "intent": null,
+  "outcome": {
+    "intent_id": "commit-1",
+    "outcome": 0
+  }
+}

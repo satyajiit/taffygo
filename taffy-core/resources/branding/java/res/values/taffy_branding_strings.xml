@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+The product's own name, as Android reads it.
+
+This file is small on purpose. It holds only the strings that are proper
+nouns — a name is not translated, so it does not belong in the translatable
+string catalogue at //taffy/resources/catalog. Everything a person reads
+that is a sentence rather than a name lives there instead, is externalized
+for translation, and is covered by the pseudo-localization check
+(PAR-L10N-001).
+
+A Chromium derivative does not inherit the Chrome name or logo
+(chromium/README.md, decision 0001). This file is the replacement, and the
+target that carries it is declared with resource overlay precedence so that
+it wins over the upstream value of the same resource name rather than
+colliding with it.
+
+VERIFY AT SP-01: that `app_name` is still the resource the Chrome Android
+manifest's `android:label` resolves, and whether the task switcher and the
+site-settings surfaces read a second name resource at the pinned milestone.
+Upstream file to read: chrome/android/java/res_chromium/values/strings.xml
+and the `android:label` attribute in chrome/android/java/AndroidManifest.xml.
+-->
+<resources>
+    <!-- The launcher and task-switcher label. A brand name, never translated;
+         the marks in brand/ spell the wordmark `taffyGo` and repository prose
+         spells the product `TaffyGo` (brand/README.md). The platform label
+         follows prose, because it sits beside other app names rather than
+         beside the mark. -->
+    <string name="app_name" translatable="false">TaffyGo</string>
+
+    <!-- The home-screen widget labels. Upstream defines all three beside
+         app_name in its channel constants, marked non-translatable there
+         too, so the overlay must shadow them or the widget picker says
+         Chromium. Same substitution mechanism as app_name (decision 0019;
+         patch specification 0002 records it); check_shadowed_names.py keeps
+         these names in step with upstream. -->
+    <string name="bookmark_widget_title" translatable="false">TaffyGo bookmarks</string>
+    <string name="search_widget_title" translatable="false">TaffyGo search</string>
+    <string name="quick_action_search_widget_title" translatable="false">TaffyGo quick action search</string>
+</resources>

@@ -1,0 +1,32 @@
+# The media worker boundary. It may use Mojo, base sequence primitives and
+# Chromium's own media parsing, and nothing that carries ambient authority: no
+# browser or embedder object, no network, no path, no profile.
+#
+# //media is the point of this component. It is also the reason the DEPS is
+# narrow: the parse runs on bytes an untrusted party wrote, in a sandbox whose
+# whole justification is that nothing else is reachable from here.
+
+include_rules = [
+  "+base",
+  "+media/base",
+  "+media/filters",
+  "+mojo/public/cpp/bindings",
+  "+mojo/public/cpp/system",
+  "+taffy/contracts/tool-runtime",
+  "+taffy/services/tool-runtime/media",
+  "+ui/gfx/geometry",
+
+  "-chrome",
+  "-content",
+  "-net",
+  "-services/network",
+  "-third_party/blink",
+  "-third_party/ffmpeg",
+]
+
+specific_include_rules = {
+  ".*_unittest\\.(cc|h)": [
+    "+base/test",
+    "+testing/gtest",
+  ],
+}

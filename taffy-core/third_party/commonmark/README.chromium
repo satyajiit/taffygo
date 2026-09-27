@@ -1,0 +1,38 @@
+Name: CommonMark Java
+Short Name: commonmark
+URL: https://repo.maven.apache.org/maven2/org/commonmark/commonmark/0.30.0/commonmark-0.30.0.jar
+Version: 0.30.0
+Update Mechanism: Manual
+License: BSD-2-Clause
+License File: LICENSE
+Shipped: yes
+Security Critical: yes
+CPEPrefix: unknown
+
+Description:
+Parses bounded assistant answer text into a CommonMark syntax tree for the
+native Compose renderer. No HTML renderer or network image loader is used.
+The artifact matches Maven Central byte for byte; the version is owned by
+gradle/libs.versions.toml and used by both Gradle and GN.
+
+Local Modifications:
+None. GN excludes the Java module descriptor from the Android build.
+-------------------- DEPENDENCY DIVIDER --------------------
+Name: CommonMark Java GFM Tables
+Short Name: commonmark-ext-gfm-tables
+URL: https://repo.maven.apache.org/maven2/org/commonmark/commonmark-ext-gfm-tables/0.30.0/commonmark-ext-gfm-tables-0.30.0.jar
+Version: 0.30.0
+Update Mechanism: Manual
+License: BSD-2-Clause
+License File: LICENSE
+Shipped: yes
+Security Critical: yes
+CPEPrefix: unknown
+
+Description:
+Parses GitHub Flavored Markdown tables into the same syntax tree. Its only
+runtime dependency is CommonMark Java core above. Comparison tables are
+rendered with native Compose components.
+
+Local Modifications:
+None. GN excludes the Java module descriptor from the Android build.

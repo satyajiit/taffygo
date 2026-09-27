@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc a33d413cc0cee751758b93ea0567e3454a024a38a3c2320a115e040625e058d5 # shrinks to observation = FieldObservation { node_id: SemanticNodeId("n_1"), role: TextField, name: None, description: None, text_runs: [], value: None, destination_url: Some("https://Example.test:443/orders"), states: [], declared_sensitivity: NotSensitive, signals: ZoneSignals { input_type: Known(Email), autocomplete: Absent, obscured: false, cross_origin_embedded: false, origin_is_potentially_trustworthy: true, organization_policy: None, user_label: None } }

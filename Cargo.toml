@@ -1,0 +1,84 @@
+# TaffyGo Rust workspace for the first-party `taffy-core/` component roots.
+#
+# GN inside the Chromium build is the authoritative build for every crate that
+# ships; this workspace is the fast host loop (decision 0013 §6). Keep the
+# dependency tree near zero: every third-party crate that ships must clear
+# Chromium's vendoring review, so runtime dependencies are the exception and
+# dev-dependencies carry the test-only machinery.
+
+[workspace]
+resolver = "2"
+members = [
+  "taffy-core/components/delivery/core/rust/asset-plane",
+  "taffy-core/components/security/core/rust/audit-engine",
+  "taffy-core/contracts/bip/rust/bip-types",
+  "taffy-core/contracts/core-api/rust/core-api-types",
+  "taffy-core/contracts/core-service/rust/core-service-types",
+  "taffy-core/contracts/tool-runtime/rust/tool-runtime-types",
+  "taffy-core/components/intelligence/core/rust/file-engine",
+  "taffy-core/components/intelligence/core/rust/core-runtime",
+  "taffy-core/components/intelligence/core/rust/kernel-test-support",
+  "taffy-core/components/intelligence/core/rust/loop-kernel",
+  "taffy-core/components/intelligence/core/rust/model-router",
+  "taffy-core/components/intelligence/core/rust/procedure-engine",
+  "taffy-core/components/security/core/rust/policy-engine",
+  "taffy-core/components/storage/core/rust/storage-domain",
+  "taffy-core/components/intelligence/core/rust/task-engine",
+  "taffy-core/components/intelligence/core/rust/table-engine",
+  "taffy-core/components/tools/core/rust/tool-entrypoints",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.96"
+publish = false
+
+[workspace.dependencies]
+# First-party
+asset-plane = { path = "taffy-core/components/delivery/core/rust/asset-plane" }
+audit-engine = { path = "taffy-core/components/security/core/rust/audit-engine" }
+bip-types = { path = "taffy-core/contracts/bip/rust/bip-types" }
+core-api-types = { path = "taffy-core/contracts/core-api/rust/core-api-types" }
+core-service-types = { path = "taffy-core/contracts/core-service/rust/core-service-types" }
+core-runtime = { path = "taffy-core/components/intelligence/core/rust/core-runtime" }
+file-engine = { path = "taffy-core/components/intelligence/core/rust/file-engine" }
+# Dev-only test doubles for the kernel's ports; never in a shipping graph.
+kernel-test-support = { path = "taffy-core/components/intelligence/core/rust/kernel-test-support" }
+loop-kernel = { path = "taffy-core/components/intelligence/core/rust/loop-kernel" }
+model-router = { path = "taffy-core/components/intelligence/core/rust/model-router" }
+policy-engine = { path = "taffy-core/components/security/core/rust/policy-engine" }
+procedure-engine = { path = "taffy-core/components/intelligence/core/rust/procedure-engine" }
+taffy-storage = { path = "taffy-core/components/storage/core/rust/storage-domain" }
+task-engine = { path = "taffy-core/components/intelligence/core/rust/task-engine" }
+table-engine = { path = "taffy-core/components/intelligence/core/rust/table-engine" }
+tool-entrypoints = { path = "taffy-core/components/tools/core/rust/tool-entrypoints" }
+
+# Third-party. serde is vendored by Chromium; everything else below is
+# dev-only and must never appear in a shipping dependency graph.
+serde = { version = "1.0.229", default-features = false, features = ["derive", "alloc"] }
+serde_json = { version = "1.0.151", default-features = false, features = ["alloc"] }
+proptest = "1.11.0"
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+missing_debug_implementations = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(taffy_candidate_capabilities)"] }
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+# A panic aborts the isolated core generation and loses in-flight work.
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+indexing_slicing = "deny"
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+
+[profile.release]
+panic = "abort"

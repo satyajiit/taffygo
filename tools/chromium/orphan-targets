@@ -1,0 +1,513 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/chromium/orphan-targets — every GN target under //taffy is
+# reachable from something that is built, or it is named here with a reason.
+#
+# WHY THIS EXISTS, AND WHY IT IS NOT THE OTHER CHECK
+#
+# taffy-core/build/tools/check_build_reachability.py answers
+# "is this BUILD.gn loaded at all", statically, on any host, and it is a lane of
+# ./tools/check fast. It works a build *file* at a time, so an orphaned
+# **target** inside a reachable file is invisible to it.
+#
+# That gap was not theoretical. On 2026-08-19 `gn refs` answered "Nothing
+# references this." for two targets in build files that check calls reachable:
+#
+#   //taffy/app/android:unit_tests       20 gtest cases, never run
+#   //taffy/renderer:test_support    20 more (the redaction canary
+#                                               sweep), never run
+#
+# Both compiled for nobody and neither could fail, because nothing built them.
+# Answering that question needs the real dependency graph, which needs a
+# checkout and a generated out/ directory — so it is a command the builder runs,
+# and the `orphans` lane of ./tools/check fast runs the same command wherever a
+# profile has actually been generated. On every other host that lane skips and
+# names the reason, which is the honesty rule rather than a silent pass.
+#
+# HOW IT WORKS
+#
+# `gn desc <root> deps --all` from each declared entry point gives everything
+# the shipped and tested graph actually reaches. `gn ls "//taffy/*"`
+# gives everything the product root declares. The difference is targets that exist
+# and are built by nothing.
+#
+# WHAT KEEPS THE DIFFERENCE HONEST
+#
+# Two mechanisms, deliberately different, because they answer different
+# questions.
+#
+#   * **Shape**, for the sub-targets a GN template derives from the target a
+#     person wrote. `mojom()` alone declares more than a dozen of them, reached
+#     through the template rather than through a dep edge. They are excluded
+#     structurally: a name counts as Mojo-derived only when stripping a suffix
+#     that upstream's template appends leaves the base's generated `__is_mojom`
+#     marker in the configured graph. So a wrapper around `mojom()` and a
+#     template that grows a variant do not grow a list here, and a
+#     hand-written `source_set("foo_headers")` with no `mojom("foo")` next to it
+#     is still reported. The by-name list this replaced had already gone stale
+#     in both directions — it named a target the graph no longer had, and it
+#     silenced every first-party Rust crate, which is to say the one tool that
+#     looks for orphaned targets could not have reported an orphaned crate.
+#
+#   * **Registers**, for the targets a person decided about. There are three,
+#     they are deliberately small, and each entry carries a written reason:
+#
+#       ENTRY_POINTS         what this repository builds and runs on purpose.
+#       ROOT_ENTRY_TARGETS   labels that exist to be *named*, not depended on:
+#                            a graph-audit root, an integration alias, a report
+#                            a release lane builds without linking the product.
+#       UPSTREAM_REGISTERED  targets a numbered Chromium patch adds to an
+#                            upstream dependency closure. The referrer is
+#                            outside //taffy, so a sweep that reads only
+#                            //taffy cannot see it; each entry names the patch.
+#                            These are roots as well as entries: a target the
+#                            patch builds builds its dependencies too, so the
+#                            sweep follows them.
+#       ACCEPTED_ORPHANS     debt with an owner and a date it is paid.
+#
+# All three registers are checked in both directions, exactly as
+# KNOWN_UNREACHABLE is in check_build_reachability.py: an entry naming a target
+# that no longer exists is a finding, and so is an entry whose target has since
+# become reachable from an entry point. A paid debt left on the books is how the
+# next orphan goes unnoticed, so a dead entry is deleted rather than renewed.
+
+set -euo pipefail
+
+# See ./tools/chromium/build: the JVM writes "Picked up JAVA_TOOL_OPTIONS" to
+# stderr and Chromium's wrappers treat stderr as failure.
+unset JAVA_TOOL_OPTIONS
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/chromium.sh"
+
+PROFILE=$(taffy_state_get last_profile "$TAFFY_DEFAULT_PROFILE")
+LANE_READY=0
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/chromium/orphan-targets [--profile <name>]
+
+Reports every target under //taffy that nothing builds.
+
+Needs a synced checkout and a generated out/<profile> directory; `gn` comes
+from depot_tools, which this script puts on PATH itself.
+
+Options:
+  --profile NAME  the out/ directory to read the graph from
+  --lane-ready    answer whether this host could run the sweep, and stop
+  -h, --help      show this help
+
+Exit status: 0 no orphan outside the registers, 1 otherwise.
+USAGE
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --profile) PROFILE=${2:-}; shift ;;
+    --profile=*) PROFILE=${1#*=} ;;
+    --lane-ready) LANE_READY=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage >&2; die "unknown option: $1" ;;
+  esac
+  shift
+done
+
+# --- can this host answer the question at all? ------------------------------
+
+# Prints `reason<TAB>remediation` and returns 1 when it cannot; prints nothing
+# and returns 0 when it can.
+#
+# That two-field shape is the lane readiness contract of tools/lib/lanes.sh,
+# and it lives here rather than there on purpose. These are the same facts the
+# sweep itself needs before it can read anything, and a second copy of them
+# beside the lane would be a second opinion: ./tools/doctor would eventually
+# report a host as able to run something this command refuses to do, or the
+# reverse. One preflight, rendered twice — as a skip for the gate, as a `die`
+# for a person at a prompt.
+host_blocker() { # <profile>
+  local profile=$1 workspace src depot
+  if ! taffy_is_chromium_host; then
+    printf 'the Chromium graph needs an x86-64 Linux host (this is %s/%s)\tRead it on an x86-64 Linux builder where ./tools/chromium/sync has made the checkout.\n' \
+      "$(taffy_os)" "$(taffy_arch)"
+    return 1
+  fi
+  case " $TAFFY_PROFILES " in
+    *" $profile "*) : ;;
+    *)
+      case " $TAFFY_HOST_PROFILES " in
+        *" $profile "*)
+          # A host profile is a committed profile, so "unknown" would be false.
+          # It is refused for what it actually is: the graph it generates has
+          # no Android in it, and an orphan audit run there would report every
+          # Android-only target as unreachable while proving nothing about the
+          # product.
+          printf 'the orphan audit needs the Android product graph, and %s is a host profile\tRun it against a product profile: ./tools/chromium/orphan-targets --profile dev-arm64\n' \
+            "$profile"
+          return 1 ;;
+        *)
+          printf 'unknown build profile: %s\tCommitted profiles (chromium/args/): %s. GN args are never typed by hand (decision 0013).\n' \
+            "$profile" "$TAFFY_PROFILES"
+          return 1 ;;
+      esac ;;
+  esac
+  workspace=${TAFFY_CHROMIUM_WORKSPACE:-$(taffy_state_get chromium_workspace "")}
+  if [ -z "$workspace" ]; then
+    printf 'no Chromium workspace is recorded\tRun: ./tools/bootstrap --profile chromium --workspace <path>. The checkout lives outside this repository (decision 0012).\n'
+    return 1
+  fi
+  taffy_reject_windows_mount "$workspace"
+  # `-e`, not `-d`. A linked `git worktree` carries a `.git` *file* pointing at
+  # the repository it belongs to, so a directory test refuses exactly the one
+  # kind of tree it is safe to read a graph in.
+  src="$workspace/src"
+  if [ ! -e "$src/.git" ]; then
+    printf 'no Chromium checkout at %s\tRun: ./tools/chromium/sync\n' "$src"
+    return 1
+  fi
+  if [ ! -f "$src/out/$profile/args.gn" ]; then
+    printf '%s/out/%s is not a generated output directory\tRun: ./tools/chromium/build --profile %s\n' \
+      "$src" "$profile" "$profile"
+    return 1
+  fi
+  if ! have gn; then
+    depot=$(taffy_state_get depot_tools "")
+    if [ -z "$depot" ] || [ ! -x "$depot/gn" ]; then
+      printf 'gn is not available\tIt comes from depot_tools: ./tools/bootstrap --profile chromium\n'
+      return 1
+    fi
+  fi
+  return 0
+}
+
+BLOCKER=$(host_blocker "$PROFILE") || true
+
+if [ "$LANE_READY" -eq 1 ]; then
+  [ -z "$BLOCKER" ] || { printf '%s\n' "$BLOCKER"; exit 1; }
+  exit 0
+fi
+
+if [ -n "$BLOCKER" ]; then
+  die "$(printf '%s' "$BLOCKER" | cut -f1)" "$(printf '%s' "$BLOCKER" | cut -f2-)"
+fi
+
+chromium_add_depot_tools_to_path
+SRC=$(chromium_src)
+OUT="out/$PROFILE"
+
+# The overlay is symlink-mounted at //taffy, so a label under //taffy names a
+# file under this directory. Reading the overlay's own build files is what lets
+# the shape rules below ask whether a template really declared a name, instead
+# of guessing from the name alone.
+OVERLAY="$TAFFY_ROOT/taffy-core"
+
+# Everything the repository builds or runs on purpose. A target reachable from
+# one of these is in the product or in a suite; a target reachable from none of
+# them is compiled by nothing, whatever its build file says.
+#
+# Keep this in step with TAFFY_SUITES in ./tools/chromium/test and with the
+# product targets in //taffy/BUILD.gn. A suite added there and not
+# here reports its whole subtree as orphaned, which is a loud failure rather
+# than a silent one — that is the intended direction for this list to be wrong
+# in.
+ENTRY_POINTS='
+//taffy/app/android:taffy_public_apk
+//taffy/app/android:taffy_public_bundle
+//taffy:taffy_unittests
+//taffy:taffy_browsertests
+//taffy:taffy_android_tests
+//taffy/app/android/shell:taffy_shell_junit_tests
+//taffy/test/android/ui:taffy_public_test_apk
+//taffy/test:fuzzers
+'
+
+# --- the registers ----------------------------------------------------------
+
+# Labels whose whole purpose is to be typed. Nothing depends on them and
+# nothing should: they are the handle, not the load. Each is reachable by a
+# person naming it on a `gn`, `autoninja` or `gn desc` command line, which is
+# why "nothing builds it" is the intended state rather than a defect.
+#
+# Format: one `label<TAB>reason` per line.
+ROOT_ENTRY_TARGETS=$(cat <<'ROOTS'
+//taffy:product	The complete first-party assembly, and the root a graph audit names. Nothing depends on it by design: the installable label stays //taffy/app/android:taffy_public_apk so upstream registration does not go through a forwarding alias.
+//taffy:contracts	The new-root integration label for the generated contracts. It exists so that one name builds all four; the browser and renderer targets that need a contract reach it directly instead.
+//taffy:architecture_manifest	Metadata and nothing else. It makes taffy-core/build/components.toml and its generated GN projection visible to `gn desc ... metadata` without claiming that a product or platform target exists.
+//taffy/contracts:contracts	The one label under //taffy/contracts that names all four contract mojoms. Its members are reached individually by the targets that use them, so the group itself is only ever named by hand.
+//taffy/contracts/tool-runtime:tool-runtime	The stable contract edge for the browser supervisor and its runtime workers. Both the supervisor and the media worker reach :tool_runtime_mojom directly, deliberately: this alias also carries the Rust view, which no worker links yet, so depending on it would pull a crate into a C++ worker's binary to no purpose.
+//taffy/resources/tokens:tokens	The shared design-token projections. Only the Kotlin projection ships today, compiled by the Android design-system target; the C++ header and the CSS file are inputs for Views and WebUI surfaces that do not exist yet, and this target is what keeps all three visible to the product graph.
+ROOTS
+)
+
+# Targets that a numbered Chromium patch adds to an upstream dependency
+# closure. These are built and run — the referrer simply lives outside //taffy,
+# where `gn ls "//taffy/*"` cannot see it. This is not orphan debt and it is
+# not a permission either: an entry names the patch that does the registering,
+# so retiring that patch turns the entry into a finding rather than leaving a
+# target quietly exempt.
+#
+# Format: one `label<TAB>patch-specification<TAB>reason` per line.
+UPSTREAM_REGISTERED=$(cat <<'UPSTREAM'
+//taffy/test/recovery:core_service_recovery_browser_tests	chromium/patches/0030-register-core-recovery-browsertest.md	Chrome owns both browser-test runner closures, so two test-only dependency edges in //chrome/test/BUILD.gn are what build this. The same registration is recorded for the build file in UPSTREAM_TEST_BUILD_ROOTS in taffy-core/build/tools/check_build_reachability.py.
+UPSTREAM
+)
+
+# Targets that are knowingly built by nothing, each with the reason and the
+# owner of landing it. An entry here is a debt with a name on it, not a
+# permission — and, exactly as in check_build_reachability.py, an entry that has
+# since been wired up is itself a finding, because a paid debt left on the books
+# is how the next orphan goes unnoticed.
+#
+# Format: one `label<TAB>reason` per line.
+ACCEPTED_ORPHANS=$(cat <<'ORPHANS'
+//taffy/contracts/bip/mojom:compatibility_fixtures	A placeholder with `sources = []`, so it compiles nothing today. SP-04 decides whether the golden and compatibility fixtures reach the test binary as GN `data` on this target or as generated output, and writes the sources in the same change; its own VERIFY AT SP-04 comment in taffy-core/contracts/bip/mojom/BUILD.gn is the authority.
+//taffy/contracts/tool-runtime/rust/tool-runtime-types:tool_runtime_types	The Rust view of the Tool Runtime contract. No binary links it because no Rust worker exists yet: the isolated core speaks Core Service's ToolJobEffect and the browser's C++ supervisor is deliberately the only translator into Tool Runtime's ToolJob, so nothing in Rust decodes this wire today. The target exists so the 431 generated lines are compiled under the workspace deny lints instead of sitting in the tree unchecked, which is the state it was found in. Owned by the planned services.python and services.local-model components in taffy-core/build/components.toml; the debt is paid, and this entry deleted, when the first Rust worker links it.
+ORPHANS
+)
+
+# --- template-derived sub-targets -------------------------------------------
+
+# The suffixes each upstream template appends to the name a person wrote. Read
+# out of the templates themselves rather than out of a build:
+#   mojo/public/tools/bindings/mojom.gni    the mojom() variants, one set per
+#                                           bindings configuration
+#   third_party/jni_zero/jni_zero.gni       the Java half of generate_jni()
+#   build/rust/rust_unit_test.gni           `_exe`, the executable behind the
+#                                           test group of the same name
+#   build/config/android/rules.gni          `_apks`, the .apks set bundletool
+#                                           builds beside every app bundle
+MOJOM_DERIVED_SUFFIXES='_headers _blink _blink_headers _cpp_sources _blink_cpp_sources _shared _shared_cpp_sources _js _js_data_deps _js_library_for_compile _ts _java _java_sources _mojolpm _mojolpm_proto'
+JNI_DERIVED_SUFFIXES='_java _java_sources'
+RUST_TEST_DERIVED_SUFFIXES='_exe'
+BUNDLE_DERIVED_SUFFIXES='_apks'
+
+# Every label the overlay declares through one named GN template. The mount is
+# `//taffy -> taffy-core/`, so a build file's directory is its label directory.
+overlay_template_targets() { # <template-name>
+  local template=$1 file directory name
+  find "$OVERLAY" -name BUILD.gn -type f | sort | while IFS= read -r file; do
+    directory=${file#"$OVERLAY"}
+    directory=${directory%/BUILD.gn}
+    sed -n "s/^[[:space:]]*$template(\"\([A-Za-z0-9_.-]*\)\").*/\1/p" "$file" |
+      while IFS= read -r name; do
+        printf '//taffy%s:%s\n' "$directory" "$name"
+      done
+  done
+}
+
+# 0 when <label> is a sub-target upstream's own template derived from a target
+# declared beside it. Mojo's template emits an exact `<base>__is_mojom` marker
+# into the configured graph, even when a first-party template wraps it. Reading
+# that marker instead of only direct `mojom()` calls in BUILD.gn keeps wrappers
+# visible without silencing a hand-written target that merely ends in a
+# familiar suffix. The base itself remains reportable, so an orphaned Rust
+# crate or an orphaned mojom is still a finding even when its derived targets
+# are not.
+derived_sub_target() { # <label>
+  local label=$1 directory name suffix base
+  directory=${label%:*}
+  name=${label##*:}
+  for suffix in $MOJOM_DERIVED_SUFFIXES; do
+    case "$name" in
+      *"$suffix")
+        base="$directory:${name%"$suffix"}"
+        if grep -qxF "${base}__is_mojom" <<<"$declared"; then return 0; fi ;;
+    esac
+  done
+  for suffix in $JNI_DERIVED_SUFFIXES; do
+    case "$name" in
+      *"$suffix")
+        base="$directory:${name%"$suffix"}"
+        if grep -qxF "$base" <<<"$JNI_TARGETS"; then return 0; fi ;;
+    esac
+  done
+  # `rust_unit_test` declares the group and its executable together, so the base
+  # is a target in the graph rather than a template call in the overlay: the
+  # group's name is chosen by the library's `unit_test_target`, which need not
+  # be spelled anywhere this could read.
+  for suffix in $RUST_TEST_DERIVED_SUFFIXES; do
+    case "$name" in
+      *"$suffix")
+        base="$directory:${name%"$suffix"}"
+        if grep -qxF "$base" <<<"$declared"; then return 0; fi ;;
+    esac
+  done
+  # `android_app_bundle` declares `<base>_apks` beside the bundle: the .apks set
+  # bundletool builds so a person can install one on a device. Play takes the
+  # .aab and never the .apks, so nothing depends on it and nothing should —
+  # it is named on a command line or not built at all. The structural marker is
+  # the template's own `<base>__bundle`, so a hand-written target that merely
+  # ends in `_apks` is still reported.
+  for suffix in $BUNDLE_DERIVED_SUFFIXES; do
+    case "$name" in
+      *"$suffix")
+        base="$directory:${name%"$suffix"}"
+        if grep -qxF "${base}__bundle" <<<"$declared"; then return 0; fi ;;
+    esac
+  done
+  return 1
+}
+
+# --- register lookups -------------------------------------------------------
+
+# One field of a register's entry for <label>, or empty when it holds none.
+# Matched on the whole first field, never as a substring, so one label cannot
+# answer for another that happens to contain it.
+register_field() { # <label> <field-number> <register>
+  awk -F'\t' -v want="$1" -v column="$2" '$1 == want { print $column; exit }' <<<"$3"
+}
+
+register_labels() { # <register>
+  printf '%s\n' "$1" | cut -f1 | sort -u
+}
+
+# --- reading the graph ------------------------------------------------------
+
+step "reading the graph from $OUT"
+
+declared=$(cd "$SRC" && gn ls "$OUT" "//taffy/*" | sed 's/(.*//' | sort -u)
+
+reached=$(
+  cd "$SRC"
+  for root in $ENTRY_POINTS; do
+    printf '%s\n' "$root"
+    # A root that does not exist is itself worth failing on: it means this list
+    # and the build have drifted, and every target below it would be reported
+    # as an orphan for the wrong reason.
+    gn desc "$OUT" "$root" deps --all 2>/dev/null ||
+      die "no such target: $root — ENTRY_POINTS in $0 has drifted from the build"
+  done | grep '^//taffy' | sed 's/(.*//' | sort -u
+)
+
+# The second root set, and the reason it is separate from the first.
+#
+# An UPSTREAM_REGISTERED target is *built* — a numbered patch puts it in an
+# upstream dependency closure — so everything it depends on is built too. Its
+# referrer is outside //taffy, which is exactly why this sweep cannot see the
+# edge; it can see the target, and following its deps from here is the same
+# claim the register already makes, carried one hop further.
+#
+# Excusing the registered target without following its deps was a real defect
+# rather than a tidy simplification: on 2026-09-06 //taffy/test:benchmark_audit_
+# support was reported as built by nothing while //taffy/test/recovery:core_
+# service_recovery_browser_tests named it, because that referrer is the
+# registered one. Every dependency reached only through a registered target
+# would have read the same way.
+#
+# It stays a separate set because `check_register` below must keep asking a
+# different question: whether an ENTRY_POINT has since started building the
+# registered target, which is what retires the register entry. Folding the two
+# together would make every entry answer "now built by an entry point" on the
+# strength of building itself, and the register would never be retired again.
+upstream_reached=$(
+  cd "$SRC"
+  while IFS= read -r root; do
+    [ -n "$root" ] || continue
+    printf '%s\n' "$root"
+    gn desc "$OUT" "$root" deps --all 2>/dev/null ||
+      die "no such target: $root — UPSTREAM_REGISTERED in $0 has drifted from the build"
+  done <<UPSTREAM_ROOTS | grep '^//taffy' | sed 's/(.*//' | sort -u
+$(register_labels "$UPSTREAM_REGISTERED")
+UPSTREAM_ROOTS
+)
+
+built=$(printf '%s\n%s\n' "$reached" "$upstream_reached" | grep -v '^$' | sort -u)
+
+JNI_TARGETS=$(overlay_template_targets generate_jni)
+
+orphans=$(comm -23 <(printf '%s\n' "$declared") <(printf '%s\n' "$built"))
+
+# The remaining by-name exclusions, and the reason they are still by name: each
+# is a target whose only referrer lives in a toolchain this comparison flattens
+# away. `gn ls` and `gn desc` both print a target once per toolchain and the
+# `sed` above strips the suffix, so a host-toolchain executable or a
+# Robolectric library looks unreferenced from the device toolchain's point of
+# view. Answering that properly means comparing per toolchain rather than per
+# label, which is a change to the query above rather than to this list.
+orphans=$(printf '%s\n' "$orphans" |
+  grep -v '__' |
+  grep -vE ':(resources|taffy_strings|taffy_strings_grit|junit|jni_headers_java|test_jni_headers|test_jni_headers_java)$' |
+  grep -vE '/test/fuzz:(wire_seed_corpus|write_wire_seeds)$' |
+  grep -vE ':(taffy|native|browser_process|taffy_tests|taffy_device_tests|javatests_all|upstream_provenance_report)$' |
+  grep -v '^$')
+
+FINDINGS=0
+
+# --- what nothing builds ----------------------------------------------------
+
+while IFS= read -r label; do
+  [ -n "$label" ] || continue
+  derived_sub_target "$label" && continue
+  reason=$(register_field "$label" 2 "$ROOT_ENTRY_TARGETS")
+  if [ -n "$reason" ]; then
+    info "    root entry target: $label"
+    info "      $reason"
+    continue
+  fi
+  reason=$(register_field "$label" 3 "$UPSTREAM_REGISTERED")
+  if [ -n "$reason" ]; then
+    info "    registered upstream by $(register_field "$label" 2 "$UPSTREAM_REGISTERED"): $label"
+    info "      $reason"
+    continue
+  fi
+  reason=$(register_field "$label" 2 "$ACCEPTED_ORPHANS")
+  if [ -n "$reason" ]; then
+    info "    accepted orphan: $label"
+    info "      $reason"
+    continue
+  fi
+  bad "$label: nothing builds it. Its sources compile for no binary, so its tests cannot fail and cannot pass."
+  FINDINGS=$((FINDINGS + 1))
+done <<EOF
+$orphans
+EOF
+
+# --- the other direction ----------------------------------------------------
+
+# A register entry whose target is now reached, or no longer exists, is stale.
+# This is what stops any of the three from becoming an excuse: the entry has to
+# keep earning its place on every run, and the remedy is to delete it.
+check_register() { # <register> <what-it-claims>
+  local register=$1 claim=$2 label
+  while IFS= read -r label; do
+    [ -n "$label" ] || continue
+    if grep -qxF "$label" <<<"$reached"; then
+      bad "$label: registered as $claim and now built by an entry point. Delete the entry."
+      FINDINGS=$((FINDINGS + 1))
+    elif ! grep -qxF "$label" <<<"$declared"; then
+      bad "$label: registered as $claim, but no such target exists. Delete the entry."
+      FINDINGS=$((FINDINGS + 1))
+    fi
+  done <<REGISTER
+$(register_labels "$register")
+REGISTER
+}
+
+check_register "$ROOT_ENTRY_TARGETS" "a root entry target"
+check_register "$UPSTREAM_REGISTERED" "registered by a Chromium patch"
+check_register "$ACCEPTED_ORPHANS" "an accepted orphan"
+
+# The third direction, and the one only UPSTREAM_REGISTERED has: the patch that
+# does the registering is itself a file that can be retired. Patch 0009 was
+# retired on 2026-08-22, so this is a thing that happens rather than a thing
+# that might.
+while IFS= read -r label; do
+  [ -n "$label" ] || continue
+  spec=$(register_field "$label" 2 "$UPSTREAM_REGISTERED")
+  if [ ! -f "$TAFFY_ROOT/$spec" ]; then
+    bad "$label: registered against $spec, but there is no such patch specification."
+    FINDINGS=$((FINDINGS + 1))
+  fi
+done <<EOF
+$(register_labels "$UPSTREAM_REGISTERED")
+EOF
+
+info ""
+if [ "$FINDINGS" -eq 0 ]; then
+  ok "orphan targets: every target under //taffy is built by something, or registered with a reason"
+  exit 0
+fi
+die "$FINDINGS orphan target finding(s)"

@@ -1,0 +1,183 @@
+{
+  "schema_version": "0.1",
+  "snapshot_id": "snap_trunc_01",
+  "request_id": "req_001",
+  "profile_id": "prof_default",
+  "browser_window_id": "win_01",
+  "tab_id": "tab_01",
+  "root_frame_id": "frame_main",
+  "page_epoch": "epoch_a1",
+  "graph_revision": 4,
+  "event_sequence": 19,
+  "lifecycle_state": "ACTIVE",
+  "committed_url_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://docs.example.test"
+    },
+    "disclosure": "ORIGIN_AND_PATH",
+    "has_query": false,
+    "has_fragment": false,
+    "path": "/"
+  },
+  "origin_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://docs.example.test"
+    },
+    "is_potentially_trustworthy": true,
+    "is_incognito": false
+  },
+  "capture_time_monotonic_ms": 1000,
+  "scope": "DOCUMENT",
+  "adapters": [
+    {
+      "adapter": "BROWSER",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    },
+    {
+      "adapter": "DOM",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    },
+    {
+      "adapter": "ACCESSIBILITY",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "n_doc",
+      "frame_id": "frame_main",
+      "role": "DOCUMENT",
+      "name": "Change log",
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "node_id": "n_list",
+      "frame_id": "frame_main",
+      "role": "LIST",
+      "name": "Releases",
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.95,
+      "attributes": [
+        {
+          "name": "LIST_SIZE",
+          "value": "2140"
+        }
+      ]
+    },
+    {
+      "node_id": "n_item_1",
+      "frame_id": "frame_main",
+      "role": "LIST_ITEM",
+      "text_runs": [
+        {
+          "text": "2026-08-01 storage retention updated",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.95,
+      "attributes": [
+        {
+          "name": "LIST_POSITION",
+          "value": "1"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_list",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_list",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_item_1",
+      "relationship": "CONTAINS",
+      "inferred": false
+    }
+  ],
+  "frames": [
+    {
+      "frame_id": "frame_main",
+      "is_main_frame": true,
+      "is_out_of_process": false,
+      "is_cross_origin_to_parent": false,
+      "origin_metadata": {
+        "origin": {
+          "kind": "TUPLE",
+          "serialization": "https://docs.example.test"
+        },
+        "is_potentially_trustworthy": true,
+        "is_incognito": false
+      },
+      "page_epoch": "epoch_a1",
+      "graph_revision": 4,
+      "lifecycle_state": "ACTIVE",
+      "included": true
+    }
+  ],
+  "truncation": {
+    "truncated": true,
+    "budgets_reached": [
+      "MAX_NODES",
+      "MAX_TEXT_BYTES"
+    ],
+    "omitted_node_count": 2137,
+    "omitted_text_bytes": 918400,
+    "omitted_frame_count": 0,
+    "may_change_answer": true
+  },
+  "redaction_summary": {
+    "applied_features": [
+      "SECRET_VALUE_SUPPRESSION",
+      "SENSITIVE_ZONE_CLASSIFICATION",
+      "URL_MINIMIZATION"
+    ],
+    "redacted_field_count": 0,
+    "suppressed_secret_value_count": 0,
+    "sensitive_zone_count": 0,
+    "policy_filtered_frame_count": 0
+  },
+  "warnings": [
+    {
+      "code": "DEADLINE_REACHED",
+      "frame_id": "frame_main",
+      "detail_code": "node_budget_reached"
+    }
+  ]
+}

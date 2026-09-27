@@ -1,0 +1,66 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="accessibility-rich">
+<title>Lumen Arc order page (accessible markup)</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Lumen Arc desk lamp</h1>
+  <p class="who">Accessible twin. Same words, same numbers, same order as its
+  inaccessible twin; only the semantics differ.</p>
+</header>
+
+<nav aria-label="Sections">
+  <ul>
+    <li><a href="#price-section">Price</a></li>
+    <li><a href="#spec-section">Specification</a></li>
+    <li><a href="#order-section">Order</a></li>
+  </ul>
+</nav>
+
+<main>
+  <section id="price-section" aria-labelledby="price-heading">
+    <h2 id="price-heading">Price</h2>
+    <p id="price">Price today: <strong>$129.00</strong></p>
+    <p id="availability">Availability: <strong>In stock</strong></p>
+  </section>
+
+  <section id="spec-section" aria-labelledby="spec-heading">
+    <h2 id="spec-heading">Specification</h2>
+    <table id="spec">
+      <caption>Lumen Arc specification</caption>
+      <thead>
+        <tr><th scope="col">Attribute</th><th scope="col">Value</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Brightness</th><td>800 lumens</td></tr>
+        <tr><th scope="row">Warranty</th><td>2 years</td></tr>
+        <tr><th scope="row">Power</th><td>12 W</td></tr>
+      </tbody>
+    </table>
+    <img id="chart" src="/media/diagram.svg" width="320" height="120"
+         alt="Bar chart: Lumen Arc 620 lux, Lumen Flat 430 lux, ceiling light 180 lux">
+  </section>
+
+  <section id="order-section" aria-labelledby="order-heading">
+    <h2 id="order-heading">Order</h2>
+    <form id="order-form" action="/forms/submit" method="post">
+      <label for="quantity">Quantity</label>
+      <input id="quantity" name="quantity" type="number" min="1" max="5" value="1">
+      <label for="finish">Finish</label>
+      <select id="finish" name="finish">
+        <option value="black" selected>Black</option>
+        <option value="white">White</option>
+      </select>
+      <p><button type="submit" id="add-to-basket">Add to basket</button></p>
+    </form>
+    <p id="order-status" role="status">Nothing added yet.</p>
+  </section>
+</main>
+
+<footer>
+  <p class="note">Fixture footer. Focus order follows reading order.</p>
+</footer>

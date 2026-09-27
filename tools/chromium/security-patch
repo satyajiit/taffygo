@@ -1,0 +1,366 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/chromium/security-patch — the urgent-security fast path, and the
+# timing record the drill needs.
+#
+# For an actively exploited critical fix the milestone is NOT rebased. The
+# upstream commit is cherry-picked onto the current pinned revision, exported
+# into chromium/patches/security/, chromium/SECURITY_PATCH_LEVEL is bumped, and
+# the Chromium and release lanes run against the existing baseline.
+# Authority: docs/development/chromium-fork-and-build.md section 1.4 and
+# docs/development/testing-and-delivery.md section 12.
+#
+# The clock is the point. The M1 exit review asks for detection-to-artifact and
+# artifact-to-distribution from a real, timed exercise; those measurements
+# calibrate the candidate objective owned by OD-052 and assert no service
+# target. This command measures; it never grades.
+#
+# Procedure around it, including who is called at 3am:
+# docs/development/release-and-incident-runbook.md
+#
+# Exit codes: 0 = done, 1 = refused with a reason, 2 = it could not run.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/security_queue.sh"
+
+DRILL_LIB="$TAFFY_ROOT/tools/chromium/lib"
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/chromium/security-patch <command> [options]
+
+Commands:
+  open     Start the clock: record the advisory, its severity, and the moment
+           it was detected.
+  apply    Take the upstream fix into chromium/patches/security/ and bump
+           chromium/SECURITY_PATCH_LEVEL.
+  mark     Record a later lifecycle event (the clock, one event at a time).
+  status   Print the record.
+  report   Recompute the intervals, print them, and optionally write the
+           manifest fragment a drill artifact carries.
+  fold     Milestone rebase: drop the cherry-picks and reset the patch level,
+           because the fix now arrives in the new pinned revision.
+
+Options for `open`:
+  --advisory REF       the upstream advisory or bug reference (required)
+  --severity LEVEL     critical | high | medium | low (required)
+  --kind KIND          drill | incident (required — the difference matters when
+                       the record is read later as evidence)
+  --exploited          the vulnerability is actively exploited
+  --at TIMESTAMP       when it was detected (RFC 3339; default: now)
+  --record FILE        where the record lives
+  --force              start over, discarding an existing measurement
+
+Options for `apply`:
+  --from-commit SHA    cherry-pick the upstream commit onto taffy/patched and
+                       export it (needs the Chromium checkout)
+  --from-file PATCH    take an already-exported git mailbox patch
+  --name SHORT-NAME    the patch filename's short name
+  --record FILE        the record to write the patch and level into
+  --dry-run            say what would change, write nothing
+
+Options for `mark`:
+  --event NAME         detected, triaged, patch_staged, build_started,
+                       artifact_signed, artifact_verified,
+                       distribution_submitted, distribution_live, closed
+  --at TIMESTAMP       when it happened (default: now)
+  --evidence REF       a link or id the event can be checked against
+
+Options for `report`:
+  --json               the record itself, machine-readable
+  --fragment FILE      write the release-manifest fragment here
+  --require-complete   an unfinished clock fails the command
+
+Also:
+  --self-test          exercise the record's lifecycle and interval maths
+  -h, --help           show this help
+
+The record defaults to artifacts/security-drill/<advisory>.json, which is build
+output and is not committed. Upload it with the artifact: it is the drill's
+only product.
+USAGE
+}
+
+# --- helpers ----------------------------------------------------------------
+
+require_python() {
+  have python3 || die "python3 is required by this command" \
+    "It is already a prerequisite of depot_tools and gclient."
+}
+
+drill_cli() { ( cd "$TAFFY_ROOT" && python3 "$DRILL_LIB/drill_cli.py" "$@" ); }
+
+# --- commands ---------------------------------------------------------------
+
+cmd_open() {
+  local advisory='' severity='' kind='' exploited='' at='' record='' force=''
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --advisory) advisory=${2:-}; shift ;;
+      --advisory=*) advisory=${1#*=} ;;
+      --severity) severity=${2:-}; shift ;;
+      --severity=*) severity=${1#*=} ;;
+      --kind) kind=${2:-}; shift ;;
+      --kind=*) kind=${1#*=} ;;
+      --exploited) exploited='--exploited' ;;
+      --at) at=${2:-}; shift ;;
+      --at=*) at=${1#*=} ;;
+      --record) record=${2:-}; shift ;;
+      --record=*) record=${1#*=} ;;
+      --force) force='--force' ;;
+      -h|--help) usage; exit 0 ;;
+      *) usage >&2; die "unknown option for open: $1" ;;
+    esac
+    shift
+  done
+  [ -n "$advisory" ] || die "open: --advisory is required" \
+    "Name the upstream advisory or bug reference. A record with no subject is a" \
+    "measurement of nothing."
+  [ -n "$severity" ] || die "open: --severity is required" "One of: critical high medium low"
+  [ -n "$kind" ] || die "open: --kind is required" \
+    "--kind drill for a rehearsal, --kind incident for a real advisory."
+  require_python
+
+  record=$(record_path_for "$advisory" "$record")
+  local chromium
+  chromium=$(printf '{"milestone":"%s","tag":"%s","commit":"%s","security_patch_level_before":%s}' \
+    "$(taffy_chromium_pin milestone)" "$(taffy_chromium_pin tag)" \
+    "$(taffy_chromium_pin commit)" "$(current_level)")
+
+  step "security fast path: opening the clock"
+  drill_cli open --record "$record" --advisory "$advisory" --severity "$severity" \
+    --kind "$kind" --chromium "$chromium" \
+    ${exploited:+$exploited} ${force:+$force} ${at:+--at "$at"}
+  info ""
+  info "Next: cherry-pick the upstream fix, then"
+  info "  ./tools/chromium/security-patch apply --from-commit <sha> --record $record"
+}
+
+cmd_apply() {
+  local from_commit='' from_file='' name='' record='' dry_run=0
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --from-commit) from_commit=${2:-}; shift ;;
+      --from-commit=*) from_commit=${1#*=} ;;
+      --from-file) from_file=${2:-}; shift ;;
+      --from-file=*) from_file=${1#*=} ;;
+      --name) name=${2:-}; shift ;;
+      --name=*) name=${1#*=} ;;
+      --record) record=${2:-}; shift ;;
+      --record=*) record=${1#*=} ;;
+      --dry-run) dry_run=1 ;;
+      -h|--help) usage; exit 0 ;;
+      *) usage >&2; die "unknown option for apply: $1" ;;
+    esac
+    shift
+  done
+  [ -n "$record" ] || die "apply: --record is required" \
+    "Open the clock first: ./tools/chromium/security-patch open --advisory <ref> ..."
+  [ -f "$record" ] || die "no timing record at $record" \
+    "The patch and the clock are one exercise. Open it first."
+  [ -n "$from_commit" ] || [ -n "$from_file" ] || die \
+    "apply: give --from-commit <sha> or --from-file <patch>" \
+    "--from-commit cherry-picks upstream in the checkout (Chromium host);" \
+    "--from-file takes a patch someone already exported."
+  require_python
+
+  local work exported
+  work=$(mktemp -d "${TMPDIR:-/tmp}/taffy-security.XXXXXX")
+  # shellcheck disable=SC2064  # expanded now on purpose
+  trap "rm -rf '$work'" EXIT
+
+  if [ -n "$from_commit" ]; then
+    taffy_require_chromium_host
+    local src; src=$(chromium_require_checkout)
+    step "cherry-picking $from_commit onto $TAFFY_PATCH_BRANCH"
+    git -C "$src" rev-parse --verify "$from_commit^{commit}" >/dev/null 2>&1 || die \
+      "unknown upstream commit: $from_commit" \
+      "Fetch it first: git -C $src fetch origin"
+    git -C "$src" checkout --quiet "$TAFFY_PATCH_BRANCH"
+    git -C "$src" cherry-pick -x "$from_commit" || die \
+      "the cherry-pick did not apply cleanly" \
+      "Resolve it in $src, commit, and re-run with --from-file on the exported" \
+      "patch. A conflicted security cherry-pick is normal work, not a failure of" \
+      "this command."
+    local subject; subject=$(git -C "$src" log -1 --format=%s)
+    case "$subject" in
+      security:*) : ;;
+      *) git -C "$src" commit --quiet --amend -m "security: $subject" \
+           -m "$(git -C "$src" log -1 --format=%b)" ;;
+    esac
+    git -C "$src" format-patch -1 --no-signature --no-stat --output-directory "$work" >/dev/null
+    exported=$(find "$work" -name '*.patch' 2>/dev/null | head -n 1 || true)
+  else
+    exported=$from_file
+  fi
+
+  validate_patch_file "$exported"
+  local upstream digest subject number target
+  upstream=$(patch_upstream_commit "$exported")
+  subject=$(patch_subject "$exported")
+  digest=$(patch_digest "$exported")
+  number=$(next_patch_number)
+  [ -n "$name" ] || name=$(slug "${subject#security: }")
+  [ -n "$name" ] || name='upstream-security-fix'
+  target="$SECURITY_DIR/$number-$name.patch"
+
+  local before after
+  before=$(current_level)
+  after=$((before + 1))
+
+  step "urgent-security fast path"
+  note "patch       ${target#"$TAFFY_ROOT"/}"
+  note "upstream    $upstream"
+  note "subject     $subject"
+  note "level       $before -> $after"
+
+  if [ "$dry_run" = 1 ]; then
+    info ""
+    ok "dry run — nothing was written"
+    return 0
+  fi
+
+  mkdir -p "$SECURITY_DIR"
+  cp "$exported" "$target"
+  taffy_kv_set "$LEVEL_FILE" level "$after"
+  local advisory
+  advisory=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["advisory"])' "$record")
+  taffy_kv_set "$LEVEL_FILE" advisories "$(record_advisory_in_level_file "$advisory")"
+
+  drill_cli patch --record "$record" --file "${target#"$TAFFY_ROOT"/}" \
+    --sha256 "$digest" --upstream-commit "$upstream" --subject "$subject" \
+    --level-before "$before" --level-after "$after"
+
+  info ""
+  ok "cherry-pick staged and the patch level bumped"
+  info "The queue and the level are committed together, and TOOLCHAIN.md's"
+  info "\"Chromium security patch level\" row moves with them."
+  info ""
+  info "Next:"
+  info "  ./tools/check fast --only pins,chromium"
+  info "  ./tools/chromium/sync && ./tools/chromium/build --profile release-arm64"
+  info "  ./tools/chromium/security-patch mark --event build_started --record $record"
+}
+
+cmd_mark() {
+  local event='' at='' evidence='' record=''
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --event) event=${2:-}; shift ;;
+      --event=*) event=${1#*=} ;;
+      --at) at=${2:-}; shift ;;
+      --at=*) at=${1#*=} ;;
+      --evidence) evidence=${2:-}; shift ;;
+      --evidence=*) evidence=${1#*=} ;;
+      --record) record=${2:-}; shift ;;
+      --record=*) record=${1#*=} ;;
+      -h|--help) usage; exit 0 ;;
+      *) usage >&2; die "unknown option for mark: $1" ;;
+    esac
+    shift
+  done
+  [ -n "$event" ] || die "mark: --event is required" \
+    "The lifecycle is listed in ./tools/chromium/security-patch --help."
+  [ -n "$record" ] || die "mark: --record is required"
+  require_python
+  drill_cli mark --record "$record" --event "$event" \
+    ${at:+--at "$at"} ${evidence:+--evidence "$evidence"}
+}
+
+cmd_status() {
+  local record=${1:-}
+  case "$record" in
+    --record) record=${2:-} ;;
+    --record=*) record=${record#*=} ;;
+    -h|--help) usage; exit 0 ;;
+  esac
+  [ -n "$record" ] || die "status: --record is required"
+  require_python
+  step "security response record"
+  drill_cli status --record "$record"
+}
+
+cmd_report() {
+  local record='' json='' fragment='' require=''
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --record) record=${2:-}; shift ;;
+      --record=*) record=${1#*=} ;;
+      --json) json='--json' ;;
+      --fragment) fragment=${2:-}; shift ;;
+      --fragment=*) fragment=${1#*=} ;;
+      --require-complete) require='--require-complete' ;;
+      -h|--help) usage; exit 0 ;;
+      *) usage >&2; die "unknown option for report: $1" ;;
+    esac
+    shift
+  done
+  [ -n "$record" ] || die "report: --record is required"
+  require_python
+  [ -n "$json" ] || step "security response report"
+  drill_cli report --record "$record" ${json:+$json} ${require:+$require} \
+    ${fragment:+--fragment "$fragment"}
+}
+
+cmd_fold() {
+  local dry_run=0
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --dry-run) dry_run=1 ;;
+      -h|--help) usage; exit 0 ;;
+      *) usage >&2; die "unknown option for fold: $1" ;;
+    esac
+    shift
+  done
+  local carried
+  carried=$(find "$SECURITY_DIR" -maxdepth 1 -name '*.patch' -type f 2>/dev/null | sort || true)
+  step "folding urgent cherry-picks into the milestone rebase"
+  if [ -z "$carried" ]; then
+    ok "no cherry-picks are carried; the patch level is already $(current_level)"
+    return 0
+  fi
+  local patch
+  for patch in $carried; do note "would drop ${patch#"$TAFFY_ROOT"/}"; done
+  note "would reset level $(current_level) -> 0 and advisories -> none"
+  if [ "$dry_run" = 1 ]; then
+    info ""
+    ok "dry run — nothing was written"
+    return 0
+  fi
+  if ! taffy_chromium_is_pinned; then
+    die "chromium/REVISION is unpinned" \
+      "Fold the cherry-picks only as part of a milestone rebase that lands a new" \
+      "pinned revision containing the fixes. Dropping them against the same pin" \
+      "removes a security fix from the build."
+  fi
+  for patch in $carried; do rm -f "$patch"; done
+  taffy_kv_set "$LEVEL_FILE" level 0
+  taffy_kv_set "$LEVEL_FILE" advisories none
+  info ""
+  ok "cherry-picks dropped and the patch level reset"
+  info "Prove the new pin carries the fixes before committing this:"
+  info "  ./tools/chromium/sync --allow-rebase && ./tools/chromium/test --upstream"
+}
+
+# --- dispatch ---------------------------------------------------------------
+
+COMMAND=${1:-}
+[ $# -gt 0 ] && shift
+case "$COMMAND" in
+  open) cmd_open "$@" ;;
+  apply) cmd_apply "$@" ;;
+  mark) cmd_mark "$@" ;;
+  status) cmd_status "$@" ;;
+  report) cmd_report "$@" ;;
+  fold) cmd_fold "$@" ;;
+  --self-test) require_python; step "security drill: record lifecycle and intervals"
+               drill_cli self-test ;;
+  -h|--help|'') usage; exit 0 ;;
+  *) usage >&2; die "unknown command: $COMMAND" ;;
+esac

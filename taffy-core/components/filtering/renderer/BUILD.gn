@@ -1,0 +1,57 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# Renderer half of Ads and trackers cosmetics: observe class and id, apply a
+# user-origin hide stylesheet. The engine stays in the browser process.
+
+source_set("renderer") {
+  sources = [
+    "class_id_tokens.cc",
+    "class_id_tokens.h",
+    "cosmetic_class_id_pump.cc",
+    "cosmetic_class_id_pump.h",
+    "cosmetic_filter_agent.cc",
+    "cosmetic_filter_agent.h",
+    "cosmetic_filter_render_frame_observer.cc",
+    "cosmetic_filter_render_frame_observer.h",
+    "filtering_url_loader_throttle.cc",
+    "filtering_url_loader_throttle.h",
+    "hide_stylesheet.cc",
+    "hide_stylesheet.h",
+  ]
+  public_deps = [ "//taffy/components/filtering/mojom" ]
+  deps = [
+    "//base",
+    "//content/public/renderer",
+    "//mojo/public/cpp/bindings",
+    "//net",
+    "//services/network/public/cpp",
+    "//services/network/public/mojom",
+    "//third_party/blink/public:blink_headers",
+    "//third_party/blink/public/common",
+    "//url",
+  ]
+  visibility = [
+    "//chrome/renderer/*",
+    "//taffy:*",
+    "//taffy/components/filtering/renderer/*",
+    "//taffy/test:browser_test_launcher",
+  ]
+  configs += [ "//build/config/compiler:wexit_time_destructors" ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+  sources = [
+    "class_id_tokens_unittest.cc",
+    "hide_stylesheet_unittest.cc",
+  ]
+  deps = [
+    ":renderer",
+    "//base",
+    "//testing/gtest",
+  ]
+}

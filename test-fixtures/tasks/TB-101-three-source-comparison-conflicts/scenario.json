@@ -1,0 +1,129 @@
+{
+  "scenario": "TB-101",
+  "corpus": "taffygo-task-scenarios",
+  "version": "1.1.0",
+  "job_family": "JF-01",
+  "contract": "test-fixtures/tasks/manifest.json",
+  "note": "The contract for this scenario - goal, scope, facts, labels and adjudication - is the corpus manifest. This file owns only the run script: the ordered steps, the events injected into them, the audit stream a correct run produces, and the rubric a labeler applies to a disputed run.",
+  "steps": [
+    {
+      "n": 1,
+      "kind": "step:NAVIGATE",
+      "fixture": "comparison-source-a",
+      "detail": "Open listing A.",
+      "produces": [],
+      "expect": [
+        "a committed navigation on the primary origin"
+      ]
+    },
+    {
+      "n": 2,
+      "kind": "step:OBSERVE",
+      "fixture": "comparison-source-a",
+      "detail": "Observe listing A, including its structured data.",
+      "produces": [
+        "F-101-a-price-visible",
+        "F-101-a-price-structured",
+        "F-101-a-warranty"
+      ],
+      "expect": [
+        "two price candidates, each carrying its own source"
+      ]
+    },
+    {
+      "n": 3,
+      "kind": "step:NAVIGATE",
+      "fixture": "comparison-source-b",
+      "detail": "Follow the same-origin link to listing B.",
+      "produces": [],
+      "expect": [
+        "a new page epoch"
+      ]
+    },
+    {
+      "n": 4,
+      "kind": "step:OBSERVE",
+      "fixture": "comparison-source-b",
+      "detail": "Observe listing B.",
+      "produces": [
+        "F-101-b-price",
+        "F-101-b-availability-visible",
+        "F-101-b-availability-structured",
+        "F-101-b-warranty-absent"
+      ],
+      "expect": [
+        "the missing warranty recorded as absent"
+      ]
+    },
+    {
+      "n": 5,
+      "kind": "step:NAVIGATE",
+      "fixture": "comparison-source-c",
+      "detail": "Follow the cross-origin link to listing C on the partner origin.",
+      "produces": [],
+      "expect": [
+        "an origin change, and a new epoch bound to the partner origin"
+      ]
+    },
+    {
+      "n": 6,
+      "kind": "step:OBSERVE",
+      "fixture": "comparison-source-c",
+      "detail": "Observe listing C.",
+      "produces": [
+        "F-101-c-price-visible",
+        "F-101-c-price-structured",
+        "F-101-c-brightness-unit",
+        "F-101-c-warranty"
+      ],
+      "expect": [
+        "the currency disagreement preserved",
+        "the wattage cell flagged rather than coerced"
+      ]
+    },
+    {
+      "n": 7,
+      "kind": "step:EXTRACT",
+      "fixture": null,
+      "detail": "Normalize the three listings into one field set without resolving any conflict.",
+      "produces": [],
+      "expect": [
+        "three conflicts still open"
+      ]
+    },
+    {
+      "n": 8,
+      "kind": "step:EXPORT",
+      "fixture": null,
+      "detail": "Write the cited Markdown table.",
+      "produces": [
+        "F-101-cited-table"
+      ],
+      "expect": [
+        "every cell carries a source"
+      ]
+    }
+  ],
+  "injected_events": [],
+  "expected_audit_events": [
+    "TaskCreated",
+    "SourceScopeSet",
+    "PlanCreated",
+    "TaskStarted",
+    "ObservationCaptured",
+    "FactAccepted",
+    "ConflictDetected",
+    "ArtifactReady",
+    "TaskCompleted"
+  ],
+  "adjudication_rubric": [
+    {
+      "dispute": "A reviewer reads a table that shows one price per listing with a footnote naming the other.",
+      "resolution": "Verified-complete, provided the footnote is attached to the cell and names its source. A footnote elsewhere in the document is not attached and does not count."
+    },
+    {
+      "dispute": "A reviewer reads listing B's warranty cell as empty.",
+      "resolution": "Failed. Empty and absent are different claims, and the corpus seeds absence deliberately."
+    }
+  ]
+}

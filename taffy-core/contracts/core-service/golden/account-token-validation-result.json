@@ -1,0 +1,13 @@
+{
+  "status": 0,
+  "operation_id": "account-token-validate-fixture",
+  "operation_kind": 0,
+  "auth_method": 2,
+  "account_subject": "account-subject-fixture",
+  "expires_in_seconds": 3600,
+  "target_rotation": 0,
+  "access_token": [97, 99, 99, 101, 115, 115],
+  "refresh_token": [114, 101, 102, 114, 101, 115, 104],
+  "email": "reader@example.test",
+  "display_name": "Reader"
+}

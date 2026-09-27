@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "accepted_milestone": "M7",
+  "profiles": {
+    "candidate": {
+      "delegated_task_start": true,
+      "task_milestone": "M7",
+      "policy_milestone": "M7"
+    },
+    "development": {
+      "delegated_task_start": true,
+      "task_milestone": "M7",
+      "policy_milestone": "M7"
+    }
+  },
+  "chromium_profiles": {
+    "dev-arm64": "development",
+    "dev-x64": "development",
+    "diag-fuzz-x64": "development",
+    "diag-sanitizer-x64": "development",
+    "release-arm64": "candidate"
+  }
+}

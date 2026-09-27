@@ -1,0 +1,70 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The product's identity, as GN sees it.
+#
+# Every value below appears exactly once in the build graph. The product
+# targets in //taffy/BUILD.gn read them; nothing else does. If a
+# second file ever spells `com.taffygo.browser` again, one of the two will be
+# wrong after the first rename, and OD-001 keeps the final product name open,
+# so a rename is not hypothetical.
+#
+# What is NOT here, and where it lives instead:
+#
+#   * The product *version*. Chromium's own version machinery owns it
+#     (//build/util/version.gni and chrome/VERSION); a fork that invented a
+#     second version number would report two different answers on the version
+#     surface.
+#   * The upstream *revision*. chromium/REVISION owns it, and the build reads
+#     it through //taffy/resources/branding:upstream_provenance, never
+#     through a GN argument.
+#   * The product name as browser-process C++ sees it.
+#     //taffy/common/public/taffy_product_identity.h owns that, because a
+#     GN value cannot be unit tested and that seam is.
+
+# The application id. Decision 0012 fixes it; brand.md records it as the
+# proposed package id under OD-001.
+taffy_application_id = "com.taffygo.browser"
+
+# Debug builds install beside release builds instead of replacing them, which
+# is the whole reason the suffix exists (decision 0012).
+if (is_debug) {
+  taffy_manifest_package = "$taffy_application_id.debug"
+} else {
+  taffy_manifest_package = taffy_application_id
+}
+
+# The base name of the built artifacts: TaffyGo.apk, TaffyGo.aab,
+# TaffyGoTest.apk. Chromium's Android templates use this to name the output
+# and, for bundles, the module and split names.
+taffy_apk_name = "TaffyGo"
+taffy_test_apk_name = "TaffyGoTest"
+taffy_bundle_name = "TaffyGo"
+
+# The resource directory that supplies `app_name`. Two directories, one
+# resource name, selected here so that no target has to branch on is_debug.
+if (is_debug) {
+  taffy_branding_values_dir = "java/res-debug"
+} else {
+  taffy_branding_values_dir = "java/res"
+}
+
+# What the manifest points `android:icon` at. The artwork is derived from the
+# committed mark by //taffy/resources/branding:launcher_icons; this is the
+# reference, not the file.
+#
+# Nothing in this repository reads it yet, and that is the honest state rather
+# than dead weight: the manifest attribute belongs to a file Chromium owns,
+# and the edit that points it here is specified in
+# chromium/patches/0002-downstream-branding-hooks.md. The value lives here so
+# that when the patch is written it reads a constant instead of spelling a
+# resource name a second time.
+#
+# There is deliberately no `android:roundIcon` and no adaptive-icon entry:
+# both need a flat brand colour behind the mark and the palette is
+# `[Open (OD-071)]`. branding/README.md carries that as a numbered item rather
+# than as a guessed hex value.
+taffy_launcher_icon = "@mipmap/taffygo_launcher"

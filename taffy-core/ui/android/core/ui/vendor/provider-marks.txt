@@ -1,0 +1,470 @@
+Provider brand marks (ImageVector subset)
+=========================================
+
+Vendored asset: the path data in `../src/main/kotlin/com/taffygo/browser/ui/core/ui/ProviderMark.kt`
+                (fifteen marks on the source's 24-unit viewport. Most sources
+                are one path; Cerebras is two and Together is three, and each is
+                carried as the source wrote it. The path data is monochrome and
+                every mark draws in a tint the caller chooses)
+Owners:         Anthropic PBC, Google LLC, OpenRouter, Inc., Moonshot AI,
+                OpenAI, Inc., xAI Corp., GitHub, Inc.,
+                DeepSeek, MiniMax, Groq, Inc., Together
+                Computer, Inc., Baseten Labs, Inc., Cerebras Systems Inc.,
+                Fireworks AI, Inc.
+Licence:        None, and none is implied by carrying the file. Each mark is
+                its owner's trademark. The Simple Icons distribution is
+                CC0-1.0, which covers the SVG files and cannot and does not
+                license anybody's trademark. The marks fetched from
+                lobe-icons v5.16.0 sit under that project's MIT licence for
+                the SVG files, and the same trademark limit: MIT covers the
+                file, not the mark. Eight marks came from Simple Icons and
+                seven from lobe-icons; the split is per mark and is recorded in
+                the table below, because it is the file's licence that differs
+                and not the trademark position, which is identical for all
+                fifteen.
+Permitted use:  One group, and one use. This file used to state two: two
+                further marks were permitted as the icons of account sign-in
+                buttons on screen SCR-701, and they left this file when that
+                screen was deleted (decision 0201). A permitted use is not a
+                licence — a mark whose one permitted use no longer exists in
+                the product has no standing to stay in the tree, so it went
+                rather than waiting for a use to be found for it. The
+                Cloudflare mark left the same way on 2026-09-20, and for the
+                same reason stated the other way round: its row left the
+                catalog (decision 0214), so the use it was permitted for
+                stopped existing.
+
+                Model providers — Anthropic, Baseten, Cerebras,
+                DeepSeek, Fireworks, GitHubCopilot, GoogleGemini, Groq, Kimi,
+                MiniMax, MoonshotAi, OpenAi, OpenRouter, Together, Xai. Each
+                mark may be shown only as the identifying mark of that vendor's
+                own row on screen SCR-404 or on that same vendor's own pages
+                SCR-415 to SCR-417, beside the vendor's own name, in a build
+                where that vendor is a real provider a person can send a request
+                to. Every mark here now names the vendor of its own row. Two
+                rows once drew another name's mark: the Gemini mark identified
+                the Google Antigravity subscription row until decision 0134
+                withdrew it, and the Cloudflare mark identified the Cloudflare
+                Workers AI row — that company's own product, with no separate
+                mark at either source — until decision 0214 withdrew that one.
+                The Gemini mark stayed because it has a row of its own; the
+                Cloudflare mark did not, because it had none.
+
+                The three per-provider screens were added on 2026-08-29 and
+                widen the permission rather than stretch it. A page that exists
+                to set up one vendor is a stronger case than a row in a list is:
+                the whole screen is about that vendor, under that vendor's own
+                name, and there is nothing else on it the mark could be read as
+                endorsing. What the permission still does not cover is a mark
+                used decoratively, a mark on a screen about the product rather
+                than about that vendor, and a mark for a vendor whose row is not
+                really there.
+
+                What the argument rests on, per owner, and it is not the same
+                document in every case. Four owners publish brand or trademark
+                guidance that speaks to this use directly: Google, OpenAI, xAI
+                and GitHub. Moonshot AI publishes a branding guide,
+                which is what Simple Icons records as the source of the Kimi
+                mark. The remaining owners — Anthropic, OpenRouter, DeepSeek,
+                MiniMax, Groq, Together, Baseten, Cerebras, Fireworks —
+                publish terms of use and no brand document that was found, so
+                for those the argument is referential and nothing more: the mark
+                names the vendor whose own service a person is choosing to
+                connect their own account to, beside that vendor's own name, and
+                implies no endorsement, sponsorship or affiliation. The
+                distinction is written down rather than smoothed over, because
+                "the owner's toolkit permits this" and "no owner document was
+                read" are two different claims and the second must not be filed
+                under the first. The removal trigger below is what makes the
+                weaker case safe to hold.
+
+                GitHub owns two marks at the upstream source and only one is
+                here. The Copilot mark is the GitHub Copilot provider row's;
+                the Invertocat was the sign-in button's, and it left with that
+                button. They were always two entries under two permissions
+                rather than one owner's entry drawn twice, which is why
+                removing one left the other untouched.
+Removal trigger: A mark leaves this file the moment its vendor leaves the
+                launch provider set of decision 0029, the moment its owner
+                asks, or the moment the mark is used anywhere other than that
+                vendor's own row. That trigger has fired twice, and on two
+                different clauses of it. The two account marks went when their
+                one screen was deleted (decision 0201); the Cloudflare mark
+                went on the first clause, when its vendor left the launch set
+                (decision 0214). This is what it looks like when it fires.
+Terms (owner):  Anthropic       https://www.anthropic.com/legal/commercial-terms
+                Google          https://about.google/brand-resource-center/
+                OpenRouter      https://openrouter.ai/terms
+                Moonshot AI     https://www.moonshot.ai/terms
+                OpenAI          https://openai.com/brand/
+                xAI             https://x.ai/legal/brand-guidelines
+                GitHub          https://brand.github.com/foundations/logo
+                DeepSeek        https://cdn.deepseek.com/policies/en-US/deepseek-terms-of-use.html
+                MiniMax         https://www.minimax.io/platform/protocol/terms-of-service
+                Groq            https://groq.com/terms-and-conditions
+                Together AI     https://www.together.ai/terms-of-service
+                Baseten         https://www.baseten.co/terms-and-conditions/
+                Cerebras        https://www.cerebras.ai/terms-of-service
+                Fireworks AI    https://fireworks.ai/terms-of-service
+Upstream:       https://cdn.jsdelivr.net/npm/simple-icons@16.28.0/icons/<name>.svg
+                (eight marks). The other seven are absent from that pin; they
+                were fetched from lobe-icons v5.16.0, which still publishes
+                them, at
+                https://cdn.jsdelivr.net/gh/lobehub/lobe-icons@v5.16.0/packages/static-svg/icons/<name>.svg
+Upstream repo:  https://github.com/simple-icons/simple-icons
+                https://github.com/lobehub/lobe-icons  (OpenAi, Xai, Groq,
+                Together, Baseten, Cerebras, Fireworks)
+Fetched:        2026-08-19  Anthropic, GoogleGemini, OpenRouter, MoonshotAi
+                2026-08-23  OpenAi, Xai
+                2026-08-30  DeepSeek, GitHubCopilot, Kimi, MiniMax,
+                            Groq, Together, Baseten, Cerebras, Fireworks
+
+The GitHub terms URL added on 2026-08-20 is the live one rather than the one
+Simple Icons records: `https://github.com/logos` now redirects to the GitHub
+brand toolkit. A provenance record that names a URL which only redirects is one
+rebase away from naming nothing. Sixteen URLs were requested again on
+2026-08-30 — the fourteen above, Cloudflare's, which went with that row on
+2026-09-20, and Meta's, which was in this file then and went with the Facebook
+mark. That count is left as it was measured rather than restated each time the
+list shrinks: it is a record of work that was done, and the work covered
+sixteen. Fourteen of the sixteen answered 200 after redirects. Two — OpenAI's
+brand page and xAI's brand guidelines — answered 403 to a plain command-line
+client, which is a refusal to serve that client and not
+a missing page; they are left as recorded rather than replaced, because a 403
+says the resource is there and a 404 would not. Neither was re-read on
+2026-08-30, so nothing in this file claims to quote them as of that date.
+
+sha256=9c321417a14ec47528c24205212d4752ad4fcf8d8ddd8626f96499c941bd6256
+
+The fifteen marks, with the upstream file each was taken from
+-------------------------------------------------------------
+
+  ProviderMark.Anthropic     anthropic.svg
+                             sha256 1cc599f6ebce2016dc388cf84e54a52c6b13487655c7e243554d654c7bce1882
+  ProviderMark.GoogleGemini  googlegemini.svg
+                             sha256 a6228d8846040401e941a39ed17459785e8324dbb7b870ce84233c9b3e9863a0
+  ProviderMark.OpenRouter    openrouter.svg
+                             sha256 9148696e3a06d23e8fe2b743ebd3ee1173354dbd7b58d33d1ca6a40ee0018d53
+  ProviderMark.MoonshotAi    moonshotai.svg
+                             sha256 2b9efa8dd053294bc133f1c57cb618ac75487363bce6425b79dd5c0c92f73569
+  ProviderMark.OpenAi        openai.svg  (lobe-icons@v5.16.0)
+                             sha256 a595df6b423920c67a7f8f73c063e4bfb72d415948097b6cac063a2366bb5186
+  ProviderMark.Xai           xai.svg     (lobe-icons@v5.16.0)
+                             sha256 89eb7de9f0d02a41cfecd9109e253d7fd3529e27467dee4254faa67f3ac21451
+  ProviderMark.DeepSeek      deepseek.svg
+                             sha256 7a55a0a7391d116eba7d32807d6838478f9209f6034612941e74fbb14934e2ef
+  ProviderMark.GitHubCopilot githubcopilot.svg
+                             sha256 c72c1e0018e84b3128c5a1ac43ec2be135ac6ec4eb9c0ea18ed76416d23f2af3
+  ProviderMark.Kimi          kimi.svg
+                             sha256 01fb4be70032974e2c9a4f2af9688ea505ad7d996de8866cea0844c4b0581091
+  ProviderMark.MiniMax       minimax.svg
+                             sha256 ef95e28b290e5954a5c0be338925d81f13b3d06a0a32af29a4bc64583fbcc368
+  ProviderMark.Groq          groq.svg      (lobe-icons@v5.16.0)
+                             sha256 078d5cf6e7a54905040c15ddacf5ea33c13042fe7739e820cedc2096e4406651
+  ProviderMark.Together      together.svg  (lobe-icons@v5.16.0, three paths)
+                             sha256 b3ec218e7e0b0432a2ce07f5ec98a1dcd24f808c74d5fee624ab31e4947feef3
+  ProviderMark.Baseten       baseten.svg   (lobe-icons@v5.16.0)
+                             sha256 d560883f6df500c1290b2fb2018836d853c72697c1fc252793538fabf53ff28d
+  ProviderMark.Cerebras      cerebras.svg  (lobe-icons@v5.16.0, two paths)
+                             sha256 05af9593eca3fefdb30c5ad042040f008beea2b27e0a6b7315c319492f7a44ff
+  ProviderMark.Fireworks     fireworks.svg (lobe-icons@v5.16.0)
+                             sha256 9991ab2a8331096d3f408e07a5f2e1cb54c369143dd9fc7a97f6458478b33fe3
+
+`GoogleGemini` is Google's Gemini mark and is shown on the `google-ai-studio`
+row, because the key Google AI Studio issues is the key that reaches the Gemini
+API. It is the mark for that model family, not a mark for the console; if that
+reading is wrong the removal trigger above covers it. `Cloudflare` was read the
+same way for `cloudflare-workers-ai` — the mark of the company whose product
+that row was, there being no mark for Workers AI itself — and that reading is
+the reason it could not survive the row: a mark held on somebody else's
+product's behalf has nothing left to identify once the product's row is gone.
+
+The five lobe-icons files fetched on 2026-08-30 set `fill-rule="evenodd"` on the
+SVG root; the Kotlin transcription keeps that fill type for all five, exactly as
+the 2026-08-23 pair already did. The Simple Icons files set no fill rule and are
+transcribed non-zero, which is what that distributor authors for.
+
+Two sources are not one path. `cerebras.svg` carries the concentric arcs and the
+"C" inside them separately, and `together.svg` carries three petals. Both are
+transcribed path by path rather than concatenated into one string: under either
+fill rule the union of two outlines is not reliably what the source painted, and
+merging them would be a re-drawing decision, which decision 0030 does not permit.
+`ProviderMarkTest` asserts the path count of every mark for that reason.
+
+The vendor that is deliberately not here
+----------------------------------------
+
+**Z.AI has no mark in this file and its row draws a monogram.** lobe-icons
+v5.16.0 does publish `zai.svg`, so the URL-and-checksum half of decision 0030
+was available and is not the reason. The reason is the other half: on 2026-08-30
+no owner-published document could be found to argue a permitted use from.
+`https://z.ai/` and `https://docs.z.ai/` answer, and the catalog's own
+`docs_url` for the row resolves, but those are product pages rather than
+anything that speaks to the mark; `z.ai/terms`, `z.ai/terms-of-service`,
+`z.ai/terms-of-use`, `z.ai/service-agreement` and `z.ai/legal` were each
+requested and each answered 404. Every other owner in this file could produce
+at least a terms page, and the argument recorded above depends on that.
+
+So the row falls to the product's own monogram treatment, which is legible in
+both themes and claims nothing. That is a correct outcome rather than a gap: the
+bar decision 0030 sets is only worth setting if something is occasionally on the
+wrong side of it, and this is the entry that shows it bites. A Z.AI brand or
+terms page appearing later is enough to revisit this; nothing else is needed,
+because the file and its checksum are already published.
+
+The model marks' own colours, and the three that are not drawn
+--------------------------------------------------------------
+
+Added 2026-08-23, when the provider rows stopped tinting every mark with the
+product's own ink and started drawing each vendor's published colour; extended
+2026-08-30 with the marks fetched that day, and corrected later the same day
+when the lobe-icons colour files were finally requested rather than assumed
+about. The values live in
+`../../../feature/providers/src/main/kotlin/com/taffygo/browser/ui/feature/providers/ProviderMarkStyle.kt`,
+outside `TaffyTheme.colors` because a vendor's brand value is part of somebody
+else's mark and a value like that inside the palette invites a later reader to
+reuse it as a product token. (That path said `feature/settings/...` until
+2026-08-30 and was simply wrong; the file has always been in
+`feature/providers`.) That Kotlin file is not checksummed by
+`tools/lib/vendored_assets.py`: the register reads one `sha256` fact per
+provenance file and this one already spends it on `ProviderMark.kt`. The gap is
+small — colour literals and no path data — and it is written down here rather
+than left for someone to discover.
+
+**No value below was read from a page the owner publishes as text.** Nor do they
+all come from one place, which the sentence this paragraph replaced got wrong:
+it said every value below was a Simple Icons `hex` field, and two entries then
+contradicted it two lines later by saying they were not. There are three classes
+and each entry says which one it is.
+
+  1. A distributor's recorded `hex` field, read out of Simple Icons'
+     `data/simple-icons.json` at the pin the path data came from, on 2026-08-23
+     and 2026-08-30. Simple Icons also records a `source` URL per icon, which is
+     where it says it took the mark from; that URL is reproduced below because
+     it is a different claim from "the owner published this number", and
+     conflating the two is a mistake this file has made before and each entry
+     below is worded to avoid repeating.
+  2. A `fill` attribute read out of the `-color.svg` sibling lobe-icons
+     publishes beside the monochrome file, at the same pin, on 2026-08-30. That
+     is the same kind of claim as the first — a distributor saying what colour
+     it holds this mark to be — stated in a file rather than in a metadata
+     field. Each such entry records the file's own checksum, and whether its
+     paths are byte-identical to the ones transcribed into `ProviderMark.kt`,
+     because a colour attaches to path data or to nothing.
+  3. No distributor value at all. Two entries are in this class, OpenAI and xAI:
+     Simple Icons 16.28.0 carries no icon under either title — checked against
+     `data/simple-icons.json` on 2026-08-30, 3453 icons, neither slug present —
+     and their lobe-icons files are `currentColor`. Their ink is a reading of
+     the owner's own stated rule rather than a number anybody published, and
+     each says so on its own line.
+
+  #191919   Anthropic.      slug `anthropic`
+            Simple Icons' source: https://www.anthropic.com
+  #000000   Moonshot AI.    slug `moonshotai`
+            Simple Icons' source: https://www.moonshot.cn — note that this is
+            a different host from the terms URL recorded at the top of this
+            file, which is www.moonshot.ai. Neither was reconciled against the
+            other and neither is asserted to supersede it.
+  #8E75B2   Google Gemini.  slug `googlegemini`
+            Simple Icons' source: https://gemini.google.com
+  #000000   OpenAI.         slug `openai` (lobe-icons v5.16.0)  — class 3.
+            `openai.svg` is `currentColor`, `openai-color.svg` does not exist
+            at the pin, and Simple Icons carries no OpenAI icon. OpenAI's brand
+            page specifies black or white at highest contrast; black is the
+            ink, on the same white chip Anthropic uses. That is a rule this
+            file read and applied, not a value a distributor recorded.
+  #000000   xAI.            slug `xai` (lobe-icons v5.16.0)  — class 3.
+            The same, checked the same way: `xai.svg` is `currentColor`, there
+            is no `xai-color.svg` at the pin, and Simple Icons carries no xAI
+            icon. xAI's marks are black on light grounds; same chip as OpenAI.
+  #5786FE   DeepSeek.       slug `deepseek`
+            Simple Icons' source: https://www.deepseek.com
+  #000000   GitHub Copilot. slug `githubcopilot`
+            Simple Icons' source: https://primer.style/foundations/icons/copilot-24
+            Black is also what GitHub's own toolkit permits for a mark on a
+            light ground, which is the ground the chip gives it.
+  #000000   Kimi.           slug `kimi`
+            Simple Icons' source: https://moonshotai.github.io/Branding-Guide
+            — the one new entry whose recorded source is the owner's own
+            branding guide rather than a marketing page.
+  #E73562   MiniMax.        slug `minimax`
+            Simple Icons' source: a file in MiniMax's own GitHub repository,
+            github.com/MiniMax-AI/MiniMax-01, pinned at one commit.
+  #F15A29   Cerebras.       slug `cerebras` (lobe-icons v5.16.0)  — class 2.
+            `cerebras-color.svg`, requested 2026-08-30, HTTP 200,
+            sha256 355c2225284cd06c9cf4246110b60cb21bc86039872981e1be6bb82deec2ffa7.
+            Two paths, byte-identical to `PATH_CEREBRAS_RINGS` and
+            `PATH_CEREBRAS_LETTER`. The rings carry this fill; the letter
+            carries no `fill` of its own and inherits the root's
+            `currentColor`, so what the source specifies for the letter is
+            "whatever colour the mark is being drawn in". The single-tint
+            treatment draws both paths in this hue, which is what the source
+            itself paints when the current colour is this hue — an
+            instantiation of what the file says, not a re-drawing of it.
+  #5019C5   Fireworks AI.   slug `fireworks` (lobe-icons v5.16.0)  — class 2.
+            `fireworks-color.svg`, requested 2026-08-30, HTTP 200,
+            sha256 f1c4782b86bc03a36323fd68ad6cc376c6b2ebe57b701cc958ebd6b8d37effd6.
+            One path, byte-identical to `PATH_FIREWORKS`.
+  #94A3B8   OpenRouter.     slug `openrouter`  — class 1.
+            Simple Icons' source: https://openrouter.ai
+            **This value is recorded and deliberately not drawn** — see below.
+  #EF2CC1   Together AI.    slug `together` (lobe-icons v5.16.0)  — class 2.
+  #CAAEF5   `together-color.svg`, requested 2026-08-30, HTTP 200,
+  #FC4C02   sha256 27ccaf118a431c386b88418a34a4346afd9638dde10e3f2295db2eec1fa5898a.
+            Three paths, byte-identical to `PATH_TOGETHER_ONE`, `PATH_TOGETHER_TWO`
+            and `PATH_TOGETHER_THREE`, and three different fills — one per
+            petal, in that order. This is the only entry here that is a set
+            rather than a value.
+            **These values are recorded and deliberately not drawn** — see below.
+
+Groq and Baseten are the only two marks here with **no recorded colour at all**,
+and the claim is bounded by what was actually requested rather than assumed. On
+2026-08-30 the `-color.svg` sibling of each answered **404** at the pin above
+(`Couldn't find the requested file … in lobehub/lobe-icons`), and `groq.svg` and
+`baseten.svg` themselves set `fill="currentColor"` on the SVG root and carry no
+hex anywhere in the file. Nothing was read for those two, so nothing is
+recorded for them: a colour this repository has not read is not a colour it may
+publish on someone's behalf. Both marks draw in the product's own ink on the
+product's own ground.
+
+Until 2026-08-30 this paragraph said the same of Cerebras, Fireworks and
+Together, and of those three it was false. All three publish a `-color.svg` at
+the same pin; each answered 200; each carries fills on paths byte-identical to
+the ones already transcribed into `ProviderMark.kt`. The sentence had never been
+checked against the URL it was making a claim about, and it was the strong form
+of the mistake this file exists to prevent — "no value was ever published" filed
+where "no value was ever requested" was the truth. Two of the three now draw
+their vendor's own colour, so those two marks had been drawn more dully than the
+evidence supported; the third is recorded and rejected below, which is the same
+outcome it had before but for a reason that can now be read.
+
+The rule is measured, and it is a threshold rather than a list
+--------------------------------------------------------------
+
+Contrast is measured rather than judged, because several of these sit at one end
+of the range. WCAG 2.x contrast ratios against the badge's own ground in each
+theme, and against white; 3:1 is the floor for a meaningful graphical object
+under SC 1.4.11:
+
+  Mark            hex       on light #F1EBE1   on dark #1C1B19   on white
+  Anthropic       #191919   14.83:1            1.02:1            17.58:1
+  Moonshot AI     #000000   17.71:1            1.22:1            21.00:1
+  OpenAI          #000000   17.71:1            1.22:1            21.00:1
+  xAI             #000000   17.71:1            1.22:1            21.00:1
+  GitHub Copilot  #000000   17.71:1            1.22:1            21.00:1
+  Kimi            #000000   17.71:1            1.22:1            21.00:1
+  Fireworks AI    #5019C5   7.75:1             1.87:1            9.18:1
+  Google Gemini   #8E75B2   3.32:1             4.37:1            3.93:1
+  MiniMax         #E73562   3.48:1             4.17:1            4.13:1
+  Cerebras        #F15A29   2.84:1             5.11:1            3.37:1
+  DeepSeek        #5786FE   2.84:1             5.12:1            3.36:1
+  OpenRouter      #94A3B8   2.16:1             6.71:1            2.56:1
+  Together AI     #EF2CC1   3.05:1             4.75:1            3.62:1
+   one per petal  #CAAEF5   1.63:1             8.92:1            1.93:1
+   of three       #FC4C02   2.87:1             5.06:1            3.40:1
+
+The near-blacks are invisible on the dark theme: 1.02:1 is not a low ratio, it
+is the mark and its ground being the same colour. Every mark that keeps a vendor
+colour therefore sits on a white chip of the badge's own size, in both themes,
+which is also the ground each of those brands specifies for its dark mark. One
+treatment for all of them, rather than a different answer per vendor.
+
+That fixes the dark half and opens the light half, which is the failure this
+section was extended to close: a pale vendor colour on a white chip is white on
+white, the same disappearance wearing the other theme. So `ProviderMarkStyle`
+measures each recorded hue against the chip and refuses the ones that fall
+short, and it is a **threshold and not a denylist** — a vendor added later whose
+colour happens to be near-white is caught by the same arithmetic that catches
+one whose colour is near-black, with nobody having to notice.
+
+Two of the thirteen recorded entries are not drawn, and not for the same
+reason.
+
+One fails the threshold outright, on the light side. OpenRouter's slate measures
+2.56:1 on the chip, and there is no ground on which it is legible at this size —
+it is worse still on the light theme, at 2.16:1. Darkening it would be
+publishing a brand colour its owner has not, which is the same act decision 0030
+forbids for a mark.
+
+Cloudflare's orange was the second until 2026-09-20, measuring 2.65:1 on the
+chip and 2.24:1 on the light theme. It is not listed above any more, because a
+hue recorded and rejected is still a fact about a mark this file may draw, and
+decision 0214 took the mark. The numbers are left in this paragraph rather than
+deleted outright: they say the value was read and measured, which is what the
+record is for.
+
+Together AI fails for a different reason, and it is worth being exact about
+which. Its entry is three fills and not one, and the treatment here is a single
+tint over the whole mark, so "Together's colour" would have to be one petal's
+fill painted over all three petals — a re-drawing decision, which is the thing
+decision 0030 does not permit and the reason `together.svg`'s three paths were
+transcribed separately in the first place. The threshold would not save the mark
+either way: the pale petal `#CAAEF5` measures 1.93:1 on the chip, so a third of
+the mark would disappear even if the arrangement could be carried. Two of its
+three fills do clear the floor on their own — 3.62:1 and 3.40:1 — which is
+recorded here because it is the fact that makes the rejection a judgement rather
+than an arithmetic result.
+
+Both marks keep the product's own neutral ink on the product's own ground
+instead: legible in both themes, and claiming nothing. Their hexes stay recorded
+above so that the next person can see the values were read and rejected rather
+than never looked up.
+
+The Gemini mark took the same treatment as well, on 2026-08-30, when it was
+violet on a chip in the `google-ai-studio` row and product ink on the sunken
+ground in the subscription row directly beneath it — one mark drawn two ways in
+one list, which was a defect and not a decision. That second row has since
+been withdrawn (decision 0134).
+
+Conversion command
+------------------
+
+The `d` attribute of each source file, copied with no hand-editing, then
+wrapped in the `ImageVector.Builder` call `ProviderMark.mark` makes:
+
+  curl -sS https://cdn.jsdelivr.net/npm/simple-icons@16.28.0/icons/<name>.svg -o <name>.svg
+  sha256sum <name>.svg
+  python3 -c "import re,sys;print(re.search(r' d=\"([^\"]+)\"',open(sys.argv[1]).read()).group(1))" <name>.svg
+
+A source with more than one path needs `re.findall` rather than `re.search`, and
+each result becomes its own argument to `mark`.
+
+The `sha256=` line above is the checksum of the committed Kotlin file, so it
+proves the transcription has not drifted since it was recorded. The per-mark
+checksums are the upstream proof: they say what was fetched. Both are needed,
+and decision 0030 is why — a committed checksum alone is what
+`feature/onboarding/vendor/google-identity.txt` has, and that file has to
+explain at length that it cannot say where its bytes came from (OD-086).
+
+The 2026-08-20 fetch re-ran the command above against `anthropic.svg` at the
+same pin before recording anything new, and got the checksum already on the
+Anthropic line. The two new numbers were therefore produced by a method that
+reproduces a number this repository had already accepted, rather than by a
+method taken on trust. Both transcriptions were then compared byte for byte
+against the `d` attribute they came from.
+
+The 2026-08-30 fetch did the same thing twice over. It re-ran the command
+against `anthropic.svg` and got `1cc599f6…` again, and it recomputed every
+contrast number in the table above from the hexes rather than copying the ones
+already written down — reproducing 14.83, 1.02, 17.58, 17.71, 1.22, 21.00, 3.32,
+4.37, 3.93, 2.16, 6.71 and 2.56 exactly. A method that reproduces two
+independent sets of already-accepted numbers is the only reason the new rows
+beside them are worth anything.
+
+The correction made later the same day was held to that standard before a word
+of it was written, because the sentence it replaced was wrong precisely for
+having skipped it. All five `-color.svg` URLs were requested one at a time and
+their status recorded as returned — 404 for `groq-color.svg` and
+`baseten-color.svg`, 200 for `together-color.svg`, `cerebras-color.svg` and
+`fireworks-color.svg` — and `openai-color.svg` and `xai-color.svg` were
+requested too, and answered 404. The monochrome file beside each of the five was
+fetched again and reproduced the checksum already on its line above. Every
+colour file's `d` attributes were compared byte for byte against the constants
+in `ProviderMark.kt` by a program rather than by eye, since a fill that is not
+on the transcribed path is a fill for a different drawing. The contrast routine
+was re-run over the whole existing table and reproduced every number already
+written in it before it was trusted with the five new hexes. And
+`data/simple-icons.json` was re-read at the pinned version in the same pass:
+3453 icons, every hex this file attributes to that distributor unchanged, and no
+icon under the title OpenAI or xAI, which is what makes the third class above a
+statement about that file rather than about a memory of it.

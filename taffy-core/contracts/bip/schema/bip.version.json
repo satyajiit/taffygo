@@ -1,0 +1,154 @@
+{
+  "title": "BIP protocol version",
+  "description": "The single owner of the Browser Intelligence Protocol wire version, and of the record of every step that version has taken. Nothing else in the repository restates the number: schema documents constrain the shape of the field, generated bindings read the value from here, and prose links to this file.",
+  "protocol_version": "0.14",
+  "status": "Proposed",
+  "version_policy": {
+    "form": "major.minor",
+    "major": "Changes required meaning, removes a field or enum member, or otherwise removes compatibility. A reader that does not know the major version rejects the message.",
+    "minor": "Adds optional fields, enum members, adapter features, or action types. A reader of an older minor version accepts the message and ignores fields it does not know.",
+    "reaches_one_zero": "The protocol stays below 1.0 until the milestone M2 exit review accepts decision 0002 on implementation evidence. A pre-1.0 minor step still follows the additive rule above."
+  },
+  "compatibility_rules": [
+    "Structs are extended append-only, with a default for every added field.",
+    "Every enumeration is closed. An unknown member is unsupported and fails closed; it is never coerced to a known member.",
+    "ProtocolInfo advertises the adapters, observation scopes, action types, redaction features, and limits an endpoint actually supports.",
+    "A request naming a capability the endpoint does not support returns UNSUPPORTED, never a degraded result that looks complete.",
+    "A persisted observation records the protocol version and the adapter versions that produced it. A persisted node handle is diagnostic only and is never valid after process or session recovery."
+  ],
+  "version_history": [
+    {
+      "version": "0.1",
+      "step": "initial",
+      "summary": "The first contract: identity and lifetime, the capability advertisement, the observation envelope, deltas and backpressure, and the action family through to the result taxonomy.",
+      "added_enum_members": [],
+      "evidence": "taffy-core/contracts/bip/golden/ instantiates every message family; taffy-core/contracts/bip/compat/ carries one deliberate deviation per compatibility rule."
+    },
+    {
+      "version": "0.2",
+      "step": "minor",
+      "summary": "AdapterKind gains SELECTION and LAYOUT, so the selection adapter and the layout and visibility adapter can name their own reports on the wire instead of being described in a warning. Additive under the minor rule above: no field changed meaning, no member was removed, and no member moved.",
+      "added_enum_members": [
+        "AdapterKind.SELECTION",
+        "AdapterKind.LAYOUT"
+      ],
+      "evidence": "taffy-core/contracts/bip/compat/new-enum-member-at-previous-minor.json proves a reader at 0.1 treats a message naming one of the two as unsupported rather than coercing it to a known member; taffy-core/contracts/bip/golden/protocol-info-selection-and-layout.json is the endpoint that advertises them."
+    },
+    {
+      "version": "0.3",
+      "step": "minor",
+      "summary": "InvalidationReason gains FRAME_DETACHED, so a frame leaving the frame tree can be named as the ordinary lifecycle event it is. The reasons that already existed would each have misdescribed it: ENDPOINT_DISCONNECTED says the pipe was lost, RENDERER_CRASHED says the process died, and TAB_CLOSED is false for a subframe. A subscriber that cannot tell a routine subframe navigation from a dead renderer cannot report the difference to a user or a log. Additive under the minor rule above: no field changed meaning, no member was removed, and no member moved.",
+      "added_enum_members": [
+        "InvalidationReason.FRAME_DETACHED"
+      ],
+      "evidence": "taffy-core/contracts/bip/compat/frame-detached-at-previous-minor.json proves a reader at 0.2 refuses a PageInvalidation naming FRAME_DETACHED, on that member and nothing else, rather than coercing it to a reason it does know; taffy-core/contracts/bip/golden/invalidation-frame-detached.json is the message a renderer sends when its frame is destroyed."
+    },
+    {
+      "version": "0.4",
+      "step": "minor",
+      "summary": "Content authorship becomes an axis of its own beside sensitivity, and the presentation and shape signals an endpoint already has in hand during its one traversal become nameable on the wire. ContentTrust and ContentSignal are new closed enumerations; TextRun, SemanticNode, FrameDescriptor and PageSnapshot gain optional labels; SemanticField gains CONTENT_TRUST and CONTENT_SIGNALS so a delta can say which of them moved; WarningCode gains INJECTION_SIGNAL_DETECTED; and RedactionFeature gains CONTENT_TRUST_LABELLING and INJECTION_SIGNAL_DETECTION, so an endpoint that cannot label refuses the request rather than emitting unlabelled evidence. Additive under the minor rule above: no field changed meaning, no member was removed, and no member moved.",
+      "added_enum_members": [
+        "SemanticField.CONTENT_TRUST",
+        "SemanticField.CONTENT_SIGNALS",
+        "WarningCode.INJECTION_SIGNAL_DETECTED",
+        "RedactionFeature.CONTENT_TRUST_LABELLING",
+        "RedactionFeature.INJECTION_SIGNAL_DETECTION"
+      ],
+      "evidence": "taffy-core/contracts/bip/compat/content-trust-field-at-previous-minor.json proves a reader at 0.3 refuses a PageDelta whose changed_fields names CONTENT_TRUST, on that member and nothing else, rather than coercing it to a field it does know; taffy-core/contracts/bip/golden/snapshot-injected-hidden-instruction.json is the labelled snapshot of a page carrying a concealed instruction, and taffy-core/contracts/bip/golden/protocol-info-trust-and-signals.json is the endpoint that advertises the two detection features."
+    },
+    {
+      "version": "0.5",
+      "step": "minor",
+      "summary": "The destination checks become expressible on the wire. PreconditionKind gains DESTINATION_CLASS_ALLOWED and CONTENT_TRUST_AT_LEAST, with min_content_trust as the operand of the second; the first deliberately takes none, because the class table is compiled in and is never supplied by a message. ActionResultCode gains EGRESS_NOT_AUTHORIZED, DESTINATION_CLASS_RESTRICTED and UNTRUSTED_CONTENT_ORIGIN, appended so that the codes already written into stored records keep the numbers they had. Expressing these as precondition members rather than as optional fields is the point: an older reader accepts and ignores an optional field, which for an authorization message fails open, while a precondition member it does not know fails the action closed. Additive under the minor rule above: no field changed meaning, no member was removed, and no member moved.",
+      "added_enum_members": [
+        "PreconditionKind.DESTINATION_CLASS_ALLOWED",
+        "PreconditionKind.CONTENT_TRUST_AT_LEAST",
+        "ActionResultCode.EGRESS_NOT_AUTHORIZED",
+        "ActionResultCode.DESTINATION_CLASS_RESTRICTED",
+        "ActionResultCode.UNTRUSTED_CONTENT_ORIGIN"
+      ],
+      "evidence": "taffy-core/contracts/bip/compat/destination-class-precondition-at-previous-minor.json proves a broker at 0.4 refuses to dispatch an envelope carrying a precondition it cannot check, rather than skipping it and dispatching an action its author believed was gated; taffy-core/contracts/bip/compat/egress-result-code-at-previous-minor.json proves a runtime at 0.4 meeting an unknown terminal code treats the message as unsupported rather than reaching for a neighbouring code; taffy-core/contracts/bip/golden/action-proposal-trust-floor.json carries both new preconditions and taffy-core/contracts/bip/golden/action-result-destination-class-restricted.json is the refusal that never reached the page."
+    },
+    {
+      "version": "0.6",
+      "step": "minor",
+      "summary": "A consequential effect becomes expressible as two acts rather than one. PreconditionKind gains PREPARED_EFFECT_UNCHANGED, whose operand is the new PreparedEffectBinding struct, and NO_UNDECLARED_EGRESS, which like the class check takes none because the channels a task declared are held by the browser and are never supplied by a message. VerifierKind gains BROWSER_NETWORK_EVENT, so the absence of an undeclared request is corroborated by the network stack rather than asserted by the renderer that would be the thing at fault. ActionResultCode gains PREPARED_EFFECT_CHANGED and COMMIT_WITHOUT_PREPARE, appended so that stored records keep the numbers they had. The binding names the prepare by identity and by digest and references the authorizing gesture only by the monotonic time the browser received it, because the receipt is opaque and no consumer parses it. Additive under the minor rule above: no field changed meaning, no member was removed, and no member moved.",
+      "added_enum_members": [
+        "PreconditionKind.PREPARED_EFFECT_UNCHANGED",
+        "PreconditionKind.NO_UNDECLARED_EGRESS",
+        "VerifierKind.BROWSER_NETWORK_EVENT",
+        "ActionResultCode.PREPARED_EFFECT_CHANGED",
+        "ActionResultCode.COMMIT_WITHOUT_PREPARE"
+      ],
+      "evidence": "taffy-core/contracts/bip/compat/prepared-effect-precondition-at-previous-minor.json proves a broker at 0.5 refuses a commit whose binding it cannot check, rather than dispatching an effect nobody confirmed; taffy-core/contracts/bip/golden/action-proposal-prepared-commit.json is the commit half of a prepared effect, carrying the binding and the two checks that hold it to what the person saw."
+    },
+    {
+      "version": "0.7",
+      "step": "minor",
+      "summary": "Two distinct causes stop sharing one answer, and an endpoint stops being asked a question in a namespace it cannot see. ActionResultCode gains GRAPH_MOVED_DURING_PREFLIGHT, appended so that stored records keep the numbers they had: STALE_GRAPH had been carrying both \"your revision floor is behind\" and \"the document moved under you\", which are different situations with different next moves, and a consumer that cannot tell them apart cannot choose one. SnapshotRequest gains the optional observed_frame_id, naming the frame a request is addressed to, because an endpoint deciding whether it is the observation root was comparing the broker's frame identity against one it had minted for itself in a namespace the broker does not share — a comparison that could only ever answer \"different\", so every document was classified as a cross-origin frame and every node name was withheld. Additive under the minor rule above: no field changed meaning, no member was removed, and no member moved.",
+      "added_enum_members": [
+        "ActionResultCode.GRAPH_MOVED_DURING_PREFLIGHT"
+      ],
+      "evidence": "taffy-core/contracts/bip/compat/graph-moved-result-code-at-previous-minor.json proves a runtime at 0.6 meeting the new terminal code treats the message as unsupported rather than reaching for STALE_GRAPH, which is the neighbour it would otherwise have been folded into; taffy-core/contracts/bip/golden/snapshot-request-child-frame.json is a request that names a root and an addressed frame that differ, which is the only shape in which the second half is expressible."
+    },
+    {
+      "version": "0.8",
+      "step": "minor",
+      "summary": "The write surface stops being a reserved name and becomes a specified one. SET_TEXT, SELECT_OPTION, TOGGLE and SUBMIT_FORM have been ActionType members since 0.1 and carried x-bip-reserved, which said only that no endpoint might advertise them; the protocol now says what each one does — every one of them is performed through the platform accessibility action path and through nothing else, so a submission goes through the control the page offered and the page's own validation and handlers run (decision 0059). ActionInputKind's TEXT, OPTION and TOGGLE_STATE and PostconditionKind's NODE_VALUE_CHANGED are un-reserved with them, because an action that cannot carry its input or declare its effect is not expressible. BROWSER_FLOW_STARTED stays reserved: a download, a file chooser and a permission prompt are consequences of their own. ActionInput gains the optional value_reference, and with it the shape rule that makes 'the model never authors what enters a field' checkable rather than intended — a proposal and an envelope may name a value and may not carry one, and the one-use renderer command may carry one and may not name one. No enumeration member is added: the terminal code a refused value reference deserves is not minted here, because the durable transaction ledger in the Core Service contract would have to carry it in the same change and that contract is not this one to raise. Until it is, an unresolvable reference is refused before dispatch and reported under the codes that already exist. Additive under the minor rule above: no field changed meaning, no member was removed, and no member moved. Un-reserving is additive in the same sense — the four members were already on the wire at every previous version, which is exactly why no fixture here claims a reader at 0.7 refuses one: x-bip-added-in cannot date a member to a version it predates, and a fixture that asserted such a refusal would be asserting something no conforming decoder was ever obliged to do.",
+      "added_enum_members": [],
+      "evidence": "taffy-core/contracts/bip/compat/proposal-authoring-a-literal-value.json and taffy-core/contracts/bip/compat/renderer-command-carrying-a-value-reference.json are the two halves of the authorship rule, each refused at the current version for its shape alone; taffy-core/contracts/bip/golden/action-proposal-set-text-by-reference.json, action-proposal-submit-through-the-control.json, renderer-action-command-set-text.json and renderer-action-command-toggle.json are the four shapes the step exists to make expressible."
+    },
+    {
+      "version": "0.9",
+      "step": "minor",
+      "summary": "A SECTION observation can now name the exact form subtree it is allowed to read. FormObservationRoot carries a browser-issued semantic node and the graph revision in which it was observed, and SnapshotRequest and PageSnapshot gain the optional form_root field under an exact shape rule: SECTION requires it and every other scope forbids it. The root is observation authority only; it does not enable filling, submitting, or any generic page action. The renderer validates that the handle still resolves to a live form in the addressed document before and after collection, so an absent, retired, changed, mismatched, or non-form target fails closed instead of degrading to a document read. Additive under the minor rule above: the structure and both fields are optional to older readers, no field changed meaning, no member was removed, and no member moved.",
+      "added_enum_members": [],
+      "evidence": "taffy-core/contracts/bip/golden/snapshot-request-form-subtree.json is a SECTION request bound to one form node and graph floor; taffy-core/contracts/bip/compat/minor-unknown-optional-field.json proves that an older minor reader accepts and ignores an optional field it does not know."
+    },
+    {
+      "version": "0.10",
+      "step": "minor",
+      "summary": "A document observation can now name one exact media node without pretending that node is a form section. MediaObservationRoot carries the browser-issued semantic node and graph floor, and SnapshotRequest and PageSnapshot gain the optional media_root under an exact shape rule: it is accepted only at DOCUMENT scope, is mutually exclusive with form_root, and the renderer validates the same live role and identity before and after extraction. TextRun gains optional source_locator, source_start and source_end fields so PDF pages, caption tracks and other generated media facts can retain bounded citation coordinates rather than collapsing them into unlocated prose. Additive under the minor rule above: every field is optional to older readers, no field changed meaning, no member was removed, and no member moved.",
+      "added_enum_members": [],
+      "evidence": "Renderer and browser media-observation unit tests bind an exact media root and reject a stale, non-media or substituted target; contract round trips cover the optional citation coordinates."
+    },
+    {
+      "version": "0.11",
+      "step": "minor",
+      "summary": "A browser-owned value reference that is invalid, already spent, expired, bound to another task or classified for another field now has its own terminal result. ActionResultCode gains VALUE_REFERENCE_UNKNOWN, appended so action-attempt records keep every existing ordinal; the Core Service durable transaction enum gains the same ordinal in contract 2.65 and transaction schema 18. A permanently non-fillable field still reports SENSITIVE_FIELD ahead of this temporary reference failure. Additive under the minor rule above: no field changed meaning, no member was removed, and no member moved.",
+      "added_enum_members": [
+        "ActionResultCode.VALUE_REFERENCE_UNKNOWN"
+      ],
+      "evidence": "taffy-core/contracts/bip/compat/value-reference-result-code-at-previous-minor.json proves a runtime at 0.10 refuses the new terminal rather than coercing it to DENIED_BY_POLICY; focused browser value-resolution tests cover invalid, spent, expired, wrong-task and wrong-class references."
+    },
+    {
+      "version": "0.12",
+      "step": "minor",
+      "summary": "A person-facing challenge becomes structural evidence rather than prose. ChallengeKind is a new closed enumeration and SemanticNode gains the optional challenge_kind field; SemanticField gains CHALLENGE_KIND so a delta can name the change. Sensitivity gains ONE_TIME_CODE and CHALLENGE_RESPONSE as distinct classes: both remain withheld from every observation and model destination, while the browser may briefly hold a value the person typed for one confirmed use. No hint grants authority or suppresses the unconditional handover path. Additive under the minor rule above: fields and members are appended, no existing member moved, and an older reader ignores the optional field but refuses a delta that says it understood the new changed-field member.",
+      "added_enum_members": [
+        "SemanticField.CHALLENGE_KIND",
+        "Sensitivity.ONE_TIME_CODE",
+        "Sensitivity.CHALLENGE_RESPONSE"
+      ],
+      "evidence": "taffy-core/contracts/bip/compat/challenge-kind-at-previous-minor.json proves a 0.11 delta reader refuses CHALLENGE_KIND rather than treating it as SENSITIVITY; taffy-core/contracts/bip/golden/snapshot-person-challenge.json carries one one-time-code field and one image-challenge response without carrying either value."
+    },
+    {
+      "version": "0.13",
+      "step": "minor",
+      "summary": "PostconditionKind gains LOADING_STOPPED so stopping one active page load is verified by a browser-owned lifecycle event rather than a renderer acknowledgement or an assumed synchronous state. The member carries no destination or node operand; the exact tab lives in the capability-bound command. Additive under the minor rule above: one closed enum member is appended and no existing member moved.",
+      "added_enum_members": [
+        "PostconditionKind.LOADING_STOPPED"
+      ],
+      "evidence": "taffy-core/contracts/bip/compat/loading-stopped-at-previous-minor.json proves a 0.12 reader refuses the new postcondition rather than treating it as NO_MUTATION; browser postcondition-verifier tests require a DidStopLoading event after dispatch."
+    },
+    {
+      "version": "0.14",
+      "step": "minor",
+      "summary": "PostconditionKind gains DOCUMENT_ADVANCED, the mirror of NO_MUTATION, so an ordinary activation can declare an effect it is able to prove. Until now the only claim an ACTIVATE could make was NODE_STATE_CHANGED with an exact expected state, which is a disclosure control's claim and nobody else's: a synthetic click was admitted only when the proposal named a node the browser could observe as expanded or collapsed, so every ordinary button on the web — a sign-in, a send, a continue — was refused before dispatch with no admissible move in its place. DOCUMENT_ADVANCED claims that the document moved past this dispatch, corroborated by a committed navigation, by the target node no longer existing, or by an observation whose graph revision is strictly newer than the dispatch watermark. It claims nothing about what the control did, because the browser cannot know that, and a caller learns it by reading the page again. Additive under the minor rule above: one closed enum member is appended and no existing member moved.",
+      "added_enum_members": [
+        "PostconditionKind.DOCUMENT_ADVANCED"
+      ],
+      "evidence": "taffy-core/contracts/bip/compat/document-advanced-at-previous-minor.json proves a 0.13 reader refuses the new postcondition rather than treating it as NO_MUTATION, which is its exact inverse; PostconditionChecks tests require evidence strictly after the dispatch watermark and refuse a snapshot taken at or before it."
+    }
+  ]
+}

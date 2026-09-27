@@ -1,0 +1,59 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+source_set("supervisor") {
+  sources = [
+    "profile_tool_supervisor.cc",
+    "profile_tool_supervisor.h",
+    "profile_tool_supervisor_job_record.h",
+    "profile_tool_supervisor_stream.cc",
+    "tool_contract_conversion.cc",
+    "tool_contract_conversion.h",
+    "tool_handle_broker.cc",
+    "tool_handle_broker.h",
+    "tool_job_client.cc",
+    "tool_job_client.h",
+    "tool_job_conversion.cc",
+    "tool_job_resources.cc",
+    "tool_job_resources.h",
+    "tool_runtime_ports.cc",
+  ]
+
+  public_deps = [
+    "//taffy/contracts/core-service",
+    "//taffy/contracts/tool-runtime:tool_runtime_mojom",
+  ]
+
+  deps = [
+    "//base",
+    "//crypto",
+    "//mojo/public/cpp/bindings",
+    "//mojo/public/cpp/system",
+  ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+  sources = [
+    "profile_tool_supervisor_cancellation_unittest.cc",
+    "profile_tool_supervisor_unittest.cc",
+    "tool_handle_broker_unittest.cc",
+    "tool_job_resources_unittest.cc",
+    "tool_runtime_enum_decoder_unittest.cc",
+  ]
+  deps = [
+    ":supervisor",
+
+    # The generated C++ decoders for this contract. Named here rather than by
+    # the supervisor because no production path decodes a Tool Runtime wire
+    # value yet; this is what makes the header reach a compiler at all.
+    "//taffy/contracts/tool-runtime:tool_runtime_enums",
+    "//base/test:test_support",
+    "//mojo/public/cpp/bindings",
+    "//testing/gmock",
+    "//testing/gtest",
+  ]
+}

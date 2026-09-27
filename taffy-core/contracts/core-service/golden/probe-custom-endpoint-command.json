@@ -1,0 +1,6 @@
+{
+  "endpoint": "https://workstation.local:11434/v1",
+  "wire_api": 2,
+  "credential_handle": null,
+  "provider_id": "my-gateway"
+}

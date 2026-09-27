@@ -1,0 +1,255 @@
+# Taffy Go is planned as an Android/Chromium, Kotlin, Rust, Python,
+# Cloudflare Workers, and Supabase monorepo. Keep source, migrations,
+# reproducible configuration, and lockfiles in Git; exclude machine-local
+# state, credentials, generated output, and release binaries.
+
+# Operating systems
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+__MACOSX/
+
+# Editors, IDEs, and per-developer assistant-tool configuration. A tool's own
+# configuration is machine-local state: it names endpoints and preferences that
+# belong to one workstation, no directory README states its authority, and no
+# gate reads it. Keep it out of the tree rather than tracking a second,
+# unowned place where a version or an endpoint is declared.
+.idea/
+.codex/
+.aider*
+.cursor/
+*.iml
+*.iws
+.fleet/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+*.swp
+*.swo
+*~
+.history/
+
+# Secrets and machine-local configuration
+.env
+.env.*
+!.env.example
+!.env.*.example
+.envrc
+.direnv/
+.netrc
+local.properties
+# Gradle signing configuration. Holds a keystore path and its passwords, and
+# decision 0203 keeps the signing identity out of this repository entirely.
+keystore.properties
+/secrets/
+/signing/
+# Every form of key material, with no exception: the signing identity is
+# resolved from the environment or from an untracked file and is never in this
+# repository (decision 0203). ./tools/check's secrets rules fail on a tracked
+# one, because an ignore rule only covers the file nobody added by hand.
+*.jks
+*.bks
+*.keystore
+*.p12
+*.pfx
+*.pkcs12
+*.private.pem
+*.private.key
+private-key*.pem
+private-key*.key
+.cargo/credentials
+.cargo/credentials.toml
+.npmrc.local
+
+# Local reference checkouts (third-party material, never committed)
+/_refs/
+# Decision 0067 mounts the checksum-verified CPython release here during
+# Chromium sync. It is an upstream source checkout, not repository source.
+/taffy-core/third_party/cpython/src/
+
+# Retired pre-cutover trees. Decision 0036 moved product source into
+# taffy-core/ (mounted at Chromium //taffy). A leftover local copy of the
+# disposable Compose harness, the overlay mount, top-level crates, or the
+# old contracts/ tree survives a pull as untracked files — ignore the paths
+# so they cannot be staged, and delete any copy that is still on disk.
+/apps/
+/chromium/overlay/
+/crates/
+/contracts/
+
+# Logs, diagnostics, and local runtime state
+/.taffy/
+/logs/
+*.pid
+*.pid.lock
+*.hprof
+hs_err_pid*.log
+crash-reports/
+/tmp/
+/temp/
+gitleaks-report.*
+
+# Android, Gradle, Kotlin, and native Android builds
+.gradle/
+.kotlin/
+/build/
+/taffy-core/ui/android/**/build/
+# The convention plugins are an included build, so their output is not under
+# the repository-level /build/ or an Android module's build directory.
+/build-logic/**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+output-metadata.json
+*.apk
+*.ap_
+*.aab
+
+# Chromium, GN, Ninja, CMake, and native build output
+/.gclient
+/.gclient_entries
+/.cipd/
+/depot_tools/
+/chromium/.gclient
+/chromium/.gclient_entries
+/chromium/.cipd/
+/out/
+/out-*/
+/out_*/
+/chromium/out/
+/chromium/src/out/
+/chromium/src/out-*/
+/chromium/src/out_*/
+.ninja_deps
+.ninja_log
+compile_commands.json
+CMakeCache.txt
+CMakeFiles/
+cmake-build-*/
+*.dSYM/
+.clangd/index/
+
+# Rust (Cargo.lock is intentionally tracked for this application)
+/target/
+
+# Generated fixture mounts inside the Taffy product root. Shipping Rust and
+# Kotlin sources live physically under taffy-core; only repository-level test
+# corpora remain top-level and need links that Chromium can read through
+# `//taffy/test/data`.
+# No trailing slash on `web`: it is a symlink, not a directory, and a
+# trailing-slash pattern matches only directories — so the mount showed up as
+# untracked. `contract/` is a real directory holding generated links, so it
+# needs the slash.
+/taffy-core/test/data/web
+/taffy-core/test/data/tasks
+/taffy-core/test/data/contract/
+**/*.rs.bk
+**/mutants.out*/
+rustc-ice-*.txt
+*.pdb
+
+# Node.js, TypeScript, and pnpm (pnpm-lock.yaml is intentionally tracked)
+node_modules/
+.pnpm-store/
+.npm/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.tsbuildinfo
+*.tgz
+.nyc_output/
+/coverage/
+/website/.next/
+/website/out/
+/website/.turbo/
+/website/coverage/
+/website/.firebase/
+
+# Local HyperFrames compositions. Not product source; ignore the whole tree.
+/videos-harness/
+.hyperframes/
+.thumbnails/
+.waveform-cache/
+
+# Supabase CLI state. Track config.toml, migrations, schemas, and seed files.
+supabase/.temp/
+supabase/.branches/
+
+# Python (lockfiles and .python-version are intentionally tracked)
+__pycache__/
+*.py[codz]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+__pypackages__/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+.tox/
+.nox/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+.ipynb_checkpoints/
+.pdm-python
+.pdm-build/
+.pixi/*
+!.pixi/config.toml
+/tools/**/build/
+/tools/**/dist/
+wheelhouse/
+/taffy-core/app/android/kotlin/
+
+# Scratch export directory. Nothing the repository produces belongs in version
+# control from here: this path once carried six unrelated personal PDFs into a
+# tracked commit, which is the failure this entry exists to prevent.
+/output/
+
+# Test and benchmark output
+/artifacts/
+/reports/
+/symbols/
+/tombstones/
+/recordings/
+/test-results/
+/playwright-report/
+/blob-report/
+/allure-results/
+/benchmark-results/
+
+# Knowledge-graph tool output. A cache of parsed syntax trees keyed by content
+# hash, plus the report generated from it. It is regenerated from the tree it
+# describes, so committing it stores a hundred megabytes to say what the source
+# already says — and the report quotes source text, which made ./tools/check
+# docs fail on vocabulary the repository never wrote.
+/graphify-out/
+
+# Patch, merge, and editor backups
+*.bak
+*.orig
+/_refs/
+*.rej
+
+# gplay's working directory. A sync receipt records exactly what reached the
+# store, with the content hash Play accepted, so it is the durable evidence a
+# publish happened and is kept. Everything else under here is a cache derived
+# from the committed listing.
+.gplay/*
+!.gplay/sync/
+.gplay/sync/*
+!.gplay/sync/receipts/

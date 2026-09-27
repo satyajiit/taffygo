@@ -1,0 +1,17 @@
+[package]
+name = "tool-entrypoints"
+description = "The frozen registry of everything a sandboxed worker may ever be asked to do, and the native-alternative rule that refuses one (decision 0064)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+# Deliberately empty, and it is the point rather than an accident. A registry
+# that could deserialize could be handed a second registry, so this crate has
+# no serializer, no reader and no dependency that owns one.
+[dependencies]
+
+[dev-dependencies]

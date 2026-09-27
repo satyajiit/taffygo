@@ -1,0 +1,14 @@
+# TaffyGo Chromium security patch level — machine owner file for the "Chromium
+# security patch level" row in TOOLCHAIN.md.
+#
+# Bumped by the urgent-security fast path in
+# docs/development/chromium-fork-and-build.md section 1.4: cherry-pick the
+# upstream fix into chromium/patches/security/, increment `level`, record the
+# upstream issue references in `advisories`, then run the Chromium and
+# release-candidate gates on the existing baseline.
+#
+# `level` resets to 0 at every milestone rebase, because the cherry-picks are
+# folded out into the new pinned revision.
+
+level=0
+advisories=none

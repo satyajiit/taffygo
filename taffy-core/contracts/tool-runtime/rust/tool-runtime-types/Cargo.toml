@@ -1,0 +1,10 @@
+[package]
+name = "tool-runtime-types"
+description = "Generated Rust types for the tool runtime boundary."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

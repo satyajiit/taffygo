@@ -1,0 +1,241 @@
+{
+  "schema_version": "0.1",
+  "snapshot_id": "snap_oopif_01",
+  "request_id": "req_001",
+  "profile_id": "prof_default",
+  "browser_window_id": "win_01",
+  "tab_id": "tab_01",
+  "root_frame_id": "frame_main",
+  "page_epoch": "epoch_a1",
+  "graph_revision": 5,
+  "event_sequence": 24,
+  "lifecycle_state": "ACTIVE",
+  "committed_url_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://docs.example.test"
+    },
+    "disclosure": "ORIGIN_AND_PATH",
+    "has_query": false,
+    "has_fragment": false,
+    "path": "/"
+  },
+  "origin_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://docs.example.test"
+    },
+    "is_potentially_trustworthy": true,
+    "is_incognito": false
+  },
+  "capture_time_monotonic_ms": 1000,
+  "scope": "DOCUMENT",
+  "adapters": [
+    {
+      "adapter": "BROWSER",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    },
+    {
+      "adapter": "DOM",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    },
+    {
+      "adapter": "ACCESSIBILITY",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "n_doc",
+      "frame_id": "frame_main",
+      "role": "DOCUMENT",
+      "name": "Status board",
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "node_id": "n_region",
+      "frame_id": "frame_main",
+      "role": "REGION",
+      "name": "Service status",
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "node_id": "f2_doc",
+      "frame_id": "frame_child_embed",
+      "role": "DOCUMENT",
+      "name": "Uptime widget",
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "node_id": "f2_value",
+      "frame_id": "frame_child_embed",
+      "role": "LABEL_VALUE_PAIR",
+      "name": "Uptime",
+      "text_runs": [
+        {
+          "text": "99.94 percent over 30 days",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM",
+        "ACCESSIBILITY"
+      ],
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/main/span[1]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_region",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_region",
+      "to_frame_id": "frame_child_embed",
+      "to_node_id": "f2_doc",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_child_embed",
+      "from_node_id": "f2_doc",
+      "to_frame_id": "frame_child_embed",
+      "to_node_id": "f2_value",
+      "relationship": "CONTAINS",
+      "inferred": false
+    }
+  ],
+  "frames": [
+    {
+      "frame_id": "frame_main",
+      "is_main_frame": true,
+      "is_out_of_process": false,
+      "is_cross_origin_to_parent": false,
+      "origin_metadata": {
+        "origin": {
+          "kind": "TUPLE",
+          "serialization": "https://docs.example.test"
+        },
+        "is_potentially_trustworthy": true,
+        "is_incognito": false
+      },
+      "page_epoch": "epoch_a1",
+      "graph_revision": 5,
+      "lifecycle_state": "ACTIVE",
+      "included": true
+    },
+    {
+      "frame_id": "frame_child_embed",
+      "parent_frame_id": "frame_main",
+      "is_main_frame": false,
+      "is_out_of_process": true,
+      "is_cross_origin_to_parent": true,
+      "origin_metadata": {
+        "origin": {
+          "kind": "TUPLE",
+          "serialization": "https://widget.other-example.test"
+        },
+        "is_potentially_trustworthy": true,
+        "is_incognito": false
+      },
+      "page_epoch": "epoch_c7",
+      "graph_revision": 2,
+      "lifecycle_state": "ACTIVE",
+      "included": true
+    },
+    {
+      "frame_id": "frame_child_pixel",
+      "parent_frame_id": "frame_main",
+      "is_main_frame": false,
+      "is_out_of_process": true,
+      "is_cross_origin_to_parent": true,
+      "origin_metadata": {
+        "origin": {
+          "kind": "TUPLE",
+          "serialization": "https://pixel.third-example.test"
+        },
+        "is_potentially_trustworthy": true,
+        "is_incognito": false
+      },
+      "page_epoch": "epoch_d2",
+      "graph_revision": 1,
+      "lifecycle_state": "ACTIVE",
+      "included": false,
+      "exclusion_reason": "HIDDEN_THIRD_PARTY"
+    }
+  ],
+  "truncation": {
+    "truncated": false,
+    "budgets_reached": [],
+    "omitted_node_count": 0,
+    "omitted_text_bytes": 0,
+    "omitted_frame_count": 0,
+    "may_change_answer": false
+  },
+  "redaction_summary": {
+    "applied_features": [
+      "SECRET_VALUE_SUPPRESSION",
+      "SENSITIVE_ZONE_CLASSIFICATION",
+      "URL_MINIMIZATION",
+      "ORIGIN_POLICY_FILTER"
+    ],
+    "redacted_field_count": 0,
+    "suppressed_secret_value_count": 0,
+    "sensitive_zone_count": 0,
+    "policy_filtered_frame_count": 1
+  },
+  "warnings": [
+    {
+      "code": "CROSS_ORIGIN_FRAME_OMITTED",
+      "frame_id": "frame_child_pixel",
+      "detail_code": "hidden_third_party"
+    }
+  ]
+}

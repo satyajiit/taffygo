@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  Strings for the first-run sequence. A module
+  owns the strings it uses: checkStringResources fails the build on a
+  reference to a name this module does not declare, and on a name this module
+  declares and never uses.
+-->
+<resources>
+
+    <!-- Screen SCR-001 — Welcome -->
+    <string name="taffy_welcome_badge">AI-NATIVE BROWSER</string>
+    <string name="taffy_welcome_headline">A whole browser. Taffy only when you ask.</string>
+    <string name="taffy_welcome_body">Ads and trackers blocked from the first page. Taffy sits in the bottom bar doing nothing until you ask — and shows every source when it does.</string>
+    <string name="taffy_welcome_promise">Nothing leaves your phone unasked.</string>
+    <string name="taffy_welcome_start">Start browsing</string>
+    <string name="taffy_welcome_footnote">You can meet Taffy later, or never.</string>
+    <string name="taffy_welcome_theme_label">Appearance</string>
+    <string name="taffy_welcome_theme_light">Light</string>
+    <string name="taffy_welcome_theme_dark">Dark</string>
+
+    <!-- Screen SCR-002 — Meet Taffy. Each slide keeps its title and prompt
+         native while a rendered film explains the work in steps. Any action
+         that needs a decision visibly asks for approval. Three further films
+         were rendered and are not shipped; vendor/showcase-films.txt and
+         OD-094 hold the reason, and their strings leave with them. -->
+    <string name="taffy_showcase_sound_turn_on">Turn showcase sound on</string>
+    <string name="taffy_showcase_sound_turn_off">Turn showcase sound off</string>
+    <string name="taffy_showcase_sound_state_on">Showcase sound is on</string>
+    <string name="taffy_showcase_sound_state_off">Showcase sound is off</string>
+    <string name="taffy_showcase_form_title">Fill a form together</string>
+    <string name="taffy_showcase_form_question">Fill this survey with me. Ask before sharing saved details</string>
+    <string name="taffy_showcase_form_video_description">A step-by-step animation of Taffy asking permission, filling a survey and asking before submission</string>
+    <string name="taffy_showcase_weekly_review_title">Your week, reviewed</string>
+    <string name="taffy_showcase_weekly_review_question">Review my browsing week and suggest one healthier limit</string>
+    <string name="taffy_showcase_weekly_review_video_description">A step-by-step animation of blocked ads, time spent and an AI weekly review that asks before setting a limit</string>
+    <string name="taffy_showcase_task_title">Give Taffy a job</string>
+    <string name="taffy_showcase_task_question">Read these 12 tabs and make an infographic report</string>
+    <string name="taffy_showcase_job_video_description">A step-by-step animation of Taffy reading 12 tabs, keeping citations and exporting an infographic in many formats</string>
+    <string name="taffy_showcase_page_tools_title">Keep the good bits</string>
+    <string name="taffy_showcase_page_tools_question">Find this page’s images and videos. Summarise it, then show “Hello” in several languages</string>
+    <string name="taffy_showcase_page_tools_video_description">A step-by-step animation of Taffy extracting page media, asking before download, summarising the page and showing “Hello” in several languages</string>
+
+    <!-- Screen SCR-006 — Language and region -->
+    <string name="taffy_language_region_title">Language and region</string>
+    <string name="taffy_language_region_region_label">Region</string>
+    <string name="taffy_language_region_region_note">Search, prices and units follow this.</string>
+    <string name="taffy_language_region_region_all">All countries and regions</string>
+    <string name="taffy_language_region_region_all_note">English and Hindi stay available in every country.</string>
+    <string name="taffy_language_region_language_label">App language</string>
+    <string name="taffy_language_region_system">Follow the system</string>
+    <string name="taffy_language_region_system_note">Whatever your phone is set to. English if TaffyGo has no words for that language.</string>
+    <string name="taffy_language_region_english">English</string>
+    <string name="taffy_language_region_english_note">TaffyGo\'s own words in English</string>
+    <string name="taffy_language_region_hindi">हिन्दी</string>
+    <string name="taffy_language_region_hindi_note">TaffyGo\'s own words in Hindi</string>
+    <string name="taffy_language_region_search">Search languages</string>
+    <string name="taffy_language_region_no_matches">No matching languages</string>
+    <string name="taffy_language_region_picker_title">Country or region</string>
+    <string name="taffy_language_region_picker_body">English and Hindi stay available in every country. This choice is for search, prices and units.</string>
+    <string name="taffy_language_region_picker_search">Search countries or codes</string>
+    <string name="taffy_language_region_footnote">Web pages are never translated or restyled — this is TaffyGo\'s own interface only.</string>
+    <string name="taffy_language_region_done">Done</string>
+    <string name="taffy_language_chip_value">%1$s · %2$s</string>
+    <string name="taffy_language_chip_english">English</string>
+    <string name="taffy_language_chip_hindi">हिन्दी</string>
+    <string name="taffy_language_chip_description">Region and language: %1$s. Change it.</string>
+
+    <!-- Screen SCR-004 — AI setup. One route, and the option to answer later. -->
+    <string name="taffy_ai_setup_title">How should Taffy think?</string>
+    <string name="taffy_ai_setup_body">Connect your own provider now, or set this up later.</string>
+    <string name="taffy_ai_setup_routes_label">Where your requests go</string>
+    <plurals name="taffy_ai_setup_routes_count">
+        <item quantity="one">%1$d way</item>
+        <item quantity="other">%1$d ways</item>
+    </plurals>
+    <string name="taffy_ai_setup_own_key_title">Use your own key</string>
+    <string name="taffy_ai_setup_own_key_cost">You pay your provider</string>
+    <string name="taffy_ai_setup_own_key_body">Save a provider key on the next screen. It stays on this phone.</string>
+    <string name="taffy_ai_setup_assure_compact">Passwords, payment details and one-time codes never go to a model.</string>
+    <string name="taffy_ai_setup_continue">Continue</string>
+    <string name="taffy_ai_setup_choose_provider">Choose a provider</string>
+    <string name="taffy_ai_setup_set_up_later">Set up later</string>
+    <string name="taffy_ai_setup_change_later">You can change this any time in Settings.</string>
+
+    <!-- Shared by the sequence -->
+    <string name="taffy_onboarding_continue">Continue</string>
+
+    <!-- Screen SCR-007 — Get started. The name and the picture are both
+         optional and both stay on the device (decision 0201). -->
+    <string name="taffy_get_started_headline">Make it yours</string>
+    <string name="taffy_get_started_body">A name and a picture, if you want them. Both stay on this phone.</string>
+    <string name="taffy_get_started_name_label">Your name</string>
+    <string name="taffy_get_started_name_placeholder">Optional</string>
+    <string name="taffy_get_started_face_label">Picture</string>
+    <!-- %1$d the position of this picture, %2$d how many there are. -->
+    <string name="taffy_get_started_face_choice">Picture %1$d of %2$d</string>
+    <string name="taffy_get_started_promise_account">No account, and nothing to sign in to.</string>
+    <string name="taffy_get_started_promise_servers">TaffyGo runs no servers of its own.</string>
+    <string name="taffy_get_started_promise_key">Taffy uses an AI key you bring — or none at all.</string>
+    <string name="taffy_get_started_data_link">How TaffyGo handles your data</string>
+    <string name="taffy_get_started_data_title">How TaffyGo handles your data</string>
+    <string name="taffy_get_started_data_device">Your name, your picture, your history, your bookmarks and anything Taffy remembers are kept on this phone. There is no account and no TaffyGo server to send them to.</string>
+    <string name="taffy_get_started_data_provider">Taffy asks an AI provider something only once you give it a key, or sign in to a plan you already pay for. Those requests go to that provider and to nobody else.</string>
+    <string name="taffy_get_started_data_sites">Websites see what any browser shows them. Ads and trackers are blocked before they load.</string>
+    <!-- %1$s the installed version name. -->
+    <string name="taffy_get_started_version">Version %1$s</string>
+    <!-- A card read as one thing: its title, then its sentence. -->
+    <string name="taffy_onboarding_pair">%1$s. %2$s</string>
+
+</resources>

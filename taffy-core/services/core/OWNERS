@@ -1,0 +1,28 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# No addresses yet: review falls through to ../OWNERS. See that file.
+#
+# The boundary needs a second pair of eyes regardless of who owns this
+# directory. Everything decision 0037 promises — no browser pointer, path,
+# network handle, credential, or capability ledger in the utility; generated
+# bounded values only; one ordered Rust sequence; exactly one terminal result
+# — is held by a handful of files.
+#
+# These files are where those promises are kept:
+#
+#   service_bridge.rs        the complete CXX vocabulary
+#   service_bridge_*.rs      canonical profile-runtime projection
+#   rust_core*               the sole C++ owner and reviewed SHA-256 adapter
+#   core_service_impl*       Mojo sequencing and capability registration gate
+#
+# VERIFY AT SP-01: whether //build/rust has an OWNERS file to point at for Rust
+# toolchain review, and what the current convention is for first-party Rust in
+# //components.
+per-file service_bridge*.rs=file://ipc/SECURITY_OWNERS
+per-file service_bridge_cxx.h=file://ipc/SECURITY_OWNERS
+per-file rust_core*=file://ipc/SECURITY_OWNERS
+per-file core_service_impl*=file://ipc/SECURITY_OWNERS

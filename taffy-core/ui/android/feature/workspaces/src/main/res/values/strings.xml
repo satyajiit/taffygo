@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  Every string the workspace surfaces show. Nothing here rounds a state up, and
+  nothing here describes an export instead of showing it.
+-->
+<resources>
+    <!-- Screen SCR-304 -->
+    <string name="taffy_workspace_list_title">Workspaces</string>
+    <string name="taffy_workspace_list_search">Search goals and sources</string>
+    <string name="taffy_workspace_list_profile">In %1$s</string>
+    <string name="taffy_workspace_list_create">New workspace</string>
+    <string name="taffy_workspace_list_supporting">%1$s · %2$s · %3$s</string>
+    <string name="taffy_workspace_list_loading">Loading workspaces</string>
+    <string name="taffy_workspace_unavailable_title">Workspaces aren\'t available right now</string>
+    <string name="taffy_workspace_unavailable_body">Your saved research is still kept. It will appear again when Taffy can load the complete list.</string>
+    <plurals name="taffy_workspace_list_sources">
+        <item quantity="one">%1$d source</item>
+        <item quantity="other">%1$d sources</item>
+    </plurals>
+    <plurals name="taffy_workspace_list_conflicts">
+        <item quantity="one">%1$d conflict</item>
+        <item quantity="other">%1$d conflicts</item>
+    </plurals>
+    <string name="taffy_workspace_list_description">%1$s, %2$s, %3$s</string>
+    <string name="taffy_workspace_list_empty_title">No workspaces yet</string>
+    <string name="taffy_workspace_list_empty_body">Research Taffy does for you is kept here, with the state it really reached.</string>
+    <string name="taffy_workspace_list_no_matches_title">Nothing matched</string>
+    <string name="taffy_workspace_list_no_matches_body">No workspace has that in its goal or its sources.</string>
+    <string name="taffy_workspace_pane_empty_title">Choose a workspace</string>
+    <string name="taffy_workspace_pane_empty_body">Pick a workspace from the list. Its output and sources open here.</string>
+
+    <!-- Screen SCR-305 -->
+    <string name="taffy_workspace_detail_loading">Loading this workspace</string>
+    <string name="taffy_workspace_detail_missing_title">That workspace is gone</string>
+    <string name="taffy_workspace_detail_missing_body">It was deleted or is no longer available on this device.</string>
+    <plurals name="taffy_workspace_detail_conflicts">
+        <item quantity="one">%1$d fact your sources disagree about</item>
+        <item quantity="other">%1$d facts your sources disagree about</item>
+    </plurals>
+    <plurals name="taffy_workspace_detail_needs_sources">
+        <item quantity="one">%1$d cell needs a new source</item>
+        <item quantity="other">%1$d cells need a new source</item>
+    </plurals>
+    <string name="taffy_workspace_detail_export">Export</string>
+    <string name="taffy_workspace_rename_action">Rename</string>
+    <string name="taffy_workspace_delete_action">Delete workspace</string>
+    <string name="taffy_workspace_rename_title">Rename workspace</string>
+    <string name="taffy_workspace_rename_label">Workspace name</string>
+    <string name="taffy_workspace_rename_confirm">Save name</string>
+    <string name="taffy_workspace_delete_title">Delete this workspace?</string>
+    <string name="taffy_workspace_delete_body">Delete this workspace and its saved findings? Records removed from this device — sources: %1$d; facts: %2$d; exports: %3$d; supporting indexes: %4$d. Exported files you saved are not affected.</string>
+    <string name="taffy_workspace_delete_confirm">Delete workspace</string>
+    <string name="taffy_workspace_lifecycle_cancel">Cancel</string>
+    <string name="taffy_workspace_detail_output">Output</string>
+    <string name="taffy_workspace_detail_fact_description">%1$s is %2$s, %3$s</string>
+    <string name="taffy_workspace_detail_source_chip">Source: %1$s</string>
+    <string name="taffy_workspace_detail_sources">Sources</string>
+    <plurals name="taffy_workspace_detail_source_facts">
+        <item quantity="one">%1$d fact</item>
+        <item quantity="other">%1$d facts</item>
+    </plurals>
+    <string name="taffy_workspace_detail_source_excluded">Excluded — its facts were removed</string>
+    <string name="taffy_workspace_detail_source_description">%1$s, %2$s</string>
+    <string name="taffy_workspace_detail_exclude">Exclude</string>
+
+    <!-- Fact kinds -->
+
+    <!-- Screen SCR-306 -->
+    <string name="taffy_source_viewer_loading">Loading this page</string>
+    <string name="taffy_source_viewer_missing_title">That source is gone</string>
+    <string name="taffy_source_viewer_missing_body">The workspace no longer lists it.</string>
+    <string name="taffy_source_viewer_host">Page</string>
+    <string name="taffy_source_viewer_read">Read</string>
+    <string name="taffy_source_viewer_facts">Facts from this page</string>
+    <string name="taffy_source_viewer_method">How it was read</string>
+    <string name="taffy_source_viewer_method_value">Page structure and accessibility tree</string>
+    <string name="taffy_source_viewer_in_scope">In scope</string>
+    <string name="taffy_source_viewer_included">Yes</string>
+    <string name="taffy_source_viewer_excluded">No, you excluded it</string>
+    <string name="taffy_source_viewer_open_live">Open the live page</string>
+
+    <!-- Screen SCR-307 -->
+    <string name="taffy_fact_correction_title">Correct this</string>
+    <string name="taffy_fact_correction_loading">Loading this fact</string>
+    <string name="taffy_fact_correction_missing_title">That fact is gone</string>
+    <string name="taffy_fact_correction_missing_body">The workspace no longer holds it.</string>
+    <string name="taffy_fact_correction_field">Field</string>
+    <string name="taffy_fact_correction_page_value">What the page said</string>
+    <string name="taffy_fact_correction_your_value">What you say</string>
+    <string name="taffy_fact_correction_notice">Your value is recorded beside the page\'s, never over it. %1$s</string>
+    <plurals name="taffy_fact_correction_downstream">
+        <item quantity="one">%1$d other cell rests on the same sources and will be worked out again.</item>
+        <item quantity="other">%1$d other cells rest on the same sources and will be worked out again.</item>
+    </plurals>
+    <string name="taffy_fact_correction_save">Save</string>
+    <string name="taffy_fact_correction_cancel">Cancel</string>
+
+    <!-- Screen SCR-309 -->
+    <string name="taffy_export_title">Export</string>
+    <string name="taffy_export_loading">Loading the export</string>
+    <string name="taffy_export_missing_title">Nothing to export</string>
+    <string name="taffy_export_missing_body">That workspace is gone.</string>
+    <string name="taffy_export_format_markdown">Markdown</string>
+    <string name="taffy_export_format_comma_separated">Comma separated</string>
+    <string name="taffy_export_destination">Choose where to save the file. Nothing is uploaded.</string>
+    <string name="taffy_export_preview">What will be written</string>
+    <string name="taffy_export_action">Export as %1$s</string>
+    <string name="taffy_export_choosing_destination">Choose where to save the file</string>
+    <string name="taffy_export_writing">Saving the file…</string>
+    <string name="taffy_export_succeeded">File saved</string>
+    <string name="taffy_export_failed">The file couldn’t be saved. Try again.</string>
+    <string name="taffy_export_cancelled">Export cancelled</string>
+</resources>

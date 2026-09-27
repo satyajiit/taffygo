@@ -1,0 +1,75 @@
+# For more information on these fields, see:
+# https://chromium.googlesource.com/chromium/src/+/HEAD/docs/adding_to_third_party.md#readme_chromium
+#
+# TaffyGo vendors CPython under //taffy rather than under Chromium's own
+# //third_party because the interpreter is a TaffyGo product decision, not an
+# upstream one: decision 0046 records why the interpreter ships inside the
+# installer while its standard library arrives through the asset plane, and
+# nothing in the Chromium tree is edited to make that true.
+#
+# No CPython source is committed here. The pin in tools/manifest.json names the
+# release tarball and the SHA-256 the release's own SPDX document records, and
+# tools/build_interpreter.py cross-builds it with the Chromium checkout's clang
+# and the NDK sysroot -- the same toolchain that will link the result. A source
+# tree of this size is a checkout-time dependency, and committing a second copy
+# of it would be the kind of duplicate this repository treats as a defect.
+# Decision 0067 settles where it arrives: ./tools/chromium/sync unpacks the
+# pinned tarball at src/ after checking it against that digest, and //taffy is
+# already a symlink to this repository, so src/ is one directory the checkout
+# and the tree both see.
+#
+# WHY "License File" NAMES A PATH A BARE CLONE DOES NOT CARRY. PSF-2.0 is
+# CPython's licence and LICENSE is its member of the pinned tarball, which
+# tools/manifest.json records as licence_member. That member unpacks with the
+# rest of the tree, so src/LICENSE is where the licence text is in a synced
+# checkout and nowhere at all in a bare clone. Sixty-five README.chromium files
+# in the Chromium tree at the pinned revision are in exactly that state, naming
+# a licence below a src/ subdirectory that only a sync populates; libvpx names
+# source/libvpx/LICENSE for the same reason. This field named a bare LICENSE
+# until 2026-08-26 and no such file was ever committed here -- decision 0065
+# recorded the gap and this is the correction. Copying the text in beside these
+# files was refused for two independent reasons: it would be a second copy of a
+# file the mount already carries, which is the duplication the paragraph above
+# refuses for the source itself and which is free to drift from it; and the
+# text is release-specific, so a copy taken from any tree other than the one
+# manifest.json pins is a claim about a release it did not come from.
+#
+# The build is not a stock CPython. Every extension module is compiled in,
+# because a sandboxed utility process cannot dlopen; _ctypes and _socket are
+# configured out, because the sandbox has neither native calls nor network; and
+# every loadable segment is aligned to 16 KiB, because an Android device with
+# that page size will not load a binary aligned for 4 KiB. build_interpreter.py
+# refuses a build that broke any of the three rather than reporting a size for
+# it.
+
+Name: CPython
+Short Name: cpython
+URL: https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tar.xz
+Version: 3.14.7
+Update Mechanism: Manual
+License: PSF-2.0
+License File: LICENSE
+Shipped: yes
+Security Critical: yes
+CPEPrefix: cpe:/a:python:python:3.14.7
+
+Description:
+The interpreter for the sandboxed Python utility service decision 0007
+describes and spike SP-07 gates. GN compiles the pinned source directly for
+android-arm64 and android-x64 with committed per-ABI configuration; the
+shipping Android profiles link it only into the isolated utility worker.
+The standard library remains a verified descriptor-backed asset.
+
+Licence File:
+The Python Software Foundation text is committed here as LICENSE rather than
+referenced at src/LICENSE, which is where the interpreter tarball puts it.
+`/taffy-core/third_party/cpython/src/` is gitignored — the source is fetched
+at version-roll time, not committed — so a `License File: src/LICENSE` named a
+path that existed on the machine that had built CPython and on no clone. The
+copy here is byte-for-byte the 3.14.7 tarball's own file.
+
+Local Modifications:
+None to the source. `tools/build_interpreter.py` produces the reviewed ABI
+configuration at version-roll time; `tools/prepare_gn_inputs.py` commits those
+headers and the frozen bootstrap inputs. GN runs no configure step and consumes
+no prebuilt Python archive. No patch is applied to any CPython file.

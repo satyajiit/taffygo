@@ -1,0 +1,725 @@
+/*
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
+
+/* Design record. Editorial. Product pages set real screens beside the words
+ * that explain them; the standing documents are one column at a reading
+ * measure. Hero: a strip of real screens clipped at the right edge. Features:
+ * screens with numbered pins, and a three-step flow on /product/. Facts: a
+ * two-column sheet with a rule on every row. A sticky install bar inside the
+ * tour. Header: lockup on one edge, links and one filled action on the
+ * other. Footer: mast-headed, links inline. Colour: the app's generated
+ * tokens only (decisions 0025 and 0068), no gradients. Type: Space Grotesk,
+ * five sizes, 700 over 400, headings upright. Motion: colour and a
+ * one-pixel press. docs/website/landing-page.md section 4 is the authority.
+ *
+ * Reviewed before handover, 1 to 5: philosophy 5, hierarchy 4, execution
+ * 4, specificity 5, restraint 5, variety 4. */
+
+@import "tailwindcss";
+@import "../taffy-core/resources/tokens/generated/css/taffy-color-tokens.css";
+
+@source "./app";
+@source "./components";
+@source "./lib";
+
+/* ---------------------------------------------------------------------------
+   The app owns the palette. The generated file imported above is emitted from
+   taffy-core/resources/tokens/tokens.json; this alias layer only maps those
+   app token names to the website's semantic names. It is declared on every
+   [data-taffy-theme] scope so a nested scope re-resolves it.
+--------------------------------------------------------------------------- */
+:root,
+[data-taffy-theme] {
+  --surface: var(--taffy-surface);
+  --surface-raised: var(--taffy-surface-raised);
+  --surface-sunken: var(--taffy-surface-sunken);
+  --surface-sheet: var(--taffy-surface-sheet);
+  --surface-inverse: var(--taffy-surface-inverse);
+  --outline: var(--taffy-outline);
+  --outline-strong: var(--taffy-hairline);
+  --focus-ring: var(--taffy-focus-ring);
+  --text-primary: var(--taffy-text-primary);
+  --text-secondary: var(--taffy-text-secondary);
+  --text-tertiary: var(--taffy-text-tertiary);
+  --text-inverse: var(--taffy-text-inverse);
+  --hairline: var(--taffy-hairline);
+  --accent: var(--taffy-accent);
+  --accent-on: var(--taffy-accent-on);
+  --accent-wash: var(--taffy-accent-wash);
+  --accent-ink: var(--taffy-accent-deep);
+  --positive: var(--taffy-positive);
+  --private: var(--taffy-private-tint);
+  --press: color-mix(in srgb, var(--taffy-text-primary) 84%, var(--taffy-surface));
+  --frame-shadow: 0 1px 2px rgba(20, 17, 14, 0.06), 0 16px 40px -18px rgba(20, 17, 14, 0.22);
+
+  color-scheme: light;
+}
+
+[data-taffy-theme="dark"] {
+  --accent-ink: var(--taffy-accent-text);
+  --frame-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+
+  color-scheme: dark;
+}
+
+/* The generated projection follows the OS when JavaScript is unavailable.
+   Mirror the website-only aliases in that same state. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-taffy-theme]) {
+    --accent-ink: var(--taffy-accent-text);
+    --frame-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+    color-scheme: dark;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Space, type and motion. Named once here; the components below and the
+   markup read these names, never raw values.
+--------------------------------------------------------------------------- */
+:root {
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: clamp(4rem, 3rem + 3vw, 6rem);
+  --space-4xl: clamp(5rem, 3rem + 6vw, 9rem);
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+
+  /* Five sizes per page at most: display, h2, h3/lead, body, small. */
+  --size-display: clamp(2.25rem, 1.35rem + 3.9vw, 4.25rem);
+  --size-h2: clamp(1.75rem, 1.3rem + 1.9vw, 2.625rem);
+  --size-h3: clamp(1.1875rem, 1.1rem + 0.35vw, 1.375rem);
+  --size-body: 1rem;
+  --size-small: 0.875rem;
+
+  --measure: 65ch;
+  --radius-pill: 999px;
+  --radius-card: 1.25rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-short: 150ms;
+}
+
+@theme inline {
+  --font-sans: var(--font-grotesk), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --color-surface: var(--surface);
+  --color-raised: var(--surface-raised);
+  --color-sheet: var(--surface-sunken);
+  --color-floating: var(--surface-sheet);
+  --color-inverse: var(--surface-inverse);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-tertiary: var(--text-tertiary);
+  --color-inverse-text: var(--text-inverse);
+  --color-outline: var(--outline);
+  --color-outline-strong: var(--outline-strong);
+  --color-hairline: var(--hairline);
+  --color-focus-ring: var(--focus-ring);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-positive: var(--positive);
+}
+
+@layer base {
+  html {
+    overflow-x: clip;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    overflow-x: clip;
+    background-color: var(--surface);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: var(--size-body);
+    line-height: 1.6;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-style: normal;
+    font-weight: 700;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
+  p,
+  li,
+  dd {
+    text-wrap: pretty;
+  }
+
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :where(a, button, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: var(--taffy-selection);
+  }
+}
+
+@layer components {
+  /* Page measure. Wider screens step it up so the margins never swallow
+     the page. */
+  .container-site {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 75rem;
+    padding-inline: var(--gutter);
+  }
+
+  @media (min-width: 90rem) {
+    .container-site {
+      max-width: 84rem;
+    }
+  }
+
+  .type-display {
+    font-size: var(--size-display);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+
+  .type-h2 {
+    font-size: var(--size-h2);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+  }
+
+  .type-h3 {
+    font-size: var(--size-h3);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .type-lead {
+    font-size: var(--size-h3);
+    line-height: 1.55;
+  }
+
+  .type-small {
+    font-size: var(--size-small);
+    line-height: 1.5;
+  }
+
+  /* ---- Actions. The primary action is neutral ink, never amber (0025). */
+  .btn {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    border-radius: var(--radius-pill);
+    padding-inline: var(--space-lg);
+    font-weight: 700;
+    white-space: nowrap;
+    transition: background-color var(--dur-short) var(--ease-out),
+      transform var(--dur-short) var(--ease-out);
+  }
+
+  .btn:active {
+    transform: translateY(1px);
+  }
+
+  .btn-ink {
+    background-color: var(--text-primary);
+    color: var(--surface);
+  }
+
+  .btn-ink:hover {
+    background-color: var(--press);
+  }
+
+  .btn-line {
+    border: 1px solid var(--outline-strong);
+    color: var(--text-primary);
+  }
+
+  .btn-line:hover {
+    background-color: var(--surface-sunken);
+  }
+
+  .btn-compact {
+    min-height: 2.75rem;
+    padding-inline: var(--space-md);
+  }
+
+  .link-arrow {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: var(--space-2xs);
+    font-weight: 700;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    white-space: nowrap;
+  }
+
+  .link-arrow:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  /* The official badge carries its own clear space; the negative margin
+     lines its visible edge up with the text above it. */
+  .play-badge {
+    display: inline-flex;
+    margin-inline-start: -0.625rem;
+    border-radius: 0.625rem;
+  }
+
+  .play-badge img {
+    height: 4rem;
+    width: auto;
+  }
+
+  /* ---- A real phone screen. No drawn device: the capture, its own corner
+     radius and a hairline. Pins sit on a light-theme scope because every
+     annotated capture is a light screen, whatever the page's theme. */
+  .phone-frame {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--outline);
+    border-radius: 9% / 4.48%;
+    background-color: var(--surface-raised);
+    box-shadow: var(--frame-shadow);
+  }
+
+  .phone-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .pin {
+    position: absolute;
+    left: calc(var(--x) * 1%);
+    top: calc(var(--y) * 1%);
+    display: grid;
+    width: 1.75rem;
+    height: 1.75rem;
+    place-items: center;
+    border-radius: var(--radius-pill);
+    background-color: var(--text-primary);
+    color: var(--surface);
+    box-shadow: 0 0 0 3px var(--surface);
+    font-size: var(--size-small);
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    transform: translate(-50%, -50%);
+  }
+
+  .callouts {
+    display: grid;
+    gap: var(--space-sm);
+    counter-reset: callout;
+  }
+
+  .callouts li {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    gap: var(--space-sm);
+    align-items: baseline;
+    counter-increment: callout;
+  }
+
+  .callouts li::before {
+    content: counter(callout);
+    display: grid;
+    width: 1.75rem;
+    height: 1.75rem;
+    place-items: center;
+    align-self: start;
+    border-radius: var(--radius-pill);
+    background-color: var(--text-primary);
+    color: var(--surface);
+    font-size: var(--size-small);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- Hero: copy on the left, a strip of real screens running off the
+     right edge of the viewport. html and body clip the overflow. */
+  .hero {
+    display: grid;
+    gap: var(--space-2xl);
+    padding-block: var(--space-xl) var(--space-3xl);
+  }
+
+  .hero-strip {
+    display: flex;
+    width: max-content;
+    align-items: flex-start;
+    gap: var(--space-lg);
+  }
+
+  .hero-strip > * {
+    flex: none;
+    width: min(62vw, 17.5rem);
+  }
+
+  .hero-strip > :nth-child(2) {
+    margin-top: var(--space-2xl);
+  }
+
+  .hero-strip > :nth-child(3) {
+    margin-top: var(--space-xl);
+  }
+
+  @media (min-width: 60rem) {
+    .hero {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: center;
+      padding-block: var(--space-2xl) var(--space-4xl);
+    }
+
+    .hero-strip > * {
+      width: 17.5rem;
+    }
+  }
+
+  /* Two columns on a phone, one line with separators from 40rem. */
+  .fact-line {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, max-content));
+    gap: var(--space-2xs) var(--space-xl);
+  }
+
+  @media (min-width: 40rem) {
+    .fact-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2xs) var(--space-md);
+    }
+
+    .fact-line li + li::before {
+      content: "·";
+      margin-inline-end: var(--space-md);
+      color: var(--text-tertiary);
+    }
+  }
+
+  /* ---- The tour: one stop per feature, separated by space alone. */
+  .tour {
+    background-color: var(--surface-sunken);
+  }
+
+  .stop {
+    display: grid;
+    gap: var(--space-xl);
+    padding-block: var(--space-2xl);
+  }
+
+  /* A single annotated screen: on a phone the heading comes first, then
+     the screen, then the notes for its pins; from 48rem the screen sits on
+     the left and the words to its right. */
+  .stop-single {
+    grid-template-areas: "head" "frame" "notes";
+    justify-items: start;
+  }
+
+  .stop-head {
+    grid-area: head;
+  }
+
+  .stop-frame {
+    grid-area: frame;
+    width: min(100%, 20rem);
+  }
+
+  .stop-notes {
+    grid-area: notes;
+  }
+
+  @media (min-width: 48rem) {
+    .stop-single {
+      grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+      grid-template-areas: "frame ." "frame head" "frame notes" "frame .";
+      grid-template-rows: 1fr auto auto 1fr;
+      column-gap: var(--space-3xl);
+      row-gap: 0;
+    }
+  }
+
+  .stop-pair .pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-lg);
+    max-width: 42rem;
+  }
+
+  @media (min-width: 60rem) {
+    .stop-pair {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 42rem);
+      column-gap: var(--space-3xl);
+      align-items: center;
+    }
+  }
+
+  .sticky-get {
+    position: sticky;
+    bottom: var(--space-md);
+    z-index: 20;
+    display: flex;
+    width: fit-content;
+    max-width: 100%;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-inline: auto;
+    margin-block: var(--space-lg) var(--space-2xl);
+    border-radius: var(--radius-pill);
+    background-color: var(--surface-inverse);
+    color: var(--text-inverse);
+    padding: var(--space-xs) var(--space-xs) var(--space-xs) var(--space-lg);
+    box-shadow: var(--frame-shadow);
+  }
+
+  .sticky-get a {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    padding-inline: var(--space-md);
+    font-weight: 700;
+    white-space: nowrap;
+    background-color: var(--surface);
+    color: var(--text-primary);
+  }
+
+  .sticky-get a:hover {
+    background-color: var(--surface-sunken);
+  }
+
+  /* ---- A painting of Taffy. It carries no text, so the words sit beside
+     it and keep the page's own theme. */
+  .painting {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background-color: var(--surface-sunken);
+  }
+
+  .painting img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .band {
+    display: grid;
+    gap: var(--space-xl);
+    align-items: center;
+  }
+
+  @media (min-width: 60rem) {
+    .band {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      gap: var(--space-3xl);
+    }
+  }
+
+  /* ---- The two-column spec sheet: label, value, a hairline per row. */
+  .spec {
+    border-bottom: 1px solid var(--outline);
+  }
+
+  .spec > div {
+    display: grid;
+    gap: var(--space-2xs);
+    border-top: 1px solid var(--outline);
+    padding-block: var(--space-sm);
+  }
+
+  .spec dt {
+    color: var(--text-secondary);
+  }
+
+  @media (min-width: 30rem) {
+    .spec > div {
+      grid-template-columns: minmax(0, 9rem) minmax(0, 1fr);
+      gap: var(--space-md);
+    }
+  }
+
+  /* ---- The step flow on /product/: horizontal from 60rem. */
+  .steps {
+    display: grid;
+    gap: var(--space-2xl);
+    counter-reset: step;
+  }
+
+  .steps > li {
+    display: grid;
+    gap: var(--space-lg);
+    align-content: start;
+    counter-increment: step;
+  }
+
+  .steps .phone-frame {
+    width: min(100%, 18rem);
+  }
+
+  .step-number::before {
+    content: counter(step);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (min-width: 60rem) {
+    /* The three screens line up whatever the length of the words above
+       them: each step spans two shared rows. */
+    .steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: auto auto;
+      gap: var(--space-lg) var(--space-xl);
+    }
+
+    .steps > li {
+      grid-row: span 2;
+      grid-template-rows: subgrid;
+    }
+  }
+
+  /* ---- Long Document: one column of prose at a reading measure. */
+  .prose-doc {
+    max-width: var(--measure);
+  }
+
+  .prose-doc h2 {
+    margin-top: var(--space-2xl);
+    font-size: var(--size-h3);
+    line-height: 1.3;
+  }
+
+  .prose-doc > section:first-child > h2 {
+    margin-top: 0;
+  }
+
+  .prose-doc p,
+  .prose-doc ul,
+  .prose-doc ol {
+    margin-top: var(--space-sm);
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .prose-doc ul {
+    list-style: disc;
+    padding-inline-start: var(--space-lg);
+  }
+
+  .prose-doc ol {
+    list-style: decimal;
+    padding-inline-start: var(--space-lg);
+  }
+
+  .prose-doc li + li {
+    margin-top: var(--space-2xs);
+  }
+
+  .prose-doc a {
+    color: var(--text-primary);
+    font-weight: 700;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+  }
+
+  .prose-doc a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  /* Theme is driven by the same data-taffy-theme attribute as the generated
+     app projection, so the two approved lockup treatments swap without JS. */
+  .lockup-light {
+    display: block;
+  }
+
+  .lockup-dark {
+    display: none;
+  }
+
+  [data-taffy-theme="dark"] .lockup-light {
+    display: none;
+  }
+
+  [data-taffy-theme="dark"] .lockup-dark {
+    display: block;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-taffy-theme]) .lockup-light {
+      display: none;
+    }
+
+    :root:not([data-taffy-theme]) .lockup-dark {
+      display: block;
+    }
+  }
+
+  .lockup {
+    width: 6rem;
+    height: auto;
+  }
+
+  @media (min-width: 26rem) {
+    .lockup {
+      width: 7.375rem;
+    }
+  }
+
+  /* The footer is the dark projection in both themes. */
+  .footer-dark {
+    background-color: var(--taffy-surface);
+    color: var(--taffy-text-primary);
+    color-scheme: dark;
+  }
+
+  /* Off-screen until focused, then the first thing a keyboard reaches. */
+  .skip-link {
+    position: fixed;
+    top: var(--space-sm);
+    left: var(--space-sm);
+    z-index: 50;
+    transform: translateY(-200%);
+  }
+
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

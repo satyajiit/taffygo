@@ -1,0 +1,40 @@
+{
+  "protocol_version": "0.2",
+  "implementation_id": "bip-endpoint-fixture",
+  "supported_adapters": [
+    "BROWSER",
+    "DOM",
+    "ACCESSIBILITY",
+    "FORMS",
+    "METADATA",
+    "SELECTION",
+    "LAYOUT"
+  ],
+  "supported_scopes": [
+    "VIEWPORT",
+    "INTERACTIVE",
+    "SELECTION",
+    "DOCUMENT"
+  ],
+  "supported_action_types": [
+    "ACTIVATE",
+    "FOCUS",
+    "SCROLL_INTO_VIEW"
+  ],
+  "supported_redaction_features": [
+    "SECRET_VALUE_SUPPRESSION",
+    "SENSITIVE_ZONE_CLASSIFICATION",
+    "PATTERN_DETECTORS"
+  ],
+  "limits": {
+    "max_message_bytes": 262144,
+    "max_nodes": 1200,
+    "max_text_bytes": 131072,
+    "max_total_bytes": 262144,
+    "max_depth": 24,
+    "max_frames": 32,
+    "max_delta_queue_depth": 64,
+    "max_snapshot_deadline_ms": 2000,
+    "min_delta_interval_ms": 100
+  }
+}

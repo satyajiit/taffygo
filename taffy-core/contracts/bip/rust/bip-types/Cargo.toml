@@ -1,0 +1,18 @@
+[package]
+name = "bip-types"
+description = "Generated and hand-written Rust types for the Browser Intelligence Protocol (taffy-core/contracts/bip)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+proptest = { workspace = true }
+

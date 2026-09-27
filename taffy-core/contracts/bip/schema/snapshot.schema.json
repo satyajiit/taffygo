@@ -1,0 +1,1034 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "snapshot.schema.json",
+  "title": "BIP observation contract",
+  "description": "Snapshot request and page snapshot envelope, the semantic node, its evidence, and the truncation and redaction reports. Protocol specification sections 7, 8, 9, and 15.",
+  "x-bip-module": "snapshot",
+  "$defs": {
+    "AdapterRequirementLevel": {
+      "title": "AdapterRequirementLevel",
+      "description": "Whether a requested adapter is required for a usable result or merely welcome. A missing required adapter yields UNSUPPORTED; it never yields a degraded result labelled complete. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": ["REQUIRED", "OPTIONAL"]
+    },
+    "AdapterRequirement": {
+      "title": "AdapterRequirement",
+      "description": "One adapter a request names, and how strictly the caller needs it.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "adapter": { "$ref": "protocol-info.schema.json#/$defs/AdapterKind" },
+        "requirement": { "$ref": "#/$defs/AdapterRequirementLevel" }
+      },
+      "required": ["adapter", "requirement"]
+    },
+    "AdapterStatus": {
+      "title": "AdapterStatus",
+      "description": "Outcome of one adapter for one snapshot. An adapter that cannot produce a value returns UNSUPPORTED, INCOMPLETE, or CONFLICTED; it never fabricates a normalized value to satisfy a requested schema. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": ["OK", "INCOMPLETE", "CONFLICTED", "UNSUPPORTED", "FAILED"]
+    },
+    "AdapterReport": {
+      "title": "AdapterReport",
+      "description": "Per-adapter provenance and health for one snapshot. Adapter failure is isolated and named: one missing optional adapter does not discard the evidence produced by the others.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "adapter": { "$ref": "protocol-info.schema.json#/$defs/AdapterKind" },
+        "status": { "$ref": "#/$defs/AdapterStatus" },
+        "adapter_version": {
+          "description": "Version of the adapter implementation that produced this evidence. Persisted observations record it so stored evidence stays interpretable.",
+          "type": "string",
+          "maxLength": 64
+        },
+        "extraction_rule_version": {
+          "description": "Version of the extraction rule set the adapter applied.",
+          "type": "string",
+          "maxLength": 64
+        },
+        "detail_code": {
+          "description": "Bounded machine-readable detail for diagnostics. Never renderer-supplied prose, and never page text.",
+          "type": "string",
+          "maxLength": 64
+        }
+      },
+      "required": ["adapter", "status", "adapter_version", "extraction_rule_version"]
+    },
+    "AttributeName": {
+      "title": "AttributeName",
+      "description": "The allowlist of typed attributes a semantic node may carry. BIP never emits an arbitrary DOM attribute map: event handlers, raw markup, scripts, stylesheets, hidden page state, browser-internal addresses, and unbounded attribute strings are outside the protocol. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "INPUT_TYPE",
+        "AUTOCOMPLETE_TOKEN",
+        "HEADING_LEVEL",
+        "LIST_POSITION",
+        "LIST_SIZE",
+        "TABLE_ROW_INDEX",
+        "TABLE_COLUMN_INDEX",
+        "LANGUAGE",
+        "LINK_RELATION",
+        "MEDIA_ALT_SOURCE",
+        "CURRENCY_CODE",
+        "RATING_SCALE_MAX",
+        "PLACEHOLDER_LABEL"
+      ]
+    },
+    "NodeAttribute": {
+      "title": "NodeAttribute",
+      "description": "One allowlisted typed attribute and its bounded value.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": { "$ref": "#/$defs/AttributeName" },
+        "value": {
+          "description": "Bounded attribute value, already redacted under the request's sensitivity policy.",
+          "type": "string",
+          "maxLength": 256
+        }
+      },
+      "required": ["name", "value"]
+    },
+    "Bounds": {
+      "title": "Bounds",
+      "description": "Viewport-relative rectangle in device-independent pixels. A diagnostic hint only: bounds are never identity, never an action target, and never a substitute for a semantic node handle.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 }
+      },
+      "required": ["x", "y", "width", "height"]
+    },
+    "BudgetKind": {
+      "title": "BudgetKind",
+      "description": "Which budget a snapshot reached. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "MAX_NODES",
+        "MAX_TEXT_BYTES",
+        "MAX_TOTAL_BYTES",
+        "MAX_DEPTH",
+        "MAX_FRAMES",
+        "MAX_MESSAGE_BYTES",
+        "DEADLINE"
+      ]
+    },
+    "Confidence": {
+      "title": "Confidence",
+      "description": "Adapter confidence in a value, from 0 through 1. Confidence is evidence quality, never authorization.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "UrlDisclosure": {
+      "title": "UrlDisclosure",
+      "description": "How much of a URL the task and provider policy permitted this message to carry. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": ["ORIGIN_ONLY", "ORIGIN_AND_PATH", "FULL_URL"]
+    },
+    "UrlMetadata": {
+      "title": "UrlMetadata",
+      "description": "Classified navigation metadata for the observed document. The browser broker's committed navigation record is the authority; a renderer-reported URL never overrides it. Full URLs, query strings, and fragments appear only when the task and provider policy permit, which the disclosure field states explicitly.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "origin": { "$ref": "identity.schema.json#/$defs/Origin" },
+        "disclosure": { "$ref": "#/$defs/UrlDisclosure" },
+        "path": {
+          "description": "Path component, present only when disclosure is ORIGIN_AND_PATH or FULL_URL.",
+          "type": "string",
+          "maxLength": 2048
+        },
+        "url": {
+          "description": "Full URL including query and fragment, present only when disclosure is FULL_URL.",
+          "type": "string",
+          "maxLength": 4096
+        },
+        "has_query": {
+          "description": "Whether the committed URL carries a query string, reported even when the query itself is withheld.",
+          "type": "boolean"
+        },
+        "has_fragment": {
+          "description": "Whether the committed URL carries a fragment, reported even when the fragment itself is withheld.",
+          "type": "boolean"
+        }
+      },
+      "required": ["origin", "disclosure", "has_query", "has_fragment"],
+      "allOf": [
+        {
+          "if": { "properties": { "disclosure": { "const": "ORIGIN_ONLY" } }, "required": ["disclosure"] },
+          "then": { "not": { "required": ["url"] } }
+        },
+        {
+          "if": { "properties": { "disclosure": { "const": "ORIGIN_ONLY" } }, "required": ["disclosure"] },
+          "then": { "not": { "required": ["path"] } }
+        },
+        {
+          "if": { "properties": { "disclosure": { "const": "ORIGIN_AND_PATH" } }, "required": ["disclosure"] },
+          "then": { "not": { "required": ["url"] } }
+        },
+        {
+          "if": { "properties": { "disclosure": { "const": "FULL_URL" } }, "required": ["disclosure"] },
+          "then": { "required": ["url"] }
+        }
+      ]
+    },
+    "Destination": {
+      "title": "Destination",
+      "description": "The normalized navigation target of a link or other destination-bearing node, when policy allows it to be observed. A destination is re-checked immediately before dispatch: a changed destination fails the action closed.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "url_metadata": { "$ref": "#/$defs/UrlMetadata" },
+        "is_cross_origin": {
+          "description": "Whether activating this destination leaves the document's current origin.",
+          "type": "boolean"
+        },
+        "opens_new_tab": {
+          "description": "Whether activation is expected to create a new tab.",
+          "type": "boolean"
+        },
+        "is_download": {
+          "description": "Whether activation is expected to start a download rather than a navigation.",
+          "type": "boolean"
+        }
+      },
+      "required": ["url_metadata", "is_cross_origin", "opens_new_tab", "is_download"]
+    },
+    "SourceKind": {
+      "title": "SourceKind",
+      "description": "Where one piece of evidence came from. Sources are preserved rather than merged: disagreement between sources is information, not noise. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": ["DOM", "ACCESSIBILITY", "FORM_CONTROL", "JSON_LD", "MICRODATA", "BROWSER", "ADAPTER"]
+    },
+    "Transformation": {
+      "title": "Transformation",
+      "description": "What the pipeline did to a source value before emitting it. INFERRED marks adapter inference, which is never presented as a DOM fact. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": ["NONE", "NORMALIZED", "INFERRED", "REDACTED"]
+    },
+    "SemanticField": {
+      "title": "SemanticField",
+      "description": "A field of a semantic node, used both to request fields and to attribute evidence to them. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "x-bip-added-in": {
+        "CONTENT_TRUST": "0.4",
+        "CONTENT_SIGNALS": "0.4",
+        "CHALLENGE_KIND": "0.12"
+      },
+      "enum": [
+        "ROLE",
+        "NAME",
+        "DESCRIPTION",
+        "TEXT_RUNS",
+        "STATES",
+        "VALUE_DESCRIPTOR",
+        "DESTINATION",
+        "BOUNDS",
+        "ACTIONS",
+        "ATTRIBUTES",
+        "SENSITIVITY",
+        "EDGES",
+        "FRAMES",
+        "CONTENT_TRUST",
+        "CONTENT_SIGNALS",
+        "CHALLENGE_KIND"
+      ]
+    },
+    "FieldEvidence": {
+      "title": "FieldEvidence",
+      "description": "Why one field of one node holds the value it holds. Conflicting evidence is preserved: a DOM-visible price and a stale structured-metadata price are emitted as separate candidates with their own evidence, and an adapter or a later normalizer marks the conflict rather than silently choosing.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "field": { "$ref": "#/$defs/SemanticField" },
+        "source_kind": { "$ref": "#/$defs/SourceKind" },
+        "source_locator": {
+          "description": "Bounded internal locator describing where in the source the value was found. Diagnostic only: it is never a reusable action identifier and is never accepted as an action target.",
+          "type": "string",
+          "maxLength": 256
+        },
+        "extraction_rule_version": {
+          "description": "Version of the extraction rule that produced the value.",
+          "type": "string",
+          "maxLength": 64
+        },
+        "transformation": { "$ref": "#/$defs/Transformation" },
+        "confidence": { "$ref": "#/$defs/Confidence" }
+      },
+      "required": ["field", "source_kind", "source_locator", "extraction_rule_version", "transformation"]
+    },
+    "Sensitivity": {
+      "title": "Sensitivity",
+      "description": "Conservative sensitivity classification of a node, run, or value. Classification uses form type, autocomplete tokens, role, label, origin, security context, obscured state, cross-origin embedding, organization policy, user labels, and bounded pattern detectors, not the HTML input type alone. UNKNOWN_SENSITIVE is handled at least as strictly as its destination policy requires. Page content can never lower a classification. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "x-bip-added-in": {
+        "ONE_TIME_CODE": "0.12",
+        "CHALLENGE_RESPONSE": "0.12"
+      },
+      "enum": [
+        "NOT_SENSITIVE",
+        "PERSONAL",
+        "ACCOUNT",
+        "PAYMENT",
+        "IDENTITY",
+        "HEALTH",
+        "FINANCIAL",
+        "LEGAL",
+        "PRIVATE_COMMUNICATION",
+        "ADMINISTRATION",
+        "CREDENTIAL",
+        "UNKNOWN_SENSITIVE",
+        "ONE_TIME_CODE",
+        "CHALLENGE_RESPONSE"
+      ]
+    },
+    "ChallengeKind": {
+      "title": "ChallengeKind",
+      "description": "A renderer-derived structural hint that a person-facing input surface may present more help. It grants no authority, never suppresses handover, and carries no challenge answer. NONE is the ordinary field case; IMAGE means a bounded page region may be copied by the browser for the person only; INTERACTIVE means the person must work in the page; ONE_TIME_CODE means a short per-use code. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "NONE",
+        "IMAGE",
+        "INTERACTIVE",
+        "ONE_TIME_CODE"
+      ]
+    },
+    "ContentTrust": {
+      "title": "ContentTrust",
+      "description": "Who authored these bytes. This is a different question from Sensitivity, which says how much harm their disclosure would cause, and the two axes are independent: a bank statement is highly sensitive and FIRST_PARTY_DOCUMENT, while a comment on the same page is not sensitive at all and is USER_GENERATED_CONTENT. A consumer MUST NOT derive one axis from the other. The order of this enumeration is wire order and is not a trust ordering. An absent label is UNKNOWN_UNTRUSTED, never an unlabelled default, and a derived value carries the least trusted label of its inputs. Frame-level authorship is browser-owned: a renderer that supplies USER_AUTHORED, TAFFY_AUTHORED, or MODEL_AUTHORED is refused the same way a renderer-reported origin is overwritten. Page content, a model, and a renderer can each lower a label and none of them can raise one. Which authors are named, and whether document-, image-, media- and search-derived content are distinct members, is [Open (OD-082)]. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "USER_AUTHORED",
+        "TAFFY_AUTHORED",
+        "FIRST_PARTY_DOCUMENT",
+        "USER_GENERATED_CONTENT",
+        "THIRD_PARTY_EMBEDDED",
+        "MODEL_AUTHORED",
+        "UNKNOWN_UNTRUSTED"
+      ]
+    },
+    "ContentSignal": {
+      "title": "ContentSignal",
+      "description": "One observation about the shape or presentation of content, computed inside the traversal the endpoint already performs. A signal is evidence and never an authorization: it raises the effective risk of acting and restricts what a model projection may carry, and no signal and no absence of one may raise a trust label, widen a scope, extend an approval, or authorize anything. Absence of a signal is not an assertion of its complement, exactly as for NodeState: a node from an endpoint that never ran the detector looks identical to one that ran it and found nothing, which is why detection is advertised as a RedactionFeature and a request whose policy needs it is refused where it is absent. The sub-family of a hidden-by-style finding travels in the bounded detail of the accompanying SnapshotWarning rather than as further members. Which detectors ship is [Open (OD-083)]. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "HIDDEN_BY_STYLE",
+        "ZERO_WIDTH_CHARACTERS",
+        "BIDI_CONTROL_CHARACTERS",
+        "ENCODED_BLOB",
+        "IMPERATIVE_INSTRUCTION_SHAPE",
+        "LANGUAGE_MISMATCH",
+        "CROSS_ORIGIN_FRAME_AUTHORED"
+      ]
+    },
+    "TextRun": {
+      "title": "TextRun",
+      "description": "One bounded run of node text with its own source and sensitivity. Text is untrusted page data. It is never an instruction with priority over system, policy, task, or user intent.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "text": {
+          "description": "Bounded, already redacted text.",
+          "type": "string",
+          "maxLength": 4096
+        },
+        "source_kind": { "$ref": "#/$defs/SourceKind" },
+        "sensitivity": { "$ref": "#/$defs/Sensitivity" },
+        "truncated": {
+          "description": "Whether this run was cut short by a text budget.",
+          "type": "boolean"
+        },
+        "source_locator": {
+          "description": "Bounded source coordinate for citations, such as pdf:page/3 or media:track/en/12500ms. It is diagnostic evidence only and is never accepted as an action target.",
+          "type": "string",
+          "maxLength": 256
+        },
+        "source_start": {
+          "description": "Inclusive UTF-8 byte offset within source_locator when the source exposes stable offsets.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "source_end": {
+          "description": "Exclusive UTF-8 byte offset within source_locator. When present it is no smaller than source_start.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+          "content_trust": {
+            "$ref": "#/$defs/ContentTrust"
+          },
+          "content_signals": {
+            "description": "Signals observed on this content. Absent means the endpoint reported none, which is not an assertion that none exist.",
+            "type": "array",
+            "x-bip-absent-as-empty": true,
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/$defs/ContentSignal"
+            }
+          }
+      },
+      "required": ["text", "source_kind", "sensitivity", "truncated"]
+    },
+    "ValueKind": {
+      "title": "ValueKind",
+      "description": "The shape of a node's value, independent of whether the value itself may be emitted. SECRET_WITHHELD is the structural placeholder for a field whose value BIP must never carry. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "TEXT",
+        "NUMBER",
+        "DATE",
+        "SELECTION",
+        "TOGGLE",
+        "PRICE",
+        "RATING",
+        "AVAILABILITY",
+        "SECRET_WITHHELD",
+        "UNKNOWN"
+      ]
+    },
+    "ValueDescriptor": {
+      "title": "ValueDescriptor",
+      "description": "What a node's value is, under redaction. BIP MUST NOT emit a plaintext value for a password, passcode, PIN, card verification value, one-time code, recovery code, passkey, private key, seed phrase, authentication token, session cookie, password-manager suggestion, or platform credential payload. The graph may say that such a field is present; it never says what it contains, what was suggested for it, or how long it is.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "kind": { "$ref": "#/$defs/ValueKind" },
+        "present": {
+          "description": "Whether the control currently holds a value at all.",
+          "type": "boolean"
+        },
+        "redacted": {
+          "description": "Whether the value was withheld by a redaction layer. When true, no normalized value is carried.",
+          "type": "boolean"
+        },
+        "normalized_value": {
+          "description": "Bounded normalized value. Absent whenever redacted is true.",
+          "type": "string",
+          "maxLength": 1024
+        },
+        "unit": {
+          "description": "Unit for a numeric or rating value.",
+          "type": "string",
+          "maxLength": 32
+        },
+        "currency_code": {
+          "description": "Currency code for a price value.",
+          "type": "string",
+          "maxLength": 8
+        }
+      },
+      "required": ["kind", "present", "redacted"],
+      "allOf": [
+        {
+          "if": { "properties": { "redacted": { "const": true } }, "required": ["redacted"] },
+          "then": { "not": { "required": ["normalized_value"] } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "SECRET_WITHHELD" } }, "required": ["kind"] },
+          "then": {
+            "required": ["redacted"],
+            "properties": { "redacted": { "const": true } },
+            "not": { "required": ["normalized_value"] }
+          }
+        }
+      ]
+    },
+    "NodeState": {
+      "title": "NodeState",
+      "description": "One asserted state of a node. A state token present in the list means the adapter asserts it. Absence means the state was not asserted, never that its complement is true: a consumer MUST NOT infer NOT_VISIBLE from a missing VISIBLE, because an action policy needs a positive assertion to proceed. Which visibility and occlusion checks are reliable enough for action policy is [Open (OD-054)]. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "VISIBLE",
+        "NOT_VISIBLE",
+        "OFFSCREEN",
+        "OBSCURED",
+        "ENABLED",
+        "DISABLED",
+        "EDITABLE",
+        "READ_ONLY",
+        "REQUIRED",
+        "INVALID",
+        "CHECKED",
+        "UNCHECKED",
+        "MIXED",
+        "SELECTED",
+        "EXPANDED",
+        "COLLAPSED",
+        "FOCUSED",
+        "BUSY"
+      ]
+    },
+    "SemanticRole": {
+      "title": "SemanticRole",
+      "description": "The initial task-oriented role vocabulary. It is deliberately small: BIP does not collapse distinct source values merely to make a model response easier, and it does not mirror the full accessibility role set. The vocabulary and its mapping rules need golden-corpus review, and how model-facing roles are versioned without locking renderer schemas is [Open (OD-028)]. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "DOCUMENT",
+        "REGION",
+        "HEADING",
+        "PARAGRAPH",
+        "LIST",
+        "LIST_ITEM",
+        "TABLE",
+        "TABLE_ROW",
+        "TABLE_CELL",
+        "LINK",
+        "BUTTON",
+        "SEARCH_FIELD",
+        "TEXT_FIELD",
+        "CHECKBOX",
+        "RADIO",
+        "SELECT",
+        "OPTION",
+        "IMAGE",
+        "MEDIA",
+        "PRICE",
+        "RATING",
+        "AVAILABILITY",
+        "LABEL_VALUE_PAIR",
+        "CITATION",
+        "UNKNOWN_INTERACTIVE",
+        "UNKNOWN_CONTENT"
+      ]
+    },
+    "RelationshipKind": {
+      "title": "RelationshipKind",
+      "description": "A typed, directional relationship between two semantic nodes. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "CONTAINS",
+        "LABELS",
+        "DESCRIBES",
+        "CONTROLS",
+        "OWNS",
+        "ROW_HEADER_FOR",
+        "COLUMN_HEADER_FOR",
+        "SAME_ENTITY_AS",
+        "SOURCE_FOR"
+      ]
+    },
+    "SemanticEdge": {
+      "title": "SemanticEdge",
+      "description": "One directed relationship between two nodes. Edges crossing a frame boundary carry the frame of each endpoint so the projection can label the boundary honestly.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "from_frame_id": { "$ref": "identity.schema.json#/$defs/FrameId" },
+        "from_node_id": { "$ref": "identity.schema.json#/$defs/SemanticNodeId" },
+        "to_frame_id": { "$ref": "identity.schema.json#/$defs/FrameId" },
+        "to_node_id": { "$ref": "identity.schema.json#/$defs/SemanticNodeId" },
+        "relationship": { "$ref": "#/$defs/RelationshipKind" },
+        "inferred": {
+          "description": "Whether an adapter inferred this relationship rather than reading it from the document. Inference is always marked as inference.",
+          "type": "boolean"
+        },
+        "confidence": { "$ref": "#/$defs/Confidence" }
+      },
+      "required": [
+        "from_frame_id",
+        "from_node_id",
+        "to_frame_id",
+        "to_node_id",
+        "relationship",
+        "inferred"
+      ]
+    },
+    "SemanticNode": {
+      "title": "SemanticNode",
+      "description": "One user-relevant page object. A node describes what a person could perceive or operate; it is not a DOM element, an accessibility node, or a layout box, and it exposes no renderer memory, Chromium pointer, or implementation-specific tree pointer. Shadow content that is open and user-visible is projected as ordinary nodes and relationships; a closed shadow root is reached only through capabilities Chromium and its accessibility stack already have, never through a bypass added for the assistant. A recycled virtualized row is a new node with a new identifier, never a continuation of the row it replaced.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "node_id": { "$ref": "identity.schema.json#/$defs/SemanticNodeId" },
+        "frame_id": { "$ref": "identity.schema.json#/$defs/FrameId" },
+        "role": { "$ref": "#/$defs/SemanticRole" },
+        "name": {
+          "description": "Bounded, redacted accessible name. Never identity: two nodes may share a name.",
+          "type": "string",
+          "maxLength": 1024
+        },
+        "description": {
+          "description": "Bounded, redacted description.",
+          "type": "string",
+          "maxLength": 2048
+        },
+        "text_runs": {
+          "description": "Bounded text runs with per-run provenance.",
+          "type": "array",
+          "x-bip-absent-as-empty": true,
+          "maxItems": 512,
+          "items": { "$ref": "#/$defs/TextRun" }
+        },
+        "states": {
+          "description": "Asserted states. Absence of a token is not an assertion of its complement.",
+          "type": "array",
+          "x-bip-absent-as-empty": true,
+          "maxItems": 32,
+          "items": { "$ref": "#/$defs/NodeState" }
+        },
+        "value_descriptor": { "$ref": "#/$defs/ValueDescriptor" },
+        "destination": { "$ref": "#/$defs/Destination" },
+        "bounds": { "$ref": "#/$defs/Bounds" },
+        "actions": {
+          "description": "Semantic capabilities the adapter believes could be attempted on this node. This list grants no permission whatsoever: authorization is the policy broker's decision, made separately. It is also a refusal in the other direction — a dispatch naming an action this list does not carry is refused by the renderer for want of an available action — so an adapter that names a write it cannot honestly offer has removed a check rather than added a feature.",
+          "type": "array",
+          "x-bip-absent-as-empty": true,
+          "maxItems": 16,
+          "items": { "$ref": "action.schema.json#/$defs/ActionType" }
+        },
+        "sensitivity": { "$ref": "#/$defs/Sensitivity" },
+        "sources": {
+          "description": "Which sources contributed to this node.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/SourceKind" }
+        },
+        "confidence": { "$ref": "#/$defs/Confidence" },
+        "attributes": {
+          "description": "Allowlisted typed attributes only.",
+          "type": "array",
+          "x-bip-absent-as-empty": true,
+          "maxItems": 32,
+          "items": { "$ref": "#/$defs/NodeAttribute" }
+        },
+        "evidence": {
+          "description": "Per-field evidence explaining where each meaningful field came from.",
+          "type": "array",
+          "x-bip-absent-as-empty": true,
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/FieldEvidence" }
+        },
+          "content_trust": {
+            "$ref": "#/$defs/ContentTrust"
+          },
+          "content_signals": {
+            "description": "Signals observed on this content. Absent means the endpoint reported none, which is not an assertion that none exist.",
+            "type": "array",
+            "x-bip-absent-as-empty": true,
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/$defs/ContentSignal"
+            }
+          },
+          "challenge_kind": {
+            "description": "Renderer-derived structural challenge hint. Optional for minor-version compatibility; absence is treated as NONE and never as permission.",
+            "$ref": "#/$defs/ChallengeKind"
+          }
+      },
+      "required": ["node_id", "frame_id", "role", "sensitivity", "sources", "confidence"]
+    },
+    "FrameExclusionReason": {
+      "title": "FrameExclusionReason",
+      "description": "Why a frame present in the browser-owned frame tree contributed no nodes. A hidden third-party frame is not observed merely because it exists; which cross-origin child-frame content may enter a task is [Open (OD-045)]. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "CROSS_ORIGIN_POLICY",
+        "HIDDEN_THIRD_PARTY",
+        "NOT_ACTIVE",
+        "BUDGET_EXCEEDED",
+        "ADAPTER_UNAVAILABLE",
+        "NOT_REQUESTED"
+      ]
+    },
+    "FrameDescriptor": {
+      "title": "FrameDescriptor",
+      "description": "One frame of the browser-assembled frame tree. The topology comes from the browser process, never from a renderer. Each frame carries its own origin, epoch, and revision, and a cross-origin child is represented as a distinct boundary rather than folded into its parent.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "frame_id": { "$ref": "identity.schema.json#/$defs/FrameId" },
+        "parent_frame_id": { "$ref": "identity.schema.json#/$defs/FrameId" },
+        "is_main_frame": { "type": "boolean" },
+        "is_out_of_process": {
+          "description": "Whether this frame is hosted in a different renderer process than its parent.",
+          "type": "boolean"
+        },
+        "is_cross_origin_to_parent": { "type": "boolean" },
+        "origin_metadata": { "$ref": "identity.schema.json#/$defs/OriginMetadata" },
+        "page_epoch": { "$ref": "identity.schema.json#/$defs/PageEpoch" },
+        "graph_revision": { "$ref": "identity.schema.json#/$defs/GraphRevision" },
+        "lifecycle_state": { "$ref": "identity.schema.json#/$defs/DocumentLifecycleState" },
+        "included": {
+          "description": "Whether this frame contributed nodes to the snapshot.",
+          "type": "boolean"
+        },
+        "exclusion_reason": { "$ref": "#/$defs/FrameExclusionReason" },
+          "content_trust": {
+            "$ref": "#/$defs/ContentTrust"
+          }
+      },
+      "required": [
+        "frame_id",
+        "is_main_frame",
+        "is_out_of_process",
+        "is_cross_origin_to_parent",
+        "origin_metadata",
+        "page_epoch",
+        "graph_revision",
+        "lifecycle_state",
+        "included"
+      ],
+      "allOf": [
+        {
+          "if": { "properties": { "included": { "const": false } }, "required": ["included"] },
+          "then": { "required": ["exclusion_reason"] }
+        },
+        {
+          "if": { "properties": { "is_main_frame": { "const": false } }, "required": ["is_main_frame"] },
+          "then": { "required": ["parent_frame_id"] }
+        }
+      ]
+    },
+    "Truncation": {
+      "title": "Truncation",
+      "description": "Explicit account of what a budget removed. Truncation is always stated, including which budget was reached and whether the omitted data could change the answer. A truncated observation is never labelled complete.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "truncated": { "type": "boolean" },
+        "budgets_reached": {
+          "description": "Every budget that was reached, in the order the extractor hit them.",
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/BudgetKind" }
+        },
+        "omitted_node_count": { "$ref": "identity.schema.json#/$defs/Count" },
+        "omitted_text_bytes": { "$ref": "identity.schema.json#/$defs/ByteCount" },
+        "omitted_frame_count": { "$ref": "identity.schema.json#/$defs/Count" },
+        "may_change_answer": {
+          "description": "Whether the omitted data could change a task's conclusion. When the extractor cannot rule that out, this is true.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "truncated",
+        "budgets_reached",
+        "omitted_node_count",
+        "omitted_text_bytes",
+        "omitted_frame_count",
+        "may_change_answer"
+      ],
+      "allOf": [
+        {
+          "if": { "properties": { "truncated": { "const": true } }, "required": ["truncated"] },
+          "then": { "properties": { "budgets_reached": { "minItems": 1 } } }
+        }
+      ]
+    },
+    "RedactionSummary": {
+      "title": "RedactionSummary",
+      "description": "Counts of what redaction removed, with no sample of what was removed. Redaction runs in layers: the renderer adapter omits prohibited values and marks sensitive zones, the browser broker applies origin, task, incognito, and organization policy, the context engine minimizes fields for the chosen route, the model adapter enforces provider constraints, and the audit and telemetry serializers redact independently.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "applied_features": {
+          "description": "Which redaction features ran for this snapshot.",
+          "type": "array",
+          "maxItems": 16,
+          "items": { "$ref": "protocol-info.schema.json#/$defs/RedactionFeature" }
+        },
+        "redacted_field_count": { "$ref": "identity.schema.json#/$defs/Count" },
+        "suppressed_secret_value_count": { "$ref": "identity.schema.json#/$defs/Count" },
+        "sensitive_zone_count": { "$ref": "identity.schema.json#/$defs/Count" },
+        "policy_filtered_frame_count": { "$ref": "identity.schema.json#/$defs/Count" }
+      },
+      "required": [
+        "applied_features",
+        "redacted_field_count",
+        "suppressed_secret_value_count",
+        "sensitive_zone_count",
+        "policy_filtered_frame_count"
+      ]
+    },
+    "WarningCode": {
+      "title": "WarningCode",
+      "description": "A bounded machine-readable warning about the completeness or reliability of an observation. Warning text shown to a person is generated from trusted local templates, never from renderer strings. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "x-bip-added-in": {
+        "INJECTION_SIGNAL_DETECTED": "0.4"
+      },
+      "enum": [
+        "ADAPTER_UNAVAILABLE",
+        "ADAPTER_FAILED",
+        "CONFLICTING_EVIDENCE",
+        "CROSS_ORIGIN_FRAME_OMITTED",
+        "CLOSED_SHADOW_ROOT_NOT_PROJECTED",
+        "VIRTUALIZED_CONTENT_PARTIAL",
+        "CANVAS_WITHOUT_SEMANTICS",
+        "SENSITIVE_ZONE_SUPPRESSED",
+        "URL_MINIMIZED_BY_POLICY",
+        "DEADLINE_REACHED",
+        "MEMORY_PRESSURE",
+        "INJECTION_SIGNAL_DETECTED"
+      ]
+    },
+    "SnapshotWarning": {
+      "title": "SnapshotWarning",
+      "description": "One warning, optionally attributed to a frame or node.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "code": { "$ref": "#/$defs/WarningCode" },
+        "frame_id": { "$ref": "identity.schema.json#/$defs/FrameId" },
+        "node_id": { "$ref": "identity.schema.json#/$defs/SemanticNodeId" },
+        "detail_code": {
+          "description": "Bounded machine-readable detail. Never page text and never a renderer-supplied message.",
+          "type": "string",
+          "maxLength": 64
+        }
+      },
+      "required": ["code"]
+    },
+    "FormObservationRoot": {
+      "title": "FormObservationRoot",
+      "description": "The exact live form subtree a SECTION observation may read. The node is a browser-issued semantic handle from this page epoch, and minimum_graph_revision binds the request to the graph in which that handle was observed. The renderer refuses an absent, retired, changed, non-form, or wrong-document root; this record grants observation only and never authorizes filling or submitting the form.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "node_id": { "$ref": "identity.schema.json#/$defs/SemanticNodeId" },
+        "minimum_graph_revision": { "$ref": "identity.schema.json#/$defs/GraphRevision" }
+      },
+      "required": ["node_id", "minimum_graph_revision"]
+    },
+    "MediaObservationRoot": {
+      "title": "MediaObservationRoot",
+      "description": "The exact live image or video node a DOCUMENT observation may inspect. The browser-issued semantic node and graph floor are validated before and after collection; this is observation authority only and never a selector, URL, pixel coordinate, or action authority.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "node_id": { "$ref": "identity.schema.json#/$defs/SemanticNodeId" },
+        "minimum_graph_revision": { "$ref": "identity.schema.json#/$defs/GraphRevision" }
+      },
+      "required": ["node_id", "minimum_graph_revision"]
+    },
+    "SnapshotRequest": {
+      "title": "SnapshotRequest",
+      "description": "A bounded request for one observation. The broker clamps every client budget to a process-safe maximum, and a request can never widen the data policy or source scope already granted to the task.",
+      "type": "object",
+      "additionalProperties": true,
+      "x-bip-message": true,
+      "properties": {
+        "schema_version": { "$ref": "identity.schema.json#/$defs/ProtocolVersion" },
+        "request_id": { "$ref": "identity.schema.json#/$defs/RequestId" },
+        "profile_id": { "$ref": "identity.schema.json#/$defs/ProfileId" },
+        "tab_id": { "$ref": "identity.schema.json#/$defs/TabId" },
+        "root_frame_id": { "$ref": "identity.schema.json#/$defs/FrameId" },
+        "observed_frame_id": {
+          "$ref": "identity.schema.json#/$defs/FrameId",
+          "description": "The frame this request is addressed to. Distinct from root_frame_id, which names the root of the observation: an endpoint is that root when the two are equal and a child frame when they are not, and this is the only way an endpoint can tell. It cannot derive the answer from its own identity, because the identity it holds is one it minted for itself in a namespace the broker does not share, so comparing the two compares nothing and has always answered \"different\". Optional under the additive rule, and its absence is not a licence to guess: an endpoint that is not told which frame it is treats itself as a cross-origin child, which raises the sensitivity floor rather than lowering it."
+        },
+        "expected_page_epoch": {
+          "$ref": "identity.schema.json#/$defs/PageEpoch",
+          "description": "Required when refreshing an existing binding, absent on a first bind. A mismatch fails the request rather than returning a snapshot of a different document."
+        },
+        "scope": { "$ref": "protocol-info.schema.json#/$defs/ObservationScope" },
+        "adapters": {
+          "description": "Adapters the request names, each marked required or optional.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/AdapterRequirement" }
+        },
+        "requested_fields": {
+          "description": "Fields the caller wants. Requesting fewer fields is the cheapest form of minimization.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/SemanticField" }
+        },
+        "include_child_frames": { "type": "boolean" },
+        "allowed_origins": {
+          "description": "The origins whose content the task may observe. An empty list means the root frame's origin only.",
+          "type": "array",
+          "maxItems": 64,
+          "items": { "$ref": "identity.schema.json#/$defs/Origin" }
+        },
+        "max_nodes": { "$ref": "identity.schema.json#/$defs/Count" },
+        "max_text_bytes": { "$ref": "identity.schema.json#/$defs/ByteCount" },
+        "max_total_bytes": { "$ref": "identity.schema.json#/$defs/ByteCount" },
+        "max_depth": { "$ref": "identity.schema.json#/$defs/Count" },
+        "deadline_ms": { "$ref": "identity.schema.json#/$defs/DurationMillis" },
+        "sensitivity_policy_id": { "$ref": "identity.schema.json#/$defs/SensitivityPolicyId" },
+        "task_purpose": {
+          "description": "A bounded trusted label describing why the task needs this observation. It is chosen by the task runtime from a local vocabulary and is never page-supplied or model-supplied free text.",
+          "type": "string",
+          "maxLength": 128
+        },
+        "form_root": {
+          "$ref": "#/$defs/FormObservationRoot",
+          "description": "Required exactly when scope is SECTION. It names the form node and graph floor that the renderer must validate before and after collection; no other scope accepts it."
+        },
+        "media_root": {
+          "$ref": "#/$defs/MediaObservationRoot",
+          "description": "Optional only at DOCUMENT scope and mutually exclusive with form_root. It narrows extraction to one exact image or video semantic node."
+        }
+      },
+      "required": [
+        "schema_version",
+        "request_id",
+        "profile_id",
+        "tab_id",
+        "root_frame_id",
+        "scope",
+        "adapters",
+        "requested_fields",
+        "include_child_frames",
+        "allowed_origins",
+        "max_nodes",
+        "max_text_bytes",
+        "max_total_bytes",
+        "max_depth",
+        "deadline_ms",
+        "sensitivity_policy_id",
+        "task_purpose"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": { "scope": { "const": "SECTION" } },
+            "required": ["scope"]
+          },
+          "then": { "required": ["form_root"] },
+          "else": { "not": { "required": ["form_root"] } }
+        },
+        {
+          "if": { "required": ["media_root"] },
+          "then": {
+            "properties": { "scope": { "const": "DOCUMENT" } },
+            "required": ["scope"],
+            "not": { "required": ["form_root"] }
+          }
+        }
+      ]
+    },
+    "PageSnapshot": {
+      "title": "PageSnapshot",
+      "description": "One bounded semantic observation of a live document, assembled by the browser broker from one or more frame endpoints. A snapshot is evidence, not authority: nothing in it authorizes an action, and every handle it carries dies with its page epoch.",
+      "type": "object",
+      "additionalProperties": true,
+      "x-bip-message": true,
+      "properties": {
+        "schema_version": { "$ref": "identity.schema.json#/$defs/ProtocolVersion" },
+        "snapshot_id": { "$ref": "identity.schema.json#/$defs/SnapshotId" },
+        "request_id": { "$ref": "identity.schema.json#/$defs/RequestId" },
+        "profile_id": { "$ref": "identity.schema.json#/$defs/ProfileId" },
+        "browser_window_id": { "$ref": "identity.schema.json#/$defs/BrowserWindowId" },
+        "tab_id": { "$ref": "identity.schema.json#/$defs/TabId" },
+        "root_frame_id": { "$ref": "identity.schema.json#/$defs/FrameId" },
+        "page_epoch": { "$ref": "identity.schema.json#/$defs/PageEpoch" },
+        "graph_revision": { "$ref": "identity.schema.json#/$defs/GraphRevision" },
+        "event_sequence": { "$ref": "identity.schema.json#/$defs/EventSequence" },
+        "lifecycle_state": { "$ref": "identity.schema.json#/$defs/DocumentLifecycleState" },
+        "committed_url_metadata": { "$ref": "#/$defs/UrlMetadata" },
+        "origin_metadata": { "$ref": "identity.schema.json#/$defs/OriginMetadata" },
+        "capture_time_monotonic_ms": { "$ref": "identity.schema.json#/$defs/MonotonicMillis" },
+        "scope": { "$ref": "protocol-info.schema.json#/$defs/ObservationScope" },
+        "adapters": {
+          "description": "One report per adapter the request named.",
+          "type": "array",
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/AdapterReport" }
+        },
+        "nodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/SemanticNode" }
+        },
+        "edges": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/SemanticEdge" }
+        },
+        "frames": {
+          "description": "The browser-assembled frame tree, including frames that contributed nothing and why.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/FrameDescriptor" }
+        },
+        "truncation": { "$ref": "#/$defs/Truncation" },
+        "redaction_summary": { "$ref": "#/$defs/RedactionSummary" },
+        "warnings": {
+          "type": "array",
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/SnapshotWarning" }
+        },
+          "lowest_content_trust": {
+            "description": "The least trusted label carried by any node or frame included in this snapshot. The context engine reads this without walking the graph.",
+            "$ref": "#/$defs/ContentTrust"
+          },
+          "form_root": {
+            "$ref": "#/$defs/FormObservationRoot",
+            "description": "The exact validated form root echoed from a SECTION request. It is absent for every other scope."
+          },
+          "media_root": {
+            "$ref": "#/$defs/MediaObservationRoot",
+            "description": "The exact validated media root echoed from a targeted DOCUMENT request."
+          }
+      },
+      "required": [
+        "schema_version",
+        "snapshot_id",
+        "request_id",
+        "profile_id",
+        "browser_window_id",
+        "tab_id",
+        "root_frame_id",
+        "page_epoch",
+        "graph_revision",
+        "event_sequence",
+        "lifecycle_state",
+        "committed_url_metadata",
+        "origin_metadata",
+        "capture_time_monotonic_ms",
+        "scope",
+        "adapters",
+        "nodes",
+        "edges",
+        "frames",
+        "truncation",
+        "redaction_summary",
+        "warnings"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": { "scope": { "const": "SECTION" } },
+            "required": ["scope"]
+          },
+          "then": { "required": ["form_root"] },
+          "else": { "not": { "required": ["form_root"] } }
+        },
+        {
+          "if": { "required": ["media_root"] },
+          "then": {
+            "properties": { "scope": { "const": "DOCUMENT" } },
+            "required": ["scope"],
+            "not": { "required": ["form_root"] }
+          }
+        }
+      ]
+    }
+  }
+}

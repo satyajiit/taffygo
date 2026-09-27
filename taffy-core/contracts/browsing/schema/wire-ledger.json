@@ -1,0 +1,30 @@
+{
+  "contract": "browsing",
+  "description": "The frozen wire record for the browsing seam: every enumeration member's value, every record field's ordinal and type, and every interface method's ordinal and signature. Nothing here moves. An append is recorded by running the generator with --refreeze, which refuses unless the contract version was raised in the same change.",
+  "contract_version": "1.1",
+  "codec_schema_versions": {},
+  "frozen_payloads": {},
+  "enums": {
+    "TabOwner": {"UNKNOWN": 0, "USER": 1, "ASSISTANT": 2},
+    "TabPrivacy": {"NORMAL": 0, "PRIVATE": 1},
+    "NavigationFailure": {"NONE": 0, "DNS_FAILURE": 1, "OFFLINE": 2, "CONNECTION_FAILURE": 3, "TIMEOUT": 4, "TLS_FAILURE": 5, "HTTP_ERROR_STATUS": 6, "BLOCKED_BY_CLIENT": 7, "BLOCKED_BY_SAFE_BROWSING": 8, "ABORTED": 9, "UNKNOWN_FAILURE": 10},
+    "InterstitialKind": {"NONE": 0, "CERTIFICATE_ERROR": 1, "SAFE_BROWSING": 2, "BLOCKED_BY_POLICY": 3, "OTHER": 4},
+    "DownloadState": {"CREATED": 0, "IN_PROGRESS": 1, "PAUSED": 2, "INTERRUPTED": 3, "COMPLETE": 4, "CANCELLED": 5},
+    "DownloadFailure": {"NONE": 0, "NETWORK": 1, "SERVER": 2, "FILE_SYSTEM": 3, "INSUFFICIENT_SPACE": 4, "PERMISSION_DENIED": 5, "BLOCKED_BY_SECURITY_CHECK": 6, "CANCELLED_BY_USER": 7, "BROWSER_SHUTDOWN": 8, "UNKNOWN": 9},
+    "DownloadDestination": {"UNDECIDED": 0, "DEFAULT_DIRECTORY": 1, "USER_CHOSEN_LOCATION": 2, "APPLICATION_PRIVATE_DIRECTORY": 3},
+    "DownloadCommand": {"PAUSE": 0, "RESUME": 1, "CANCEL": 2, "RETRY": 3, "OPEN_WHEN_COMPLETE": 4, "OPEN_NOW": 5},
+    "BrowsingStatus": {"ACCEPTED": 0, "INVALID_REQUEST": 1, "UNKNOWN_TAB": 2, "UNKNOWN_DOWNLOAD": 3, "ILLEGAL_IN_STATE": 4, "REFUSED_BY_POLICY": 5, "NO_HISTORY": 6, "UNAVAILABLE": 7}
+  },
+  "records": {
+    "TabView": {"tab_id": [0, "string"], "title": [1, "string"], "host": [2, "string"], "has_been_nowhere": [3, "bool"], "owner": [4, "TabOwner"], "privacy": [5, "TabPrivacy"], "selected": [6, "bool"]},
+    "NavigationView": {"host": [0, "string"], "title": [1, "string"], "can_go_back": [2, "bool"], "can_go_forward": [3, "bool"], "is_loading": [4, "bool"], "failure": [5, "NavigationFailure"], "interstitial": [6, "InterstitialKind"], "http_status_code": [7, "u32"], "filtering_active": [8, "bool"], "blocked_request_count": [9, "u32"]},
+    "DownloadView": {"download_id": [0, "string"], "file_name": [1, "string"], "host": [2, "string"], "received_bytes": [3, "u64"], "total_bytes": [4, "u64"], "total_known": [5, "bool"], "state": [6, "DownloadState"], "failure": [7, "DownloadFailure"], "destination": [8, "DownloadDestination"], "resumable": [9, "bool"], "requires_danger_confirmation": [10, "bool"]},
+    "BrowsingStateView": {"tabs": [0, "list<TabView>"], "navigation": [1, "NavigationView"], "downloads": [2, "list<DownloadView>"]}
+  },
+  "unions": {
+  },
+  "interfaces": {
+    "TaffyBrowsingObserver": {"OnBrowsingState": {"ordinal": 0, "params": {"state": [0, "BrowsingStateView"]}, "reply": ""}},
+    "TaffyBrowsingSurface": {"Observe": {"ordinal": 0, "params": {"observer": [0, "pending_remote<TaffyBrowsingObserver>"]}, "reply": ""}, "OpenTab": {"ordinal": 1, "params": {"host": [0, "string"], "privacy": [1, "TabPrivacy"]}, "reply": "(status: BrowsingStatus, tab_id: string)"}, "SelectTab": {"ordinal": 2, "params": {"tab_id": [0, "string"]}, "reply": "(status: BrowsingStatus)"}, "CloseTab": {"ordinal": 3, "params": {"tab_id": [0, "string"]}, "reply": "(status: BrowsingStatus)"}, "NavigateTo": {"ordinal": 4, "params": {"host": [0, "string"]}, "reply": "(status: BrowsingStatus)"}, "GoBack": {"ordinal": 5, "params": {}, "reply": "(status: BrowsingStatus)"}, "GoForward": {"ordinal": 6, "params": {}, "reply": "(status: BrowsingStatus)"}, "Reload": {"ordinal": 7, "params": {}, "reply": "(status: BrowsingStatus)"}, "RunDownloadCommand": {"ordinal": 8, "params": {"download_id": [0, "string"], "command": [1, "DownloadCommand"]}, "reply": "(status: BrowsingStatus)"}, "SetFilteringEnabled": {"ordinal": 9, "params": {"enabled": [0, "bool"]}, "reply": "(status: BrowsingStatus)"}, "SetSiteFilteringException": {"ordinal": 10, "params": {"host": [0, "string"], "allow": [1, "bool"]}, "reply": "(status: BrowsingStatus)"}}
+  }
+}

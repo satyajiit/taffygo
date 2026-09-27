@@ -1,0 +1,26 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# This file intentionally lists no addresses yet.
+#
+# An OWNERS file with only comments does not grant ownership: review falls
+# through to the parent //components/OWNERS, which is the honest state while
+# the browser, assistant-runtime, and Android owner roles named in the M0
+# milestone of docs/roadmap.md are still unfilled. Adding a name here is part
+# of closing M0, not something to guess at now.
+#
+# Security-sensitive surfaces keep an explicit reviewer requirement even
+# before then. Both paths below carry the same property: they parse or
+# transport data that a compromised renderer controls.
+#
+# VERIFY AT SP-01: confirm that file:// OWNERS references resolve from an
+# overlay-mounted directory (the directory is a symlink into this repository,
+# so the OWNERS parser sees it at //taffy/... but the file lives
+# outside src/). If symlinked OWNERS files are not resolved, this file has to
+# move into the patch queue instead, and that cost belongs in the SP-01
+# report.
+per-file *.mojom=file://ipc/SECURITY_OWNERS
+per-file *_mojom_traits*=file://ipc/SECURITY_OWNERS

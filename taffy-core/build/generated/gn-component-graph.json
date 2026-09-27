@@ -1,0 +1,2039 @@
+{
+  "schema_version": 1,
+  "root_label": "//taffy",
+  "targets": [
+    {
+      "label": "//taffy/app/android:taffy_public_apk",
+      "component": "app.android",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.aggregate",
+        "contracts.core-api",
+        "contracts.core-service",
+        "delivery.bundled",
+        "renderer",
+        "resources",
+        "third-party.easylist",
+        "ui.android.app",
+        "ui.android.core.api",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.ui",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.settings",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "app/android/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android:taffy_public_base_bundle_module",
+      "component": "app.android",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.aggregate",
+        "contracts.core-api",
+        "contracts.core-service",
+        "delivery.bundled",
+        "renderer",
+        "resources",
+        "third-party.easylist",
+        "ui.android.app",
+        "ui.android.core.api",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.ui",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.settings",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "app/android/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android:taffy_public_bundle",
+      "component": "app.android",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.aggregate",
+        "contracts.core-api",
+        "contracts.core-service",
+        "delivery.bundled",
+        "renderer",
+        "resources",
+        "third-party.easylist",
+        "ui.android.app",
+        "ui.android.core.api",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.ui",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.settings",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "app/android/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy:native",
+      "component": "app.android",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.aggregate",
+        "contracts.core-api",
+        "contracts.core-service",
+        "delivery.bundled",
+        "renderer",
+        "resources",
+        "third-party.easylist",
+        "ui.android.app",
+        "ui.android.core.api",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.ui",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.settings",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "app/android/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy:product",
+      "component": "app.android",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.aggregate",
+        "contracts.core-api",
+        "contracts.core-service",
+        "delivery.bundled",
+        "renderer",
+        "resources",
+        "third-party.easylist",
+        "ui.android.app",
+        "ui.android.core.api",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.ui",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.settings",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "app/android/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/browser:browser",
+      "component": "browser.host",
+      "direct_component_deps": [
+        "common",
+        "contracts.bip",
+        "contracts.browsing",
+        "contracts.core-api",
+        "contracts.core-service",
+        "filtering.browser",
+        "filtering.mojom",
+        "intelligence.content",
+        "resources",
+        "security.browser",
+        "services.tool-supervisor",
+        "storage.browser",
+        "tools.entrypoints"
+      ],
+      "owned_sources": [
+        "browser/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy:architecture_manifest",
+      "component": "build.manifest",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "build/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/common/public:public",
+      "component": "common",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "common/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/contracts:contracts",
+      "component": "contracts.aggregate",
+      "direct_component_deps": [
+        "contracts.bip",
+        "contracts.browsing",
+        "contracts.core-api",
+        "contracts.core-service",
+        "contracts.tool-runtime"
+      ],
+      "owned_sources": [
+        "contracts/BUILD.gn"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy:contracts",
+      "component": "contracts.aggregate",
+      "direct_component_deps": [
+        "contracts.bip",
+        "contracts.browsing",
+        "contracts.core-api",
+        "contracts.core-service",
+        "contracts.tool-runtime"
+      ],
+      "owned_sources": [
+        "contracts/BUILD.gn"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/contracts/bip/mojom:mojom",
+      "component": "contracts.bip",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "contracts/bip/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/contracts/bip/rust/bip-types:bip_types",
+      "component": "contracts.bip",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "contracts/bip/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/contracts/browsing:browsing",
+      "component": "contracts.browsing",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "contracts/browsing/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/contracts/core-api/rust/core-api-types:core_api_types",
+      "component": "contracts.core-api",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "contracts/core-api/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/contracts/core-api:core-api",
+      "component": "contracts.core-api",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "contracts/core-api/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/contracts/core-service/rust/core-service-types:core_service_types",
+      "component": "contracts.core-service",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "contracts/core-service/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/contracts/core-service:core-service",
+      "component": "contracts.core-service",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "contracts/core-service/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/contracts/tool-runtime:tool-runtime",
+      "component": "contracts.tool-runtime",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "contracts/tool-runtime/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/delivery/core/rust/asset-plane:asset_plane",
+      "component": "delivery.asset-plane",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "components/delivery/core/rust/asset-plane/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/delivery:bundled_delivery_assets",
+      "component": "delivery.bundled",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "components/delivery/BUILD.gn",
+        "components/delivery/bundled/**",
+        "components/delivery/bundled_assets.gni"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/filtering/browser:browser",
+      "component": "filtering.browser",
+      "direct_component_deps": [
+        "filtering.core",
+        "filtering.mojom"
+      ],
+      "owned_sources": [
+        "components/filtering/browser/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/filtering/browser:prefs",
+      "component": "filtering.browser",
+      "direct_component_deps": [
+        "filtering.core",
+        "filtering.mojom"
+      ],
+      "owned_sources": [
+        "components/filtering/browser/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/filtering/core:core",
+      "component": "filtering.core",
+      "direct_component_deps": [
+        "third-party.adblock-rust"
+      ],
+      "owned_sources": [
+        "components/filtering/core/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/filtering/mojom:mojom",
+      "component": "filtering.mojom",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "components/filtering/mojom/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/filtering/renderer:renderer",
+      "component": "filtering.renderer",
+      "direct_component_deps": [
+        "filtering.mojom"
+      ],
+      "owned_sources": [
+        "components/filtering/renderer/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/intelligence/content:content",
+      "component": "intelligence.content",
+      "direct_component_deps": [
+        "common",
+        "contracts.bip",
+        "security.browser"
+      ],
+      "owned_sources": [
+        "components/intelligence/content/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/intelligence/core/rust/file-engine:file_engine",
+      "component": "intelligence.file-engine",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "components/intelligence/core/rust/file-engine/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/intelligence/core/rust/loop-kernel:loop_kernel",
+      "component": "intelligence.loop-kernel",
+      "direct_component_deps": [
+        "contracts.bip",
+        "contracts.core-service",
+        "intelligence.model-router",
+        "intelligence.procedure-engine",
+        "intelligence.table-engine",
+        "intelligence.task-engine",
+        "security.policy-engine"
+      ],
+      "owned_sources": [
+        "components/intelligence/core/rust/loop-kernel/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/intelligence/core/rust/model-router:model_router",
+      "component": "intelligence.model-router",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "components/intelligence/core/rust/model-router/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/intelligence/core/rust/procedure-engine:procedure_engine",
+      "component": "intelligence.procedure-engine",
+      "direct_component_deps": [
+        "contracts.bip",
+        "intelligence.task-engine",
+        "security.policy-engine"
+      ],
+      "owned_sources": [
+        "components/intelligence/core/rust/procedure-engine/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/intelligence/core/rust/core-runtime:core_runtime",
+      "component": "intelligence.runtime",
+      "direct_component_deps": [
+        "contracts.bip",
+        "contracts.core-api",
+        "contracts.core-service",
+        "delivery.asset-plane",
+        "intelligence.file-engine",
+        "intelligence.loop-kernel",
+        "intelligence.model-router",
+        "intelligence.procedure-engine",
+        "intelligence.task-engine",
+        "security.audit-engine",
+        "security.policy-engine",
+        "storage.domain",
+        "tools.entrypoints"
+      ],
+      "owned_sources": [
+        "components/intelligence/core/rust/core-runtime/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/intelligence/core/rust/table-engine:table_engine",
+      "component": "intelligence.table-engine",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "components/intelligence/core/rust/table-engine/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/intelligence/core/rust/task-engine:task_engine",
+      "component": "intelligence.task-engine",
+      "direct_component_deps": [
+        "contracts.bip"
+      ],
+      "owned_sources": [
+        "components/intelligence/core/rust/task-engine/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/renderer:renderer",
+      "component": "renderer",
+      "direct_component_deps": [
+        "contracts.bip"
+      ],
+      "owned_sources": [
+        "renderer/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/resources/branding:upstream_provenance",
+      "component": "resources",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "resources/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/resources/catalog:resources",
+      "component": "resources",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "resources/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/resources/tokens:tokens",
+      "component": "resources",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "resources/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/security/core/rust/audit-engine:audit_engine",
+      "component": "security.audit-engine",
+      "direct_component_deps": [
+        "contracts.bip"
+      ],
+      "owned_sources": [
+        "components/security/core/rust/audit-engine/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/security/browser:authority",
+      "component": "security.browser",
+      "direct_component_deps": [
+        "common",
+        "contracts.core-service"
+      ],
+      "owned_sources": [
+        "components/security/browser/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/security/core/rust/policy-engine:policy_engine",
+      "component": "security.policy-engine",
+      "direct_component_deps": [
+        "common",
+        "contracts.bip"
+      ],
+      "owned_sources": [
+        "components/security/core/rust/policy-engine/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/services/core:service",
+      "component": "services.core",
+      "direct_component_deps": [
+        "contracts.core-service",
+        "intelligence.runtime"
+      ],
+      "owned_sources": [
+        "services/core/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/services/tool-runtime/media:media",
+      "component": "services.media",
+      "direct_component_deps": [
+        "contracts.tool-runtime"
+      ],
+      "owned_sources": [
+        "services/tool-runtime/media/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/services/tool-runtime/python:python",
+      "component": "services.python",
+      "direct_component_deps": [
+        "contracts.tool-runtime",
+        "third-party.cpython-runtime"
+      ],
+      "owned_sources": [
+        "services/tool-runtime/python/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/services/tool-runtime/supervisor:supervisor",
+      "component": "services.tool-supervisor",
+      "direct_component_deps": [
+        "contracts.core-service",
+        "contracts.tool-runtime"
+      ],
+      "owned_sources": [
+        "services/tool-runtime/supervisor/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/storage/browser:storage",
+      "component": "storage.browser",
+      "direct_component_deps": [
+        "common",
+        "contracts.core-service",
+        "storage.domain"
+      ],
+      "owned_sources": [
+        "components/storage/browser/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/storage/core/rust/storage-domain:taffy_storage",
+      "component": "storage.domain",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "components/storage/core/rust/storage-domain/**",
+        "components/storage/core/schema/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/test/android/profile:task_pdf_handoff_java",
+      "component": "test.android-profile",
+      "direct_component_deps": [
+        "app.android",
+        "test.recovery"
+      ],
+      "owned_sources": [
+        "test/android/profile/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/android/ui:core_ui_instrumentation_tests_java",
+      "component": "test.android-ui",
+      "direct_component_deps": [
+        "test.support",
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "test/android/ui/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/android/ui:feature_assistant_instrumentation_tests_java",
+      "component": "test.android-ui",
+      "direct_component_deps": [
+        "test.support",
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "test/android/ui/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/android/ui:feature_browsing_instrumentation_tests_java",
+      "component": "test.android-ui",
+      "direct_component_deps": [
+        "test.support",
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "test/android/ui/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/android/ui:feature_downloads_instrumentation_tests_java",
+      "component": "test.android-ui",
+      "direct_component_deps": [
+        "test.support",
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "test/android/ui/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/android/ui:feature_onboarding_instrumentation_tests_java",
+      "component": "test.android-ui",
+      "direct_component_deps": [
+        "test.support",
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "test/android/ui/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/android/ui:feature_providers_instrumentation_tests_java",
+      "component": "test.android-ui",
+      "direct_component_deps": [
+        "test.support",
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "test/android/ui/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/android/ui:feature_settings_instrumentation_tests_java",
+      "component": "test.android-ui",
+      "direct_component_deps": [
+        "test.support",
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "test/android/ui/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/android/ui:feature_workspaces_instrumentation_tests_java",
+      "component": "test.android-ui",
+      "direct_component_deps": [
+        "test.support",
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "test/android/ui/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/android/ui:taffy_public_test_apk",
+      "component": "test.android-ui",
+      "direct_component_deps": [
+        "test.support",
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "test/android/ui/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/android/ui:ui_instrumentation_manifest",
+      "component": "test.android-ui",
+      "direct_component_deps": [
+        "test.support",
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "test/android/ui/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/android/ui:ui_instrumentation_resources",
+      "component": "test.android-ui",
+      "direct_component_deps": [
+        "test.support",
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "test/android/ui/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy:taffy_android_tests",
+      "component": "test.android-ui",
+      "direct_component_deps": [
+        "test.support",
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "test/android/ui/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/recovery:core_service_recovery_browser_tests",
+      "component": "test.recovery",
+      "direct_component_deps": [
+        "browser.host",
+        "contracts.core-api",
+        "contracts.core-service",
+        "filtering.browser",
+        "intelligence.content",
+        "security.browser",
+        "storage.browser",
+        "test.support"
+      ],
+      "owned_sources": [
+        "test/recovery/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test/recovery:task_pdf_handoff_jni_headers",
+      "component": "test.recovery",
+      "direct_component_deps": [
+        "browser.host",
+        "contracts.core-api",
+        "contracts.core-service",
+        "filtering.browser",
+        "intelligence.content",
+        "security.browser",
+        "storage.browser",
+        "test.support"
+      ],
+      "owned_sources": [
+        "test/recovery/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test:benchmark_audit_decoder",
+      "component": "test.support",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.bip",
+        "contracts.tool-runtime",
+        "filtering.browser",
+        "filtering.core",
+        "filtering.renderer",
+        "intelligence.content",
+        "renderer",
+        "security.browser",
+        "services.core",
+        "services.media",
+        "services.tool-supervisor",
+        "storage.browser",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "test/BUILD.gn",
+        "test/adversarial/**",
+        "test/android/AndroidManifest.xml.jinja2",
+        "test/android/taffy_browsertests_jni_onload.cc",
+        "test/benchmark/**",
+        "test/corpus/**",
+        "test/correctness/**",
+        "test/fuzz/**",
+        "test/parity/**",
+        "test/support/**",
+        "test/taffy_browser_test_main_delegate.cc",
+        "test/taffy_browser_test_main_delegate.h",
+        "test/taffy_content_renderer_client.cc",
+        "test/taffy_content_renderer_client.h",
+        "test/taffy_content_utility_client.cc",
+        "test/taffy_content_utility_client.h",
+        "test/tool/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test:benchmark_audit_support",
+      "component": "test.support",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.bip",
+        "contracts.tool-runtime",
+        "filtering.browser",
+        "filtering.core",
+        "filtering.renderer",
+        "intelligence.content",
+        "renderer",
+        "security.browser",
+        "services.core",
+        "services.media",
+        "services.tool-supervisor",
+        "storage.browser",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "test/BUILD.gn",
+        "test/adversarial/**",
+        "test/android/AndroidManifest.xml.jinja2",
+        "test/android/taffy_browsertests_jni_onload.cc",
+        "test/benchmark/**",
+        "test/corpus/**",
+        "test/correctness/**",
+        "test/fuzz/**",
+        "test/parity/**",
+        "test/support/**",
+        "test/taffy_browser_test_main_delegate.cc",
+        "test/taffy_browser_test_main_delegate.h",
+        "test/taffy_content_renderer_client.cc",
+        "test/taffy_content_renderer_client.h",
+        "test/taffy_content_utility_client.cc",
+        "test/taffy_content_utility_client.h",
+        "test/tool/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test:benchmark_page_evidence",
+      "component": "test.support",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.bip",
+        "contracts.tool-runtime",
+        "filtering.browser",
+        "filtering.core",
+        "filtering.renderer",
+        "intelligence.content",
+        "renderer",
+        "security.browser",
+        "services.core",
+        "services.media",
+        "services.tool-supervisor",
+        "storage.browser",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "test/BUILD.gn",
+        "test/adversarial/**",
+        "test/android/AndroidManifest.xml.jinja2",
+        "test/android/taffy_browsertests_jni_onload.cc",
+        "test/benchmark/**",
+        "test/corpus/**",
+        "test/correctness/**",
+        "test/fuzz/**",
+        "test/parity/**",
+        "test/support/**",
+        "test/taffy_browser_test_main_delegate.cc",
+        "test/taffy_browser_test_main_delegate.h",
+        "test/taffy_content_renderer_client.cc",
+        "test/taffy_content_renderer_client.h",
+        "test/taffy_content_utility_client.cc",
+        "test/taffy_content_utility_client.h",
+        "test/tool/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test:benchmark_support",
+      "component": "test.support",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.bip",
+        "contracts.tool-runtime",
+        "filtering.browser",
+        "filtering.core",
+        "filtering.renderer",
+        "intelligence.content",
+        "renderer",
+        "security.browser",
+        "services.core",
+        "services.media",
+        "services.tool-supervisor",
+        "storage.browser",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "test/BUILD.gn",
+        "test/adversarial/**",
+        "test/android/AndroidManifest.xml.jinja2",
+        "test/android/taffy_browsertests_jni_onload.cc",
+        "test/benchmark/**",
+        "test/corpus/**",
+        "test/correctness/**",
+        "test/fuzz/**",
+        "test/parity/**",
+        "test/support/**",
+        "test/taffy_browser_test_main_delegate.cc",
+        "test/taffy_browser_test_main_delegate.h",
+        "test/taffy_content_renderer_client.cc",
+        "test/taffy_content_renderer_client.h",
+        "test/taffy_content_utility_client.cc",
+        "test/taffy_content_utility_client.h",
+        "test/tool/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test:benchmark_unit_tests",
+      "component": "test.support",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.bip",
+        "contracts.tool-runtime",
+        "filtering.browser",
+        "filtering.core",
+        "filtering.renderer",
+        "intelligence.content",
+        "renderer",
+        "security.browser",
+        "services.core",
+        "services.media",
+        "services.tool-supervisor",
+        "storage.browser",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "test/BUILD.gn",
+        "test/adversarial/**",
+        "test/android/AndroidManifest.xml.jinja2",
+        "test/android/taffy_browsertests_jni_onload.cc",
+        "test/benchmark/**",
+        "test/corpus/**",
+        "test/correctness/**",
+        "test/fuzz/**",
+        "test/parity/**",
+        "test/support/**",
+        "test/taffy_browser_test_main_delegate.cc",
+        "test/taffy_browser_test_main_delegate.h",
+        "test/taffy_content_renderer_client.cc",
+        "test/taffy_content_renderer_client.h",
+        "test/taffy_content_utility_client.cc",
+        "test/taffy_content_utility_client.h",
+        "test/tool/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test:fixture_server_support",
+      "component": "test.support",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.bip",
+        "contracts.tool-runtime",
+        "filtering.browser",
+        "filtering.core",
+        "filtering.renderer",
+        "intelligence.content",
+        "renderer",
+        "security.browser",
+        "services.core",
+        "services.media",
+        "services.tool-supervisor",
+        "storage.browser",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "test/BUILD.gn",
+        "test/adversarial/**",
+        "test/android/AndroidManifest.xml.jinja2",
+        "test/android/taffy_browsertests_jni_onload.cc",
+        "test/benchmark/**",
+        "test/corpus/**",
+        "test/correctness/**",
+        "test/fuzz/**",
+        "test/parity/**",
+        "test/support/**",
+        "test/taffy_browser_test_main_delegate.cc",
+        "test/taffy_browser_test_main_delegate.h",
+        "test/taffy_content_renderer_client.cc",
+        "test/taffy_content_renderer_client.h",
+        "test/taffy_content_utility_client.cc",
+        "test/taffy_content_utility_client.h",
+        "test/tool/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test:support",
+      "component": "test.support",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.bip",
+        "contracts.tool-runtime",
+        "filtering.browser",
+        "filtering.core",
+        "filtering.renderer",
+        "intelligence.content",
+        "renderer",
+        "security.browser",
+        "services.core",
+        "services.media",
+        "services.tool-supervisor",
+        "storage.browser",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "test/BUILD.gn",
+        "test/adversarial/**",
+        "test/android/AndroidManifest.xml.jinja2",
+        "test/android/taffy_browsertests_jni_onload.cc",
+        "test/benchmark/**",
+        "test/corpus/**",
+        "test/correctness/**",
+        "test/fuzz/**",
+        "test/parity/**",
+        "test/support/**",
+        "test/taffy_browser_test_main_delegate.cc",
+        "test/taffy_browser_test_main_delegate.h",
+        "test/taffy_content_renderer_client.cc",
+        "test/taffy_content_renderer_client.h",
+        "test/taffy_content_utility_client.cc",
+        "test/taffy_content_utility_client.h",
+        "test/tool/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/test:workspace_snapshot_compat_unit_tests",
+      "component": "test.support",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.bip",
+        "contracts.tool-runtime",
+        "filtering.browser",
+        "filtering.core",
+        "filtering.renderer",
+        "intelligence.content",
+        "renderer",
+        "security.browser",
+        "services.core",
+        "services.media",
+        "services.tool-supervisor",
+        "storage.browser",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "test/BUILD.gn",
+        "test/adversarial/**",
+        "test/android/AndroidManifest.xml.jinja2",
+        "test/android/taffy_browsertests_jni_onload.cc",
+        "test/benchmark/**",
+        "test/corpus/**",
+        "test/correctness/**",
+        "test/fuzz/**",
+        "test/parity/**",
+        "test/support/**",
+        "test/taffy_browser_test_main_delegate.cc",
+        "test/taffy_browser_test_main_delegate.h",
+        "test/taffy_content_renderer_client.cc",
+        "test/taffy_content_renderer_client.h",
+        "test/taffy_content_utility_client.cc",
+        "test/taffy_content_utility_client.h",
+        "test/tool/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy:taffy_browsertests",
+      "component": "test.support",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.bip",
+        "contracts.tool-runtime",
+        "filtering.browser",
+        "filtering.core",
+        "filtering.renderer",
+        "intelligence.content",
+        "renderer",
+        "security.browser",
+        "services.core",
+        "services.media",
+        "services.tool-supervisor",
+        "storage.browser",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "test/BUILD.gn",
+        "test/adversarial/**",
+        "test/android/AndroidManifest.xml.jinja2",
+        "test/android/taffy_browsertests_jni_onload.cc",
+        "test/benchmark/**",
+        "test/corpus/**",
+        "test/correctness/**",
+        "test/fuzz/**",
+        "test/parity/**",
+        "test/support/**",
+        "test/taffy_browser_test_main_delegate.cc",
+        "test/taffy_browser_test_main_delegate.h",
+        "test/taffy_content_renderer_client.cc",
+        "test/taffy_content_renderer_client.h",
+        "test/taffy_content_utility_client.cc",
+        "test/taffy_content_utility_client.h",
+        "test/tool/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy:taffy_browsertests_manifest",
+      "component": "test.support",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.bip",
+        "contracts.tool-runtime",
+        "filtering.browser",
+        "filtering.core",
+        "filtering.renderer",
+        "intelligence.content",
+        "renderer",
+        "security.browser",
+        "services.core",
+        "services.media",
+        "services.tool-supervisor",
+        "storage.browser",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "test/BUILD.gn",
+        "test/adversarial/**",
+        "test/android/AndroidManifest.xml.jinja2",
+        "test/android/taffy_browsertests_jni_onload.cc",
+        "test/benchmark/**",
+        "test/corpus/**",
+        "test/correctness/**",
+        "test/fuzz/**",
+        "test/parity/**",
+        "test/support/**",
+        "test/taffy_browser_test_main_delegate.cc",
+        "test/taffy_browser_test_main_delegate.h",
+        "test/taffy_content_renderer_client.cc",
+        "test/taffy_content_renderer_client.h",
+        "test/taffy_content_utility_client.cc",
+        "test/taffy_content_utility_client.h",
+        "test/tool/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy:taffy_tests",
+      "component": "test.support",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.bip",
+        "contracts.tool-runtime",
+        "filtering.browser",
+        "filtering.core",
+        "filtering.renderer",
+        "intelligence.content",
+        "renderer",
+        "security.browser",
+        "services.core",
+        "services.media",
+        "services.tool-supervisor",
+        "storage.browser",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "test/BUILD.gn",
+        "test/adversarial/**",
+        "test/android/AndroidManifest.xml.jinja2",
+        "test/android/taffy_browsertests_jni_onload.cc",
+        "test/benchmark/**",
+        "test/corpus/**",
+        "test/correctness/**",
+        "test/fuzz/**",
+        "test/parity/**",
+        "test/support/**",
+        "test/taffy_browser_test_main_delegate.cc",
+        "test/taffy_browser_test_main_delegate.h",
+        "test/taffy_content_renderer_client.cc",
+        "test/taffy_content_renderer_client.h",
+        "test/taffy_content_utility_client.cc",
+        "test/taffy_content_utility_client.h",
+        "test/tool/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy:taffy_unittests",
+      "component": "test.support",
+      "direct_component_deps": [
+        "browser.host",
+        "common",
+        "contracts.bip",
+        "contracts.tool-runtime",
+        "filtering.browser",
+        "filtering.core",
+        "filtering.renderer",
+        "intelligence.content",
+        "renderer",
+        "security.browser",
+        "services.core",
+        "services.media",
+        "services.tool-supervisor",
+        "storage.browser",
+        "utility.registry"
+      ],
+      "owned_sources": [
+        "test/BUILD.gn",
+        "test/adversarial/**",
+        "test/android/AndroidManifest.xml.jinja2",
+        "test/android/taffy_browsertests_jni_onload.cc",
+        "test/benchmark/**",
+        "test/corpus/**",
+        "test/correctness/**",
+        "test/fuzz/**",
+        "test/parity/**",
+        "test/support/**",
+        "test/taffy_browser_test_main_delegate.cc",
+        "test/taffy_browser_test_main_delegate.h",
+        "test/taffy_content_renderer_client.cc",
+        "test/taffy_content_renderer_client.h",
+        "test/taffy_content_utility_client.cc",
+        "test/taffy_content_utility_client.h",
+        "test/tool/**"
+      ],
+      "test_only": true
+    },
+    {
+      "label": "//taffy/third_party/adblock-rust:c_abi",
+      "component": "third-party.adblock-rust",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "third_party/adblock-rust/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/third_party/commonmark:commonmark_java",
+      "component": "third-party.commonmark",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "third_party/commonmark/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/third_party/cpython:python",
+      "component": "third-party.cpython-runtime",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "third_party/cpython/BUILD.gn",
+        "third_party/cpython/generated/**",
+        "third_party/cpython/python_sources.gni",
+        "third_party/cpython/runtime/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/third_party/dagger:taffy_dagger_runtime_java",
+      "component": "third-party.dagger",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "third_party/dagger/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/third_party/easylist:bundled_filter_list_assets",
+      "component": "third-party.easylist",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "third_party/easylist/BUILD.gn",
+        "third_party/easylist/concat_snapshots.py",
+        "third_party/easylist/snapshots/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/tools/core/rust/tool-entrypoints:tool_entrypoints",
+      "component": "tools.entrypoints",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "components/tools/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/components/tools/entrypoints:entrypoints",
+      "component": "tools.entrypoints",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "components/tools/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:app_java",
+      "component": "ui.android.app",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.task",
+        "ui.android.core.ui",
+        "ui.android.core.workspace",
+        "ui.android.feature.assistant",
+        "ui.android.feature.browsing",
+        "ui.android.feature.downloads",
+        "ui.android.feature.onboarding",
+        "ui.android.feature.providers",
+        "ui.android.feature.settings",
+        "ui.android.feature.workspaces"
+      ],
+      "owned_sources": [
+        "ui/android/app/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_analytics_java",
+      "component": "ui.android.core.analytics",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.common",
+        "ui.android.core.model"
+      ],
+      "owned_sources": [
+        "ui/android/core/analytics/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_api_java",
+      "component": "ui.android.core.api",
+      "direct_component_deps": [
+        "contracts.core-api",
+        "ui.android.core.common",
+        "ui.android.core.model"
+      ],
+      "owned_sources": [
+        "ui/android/core/api/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_assets_java",
+      "component": "ui.android.core.assets",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.api",
+        "ui.android.core.common",
+        "ui.android.core.model"
+      ],
+      "owned_sources": [
+        "ui/android/core/assets/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_browser_java",
+      "component": "ui.android.core.browser",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.common",
+        "ui.android.core.model"
+      ],
+      "owned_sources": [
+        "ui/android/core/browser/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_common_java",
+      "component": "ui.android.core.common",
+      "direct_component_deps": [
+        "third-party.dagger"
+      ],
+      "owned_sources": [
+        "ui/android/core/common/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_credentials_java",
+      "component": "ui.android.core.credentials",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "ui/android/core/credentials/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_designsystem_java",
+      "component": "ui.android.core.designsystem",
+      "direct_component_deps": [
+        "resources",
+        "ui.android.core.common"
+      ],
+      "owned_sources": [
+        "ui/android/core/designsystem/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_model_java",
+      "component": "ui.android.core.model",
+      "direct_component_deps": [],
+      "owned_sources": [
+        "ui/android/core/model/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_page_intelligence_java",
+      "component": "ui.android.core.page-intelligence",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.api",
+        "ui.android.core.common"
+      ],
+      "owned_sources": [
+        "ui/android/core/page-intelligence/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_preferences_java",
+      "component": "ui.android.core.preferences",
+      "direct_component_deps": [
+        "ui.android.core.model"
+      ],
+      "owned_sources": [
+        "ui/android/core/preferences/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_providerauth_java",
+      "component": "ui.android.core.providerauth",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.api",
+        "ui.android.core.common"
+      ],
+      "owned_sources": [
+        "ui/android/core/providerauth/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_providers_java",
+      "component": "ui.android.core.providers",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.api",
+        "ui.android.core.common",
+        "ui.android.core.model"
+      ],
+      "owned_sources": [
+        "ui/android/core/providers/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_task_java",
+      "component": "ui.android.core.task",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.common",
+        "ui.android.core.model"
+      ],
+      "owned_sources": [
+        "ui/android/core/task/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_ui_java",
+      "component": "ui.android.core.ui",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.designsystem",
+        "ui.android.core.model"
+      ],
+      "owned_sources": [
+        "ui/android/core/ui/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:core_workspace_java",
+      "component": "ui.android.core.workspace",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.api",
+        "ui.android.core.common",
+        "ui.android.core.model"
+      ],
+      "owned_sources": [
+        "ui/android/core/workspace/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:feature_assistant_java",
+      "component": "ui.android.feature.assistant",
+      "direct_component_deps": [
+        "third-party.commonmark",
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.preferences",
+        "ui.android.core.task",
+        "ui.android.core.ui"
+      ],
+      "owned_sources": [
+        "ui/android/feature/assistant/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:feature_browsing_java",
+      "component": "ui.android.feature.browsing",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.page-intelligence",
+        "ui.android.core.task",
+        "ui.android.core.ui"
+      ],
+      "owned_sources": [
+        "ui/android/feature/browsing/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:feature_downloads_java",
+      "component": "ui.android.feature.downloads",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.assets",
+        "ui.android.core.common",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.ui"
+      ],
+      "owned_sources": [
+        "ui/android/feature/downloads/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:feature_onboarding_java",
+      "component": "ui.android.feature.onboarding",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.preferences",
+        "ui.android.core.ui"
+      ],
+      "owned_sources": [
+        "ui/android/feature/onboarding/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:feature_providers_java",
+      "component": "ui.android.feature.providers",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.browser",
+        "ui.android.core.credentials",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.preferences",
+        "ui.android.core.providerauth",
+        "ui.android.core.providers",
+        "ui.android.core.ui"
+      ],
+      "owned_sources": [
+        "ui/android/feature/providers/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:feature_settings_java",
+      "component": "ui.android.feature.settings",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.assets",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.preferences",
+        "ui.android.core.ui",
+        "ui.android.core.workspace"
+      ],
+      "owned_sources": [
+        "ui/android/feature/settings/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/app/android/ui:feature_workspaces_java",
+      "component": "ui.android.feature.workspaces",
+      "direct_component_deps": [
+        "third-party.dagger",
+        "ui.android.core.analytics",
+        "ui.android.core.api",
+        "ui.android.core.browser",
+        "ui.android.core.common",
+        "ui.android.core.designsystem",
+        "ui.android.core.model",
+        "ui.android.core.ui",
+        "ui.android.core.workspace"
+      ],
+      "owned_sources": [
+        "ui/android/feature/workspaces/**"
+      ],
+      "test_only": false
+    },
+    {
+      "label": "//taffy/utility:registry",
+      "component": "utility.registry",
+      "direct_component_deps": [
+        "contracts.core-service",
+        "contracts.tool-runtime",
+        "services.core",
+        "services.media",
+        "services.python"
+      ],
+      "owned_sources": [
+        "utility/**"
+      ],
+      "test_only": false
+    }
+  ]
+}

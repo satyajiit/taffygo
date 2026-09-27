@@ -1,0 +1,14 @@
+# The fixture-corpus destination-class table.
+#
+# Columns, tab-separated:  host <TAB> class <TAB> reason
+#
+# Read by the same parser as the shared
+# //taffy/common/policy/restricted_destination_classes.tsv, on purpose. A
+# test-only override would mean the shipping classifier is never the thing
+# under test; two tables through one parser keeps the code path identical and
+# moves only the data.
+#
+# Every host here ends in .test, and a test asserts this file and the shipping
+# one never name the same host.
+
+bank.taffy.test	banking	The corpus origin that exists so a class has something to class.

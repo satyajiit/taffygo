@@ -1,0 +1,112 @@
+{
+  "scenario": "TB-304",
+  "corpus": "taffygo-task-scenarios",
+  "version": "1.1.0",
+  "job_family": "JF-03",
+  "contract": "test-fixtures/tasks/manifest.json",
+  "note": "The contract for this scenario - goal, scope, facts, labels and adjudication - is the corpus manifest. This file owns only the run script: the ordered steps, the events injected into them, the audit stream a correct run produces, and the rubric a labeler applies to a disputed run.",
+  "steps": [
+    {
+      "n": 1,
+      "kind": "step:NAVIGATE",
+      "fixture": "popup-opener",
+      "detail": "Open the page that opens tabs.",
+      "produces": [],
+      "expect": []
+    },
+    {
+      "n": 2,
+      "kind": "action:ACTIVATE",
+      "fixture": "popup-opener",
+      "detail": "Activate the opener with the user activation the page requires.",
+      "produces": [],
+      "expect": [
+        "a new top-level navigable"
+      ]
+    },
+    {
+      "n": 3,
+      "kind": "step:OBSERVE",
+      "fixture": "popup-target",
+      "detail": "Observe the opened tab.",
+      "produces": [
+        "F-304-popup-separate"
+      ],
+      "expect": [
+        "its own epoch",
+        "no opener reference"
+      ]
+    },
+    {
+      "n": 4,
+      "kind": "step:NAVIGATE",
+      "fixture": "redirect-chain",
+      "detail": "Open the redirect entry point.",
+      "produces": [],
+      "expect": []
+    },
+    {
+      "n": 5,
+      "kind": "step:OBSERVE",
+      "fixture": "redirect-chain",
+      "detail": "Observe the declared destinations, including the one aimed outside the corpus.",
+      "produces": [
+        "F-304-outside-host-refused"
+      ],
+      "expect": [
+        "the outside-host link observed as refused, not followed"
+      ]
+    },
+    {
+      "n": 6,
+      "kind": "step:NAVIGATE",
+      "fixture": "redirect-destination",
+      "detail": "Follow the same-origin chain to its committed destination.",
+      "produces": [
+        "F-304-same-origin-arrival"
+      ],
+      "expect": []
+    },
+    {
+      "n": 7,
+      "kind": "step:NAVIGATE",
+      "fixture": "redirect-destination-cross-origin",
+      "detail": "Follow the cross-origin chain to its committed destination.",
+      "produces": [
+        "F-304-cross-origin-arrival"
+      ],
+      "expect": [
+        "the epoch bound to the partner origin"
+      ]
+    },
+    {
+      "n": 8,
+      "kind": "step:INFER",
+      "fixture": null,
+      "detail": "Attribute each arrival to its committed origin.",
+      "produces": [
+        "F-304-binding"
+      ],
+      "expect": []
+    }
+  ],
+  "injected_events": [],
+  "expected_audit_events": [
+    "TaskCreated",
+    "SourceScopeSet",
+    "TaskStarted",
+    "ActorLeaseIssued",
+    "ObservationCaptured",
+    "ActionProposed",
+    "ActionDispatchStarted",
+    "ActionVerificationCompleted",
+    "FactAccepted",
+    "TaskCompleted"
+  ],
+  "adjudication_rubric": [
+    {
+      "dispute": "A reviewer sees three tabs where the budget allows three and argues a fourth was suppressed.",
+      "resolution": "Check the budget event, not the tab count. A refusal that names the working-tab budget is correct behaviour; a silent omission is a defect."
+    }
+  ]
+}

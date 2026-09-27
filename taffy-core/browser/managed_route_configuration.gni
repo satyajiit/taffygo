@@ -1,0 +1,25 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+declare_args() {
+  # The only origin the managed route would ever speak to. Compiled into
+  # trusted browser code like the account plane's origin, and for the same
+  # reason: a value a catalog, a core effect or a UI could move would be a
+  # value that redirects a bearer token.
+  #
+  # **Empty, and that is the shipped value** (decision 0252, point 5). TaffyGo
+  # operates no server (decision 0200), so there is no managed worker to name.
+  # Empty disables the route whole: `ValidateManagedRouteConfiguration` answers
+  # `kDisabled`, nothing mints, and a managed effect is refused because no
+  # endpoint matches an origin that does not exist. The route's code stays
+  # compiled, inert, until a later change removes it.
+  #
+  # There is one origin rather than a worker and a gateway because the
+  # entitlement summary already carries both hosts as separate fields; a
+  # second argument with nothing to name would be a knob nobody can set
+  # truthfully.
+  taffy_managed_worker_origin = ""
+}

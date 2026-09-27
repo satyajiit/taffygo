@@ -1,0 +1,19 @@
+[package]
+name = "loop-kernel"
+description = "The machinery around the durable reducer: the walk, turn composition, and the transient context one task holds."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+bip-types = { workspace = true }
+core-service-types = { workspace = true }
+model-router = { workspace = true }
+policy-engine = { workspace = true }
+procedure-engine = { workspace = true }
+task-engine = { workspace = true }
+table-engine = { workspace = true }

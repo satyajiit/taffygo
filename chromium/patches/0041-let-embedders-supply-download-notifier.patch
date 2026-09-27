@@ -1,0 +1,172 @@
+From 9e72b50fc2574ebe3541a280fbbe6062ed84478a Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Tue, 1 Sep 2026 06:37:52 +0530
+Subject: let embedders supply download notifier
+
+Allow an embedder to install the process-wide presentation sink before the download-manager singleton is created, while preserving Chromium's system notifier as the default.
+
+Specified by chromium/patches/0041-let-embedders-supply-download-notifier.md.
+
+Taffy-Patch: 0041
+
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/download/DownloadManagerService.java b/chrome/android/java/src/org/chromium/chrome/browser/download/DownloadManagerService.java
+index 32ab73c09f15f..be7d65fccec1a 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/download/DownloadManagerService.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/download/DownloadManagerService.java
+@@ -93,6 +93,7 @@ public class DownloadManagerService implements DownloadServiceDelegate, ProfileM
+     private static final Set<String> sFirstSeenDownloadIds = new HashSet<>();
+ 
+     private static @Nullable DownloadManagerService sDownloadManagerService;
++    private static @Nullable DownloadNotifierFactory sDownloadNotifierFactory;
+     private static boolean sIsNetworkListenerDisabled;
+     private static boolean sIsNetworkMetered;
+ 
+@@ -134,6 +135,11 @@ public class DownloadManagerService implements DownloadServiceDelegate, ProfileM
+     private boolean mIsUiUpdateScheduled;
+     private @Nullable DownloadManagerRequestInterceptor mDownloadManagerRequestInterceptor;
+ 
++    /** Creates the presentation sink used by the process-wide download manager. */
++    public interface DownloadNotifierFactory {
++        DownloadNotifier create();
++    }
++
+     /**
+      * Interface to intercept download request to Android DownloadManager. This is implemented by
+      * tests so that we don't need to actually enqueue a download into the Android DownloadManager.
+@@ -171,14 +177,38 @@ public class DownloadManagerService implements DownloadServiceDelegate, ProfileM
+     public static DownloadManagerService getDownloadManagerService() {
+         ThreadUtils.assertOnUiThread();
+         if (sDownloadManagerService == null) {
+-            DownloadNotifier downloadNotifier = new SystemDownloadNotifier();
+             sDownloadManagerService =
+                     new DownloadManagerService(
+-                            downloadNotifier, new Handler(), UPDATE_DELAY_MILLIS);
++                            createDownloadNotifier(), new Handler(), UPDATE_DELAY_MILLIS);
+         }
+         return sDownloadManagerService;
+     }
+ 
++    /**
++     * Installs the notifier factory used when the singleton is first created.
++     *
++     * <p>The factory cannot replace another embedder factory or a notifier already owned by a live
++     * service. Callers must install it during process initialization, before any download code can
++     * obtain the singleton.
++     *
++     * @return Whether the factory was installed.
++     */
++    public static boolean installDownloadNotifierFactory(DownloadNotifierFactory factory) {
++        ThreadUtils.assertOnUiThread();
++        if (sDownloadManagerService != null || sDownloadNotifierFactory != null) return false;
++
++        sDownloadNotifierFactory = factory;
++        ResettersForTesting.register(() -> sDownloadNotifierFactory = null);
++        return true;
++    }
++
++    @VisibleForTesting
++    static DownloadNotifier createDownloadNotifier() {
++        return sDownloadNotifierFactory == null
++                ? new SystemDownloadNotifier()
++                : assertNonNull(sDownloadNotifierFactory.create());
++    }
++
+     public static boolean hasDownloadManagerService() {
+         ThreadUtils.assertOnUiThread();
+         return sDownloadManagerService != null;
+diff --git a/chrome/android/junit/BUILD.gn b/chrome/android/junit/BUILD.gn
+index 1da65f4fd7aea..6be277b8eb425 100644
+--- a/chrome/android/junit/BUILD.gn
++++ b/chrome/android/junit/BUILD.gn
+@@ -794,6 +794,7 @@ if (is_android) {
+   robolectric_library(
+       "chrome_junit_tests_org.chromium.chrome.browser.download") {
+     sources = [
++      "src/org/chromium/chrome/browser/download/DownloadManagerServiceUnitTest.java",
+       "src/org/chromium/chrome/browser/download/DownloadOpenRequestTest.java",
+       "src/org/chromium/chrome/browser/download/DownloadSharedPreferenceEntryTest.java",
+       "src/org/chromium/chrome/browser/download/OfflineContentAvailabilityStatusProviderTest.java",
+diff --git a/chrome/android/junit/src/org/chromium/chrome/browser/download/DownloadManagerServiceUnitTest.java b/chrome/android/junit/src/org/chromium/chrome/browser/download/DownloadManagerServiceUnitTest.java
+new file mode 100644
+index 0000000000000..49a8d0c085f05
+--- /dev/null
++++ b/chrome/android/junit/src/org/chromium/chrome/browser/download/DownloadManagerServiceUnitTest.java
+@@ -0,0 +1,78 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.download;
++
++import static org.junit.Assert.assertFalse;
++import static org.junit.Assert.assertSame;
++import static org.junit.Assert.assertTrue;
++import static org.mockito.Mockito.never;
++import static org.mockito.Mockito.verify;
++import static org.mockito.Mockito.when;
++
++import org.junit.After;
++import org.junit.Before;
++import org.junit.Rule;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.mockito.Mock;
++import org.mockito.junit.MockitoJUnit;
++import org.mockito.junit.MockitoRule;
++import org.robolectric.annotation.Config;
++
++import org.chromium.base.test.BaseRobolectricTestRunner;
++
++/** Unit tests for the embedder-owned notification seam in {@link DownloadManagerService}. */
++@RunWith(BaseRobolectricTestRunner.class)
++@Config(manifest = Config.NONE)
++public final class DownloadManagerServiceUnitTest {
++    @Rule public final MockitoRule mMockitoRule = MockitoJUnit.rule();
++
++    @Mock private DownloadNotifier mDownloadNotifier;
++    @Mock private DownloadManagerService mDownloadManagerService;
++    @Mock private DownloadManagerService.DownloadNotifierFactory mFactory;
++
++    @Before
++    public void setUp() {
++        DownloadManagerService.setDownloadManagerService(null);
++    }
++
++    @After
++    public void tearDown() {
++        DownloadManagerService.setDownloadManagerService(null);
++    }
++
++    @Test
++    public void createDownloadNotifier_withoutFactory_keepsSystemDefault() {
++        assertTrue(
++                DownloadManagerService.createDownloadNotifier() instanceof SystemDownloadNotifier);
++    }
++
++    @Test
++    public void createDownloadNotifier_withFactory_usesExactEmbedderNotifier() {
++        when(mFactory.create()).thenReturn(mDownloadNotifier);
++
++        assertTrue(DownloadManagerService.installDownloadNotifierFactory(mFactory));
++
++        assertSame(mDownloadNotifier, DownloadManagerService.createDownloadNotifier());
++        verify(mFactory).create();
++    }
++
++    @Test
++    public void installDownloadNotifierFactory_secondOwnerIsRejected() {
++        assertTrue(DownloadManagerService.installDownloadNotifierFactory(mFactory));
++
++        assertFalse(DownloadManagerService.installDownloadNotifierFactory(mFactory));
++    }
++
++    @Test
++    public void installDownloadNotifierFactory_afterSingleton_isRejected() {
++        DownloadManagerService.setDownloadManagerService(mDownloadManagerService);
++
++        assertFalse(DownloadManagerService.installDownloadNotifierFactory(mFactory));
++
++        verify(mFactory, never()).create();
++        assertSame(mDownloadManagerService, DownloadManagerService.getDownloadManagerService());
++    }
++}

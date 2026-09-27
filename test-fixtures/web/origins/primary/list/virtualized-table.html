@@ -1,0 +1,89 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="virtualized-table">
+<title>Virtualized table</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Virtualized table</h1>
+  <p class="who">Two thousand logical rows are drawn by a pool of sixteen row
+  elements. A recycled element is a different row: reuse must never imply
+  continuity.</p>
+</header>
+
+<p class="note">Pool size <span id="pool-size">16</span> &middot; first visible
+row <span id="first-row">0</span> &middot; recycles so far
+<span id="recycles">0</span></p>
+
+<div class="scroller" id="viewport" tabindex="0" role="region" aria-label="Order rows">
+  <div id="spacer" style="position: relative;">
+    <table id="grid">
+      <thead>
+        <tr><th scope="col">Row</th><th scope="col">Order</th><th scope="col">Amount</th><th scope="col">State</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  (function () {
+    "use strict";
+    var TOTAL = 2000;
+    var POOL = 16;
+    var ROW_HEIGHT = 28;
+    var STATES = ["packed", "shipped", "delivered", "returned"];
+    var recycles = 0;
+    var firstRendered = -1;
+
+    var rows = document.getElementById("rows");
+    var viewport = document.getElementById("viewport");
+    var spacer = document.getElementById("spacer");
+    spacer.style.height = (TOTAL * ROW_HEIGHT) + "px";
+
+    var pool = [];
+    for (var i = 0; i < POOL; i++) {
+      var tr = document.createElement("tr");
+      tr.setAttribute("data-pool-slot", String(i));
+      tr.innerHTML = "<td></td><td></td><td></td><td></td>";
+      rows.appendChild(tr);
+      pool.push(tr);
+    }
+
+    function fill(tr, index) {
+      var cells = tr.children;
+      tr.id = "row-" + index;
+      tr.setAttribute("data-row-index", String(index));
+      cells[0].textContent = String(index);
+      cells[1].textContent = "ORD-" + (100000 + index * 13);
+      cells[2].textContent = "$" + (20 + ((index * 29) % 400)) + ".00";
+      cells[3].textContent = STATES[index % STATES.length];
+    }
+
+    function render() {
+      var first = Math.max(0, Math.floor(viewport.scrollTop / ROW_HEIGHT));
+      if (first === firstRendered) { return; }
+      if (firstRendered >= 0) { recycles += 1; }
+      firstRendered = first;
+      for (var i = 0; i < POOL; i++) {
+        var index = first + i;
+        if (index < TOTAL) {
+          pool[i].hidden = false;
+          fill(pool[i], index);
+        } else {
+          pool[i].hidden = true;
+          pool[i].removeAttribute("id");
+        }
+      }
+      rows.style.transform = "translateY(" + (first * ROW_HEIGHT) + "px)";
+      document.getElementById("first-row").textContent = String(first);
+      document.getElementById("recycles").textContent = String(recycles);
+    }
+
+    viewport.addEventListener("scroll", render);
+    render();
+  })();
+</script>

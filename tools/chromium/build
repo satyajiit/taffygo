@@ -1,0 +1,411 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/chromium/build — gn gen from a committed args profile, then autoninja.
+#
+# Developers never hand-edit GN args: the profiles in chromium/args/ are the
+# only supported configurations (decision 0013).
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/chromium.sh"
+
+PROFILE=$TAFFY_DEFAULT_PROFILE
+BASELINE=0
+JOBS=''
+TARGETS=()
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/chromium/build [--profile <name>] [--baseline] [--jobs N] [target...]
+
+Product profiles (chromium/args/) — Android, installable with `run`:
+  dev-x64        component build, symbol_level=0, emulator — the fastest loop
+  dev-arm64      the same shape for on-device work
+  release-arm64  official build, symbols retained as artifacts
+
+Host profiles (chromium/args/) — this machine, nothing to install:
+  diag-sanitizer-x64  ASan + LSan, the only configuration that can answer
+                      whether TaffyGo leaks. Default target: taffy_unittests.
+                      Run it with ./tools/chromium/test, which sets the
+                      sanitizer options the suite needs to start at all.
+  diag-fuzz-x64       ASan + libFuzzer, the only configuration under which the
+                      thirteen fuzzers in //taffy/test/fuzz are compiled at
+                      all. Default target: taffy/test/fuzz:fuzzers, which is
+                      every one of them. A fuzzer has no ./tools/chromium/test
+                      runner; drive the binary directly, for example:
+                        out/diag-fuzz-x64/taffy_bip_snapshot_result_fuzzer \
+                          -runs=100000 out/diag-fuzz-x64/gen/taffy/test/fuzz/wire_seeds
+                      TEST-INDEX.md section 6 names all thirteen and the seed
+                      corpus each one starts from.
+
+Options:
+  --profile NAME  which committed args profile to use (default: dev-x64)
+  --baseline      build upstream chrome_public_apk instead — the clean-host
+                  toolchain proof. It is never the product and is never branded.
+  --jobs N        run at most N build steps at once (autoninja -j N). The
+                  default is one per core, and on release-arm64 that many
+                  Kotlin, Java and R8 steps together outgrow 62 GB of memory.
+  -h, --help      show this help
+
+Default target: taffy_public_apk on a product profile, taffy_unittests on the
+sanitizer profile, taffy/test/fuzz:fuzzers on the fuzz profile.
+
+The distribution artifact is a separate target and is never the default:
+
+  ./tools/chromium/build --profile release-arm64 taffy_public_bundle
+
+Play accepts a bundle and not an APK, so that .aab is what ./tools/play
+uploads. It cannot be built on a dev profile: both set incremental_install,
+which is an APK-only flow, and this command refuses the pair rather than
+letting the packaging step fail late. A successful bundle build is inspected
+before this command reports it — see tools/lib/android_bundle_inspect.py.
+USAGE
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --profile) PROFILE=${2:-}; shift ;;
+    --profile=*) PROFILE=${1#*=} ;;
+    --baseline) BASELINE=1 ;;
+    --jobs) JOBS=${2:-}; shift ;;
+    --jobs=*) JOBS=${1#*=} ;;
+    -h|--help) usage; exit 0 ;;
+    -*) usage >&2; die "unknown option: $1" ;;
+    *) TARGETS+=("$1") ;;
+  esac
+  shift
+done
+case "$JOBS" in
+  '') ;;
+  *[!0-9]*|0) die "--jobs takes a positive whole number, not '$JOBS'" ;;
+esac
+
+taffy_require_chromium_host
+chromium_add_depot_tools_to_path
+chromium_validate_profile "$PROFILE"
+
+SRC=$(chromium_require_checkout)
+ARGS_FILE=$(chromium_args_file "$PROFILE")
+OUT_DIR=$(chromium_out_dir "$PROFILE")
+[ -f "$ARGS_FILE" ] || die "missing args profile: ${ARGS_FILE#"$TAFFY_ROOT"/}"
+
+HOST_PROFILE=0
+for known in $TAFFY_HOST_PROFILES; do
+  [ "$PROFILE" = "$known" ] && HOST_PROFILE=1
+done
+
+if [ "${#TARGETS[@]}" -eq 0 ]; then
+  if [ "$BASELINE" = 1 ]; then
+    TARGETS=(chrome_public_apk)
+  elif [ "$HOST_PROFILE" = 1 ]; then
+    # There is no APK on a host profile, and the suite — or the fuzzer set —
+    # is the reason the profile exists.
+    case "$PROFILE" in
+      diag-fuzz-*) TARGETS=(taffy/test/fuzz:fuzzers) ;;
+      *) TARGETS=(taffy_unittests) ;;
+    esac
+  else
+    TARGETS=("$TAFFY_DEFAULT_TARGET")
+  fi
+fi
+
+# taffy_public_apk is defined by the //taffy product root. Say so plainly rather
+# than letting GN fail with "no such target".
+if [ "$BASELINE" = 0 ] && [ ! -f "$TAFFY_ROOT/taffy-core/app/android/BUILD.gn" ]; then
+  warn "the //taffy product root does not define the Android product targets"
+  note "For the clean-host toolchain proof: ./tools/chromium/build --baseline"
+fi
+
+# A bundle and incremental install are mutually exclusive flows: incremental
+# install pushes dex into a device directory beside an installed APK, and there
+# is no such thing for a bundle. Both dev profiles set the argument, so the
+# pairing is a profile mistake rather than a rare edge, and it is worth one
+# sentence here instead of a packaging error several minutes in.
+WANTS_BUNDLE=0
+for target in "${TARGETS[@]}"; do
+  case "$target" in
+    taffy_public_bundle|*:taffy_public_bundle) WANTS_BUNDLE=1 ;;
+  esac
+done
+if [ "$WANTS_BUNDLE" = 1 ]; then
+  if [ "$HOST_PROFILE" = 1 ] || [ "$BASELINE" = 1 ]; then
+    die "taffy_public_bundle is an Android distribution artifact; profile $PROFILE builds none"
+  fi
+  if grep -q '^incremental_install = true' "$ARGS_FILE"; then
+    die "profile $PROFILE sets incremental_install = true, which is an APK-only
+      flow — a bundle has no incremental install and the packaging step would
+      fail late. Build the distribution artifact on the profile that signs one:
+        ./tools/chromium/build --profile release-arm64 taffy_public_bundle"
+  fi
+fi
+
+# The branding image overrides shadow upstream resources by name; a rename
+# at a rebase would silently ship Chromium art. The check reads the manifest
+# and the committed shadows, so it costs nothing to keep here on every build.
+if [ "$BASELINE" = 0 ] && [ "$HOST_PROFILE" = 0 ]; then
+  step "branding: shadowed upstream resource names"
+  python3 "$TAFFY_ROOT/taffy-core/resources/branding/tools/check_shadowed_names.py" \
+    --checkout "$SRC" \
+    || die "a shadowed branding resource is dead at this pin" \
+           "See chromium/patches/0002-downstream-branding-hooks.md for the mechanism."
+fi
+
+step "gn gen $OUT_DIR (profile $PROFILE)"
+mkdir -p "$OUT_DIR"
+{
+  printf '# Generated by ./tools/chromium/build from chromium/args/%s.gn\n' "$PROFILE"
+  printf '# Do not edit here: edit the committed profile and re-run the build.\n\n'
+  cat "$ARGS_FILE"
+} > "$OUT_DIR/args.gn"
+
+# The signing identity is appended to the configured build rather than
+# committed to a profile (decision 0203): chromium/args/ is published with the
+# source, and a keystore path, an alias and a password in it would be
+# published with it. A build that resolves no identity still builds, and says
+# which key it will carry; a release artifact refuses, because an upload signed
+# with Chromium's debug key is one Play rejects and one no fingerprint matches.
+if taffy_signing_resolve; then
+  if [ "$HOST_PROFILE" = 1 ]; then
+    info "signing: an identity is configured; profile $PROFILE packages no APK and does not use it"
+  else
+    {
+      printf '\n# Appended by ./tools/chromium/build from %s.\n' "$TAFFY_SIGNING_SOURCE"
+      printf '# Never committed: decision 0203.\n'
+      printf 'android_keystore_path = "%s"\n' "$TAFFY_SIGNING_KEYSTORE"
+      printf 'android_keystore_name = "%s"\n' "$TAFFY_SIGNING_ALIAS"
+      printf 'android_keystore_password = "%s"\n' "$TAFFY_SIGNING_PASSWORD"
+    } >> "$OUT_DIR/args.gn"
+    chmod 600 "$OUT_DIR/args.gn"
+    ok "signing: $TAFFY_SIGNING_ALIAS, from $TAFFY_SIGNING_SOURCE"
+  fi
+elif [ "$HOST_PROFILE" = 0 ]; then
+  SHIPPING_TARGET=0
+  for target in "${TARGETS[@]}"; do
+    case "$target" in
+      taffy_public_apk|taffy_public_bundle|*:taffy_public_apk|*:taffy_public_bundle)
+        SHIPPING_TARGET=1 ;;
+    esac
+  done
+  if [ "$SHIPPING_TARGET" = 1 ] && [ "${PROFILE#release-}" != "$PROFILE" ]; then
+    die "no signing identity is configured, and $PROFILE builds what a store distributes
+      Set TAFFY_ANDROID_KEYSTORE, TAFFY_ANDROID_KEY_ALIAS and
+      TAFFY_ANDROID_KEYSTORE_PASSWORD, or write them into
+      $(taffy_signing_env_file) with mode 600.
+      The key is never committed (decision 0203)."
+  fi
+  info "signing: Chromium's debug key — no identity is configured, and this build installs by hand"
+fi
+
+( cd "$SRC" && gn gen "out/$PROFILE" )
+
+step "architecture: configured //taffy component graph"
+python3 "$TAFFY_ROOT/taffy-core/build/component_gn_graph.py" \
+  --checkout "$SRC" \
+  --gn-out "$OUT_DIR" \
+  --gn "$(command -v gn)" \
+  || die "the configured //taffy GN graph differs from build/components.toml" \
+         "Fix the target, source ownership, or exact direct-dependency row before building."
+
+# Asked of the graph that was just generated, and asked before the build rather
+# than after it, because the answer decides whether the exit code below is worth
+# anything. See the helper for what each verdict means.
+chromium_require_honest_static_analysis "$SRC" "$OUT_DIR" "$PROFILE"
+
+# JAVA_TOOL_OPTIONS is cleared for the build, not respected. Chromium's
+# build/android/gyp/compile_kt.py fails a compile step that writes anything to
+# stderr, and the JVM prints "Picked up JAVA_TOOL_OPTIONS: ..." there on every
+# invocation — so a variable set for an unrelated reason (a proxy or IPv4
+# preference, say) fails every Kotlin and Java target in the product root with
+# "Command failed because it wrote to stderr" and no compiler diagnostic. No
+# TaffyGo build step needs the variable. ./tools/doctor reports it when set.
+# GOROOT and GOTOOLDIR are also cleared: Dawn invokes its pinned CIPD Go
+# binary, and an ambient path from a different Go release makes that binary
+# combine mismatched compiler and standard-library versions.
+step "autoninja -C out/$PROFILE ${TARGETS[*]}"
+# autoninja can DECLINE to build and still exit 0, and this command used to
+# report success for it. siso refuses an output directory that carries a
+# foreign Ninja state file, prints two lines of advice, and returns zero; the
+# `set -e` above cannot see a zero. The result was the worst shape a build can
+# fail in: `ok built taffy_unittests`, a stale library from hours earlier, and
+# a device suite that ran the previous binary and passed. New object files sat
+# beside a link that never happened.
+#
+# So the exit code is necessary and not sufficient. The build output has to
+# carry a line that only a build that actually ran can produce, and the known
+# refusal is named separately because its remedy is specific and not
+# guessable from "no completion line".
+BUILD_LOG=$(mktemp "${TMPDIR:-/tmp}/taffy-build.XXXXXX")
+set +e
+JOB_ARGS=()
+[ -n "$JOBS" ] && JOB_ARGS=(-j "$JOBS")
+( cd "$SRC" && unset JAVA_TOOL_OPTIONS GOROOT GOTOOLDIR && \
+  autoninja -C "out/$PROFILE" ${JOB_ARGS[@]+"${JOB_ARGS[@]}"} "${TARGETS[@]}" ) 2>&1 | tee "$BUILD_LOG"
+BUILD_RC=${PIPESTATUS[0]}
+set -e
+if [ "$BUILD_RC" -ne 0 ]; then
+  rm -f "$BUILD_LOG"
+  die "autoninja exited $BUILD_RC"
+fi
+if grep -q "contains Ninja state file" "$BUILD_LOG"; then
+  rm -f "$BUILD_LOG"
+  die "siso refused out/$PROFILE: it carries a Ninja state file from a plain
+      ninja run, so nothing was built and nothing was linked. Move the two
+      files aside and build again — siso keeps its own state in .siso_deps,
+      so this costs one cold dependency scan and no correctness:
+        mkdir -p out/$PROFILE/.stale-ninja-state
+        mv out/$PROFILE/.ninja_log out/$PROFILE/.ninja_deps \\
+           out/$PROFILE/.stale-ninja-state/"
+fi
+if ! grep -qE "finished successfully|no work to do|Everything is up-to-date|Build Succeeded" \
+     "$BUILD_LOG"; then
+  rm -f "$BUILD_LOG"
+  die "autoninja exited 0 without reporting that it built anything. Treating
+      that as success is how a stale binary reaches a device suite and passes.
+      Read the output above: the build did not run."
+fi
+rm -f "$BUILD_LOG"
+
+# The Gradle version catalog owns targetSdk for the whole product, while GN
+# assembles the APK that reaches a phone. A static agreement check catches
+# source drift; inspecting the artifact catches a template that accepted the
+# value but failed to put it in the merged manifest. Run only when this command
+# actually asked for the shipping APK, never for Chromium's baseline APK.
+CHECK_PRODUCT_APK=0
+if [ "$BASELINE" = 0 ] && [ "$HOST_PROFILE" = 0 ]; then
+  for target in "${TARGETS[@]}"; do
+    case "$target" in
+      taffy_public_apk|*:taffy_public_apk) CHECK_PRODUCT_APK=1 ;;
+    esac
+  done
+fi
+if [ "$CHECK_PRODUCT_APK" = 1 ]; then
+  APK_NAME=$(sed -n 's/^taffy_apk_name = "\([^"]*\)"$/\1/p' \
+    "$TAFFY_ROOT/taffy-core/resources/branding/taffy_branding.gni")
+  [ -n "$APK_NAME" ] || die "taffy_apk_name is missing from the branding authority"
+  if grep -q '^incremental_install = true' "$ARGS_FILE"; then
+    PRODUCT_APK="$OUT_DIR/apks/${APK_NAME}_incremental.apk"
+  else
+    PRODUCT_APK="$OUT_DIR/apks/${APK_NAME}.apk"
+  fi
+  AAPT2=$(find "$SRC/third_party/android_sdk/public/build-tools" \
+    -type f -name aapt2 -perm -u+x -print | sort | tail -n 1)
+  [ -n "$AAPT2" ] || die "the pinned Chromium Android SDK carries no aapt2"
+  step "artifact: shipping Android target SDK"
+  python3 "$TAFFY_ROOT/tools/lib/android_sdk_agreement.py" \
+    --apk "$PRODUCT_APK" \
+    --aapt2 "$AAPT2" \
+    || die "the built shipping APK does not target the SDK pinned by gradle/libs.versions.toml"
+fi
+
+# The bundle is the only artifact in this tree that no suite has ever run, and
+# it is the one a store upload carries. What a zip file can answer is asked
+# here, now, rather than by Play several hundred megabytes later: that the file
+# is bundle-shaped and not an APK, that the base module carries dex, resources
+# and a native library for this profile's ABI, and that every loadable segment
+# of every shipped .so is 16 KiB aligned. That last one is silent on a 4 KiB
+# device, which is every device this tree has tested on.
+if [ "$WANTS_BUNDLE" = 1 ]; then
+  BUNDLE_NAME=$(sed -n 's/^taffy_bundle_name = "\([^"]*\)"$/\1/p' \
+    "$TAFFY_ROOT/taffy-core/resources/branding/taffy_branding.gni")
+  [ -n "$BUNDLE_NAME" ] || die "taffy_bundle_name is missing from the branding authority"
+  # Chromium's android_app_bundle writes apks/<bundle_name>.aab at milestone
+  # 152 (observed at the first bundle build, 2026-09-11). If a later pin moves
+  # it, the search below names what it did write instead of a missing artifact.
+  BUNDLE_PATH="$OUT_DIR/apks/${BUNDLE_NAME}.aab"
+  if [ ! -f "$BUNDLE_PATH" ]; then
+    FOUND=$(find "$OUT_DIR" -name '*.aab' -type f 2>/dev/null | head -n 5)
+    if [ -n "$FOUND" ]; then
+      die "no bundle at ${BUNDLE_PATH#"$SRC"/}, but the build wrote:
+      $(printf '%s' "$FOUND" | tr '\n' ' ')
+      Correct BUNDLE_PATH in this command and the VERIFY note above it."
+    fi
+    die "the build reported success and wrote no .aab under $OUT_DIR"
+  fi
+  case "$PROFILE" in
+    *-arm64) BUNDLE_ABI=arm64-v8a ;;
+    *-x64)   BUNDLE_ABI=x86_64 ;;
+    *)       BUNDLE_ABI='' ;;
+  esac
+  step "artifact: bundle structure, ABI and 16 KiB segment alignment"
+  python3 "$TAFFY_ROOT/tools/lib/android_bundle_inspect.py" \
+    --bundle "$BUNDLE_PATH" --abi "$BUNDLE_ABI" \
+    || die "the built bundle is not fit to upload; the findings above say why"
+  # Play takes a bundle signed with the upload key, and android_app_bundle
+  # writes an unsigned one: at milestone 152 only Chromium's APK templates sign.
+  # The key is read back from the configured build rather than from where it
+  # was resolved, so it follows the argument the packaging step actually used.
+  # The password reaches jarsigner and keytool through the environment and
+  # never through argv. The signed copy sits beside the build's
+  # own output, which stays exactly what ninja wrote, so the next build does
+  # not see a changed output and redo the bundle.
+  step "artifact: sign the bundle with the product key"
+  gn_arg() {
+    ( cd "$SRC" && gn args "out/$PROFILE" --list="$1" --short 2>/dev/null ) \
+      | sed -n "s/^$1 = \"\(.*\)\"\$/\1/p"
+  }
+  KEYSTORE_LABEL=$(gn_arg android_keystore_path)
+  KEY_NAME=$(gn_arg android_keystore_name)
+  case "$KEYSTORE_LABEL" in
+    //*) KEYSTORE="$SRC/${KEYSTORE_LABEL#//}" ;;
+    *)   KEYSTORE=$KEYSTORE_LABEL ;;
+  esac
+  if [ ! -f "$KEYSTORE" ] || [ -z "$KEY_NAME" ]; then
+    die "the configured build names no usable signing key (android_keystore_path
+      '$KEYSTORE_LABEL', android_keystore_name '$KEY_NAME'); Play refuses an
+      unsigned bundle. The identity is resolved from the environment or from
+      $(taffy_signing_env_file), and never from this repository (decision 0203)."
+  fi
+  JDK_BIN="$SRC/third_party/jdk/current/bin"
+  SIGNED_PATH="$OUT_DIR/apks/${BUNDLE_NAME}.signed.aab"
+  rm -f "$SIGNED_PATH"
+  TAFFY_KEYSTORE_PASSWORD=$(gn_arg android_keystore_password) \
+    "$JDK_BIN/jarsigner" -keystore "$KEYSTORE" \
+      -storepass:env TAFFY_KEYSTORE_PASSWORD -keypass:env TAFFY_KEYSTORE_PASSWORD \
+      -signedjar "$SIGNED_PATH" "$BUNDLE_PATH" "$KEY_NAME" >/dev/null \
+    || die "jarsigner could not sign ${BUNDLE_PATH#"$SRC"/} with $KEY_NAME"
+  "$JDK_BIN/jarsigner" -verify "$SIGNED_PATH" 2>/dev/null | grep -q '^jar verified\.' \
+    || die "the signed bundle does not verify: ${SIGNED_PATH#"$SRC"/}"
+  SIGNED_SHA=$("$JDK_BIN/keytool" -printcert -jarfile "$SIGNED_PATH" 2>/dev/null \
+    | sed -n 's/^[[:space:]]*SHA256: //p' | head -n 1)
+  KEY_SHA=$(TAFFY_KEYSTORE_PASSWORD=$(gn_arg android_keystore_password) \
+    "$JDK_BIN/keytool" -list -v -keystore "$KEYSTORE" \
+      -storepass:env TAFFY_KEYSTORE_PASSWORD -alias "$KEY_NAME" 2>/dev/null \
+    | sed -n 's/^[[:space:]]*SHA256: //p' | head -n 1)
+  if [ -z "$SIGNED_SHA" ] || [ "$SIGNED_SHA" != "$KEY_SHA" ]; then
+    die "the signed bundle's certificate (${SIGNED_SHA:-none}) is not the product
+      key's (${KEY_SHA:-unreadable})"
+  fi
+  ok "signed with $KEY_NAME from ${KEYSTORE#"$SRC"/}, certificate SHA-256 $SIGNED_SHA"
+  info "Next: ./tools/play upload ${SIGNED_PATH} --track internal"
+fi
+
+chromium_report_cache
+# `last_profile` is what `run`, `test` and the orphans lane default to, and all
+# three of those are about the product on a device. A host build records itself
+# under its own key instead: letting a sanitizer build repoint them made the
+# orphan audit skip with "unknown build profile" after a leak run, which reads
+# as a host problem rather than as this line.
+if [ "$HOST_PROFILE" = 1 ]; then
+  taffy_state_set last_host_profile "$PROFILE"
+else
+  taffy_state_set last_profile "$PROFILE"
+fi
+info ""
+ok "built ${TARGETS[*]} in out/$PROFILE"
+if [ "$HOST_PROFILE" = 1 ]; then
+  case "$PROFILE" in
+    diag-fuzz-*)
+      info "Next: out/$PROFILE/<fuzzer> -runs=100000 <seed dir> — no ./tools/chromium/test"
+      info "      runner exists for a fuzzer; see ./tools/chromium/build --help for the seed"
+      info "      directories and taffy-core/test/fuzz/README.md section 3 for what to check first."
+      ;;
+    *) info "Next: ./tools/chromium/test --profile $PROFILE ${TARGETS[*]}" ;;
+  esac
+else
+  info "Next: ./tools/chromium/run --profile $PROFILE"
+fi

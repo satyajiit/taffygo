@@ -1,0 +1,55 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The filtering plane's pure decision policy (decision 0076): compile pinned
+# rule-set text into an engine, answer block or allow for one request's
+# facts, and answer whether a site posture leaves filtering active. Decision
+# 0086 wires Brave's adblock-rust through a C ABI. Nothing here performs:
+# no I/O, no browser object, no thread, which is what lets
+# `filtering.browser` run the compile on a worker pool and share the matcher
+# across request threads.
+source_set("core") {
+  sources = [
+    "cosmetic_resources.cc",
+    "cosmetic_resources.h",
+    "posture.cc",
+    "posture.h",
+    "rule_parser.cc",
+    "rule_parser.h",
+    "ruleset.cc",
+    "ruleset.h",
+    "scoped_adblock_string.h",
+  ]
+  public_deps = [
+    "//components/url_pattern_index/proto:url_pattern_index",
+  ]
+  deps = [
+    "//base",
+    "//taffy/third_party/adblock-rust:c_abi",
+    "//url",
+  ]
+  visibility = [
+    ":unit_tests",
+    "//taffy/browser:*",
+    "//taffy/components/filtering/browser:*",
+  ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+  sources = [
+    "cosmetic_resources_unittest.cc",
+    "posture_unittest.cc",
+    "rule_parser_unittest.cc",
+    "ruleset_unittest.cc",
+  ]
+  deps = [
+    ":core",
+    "//base",
+    "//testing/gtest",
+    "//url",
+  ]
+}

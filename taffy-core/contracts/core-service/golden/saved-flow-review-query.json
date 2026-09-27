@@ -1,0 +1,13 @@
+{
+  "operation": {
+    "operation_id": "saved-flow-read-1",
+    "service_generation": 7,
+    "task_revision": 0,
+    "deadline_monotonic_ms": 60000,
+    "idempotency_key": "saved-flow-read-1"
+  },
+  "kind": 1,
+  "goal": "",
+  "skill_id": "flow.saved",
+  "expected_version": 2
+}

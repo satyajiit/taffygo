@@ -1,0 +1,170 @@
+{
+  "description": "Which schema definition each golden message is an instance of. The generator reads this file when --verify runs; the sibling .md note beside each document says what that document proves.",
+  "messages": [
+    {
+      "file": "protocol-info.json",
+      "schema": "protocol-info.schema.json",
+      "definition": "ProtocolInfo"
+    },
+    {
+      "file": "snapshot-request-document-scope.json",
+      "schema": "snapshot.schema.json",
+      "definition": "SnapshotRequest"
+    },
+    {
+      "file": "snapshot-request-child-frame.json",
+      "schema": "snapshot.schema.json",
+      "definition": "SnapshotRequest"
+    },
+    {
+      "file": "snapshot-request-form-subtree.json",
+      "schema": "snapshot.schema.json",
+      "definition": "SnapshotRequest"
+    },
+    {
+      "file": "snapshot-static-document.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot"
+    },
+    {
+      "file": "snapshot-truncated.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot"
+    },
+    {
+      "file": "snapshot-oopif-frame-tree.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot"
+    },
+    {
+      "file": "snapshot-shadow-dom-projection.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot"
+    },
+    {
+      "file": "snapshot-virtualized-list.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot"
+    },
+    {
+      "file": "snapshot-conflicting-jsonld-price.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot"
+    },
+    {
+      "file": "snapshot-redacted-password-field.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot"
+    },
+    {
+      "file": "snapshot-person-challenge.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot"
+    },
+    {
+      "file": "snapshot-selection-and-layout-reports.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot"
+    },
+    {
+      "file": "delta-node-change.json",
+      "schema": "delta.schema.json",
+      "definition": "PageDelta"
+    },
+    {
+      "file": "invalidation-cross-document-commit.json",
+      "schema": "delta.schema.json",
+      "definition": "PageInvalidation"
+    },
+    {
+      "file": "invalidation-frame-detached.json",
+      "schema": "delta.schema.json",
+      "definition": "PageInvalidation"
+    },
+    {
+      "file": "backpressure-notice.json",
+      "schema": "delta.schema.json",
+      "definition": "BackpressureNotice"
+    },
+    {
+      "file": "action-proposal-activate-link.json",
+      "schema": "action.schema.json",
+      "definition": "ActionProposal"
+    },
+    {
+      "file": "action-proposal-trust-floor.json",
+      "schema": "action.schema.json",
+      "definition": "ActionProposal"
+    },
+    {
+      "file": "action-proposal-prepared-commit.json",
+      "schema": "action.schema.json",
+      "definition": "ActionProposal"
+    },
+    {
+      "file": "authorized-envelope-activate-link.json",
+      "schema": "action.schema.json",
+      "definition": "AuthorizedActionEnvelope"
+    },
+    {
+      "file": "renderer-action-command.json",
+      "schema": "action.schema.json",
+      "definition": "RendererActionCommand"
+    },
+    {
+      "file": "action-result-verified.json",
+      "schema": "action.schema.json",
+      "definition": "ActionResult"
+    },
+    {
+      "file": "action-result-stale-page-epoch.json",
+      "schema": "action.schema.json",
+      "definition": "ActionResult"
+    },
+    {
+      "file": "action-result-destination-class-restricted.json",
+      "schema": "action.schema.json",
+      "definition": "ActionResult"
+    },
+    {
+      "file": "snapshot-injected-hidden-instruction.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot"
+    },
+    {
+      "file": "snapshot-kernel-payload-source.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot"
+    },
+    {
+      "file": "delta-content-signal-change.json",
+      "schema": "delta.schema.json",
+      "definition": "PageDelta"
+    },
+    {
+      "file": "protocol-info-trust-and-signals.json",
+      "schema": "protocol-info.schema.json",
+      "definition": "ProtocolInfo"
+    },
+    {
+      "file": "action-proposal-set-text-by-reference.json",
+      "schema": "action.schema.json",
+      "definition": "ActionProposal"
+    },
+    {
+      "file": "action-proposal-submit-through-the-control.json",
+      "schema": "action.schema.json",
+      "definition": "ActionProposal"
+    },
+    {
+      "file": "renderer-action-command-set-text.json",
+      "schema": "action.schema.json",
+      "definition": "RendererActionCommand"
+    },
+    {
+      "file": "renderer-action-command-toggle.json",
+      "schema": "action.schema.json",
+      "definition": "RendererActionCommand"
+    }
+  ]
+}

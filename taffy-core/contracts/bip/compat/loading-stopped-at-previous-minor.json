@@ -1,0 +1,45 @@
+{
+  "schema_version": "0.13",
+  "action_id": "act_stop_01",
+  "task_id": "task_stop_01",
+  "principal": {
+    "kind": "ASSISTANT"
+  },
+  "action_type": "ACTIVATE",
+  "target_handle": {
+    "tab_id": "tab_stop_01",
+    "frame_id": "frame_main",
+    "page_epoch": "epoch_stop_01",
+    "graph_revision": 4,
+    "node_id": "n_stop_01",
+    "expected_origin": {
+      "kind": "TUPLE",
+      "serialization": "https://example.test"
+    }
+  },
+  "preconditions": [
+    {
+      "kind": "EXACT_PAGE_EPOCH",
+      "page_epoch": "epoch_stop_01"
+    },
+    {
+      "kind": "DOCUMENT_ACTIVE"
+    },
+    {
+      "kind": "BUDGET_REMAINING"
+    }
+  ],
+  "expected_postconditions": [
+    {
+      "kind": "LOADING_STOPPED",
+      "timeout_ms": 8000
+    }
+  ],
+  "idempotency_policy": "CONDITIONALLY_IDEMPOTENT",
+  "deadline_monotonic_ms": 24000,
+  "user_visible_reason": "Stop loading the current page.",
+  "proposal_digest": {
+    "algorithm": "SHA_256",
+    "value": "7f2e7a1b6c0d5348e9f0a1b2c3d4e5f60718293a4b5c6d7e8f9012a3b4c5d6e8"
+  }
+}

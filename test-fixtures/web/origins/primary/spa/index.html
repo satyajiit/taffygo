@@ -1,0 +1,73 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="spa-router">
+<title>Lumen catalogue (history-API router)</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Lumen catalogue</h1>
+  <p class="who">Single-page fixture. Routes change with <code>history.pushState</code>;
+  the document is never replaced.</p>
+</header>
+
+<nav id="routes">
+  <button type="button" data-route="/spa/index.html#/overview">Overview</button>
+  <button type="button" data-route="/spa/index.html#/specs">Specifications</button>
+  <button type="button" data-route="/spa/index.html#/sellers">Sellers</button>
+  <a id="leave" href="/product/lumen-desk-lamp.html">Leave the single-page fixture</a>
+</nav>
+
+<main id="view" aria-live="polite">
+  <h2 id="view-title">Overview</h2>
+  <p id="view-body">The Lumen Arc is a fixture product used to exercise
+  same-document route changes.</p>
+</main>
+
+<p class="note">Current route: <code id="route-label">/spa/index.html#/overview</code>
+&middot; route changes so far: <span id="route-count">0</span></p>
+
+<script>
+  (function () {
+    "use strict";
+    var VIEWS = {
+      "#/overview": {
+        title: "Overview",
+        body: "The Lumen Arc is a fixture product used to exercise same-document route changes."
+      },
+      "#/specs": {
+        title: "Specifications",
+        body: "Brightness 800 lumens. Colour temperature 2700-5000 K. Warranty 2 years."
+      },
+      "#/sellers": {
+        title: "Sellers",
+        body: "Listing A sells at $129.00. Listing B sells at $134.50 and is backordered."
+      }
+    };
+    var count = 0;
+    function render(route) {
+      var key = route.indexOf("#") >= 0 ? route.slice(route.indexOf("#")) : "#/overview";
+      var view = VIEWS[key] || VIEWS["#/overview"];
+      document.getElementById("view-title").textContent = view.title;
+      document.getElementById("view-body").textContent = view.body;
+      document.getElementById("route-label").textContent = route;
+      document.getElementById("route-count").textContent = String(count);
+    }
+    var buttons = document.querySelectorAll("#routes button[data-route]");
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].addEventListener("click", function (event) {
+        var route = event.currentTarget.getAttribute("data-route");
+        count += 1;
+        history.pushState({ route: route }, "", route);
+        render(route);
+      });
+    }
+    window.addEventListener("popstate", function () {
+      count += 1;
+      render(location.pathname + location.hash);
+    });
+    render(location.pathname + (location.hash || "#/overview"));
+  })();
+</script>

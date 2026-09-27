@@ -1,0 +1,42 @@
+{
+  "task_id": "task-browser-minted-1",
+  "workspace_id": "workspace-1",
+  "browser_profile_id": "profile-regular-1",
+  "browser_session_id": "browser-session-1",
+  "kind": 0,
+  "goal": "Compare the selected sources.",
+  "control_mode": 1,
+  "provider_route_id": "no_model_required",
+  "assistant_config_version": 3,
+  "policy_version": 5,
+  "skill_version_id": null,
+  "tool_allowlist": [],
+  "milestone": 3,
+  "budgets": [{"kind": 0, "limit": 1}],
+  "has_task_deadline": false,
+  "task_deadline_monotonic_ms": 0,
+  "task_deadline_utc_ms": 0,
+  "predecessor_task_id": null,
+  "trace_id": "trace-browser-minted-1",
+  "task_id_seed": [
+    1, 2, 3, 4, 5, 6, 7, 8,
+    9, 10, 11, 12, 13, 14, 15, 16,
+    17, 18, 19, 20, 21, 22, 23, 24,
+    25, 26, 27, 28, 29, 30, 31, 32
+  ],
+  "template_id": 2,
+  "consent_preview": {
+    "sources": [{
+      "source_id": "source-1",
+      "tab_id": "tab-1",
+      "normalized_origin": "https://example.test",
+      "canonical_locator": null
+    }],
+    "source_discovery_enabled": false,
+    "new_source_cap": 0,
+    "provider_route": 3
+  },
+  "initial_consent_receipt_id": "initial-consent-1",
+  "library_refresh": null,
+  "builtin_skill": null
+}

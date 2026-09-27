@@ -1,0 +1,47 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="renderer-crash">
+<title>Renderer crash on demand</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Renderer crash on demand</h1>
+  <p class="who">This page ends its own renderer process. Whatever was observed
+  here becomes unresolvable, and no queued action may be replayed after it.</p>
+</header>
+
+<p id="pre-crash-fact">Fact recorded before the crash: the fixture order total is
+<strong>$129.00</strong>.</p>
+
+<p>
+  <button type="button" id="crash-now">Crash the renderer (memory exhaustion)</button>
+  <button type="button" id="crash-delayed">Crash after 2 seconds</button>
+</p>
+
+<p class="note" id="crash-note">The preferred mechanism in a browser test is to
+kill the renderer process from the browser process. This button is the in-page
+fallback: it grows an allocation until the process is terminated. Loading with
+<code>?crash=1</code> starts it immediately.</p>
+
+<script>
+  (function () {
+    "use strict";
+    function exhaust() {
+      var blocks = [];
+      var chunk = new Array(1024 * 1024).join("x");
+      for (;;) {
+        blocks.push(chunk + blocks.length);
+      }
+    }
+    document.getElementById("crash-now").addEventListener("click", exhaust);
+    document.getElementById("crash-delayed").addEventListener("click", function () {
+      setTimeout(exhaust, 2000);
+    });
+    if (location.search.indexOf("crash=1") >= 0) {
+      setTimeout(exhaust, 250);
+    }
+  })();
+</script>

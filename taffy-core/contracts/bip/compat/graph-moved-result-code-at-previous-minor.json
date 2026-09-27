@@ -1,0 +1,11 @@
+{
+  "schema_version": "0.7",
+  "action_id": "act_11",
+  "dispatch_id": "disp_11",
+  "result_code": "GRAPH_MOVED_DURING_PREFLIGHT",
+  "dispatched": false,
+  "terminal": true,
+  "verified_by": [],
+  "postcondition_outcomes": [],
+  "completed_at_monotonic_ms": 41880
+}

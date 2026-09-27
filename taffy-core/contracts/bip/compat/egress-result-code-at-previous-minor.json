@@ -1,0 +1,11 @@
+{
+  "schema_version": "0.5",
+  "action_id": "act_08",
+  "dispatch_id": "disp_08",
+  "result_code": "EGRESS_NOT_AUTHORIZED",
+  "dispatched": false,
+  "terminal": true,
+  "verified_by": [],
+  "postcondition_outcomes": [],
+  "completed_at_monotonic_ms": 26310
+}

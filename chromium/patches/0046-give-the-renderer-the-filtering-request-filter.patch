@@ -1,0 +1,176 @@
+From 2c3453e6e8ce95951706ecc0041b1e5d3ed25395 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sun, 6 Sep 2026 19:07:10 +0530
+Subject: give the renderer the filtering request filter
+
+The cosmetic-filter render frame observer needs to ask the browser what a
+frame's origin is allowed to load. Bind taffy::filtering::mojom::RequestFilter
+on each render process host, and carry a pending remote through
+URLLoaderThrottleProviderImpl so a renderer-side throttle can reach it without
+a synchronous hop.
+
+The remote is per-provider and cloned on demand: the throttle provider is
+copied for each worker, and a bound Remote cannot be shared across sequences.
+
+Specified by
+chromium/patches/0046-give-the-renderer-the-filtering-request-filter.md.
+
+Taffy-Patch: 0046
+
+diff --git a/chrome/browser/chrome_content_browser_client_receiver_bindings.cc b/chrome/browser/chrome_content_browser_client_receiver_bindings.cc
+index 6cf53712f067f..1903d8d14a57e 100644
+--- a/chrome/browser/chrome_content_browser_client_receiver_bindings.cc
++++ b/chrome/browser/chrome_content_browser_client_receiver_bindings.cc
+@@ -14,6 +14,7 @@
+ #include "chrome/browser/chrome_content_browser_client.h"
+ #include "chrome/browser/chrome_content_browser_client_parts.h"
+ #include "taffy/browser/cosmetic_filter_bindings.h"
++#include "taffy/browser/filtering_request_filter.h"
+ #include "chrome/browser/content_settings/content_settings_manager_delegate.h"
+ #include "chrome/browser/headless/headless_mode_util.h"
+ #include "chrome/browser/net/net_error_tab_helper.h"
+@@ -221,6 +222,11 @@ void ChromeContentBrowserClient::ExposeInterfacesToRenderer(
+   registry->AddInterface<metrics::mojom::CallStackProfileCollector>(
+       base::BindRepeating(&metrics::CallStackProfileCollector::Create));
+ 
++  registry->AddInterface<taffy::filtering::mojom::RequestFilter>(
++      base::BindRepeating(&taffy::BindFilteringRequestFilter,
++                          render_process_host->GetDeprecatedID()),
++      ui_task_runner);
++
+   if (NetBenchmarking::CheckBenchmarkingEnabled()) {
+     Profile* profile =
+         Profile::FromBrowserContext(render_process_host->GetBrowserContext());
+diff --git a/chrome/renderer/url_loader_throttle_provider_impl.cc b/chrome/renderer/url_loader_throttle_provider_impl.cc
+index 1367d6b4c2dca..a25d38fae347a 100644
+--- a/chrome/renderer/url_loader_throttle_provider_impl.cc
++++ b/chrome/renderer/url_loader_throttle_provider_impl.cc
+@@ -29,6 +29,7 @@
+ #include "content/public/renderer/render_thread.h"
+ #include "extensions/renderer/extension_localization_throttle.h"
+ #include "services/network/public/cpp/resource_request.h"
++#include "taffy/components/filtering/renderer/filtering_url_loader_throttle.h"
+ #include "third_party/blink/public/common/loader/resource_type_util.h"
+ #include "third_party/blink/public/common/thread_safe_browser_interface_broker_proxy.h"
+ #include "third_party/blink/public/mojom/loader/resource_load_info.mojom-shared.h"
+@@ -108,6 +109,10 @@ URLLoaderThrottleProviderImpl::Create(
+     blink::ThreadSafeBrowserInterfaceBrokerProxy* broker) {
+   mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing> pending_safe_browsing;
+   broker->GetInterface(pending_safe_browsing.InitWithNewPipeAndPassReceiver());
++  mojo::PendingRemote<taffy::filtering::mojom::RequestFilter>
++      pending_filtering_request_filter;
++  broker->GetInterface(
++      pending_filtering_request_filter.InitWithNewPipeAndPassReceiver());
+ #if BUILDFLAG(ENABLE_EXTENSIONS)
+   mojo::PendingRemote<safe_browsing::mojom::ExtensionWebRequestReporter>
+       pending_extension_web_request_reporter;
+@@ -117,6 +122,7 @@ URLLoaderThrottleProviderImpl::Create(
+ 
+   return std::make_unique<URLLoaderThrottleProviderImpl>(
+       type, chrome_content_renderer_client, std::move(pending_safe_browsing),
++      std::move(pending_filtering_request_filter),
+ #if BUILDFLAG(ENABLE_EXTENSIONS)
+       std::move(pending_extension_web_request_reporter),
+ #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
+@@ -132,6 +138,8 @@ URLLoaderThrottleProviderImpl::URLLoaderThrottleProviderImpl(
+     ChromeContentRendererClient* chrome_content_renderer_client,
+     mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing>
+         pending_safe_browsing,
++    mojo::PendingRemote<taffy::filtering::mojom::RequestFilter>
++        pending_filtering_request_filter,
+ #if BUILDFLAG(ENABLE_EXTENSIONS)
+     mojo::PendingRemote<safe_browsing::mojom::ExtensionWebRequestReporter>
+         pending_extension_web_request_reporter,
+@@ -141,6 +149,8 @@ URLLoaderThrottleProviderImpl::URLLoaderThrottleProviderImpl(
+     : type_(type),
+       chrome_content_renderer_client_(chrome_content_renderer_client),
+       pending_safe_browsing_(std::move(pending_safe_browsing)),
++      pending_filtering_request_filter_(
++          std::move(pending_filtering_request_filter)),
+ #if BUILDFLAG(ENABLE_EXTENSIONS)
+       pending_extension_web_request_reporter_(
+           std::move(pending_extension_web_request_reporter)),
+@@ -158,6 +168,7 @@ URLLoaderThrottleProviderImpl::Clone() {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+   return std::make_unique<URLLoaderThrottleProviderImpl>(
+       type_, chrome_content_renderer_client_, CloneSafeBrowsingPendingRemote(),
++      CloneFilteringRequestFilterPendingRemote(),
+ #if BUILDFLAG(ENABLE_EXTENSIONS)
+       CloneExtensionWebRequestReporterPendingRemote(),
+ #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
+@@ -207,6 +218,12 @@ URLLoaderThrottleProviderImpl::CreateThrottles(
+   }
+ #endif
+ 
++  if (!is_frame_resource && local_frame_token.has_value()) {
++    throttles.emplace_back(
++        std::make_unique<taffy::filtering::FilteringURLLoaderThrottle>(
++            CloneFilteringRequestFilterPendingRemote(), local_frame_token));
++  }
++
+   if (type_ == blink::URLLoaderThrottleProviderType::kFrame &&
+       !is_frame_resource && local_frame_token.has_value()) {
+     auto throttle = prerender::NoStatePrefetchHelper::MaybeCreateThrottle(
+@@ -326,6 +343,21 @@ URLLoaderThrottleProviderImpl::CloneSafeBrowsingPendingRemote() {
+   return new_pending_safe_browsing;
+ }
+ 
++mojo::PendingRemote<taffy::filtering::mojom::RequestFilter>
++URLLoaderThrottleProviderImpl::CloneFilteringRequestFilterPendingRemote() {
++  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
++  mojo::PendingRemote<taffy::filtering::mojom::RequestFilter> pending_remote;
++  if (pending_filtering_request_filter_) {
++    filtering_request_filter_.Bind(
++        std::move(pending_filtering_request_filter_));
++  }
++  if (filtering_request_filter_) {
++    filtering_request_filter_->Clone(
++        pending_remote.InitWithNewPipeAndPassReceiver());
++  }
++  return pending_remote;
++}
++
+ #if BUILDFLAG(ENABLE_EXTENSIONS)
+ mojo::PendingRemote<safe_browsing::mojom::ExtensionWebRequestReporter>
+ URLLoaderThrottleProviderImpl::CloneExtensionWebRequestReporterPendingRemote() {
+diff --git a/chrome/renderer/url_loader_throttle_provider_impl.h b/chrome/renderer/url_loader_throttle_provider_impl.h
+index 481b34cd5bd47..940e40cbd5140 100644
+--- a/chrome/renderer/url_loader_throttle_provider_impl.h
++++ b/chrome/renderer/url_loader_throttle_provider_impl.h
+@@ -15,6 +15,7 @@
+ #include "extensions/buildflags/buildflags.h"
+ #include "mojo/public/cpp/bindings/pending_remote.h"
+ #include "mojo/public/cpp/bindings/remote.h"
++#include "taffy/components/filtering/mojom/request_filter.mojom.h"
+ #include "third_party/blink/public/common/thread_safe_browser_interface_broker_proxy.h"
+ #include "third_party/blink/public/platform/url_loader_throttle_provider.h"
+ 
+@@ -43,6 +44,8 @@ class URLLoaderThrottleProviderImpl : public blink::URLLoaderThrottleProvider {
+       ChromeContentRendererClient* chrome_content_renderer_client,
+       mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing>
+           pending_safe_browsing,
++      mojo::PendingRemote<taffy::filtering::mojom::RequestFilter>
++          pending_filtering_request_filter,
+ #if BUILDFLAG(ENABLE_EXTENSIONS)
+       mojo::PendingRemote<safe_browsing::mojom::ExtensionWebRequestReporter>
+           pending_extension_web_request_reporter,
+@@ -65,6 +68,8 @@ class URLLoaderThrottleProviderImpl : public blink::URLLoaderThrottleProvider {
+  private:
+   mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing>
+   CloneSafeBrowsingPendingRemote();
++  mojo::PendingRemote<taffy::filtering::mojom::RequestFilter>
++  CloneFilteringRequestFilterPendingRemote();
+ #if BUILDFLAG(ENABLE_EXTENSIONS)
+   mojo::PendingRemote<safe_browsing::mojom::ExtensionWebRequestReporter>
+   CloneExtensionWebRequestReporterPendingRemote();
+@@ -76,6 +81,10 @@ class URLLoaderThrottleProviderImpl : public blink::URLLoaderThrottleProvider {
+   mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing>
+       pending_safe_browsing_;
+   mojo::Remote<safe_browsing::mojom::SafeBrowsing> safe_browsing_;
++  mojo::PendingRemote<taffy::filtering::mojom::RequestFilter>
++      pending_filtering_request_filter_;
++  mojo::Remote<taffy::filtering::mojom::RequestFilter>
++      filtering_request_filter_;
+ 
+ // TODO(crbug.com/513231260): Convert to ENABLE_EXTENSIONS_CORE when safe
+ // browsing supports extensions on desktop Android.

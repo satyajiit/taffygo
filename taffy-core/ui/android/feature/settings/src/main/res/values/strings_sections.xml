@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!--
+  Settings home and search copy for the IA-C sections. Existing AI, blocking,
+  notifications, and appearance keys stay in strings.xml.
+-->
+<resources>
+    <string name="taffy_settings_taffy_title">Taffy</string>
+    <string name="taffy_settings_taffy_summary">Skills, and how Taffy talks</string>
+    <string name="taffy_settings_privacy_title">Privacy</string>
+    <string name="taffy_settings_privacy_summary">What\'s kept on this phone</string>
+    <string name="taffy_settings_general_title">General</string>
+    <string name="taffy_settings_general_summary">Search engine and files</string>
+    <string name="taffy_settings_about_title">About and help</string>
+    <string name="taffy_settings_about_summary">Version and how to reach us</string>
+    <string name="taffy_settings_group_phone">This phone</string>
+
+    <string name="taffy_settings_you_title">You</string>
+    <string name="taffy_settings_you_summary">Your profile and what\'s saved on this phone</string>
+    <string name="taffy_settings_time_on_sites_title">Time on sites</string>
+    <string name="taffy_settings_time_on_sites_summary">How long this browser spent on each site this week</string>
+    <string name="taffy_settings_memory_title">Memory</string>
+    <string name="taffy_settings_memory_summary">What Taffy remembers about you</string>
+    <string name="taffy_settings_saved_sign_ins_title">Saved sign-ins</string>
+    <string name="taffy_settings_saved_sign_ins_summary">Passwords and passkeys this browser can fill</string>
+    <string name="taffy_settings_saved_details_title">Saved details</string>
+    <string name="taffy_settings_saved_details_summary">Name, address, email, and phone kept for forms</string>
+    <string name="taffy_settings_what_happened_title">What happened</string>
+    <string name="taffy_settings_what_happened_summary">Task outcomes and blocking totals, no page content</string>
+    <string name="taffy_settings_library_title">Library</string>
+    <string name="taffy_settings_library_summary">Things you chose to keep</string>
+    <string name="taffy_settings_personality_title">How Taffy talks</string>
+    <string name="taffy_settings_personality_summary">Personality — how Taffy writes, and how careful it is</string>
+    <string name="taffy_settings_what_taffy_can_do_title">What Taffy can do</string>
+    <string name="taffy_settings_what_taffy_can_do_summary">Skills on this phone</string>
+</resources>

@@ -1,0 +1,420 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//build/config/android/rules.gni")
+import("//third_party/jni_zero/jni_zero.gni")
+
+generate_jni("browser_profiles_jni_headers") {
+  sources =
+      [ "java/src/org/chromium/taffy/browser/TaffyBrowserProfilesBridge.java" ]
+}
+
+generate_jni("backup_workflow_jni_headers") {
+  sources = [
+    "java/src/org/chromium/taffy/browser/TaffyBackupRestoreWindow.java",
+    "java/src/org/chromium/taffy/browser/TaffyBackupWorkflowBridge.java",
+  ]
+}
+
+generate_jni("regular_profile_loader_jni_headers") {
+  sources =
+      [ "java/src/org/chromium/taffy/browser/TaffyRegularProfileLoader.java" ]
+}
+
+android_library("browser_profiles_java") {
+  sources =
+      [ "java/src/org/chromium/taffy/browser/TaffyBrowserProfilesBridge.java" ]
+  srcjar_deps = [ ":browser_profiles_jni_headers" ]
+  deps = [
+    "//base:base_java",
+    "//base:callback_java",
+    "//chrome/browser/profiles/android:java",
+    "//third_party/androidx:androidx_annotation_annotation_java",
+    "//third_party/jni_zero:jni_zero_java",
+  ]
+}
+
+android_library("backup_workflow_java") {
+  sources = [
+    "java/src/org/chromium/taffy/browser/TaffyBackupArchiveIo.java",
+    "java/src/org/chromium/taffy/browser/TaffyBackupExportPreparation.java",
+    "java/src/org/chromium/taffy/browser/TaffyBackupRestorePreparation.java",
+    "java/src/org/chromium/taffy/browser/TaffyBackupRestartRecovery.java",
+    "java/src/org/chromium/taffy/browser/TaffyBackupRestoreWindow.java",
+    "java/src/org/chromium/taffy/browser/TaffyBackupWorkflowBridge.java",
+    "java/src/org/chromium/taffy/browser/TaffyInterruptedRestoreDiscovery.java",
+  ]
+  srcjar_deps = [ ":backup_workflow_jni_headers" ]
+  deps = [
+    "//base:base_java",
+    "//base:callback_java",
+    "//chrome/browser/profiles/android:java",
+    "//third_party/androidx:androidx_annotation_annotation_java",
+    "//third_party/jni_zero:jni_zero_java",
+  ]
+}
+
+android_library("regular_profile_loader_java") {
+  sources =
+      [ "java/src/org/chromium/taffy/browser/TaffyRegularProfileLoader.java" ]
+  srcjar_deps = [ ":regular_profile_loader_jni_headers" ]
+  deps = [
+    "//base:base_java",
+    "//base:callback_java",
+    "//chrome/browser/profiles/android:java",
+    "//third_party/androidx:androidx_annotation_annotation_java",
+    "//third_party/jni_zero:jni_zero_java",
+  ]
+}
+
+# The JNI edge of //taffy/browser, and nothing else. This file imports
+# //build/config/android/rules.gni, which asserts is_android, so anything that
+# lands here can only ever be built for one platform — which is the whole
+# reason the account plane, the Core API facade and the command factory are
+# not here any more (decision 0042 section 3). What remains is what is
+# genuinely Android: native entry points, the Java they register, and the
+# generated Java transport those two need.
+
+generate_jni("page_inspector_jni_headers") {
+  sources =
+      [ "java/src/org/chromium/taffy/browser/TaffyPageInspectorBridge.java" ]
+}
+
+generate_jni("download_provider_jni_headers") {
+  sources =
+      [ "java/src/org/chromium/taffy/browser/TaffyDownloadProviderBridge.java" ]
+}
+
+android_library("download_provider_java") {
+  sources =
+      [ "java/src/org/chromium/taffy/browser/TaffyDownloadProviderBridge.java" ]
+  srcjar_deps = [ ":download_provider_jni_headers" ]
+  deps = [
+    "//chrome/browser/profiles/android:java",
+    "//components/offline_items_collection/core:core_java",
+    "//third_party/jni_zero:jni_zero_java",
+  ]
+}
+
+android_library("page_inspector_java") {
+  sources =
+      [ "java/src/org/chromium/taffy/browser/TaffyPageInspectorBridge.java" ]
+  srcjar_deps = [ ":page_inspector_jni_headers" ]
+  deps = [
+    "//chrome/browser/profiles/android:java",
+    "//content/public/android:content_java",
+    "//mojo/public/java:bindings_java",
+    "//mojo/public/java:system_java",
+    "//mojo/public/java/system:system_impl_java",
+    "//taffy/contracts/core-api:core_api_types_java",
+    "//third_party/jni_zero:jni_zero_java",
+  ]
+}
+
+generate_jni("pdf_intelligence_jni_headers") {
+  sources =
+      [ "java/src/org/chromium/taffy/browser/TaffyPdfIntelligenceBridge.java" ]
+}
+
+android_library("pdf_intelligence_java") {
+  sources =
+      [ "java/src/org/chromium/taffy/browser/TaffyPdfIntelligenceBridge.java" ]
+  srcjar_deps = [ ":pdf_intelligence_jni_headers" ]
+  deps = [
+    "//chrome/browser/tab:java",
+    "//chrome/browser/ui/android/native_page:java",
+    "//chrome/browser/ui/android/pdf:java",
+    "//chrome/browser/ui/android/pdf:pdf_page_java",
+    "//third_party/androidx:androidx_annotation_annotation_java",
+    "//third_party/androidx:androidx_pdf_pdf_core_java",
+    "//third_party/androidx:androidx_pdf_pdf_viewer_java",
+    "//third_party/jni_zero:jni_zero_java",
+    "//third_party/kotlin_stdlib:kotlin_stdlib_java",
+  ]
+}
+
+generate_jni("core_api_jni_headers") {
+  sources = [ "java/src/org/chromium/taffy/browser/TaffyCoreApiBridge.java" ]
+}
+
+generate_jni("field_value_jni_headers") {
+  sources = [ "java/src/org/chromium/taffy/browser/TaffyFieldValueBridge.java" ]
+}
+
+android_library("field_value_java") {
+  sources = [ "java/src/org/chromium/taffy/browser/TaffyFieldValueBridge.java" ]
+  srcjar_deps = [ ":field_value_jni_headers" ]
+  deps = [
+    "//chrome/browser/profiles/android:java",
+    "//mojo/public/java:bindings_java",
+    "//mojo/public/java:system_java",
+    "//mojo/public/java/system:system_impl_java",
+    "//taffy/browser:field_value_surface_mojom_java",
+    "//third_party/jni_zero:jni_zero_java",
+  ]
+}
+
+generate_jni("errand_page_jni_headers") {
+  sources = [ "java/src/org/chromium/taffy/browser/TaffyErrandPageBridge.java" ]
+}
+
+android_library("errand_page_java") {
+  sources = [ "java/src/org/chromium/taffy/browser/TaffyErrandPageBridge.java" ]
+  srcjar_deps = [ ":errand_page_jni_headers" ]
+  deps = [
+    "//chrome/browser/tab:java",
+    "//third_party/jni_zero:jni_zero_java",
+  ]
+}
+
+# About's licences row (decision 0206): the attribution page's address, read
+# from the product identity. The entry point takes no argument.
+generate_jni("attribution_notice_jni_headers") {
+  sources = [
+    "java/src/org/chromium/taffy/browser/TaffyAttributionNoticeBridge.java",
+  ]
+}
+
+android_library("attribution_notice_java") {
+  sources = [
+    "java/src/org/chromium/taffy/browser/TaffyAttributionNoticeBridge.java",
+  ]
+  srcjar_deps = [ ":attribution_notice_jni_headers" ]
+  deps = [ "//third_party/jni_zero:jni_zero_java" ]
+}
+
+generate_jni("filtering_jni_headers") {
+  sources = [ "java/src/org/chromium/taffy/browser/TaffyFilteringBridge.java" ]
+}
+
+android_library("filtering_java") {
+  sources = [ "java/src/org/chromium/taffy/browser/TaffyFilteringBridge.java" ]
+  srcjar_deps = [ ":filtering_jni_headers" ]
+  deps = [
+    "//chrome/browser/profiles/android:java",
+    "//chrome/browser/tab:java",
+    "//third_party/androidx:androidx_annotation_annotation_java",
+    "//third_party/jni_zero:jni_zero_java",
+  ]
+}
+
+generate_jni("task_source_selection_jni_headers") {
+  sources = [
+    "java/src/org/chromium/taffy/browser/TaffyTaskSourceSelectionBridge.java",
+  ]
+}
+
+generate_jni("profile_platform_jni_headers") {
+  sources =
+      [ "java/src/org/chromium/taffy/browser/TaffyProfilePlatformBridge.java" ]
+}
+
+android_library("profile_platform_java") {
+  sources =
+      [ "java/src/org/chromium/taffy/browser/TaffyProfilePlatformBridge.java" ]
+  srcjar_deps = [ ":profile_platform_jni_headers" ]
+  deps = [
+    "//chrome/browser/profiles/android:java",
+    "//mojo/public/java:bindings_java",
+    "//mojo/public/java:system_java",
+    "//mojo/public/java/system:system_impl_java",
+    "//taffy/browser:profile_platform_mojom_java",
+    "//third_party/jni_zero:jni_zero_java",
+  ]
+}
+
+android_library("task_source_selection_java") {
+  sources = [
+    "java/src/org/chromium/taffy/browser/TaffyTaskSourceSelectionBridge.java",
+  ]
+  srcjar_deps = [ ":task_source_selection_jni_headers" ]
+  deps = [
+    "//base:callback_java",
+    "//chrome/browser/profiles/android:java",
+    "//chrome/browser/tab:java",
+    "//third_party/androidx:androidx_annotation_annotation_java",
+    "//third_party/jni_zero:jni_zero_java",
+  ]
+}
+
+android_library("core_api_java") {
+  sources = [ "java/src/org/chromium/taffy/browser/TaffyCoreApiBridge.java" ]
+  srcjar_deps = [ ":core_api_jni_headers" ]
+  deps = [
+    "//chrome/browser/profiles/android:java",
+    "//mojo/public/java:bindings_java",
+    "//mojo/public/java:system_java",
+    "//mojo/public/java/system:system_impl_java",
+    "//taffy/contracts/core-api:core_api_types_java",
+    "//third_party/jni_zero:jni_zero_java",
+  ]
+}
+
+# One source-authoritative Java closure paired with every JNI native half that
+# //taffy/browser adds to libchrome. Chromium's registration metadata consumes
+# this group; no source is copied into an upstream target.
+java_group("jni_bridge_java") {
+  public_deps = [
+    ":attribution_notice_java",
+    ":backup_workflow_java",
+    ":browser_profiles_java",
+    ":core_api_java",
+    ":download_provider_java",
+    ":errand_page_java",
+    ":field_value_java",
+    ":filtering_java",
+    ":page_inspector_java",
+    ":pdf_intelligence_java",
+    ":profile_platform_java",
+    ":regular_profile_loader_java",
+    ":task_source_selection_java",
+    "//components/embedder_support/android:view_java",
+  ]
+}
+
+# The native half of ":jni_bridge_java", and the only //taffy code anywhere that
+# is typed against a //chrome Android object.
+#
+# Two facts make this a target of its own rather than more sources in
+# //taffy/browser:browser_shared, and both were paid for before the split
+# existed:
+#
+#   * Link. profile_platform_bridge.cc calls Profile::FromJavaObject and
+#     task_source_selection_bridge.cc's @JniType("TabAndroid*") glue calls
+#     TabAndroid::GetNativeTab. Those are defined in
+#     //chrome/browser/profiles:misc and //chrome/browser/android:tabs_public,
+#     neither of which a content_shell binary links, so taffy_browsertests could
+#     not be linked at all while these sources were in the browser library.
+#   * Registration. jni_zero resolves the Java peer of every native it
+#     registers when the process starts. These bridges resolve
+#     org.chromium.chrome.browser.profiles.Profile and TabAndroid, which live in
+#     //chrome/android:chrome_java, so a test APK that linked them aborted at
+#     startup with ClassNotFoundException before any test body ran.
+#
+# libchrome is the only binary that carries both halves, and //taffy/browser's
+# group is the only edge that reaches this target. Nothing test-only may depend
+# on it: a test that needs a Profile uses //chrome/test's harnesses, and a test
+# that needs a page uses content_shell.
+source_set("regular_profile_token") {
+  sources = [
+    "regular_profile_token.cc",
+    "regular_profile_token.h",
+  ]
+  public_deps = [
+    "//base",
+    "//chrome/browser/android:profile_token",
+    "//crypto",
+  ]
+}
+
+# Physical lifecycle for an omitted restore candidate. It is Android-owned but
+# has no JNI registration, so it remains independently compilable/testable and
+# is merely retained by libchrome through the JNI composition edge.
+source_set("restore_profile_lifecycle") {
+  sources = [
+    "backup_workflow_restore_projection.cc",
+    "backup_workflow_restore_projection.h",
+    "browser_profiles_restore_lifecycle.cc",
+    "browser_profiles_restore_lifecycle_binding.cc",
+    "browser_profiles_restore_lifecycle_creation.cc",
+    "browser_profiles_restore_lifecycle_precommit_cancel.cc",
+    "browser_profiles_restore_precommit_cleanup_handle.cc",
+  ]
+  public_deps = [
+    "//base",
+    "//taffy/browser:backup_restore_dormant_target_owner",
+  ]
+  deps = [
+    "//chrome/browser/profiles",
+    "//chrome/browser/profiles:profile_util",
+    "//chrome/common",
+    "//components/prefs",
+    "//content/public/browser",
+    "//taffy/browser:backup_restore_preference_readback",
+    "//taffy/browser:browser_shared",
+  ]
+}
+
+source_set("jni_bridges") {
+  sources = [
+    "attribution_notice_bridge.cc",
+    "backup_workflow_android_notifications.h",
+    "backup_workflow_bridge.cc",
+    "backup_workflow_bridge_internal.cc",
+    "backup_workflow_bridge_internal.h",
+    "backup_workflow_restore_android.cc",
+    "backup_workflow_restore_android.h",
+    "backup_workflow_restore_android_actions.cc",
+    "backup_workflow_restore_android_internal.h",
+    "backup_workflow_restore_android_recovery.cc",
+    "backup_workflow_restore_bridge.cc",
+    "browser_profiles_bridge.cc",
+    "download_provider_bridge.cc",
+    "errand_page_bridge.cc",
+    "field_value_bridge.cc",
+    "filtering_bridge.cc",
+    "page_inspector_bridge.cc",
+    "pdf_intelligence_bridge.cc",
+    "pdf_intelligence_bridge.h",
+    "profile_core_api_bridge.cc",
+    "profile_platform_bridge.cc",
+    "regular_profile_loader.cc",
+    "task_navigation_authority_chrome.cc",
+    "task_navigation_authority_chrome.h",
+    "task_source_selection_bridge.cc",
+  ]
+
+  deps = [
+    ":attribution_notice_jni_headers",
+    ":backup_workflow_jni_headers",
+    ":browser_profiles_jni_headers",
+    ":core_api_jni_headers",
+    ":download_provider_jni_headers",
+    ":errand_page_jni_headers",
+    ":field_value_jni_headers",
+    ":filtering_jni_headers",
+    ":page_inspector_jni_headers",
+    ":pdf_intelligence_jni_headers",
+    ":profile_platform_jni_headers",
+    ":regular_profile_loader_jni_headers",
+    ":regular_profile_token",
+    ":restore_profile_lifecycle",
+    ":task_source_selection_jni_headers",
+    "//base",
+
+    # The Java peer of a tab, resolved to its native WebContents. This is the
+    # dependency that may not reach a content_shell binary.
+    "//chrome/browser/android:tabs_public",
+
+    # Headers only: `HistoryTabHelper`'s user-data key, so errand_page_bridge.cc
+    # can take Chromium's history recorder off one tab. The definition of that
+    # key is in //chrome/browser/history:impl, which //chrome/browser already
+    # links — depending on it from here would be the cycle this split exists to
+    # avoid.
+    "//chrome/browser/history",
+    "//chrome/browser/offline_items_collection",
+    "//chrome/browser/profiles",
+    "//chrome/browser/renderer_host",
+
+    # TaffyPageHostView owns ContentViewRenderView on the Java side. Keep its
+    # native half in libchrome through this edge; APK Java dependencies cannot
+    # carry native code into the library.
+    "//components/embedder_support/android:view",
+    "//components/offline_items_collection/core",
+    "//content/public/browser",
+    "//crypto",
+    "//mojo/public/cpp/bindings",
+    "//taffy/browser:browser_shared",
+    "//taffy/browser:field_value_surface_mojom",
+    "//taffy/browser:profile_platform_mojom",
+    "//taffy/common/public",
+    "//taffy/components/filtering/browser",
+    "//taffy/components/storage/browser:storage",
+    "//taffy/contracts/core-api",
+    "//taffy/contracts/core-service",
+    "//url",
+  ]
+}

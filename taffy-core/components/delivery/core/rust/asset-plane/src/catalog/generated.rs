@@ -1,0 +1,322 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+//! The catalog this build was compiled with.
+//!
+//! GENERATED FILE — do not edit. Its source is
+//! `catalog/source/assets.json` and its generator is
+//! `catalog/tools/generate_catalog.py`. Add an asset by adding a row
+//! there and running the generator with `--write`; no code changes.
+
+use super::entry::{CatalogEntry, Container, Kind, Necessity, Publication, Variant};
+use crate::platform::Platform;
+
+/// A digest of the rows below, so a device can tell one catalog from another.
+pub const CATALOG_FINGERPRINT: u32 = 446_319_034;
+
+static VARIANTS_EASYLIST_BASE_0: &[Variant] = &[
+    Variant::new(
+        Platform::AndroidArm64,
+        Publication::Published,
+        "filter-lists/202608272347-taffy.1/easylist-base.zip",
+        1_183_665,
+        1_183_665,
+        "c1ea235b7eb1de2efa7b6fd6f5af802fa548e779b9e008efe98ff629a16eef10",
+    ),
+    Variant::new(
+        Platform::AndroidX64,
+        Publication::Published,
+        "filter-lists/202608272347-taffy.1/easylist-base.zip",
+        1_183_665,
+        1_183_665,
+        "c1ea235b7eb1de2efa7b6fd6f5af802fa548e779b9e008efe98ff629a16eef10",
+    ),
+    Variant::new(
+        Platform::MacosArm64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::MacosX64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::WindowsX64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::WindowsArm64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+];
+
+static VARIANTS_PYTHON_STDLIB_1: &[Variant] = &[
+    Variant::new(
+        Platform::AndroidArm64,
+        Publication::Published,
+        "python/3.14.7-taffy.1/android-arm64/stdlib.zip",
+        2_769_014,
+        2_769_014,
+        "a01d637051448386b07865ca543c8dd3aed00a9e374385aa971de94334fee363",
+    ),
+    Variant::new(
+        Platform::AndroidX64,
+        Publication::Published,
+        "python/3.14.7-taffy.1/android-x64/stdlib.zip",
+        2_769_014,
+        2_769_014,
+        "a01d637051448386b07865ca543c8dd3aed00a9e374385aa971de94334fee363",
+    ),
+    Variant::new(
+        Platform::MacosArm64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::MacosX64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::WindowsX64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::WindowsArm64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+];
+
+static VARIANTS_PYTHON_TOOLKIT_2: &[Variant] = &[
+    Variant::new(
+        Platform::AndroidArm64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::AndroidX64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::MacosArm64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::MacosX64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::WindowsX64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::WindowsArm64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+];
+
+static VARIANTS_COUNTRY_FLAGS_3: &[Variant] = &[
+    Variant::new(
+        Platform::AndroidArm64,
+        Publication::Published,
+        "country-flags/7.5.0-taffy.1/flags-4x3-webp.zip",
+        584_892,
+        584_892,
+        "46d06699bd17d6943eeb2d4540b707eae34c6313ac01d1835c61201b2decb5b5",
+    ),
+    Variant::new(
+        Platform::AndroidX64,
+        Publication::Published,
+        "country-flags/7.5.0-taffy.1/flags-4x3-webp.zip",
+        584_892,
+        584_892,
+        "46d06699bd17d6943eeb2d4540b707eae34c6313ac01d1835c61201b2decb5b5",
+    ),
+    Variant::new(
+        Platform::MacosArm64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::MacosX64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::WindowsX64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::WindowsArm64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+];
+
+static VARIANTS_START_SCENES_4: &[Variant] = &[
+    Variant::new(
+        Platform::AndroidArm64,
+        Publication::Published,
+        "start-scenes/20260910-taffy.1/scenes-4x3-webp.zip",
+        1_219_859,
+        1_219_859,
+        "1a6d9eeee5df0725f35d6dfdd6028ee90aa79312b35c4a01d8f856525f40c566",
+    ),
+    Variant::new(
+        Platform::AndroidX64,
+        Publication::Published,
+        "start-scenes/20260910-taffy.1/scenes-4x3-webp.zip",
+        1_219_859,
+        1_219_859,
+        "1a6d9eeee5df0725f35d6dfdd6028ee90aa79312b35c4a01d8f856525f40c566",
+    ),
+    Variant::new(
+        Platform::MacosArm64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::MacosX64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::WindowsX64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+    Variant::new(
+        Platform::WindowsArm64,
+        Publication::Unpublished,
+        "",
+        0,
+        0,
+        "",
+    ),
+];
+
+/// Every asset, in source order.
+pub static ENTRIES: &[CatalogEntry] = &[
+    CatalogEntry::new(
+        "easylist-base",
+        "202608272347-taffy.1",
+        Kind::FilterList,
+        Necessity::Required,
+        Container::Zip,
+        None,
+        VARIANTS_EASYLIST_BASE_0,
+    ),
+    CatalogEntry::new(
+        "python-stdlib",
+        "3.14.7-taffy.1",
+        Kind::PythonStdlib,
+        Necessity::Required,
+        Container::Zip,
+        None,
+        VARIANTS_PYTHON_STDLIB_1,
+    ),
+    CatalogEntry::new(
+        "python-toolkit",
+        "1-taffy.1",
+        Kind::PythonPackages,
+        Necessity::OnDemand,
+        Container::Zip,
+        None,
+        VARIANTS_PYTHON_TOOLKIT_2,
+    ),
+    CatalogEntry::new(
+        "country-flags",
+        "7.5.0-taffy.1",
+        Kind::CountryFlags,
+        Necessity::Required,
+        Container::Zip,
+        None,
+        VARIANTS_COUNTRY_FLAGS_3,
+    ),
+    CatalogEntry::new(
+        "start-scenes",
+        "20260910-taffy.1",
+        Kind::StartScenes,
+        Necessity::Required,
+        Container::Zip,
+        None,
+        VARIANTS_START_SCENES_4,
+    ),
+];

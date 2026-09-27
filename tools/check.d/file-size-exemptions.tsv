@@ -1,0 +1,34 @@
+# Files permitted past the soft line cap of ./tools/check fast, lane "files".
+#
+# Columns, tab-separated:  path-glob <TAB> ceiling <TAB> reason
+#
+# The ceiling is the largest the file may be, in lines of code as
+# tools/lib/code_lines.py counts them: not blank, not a comment, not inside an
+# inline test block. It must be above the cap, or the entry exempts nothing.
+#
+# Three rules keep this table from becoming a silencer, and ./tools/check
+# enforces all three:
+#
+#   1. Every entry carries a reason. "It failed the check" is not one, and a
+#      placeholder reason is a hard error.
+#   2. Every entry has its own ceiling. An exemption is permission for a file
+#      to be the size it is, never permission to keep growing.
+#   3. An entry that no longer matches anything, or whose file is now under
+#      the cap, fails the lane. Dead exemptions are deleted, not kept.
+#
+# Generated files are NOT listed here. They are detected by the @generated
+# marker or a "generated" path segment (tools/lib/source_index.py), because an
+# exemption would rot the moment a generator changed its output layout.
+#
+# The rule these entries are exceptions to: docs/architecture/
+# android-app-architecture.md section 5, and decision 0014 item 3.
+
+taffy-core/contracts/bip/mojom/page_intelligence.mojom	820	The main interface and its message vocabulary, after the shared identity, origin, lifecycle and digest seam moved to page_intelligence_identity.mojom. Mojo's generated main header includes that imported vocabulary, so consumers still include one header. This file holds declarations rather than logic, and schema agreement is gated by generate.py --mojom.
+taffy-core/components/intelligence/core/rust/task-engine/tests/seeded_secret_fixtures.rs	460	The milestone M2 exit criterion over the whole seeded-secret corpus. The corpus is one manifest, and the criterion is "zero plaintext secrets anywhere"; a per-destination split would answer that question in pieces and lose the property that no destination was forgotten.
+taffy-core/components/intelligence/core/rust/model-router/tests/route_selection.rs	560	Eligibility, disclosure, failover order and every refusal for one router call. They are one file because the property under test is that a route never changes under a failure — which can only be asserted by driving the same request through the success and the refusal paths side by side.
+taffy-core/components/security/core/rust/policy-engine/tests/approval_lifecycle.rs	520	The seven invalidation triggers of domain model section 12.5, each proved against the same approved action. The value of the suite is that the seven are exhaustive; splitting it would leave no file where that exhaustiveness is visible.
+taffy-core/components/security/core/rust/policy-engine/tests/dispatch_path.rs	480	The whole ten-step path walked once through the broker's own interface, then re-walked with the document moved underneath each of the first six steps. It is one narrative; cutting it in half would leave two files that must be read together to mean anything.
+taffy-core/components/security/core/rust/policy-engine/tests/fail_closed_properties.rs	470	Property tests for threat-model invariant I-04. The generators, the shrinkers and the properties are one apparatus: separating a property from the generator that feeds it is how a property test quietly stops covering what it claims.
+taffy-core/components/security/core/rust/policy-engine/tests/stale_node_decisions.rs	560	Steps one to six of the section 12 sequence, already split from steps seven to ten. Each test mutates exactly one thing about the same authorized action and names the step that catches it; the fixture is the point, and a further split would copy it.
+taffy-core/components/security/core/rust/policy-engine/tests/stale_node_effects.rs	470	Steps seven to ten of the section 12 sequence, already split from steps one to six. The out-of-turn cases — an outcome offered for a step the sequence is not waiting on — are the reason the suite exists, and they need every step present in one file to be stated.
+taffy-core/browser/core_service_manager.h	430	The declaration of CoreServiceManager, the browser's one owner of the core service's lifetime, brokers, publications and task surfaces. Its implementation is split by responsibility across the core_service_manager_*.cc files, but a class has one declaration and this is it; every member here is reached from one of those files. The ceiling is permission to be this size, not to grow: the next surface belongs in a collaborator class, as the task browser actions and the surface readiness already are.

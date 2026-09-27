@@ -1,0 +1,6 @@
+# The country-flag pack's build recipe.
+#
+# Empty of names on purpose: no owner has signed anything in this repository
+# yet, and a file that named one would be recording an approval that does not
+# exist. It exists so the directory has the file upstream conventions expect,
+# and so the first real owner has somewhere to be written down.

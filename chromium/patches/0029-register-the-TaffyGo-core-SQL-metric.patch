@@ -1,0 +1,19 @@
+From 66f2efc8d7a45bad940a404dec8e6853fd326a56 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sat, 22 Aug 2026 05:49:21 +0530
+Subject: register the TaffyGo core SQL metric
+
+Taffy-Patch: 0029
+
+diff --git a/tools/metrics/histograms/metadata/sql/histograms.xml b/tools/metrics/histograms/metadata/sql/histograms.xml
+index 10c7b0a724e26..057d5fe16ccb4 100644
+--- a/tools/metrics/histograms/metadata/sql/histograms.xml
++++ b/tools/metrics/histograms/metadata/sql/histograms.xml
+@@ -100,6 +100,7 @@ chromium-metrics-reviews@google.com.
+   <variant name="Shortcuts" summary="Shortcuts"/>
+   <variant name="SQLiteDiagnostics" summary="SQLiteDiagnostics"/>
+   <variant name="TabStateStorage" summary="TabStateStorage"/>
++  <variant name="TaffyCore" summary="TaffyGo core journal"/>
+   <variant name="Test" summary="Test"/>
+   <variant name="Thumbnail" summary="Thumbnail"/>
+   <variant name="TopSites" summary="TopSites"/>

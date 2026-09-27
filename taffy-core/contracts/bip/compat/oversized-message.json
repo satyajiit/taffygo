@@ -1,0 +1,2374 @@
+{
+  "schema_version": "0.1",
+  "snapshot_id": "snap_oversized_01",
+  "request_id": "req_001",
+  "profile_id": "prof_default",
+  "browser_window_id": "win_01",
+  "tab_id": "tab_01",
+  "root_frame_id": "frame_main",
+  "page_epoch": "epoch_a1",
+  "graph_revision": 3,
+  "event_sequence": 12,
+  "lifecycle_state": "ACTIVE",
+  "committed_url_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://docs.example.test"
+    },
+    "disclosure": "ORIGIN_AND_PATH",
+    "path": "/long",
+    "has_query": false,
+    "has_fragment": false
+  },
+  "origin_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://docs.example.test"
+    },
+    "is_potentially_trustworthy": true,
+    "is_incognito": false
+  },
+  "capture_time_monotonic_ms": 1000,
+  "scope": "DOCUMENT",
+  "adapters": [
+    {
+      "adapter": "DOM",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "n_doc",
+      "frame_id": "frame_main",
+      "role": "DOCUMENT",
+      "name": "Long document",
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "node_id": "n_p001",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 1 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[1]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p002",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 2 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[2]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p003",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 3 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[3]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p004",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 4 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[4]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p005",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 5 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[5]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p006",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 6 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[6]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p007",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 7 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[7]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p008",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 8 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[8]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p009",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 9 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[9]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p010",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 10 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[10]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p011",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 11 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[11]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p012",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 12 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[12]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p013",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 13 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[13]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p014",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 14 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[14]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p015",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 15 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[15]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p016",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 16 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[16]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p017",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 17 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[17]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p018",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 18 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[18]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p019",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 19 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[19]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p020",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 20 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[20]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p021",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 21 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[21]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p022",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 22 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[22]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p023",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 23 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[23]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p024",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 24 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[24]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p025",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 25 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[25]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p026",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 26 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[26]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p027",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 27 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[27]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p028",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 28 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[28]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p029",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 29 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[29]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p030",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 30 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[30]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p031",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 31 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[31]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p032",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 32 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[32]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p033",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 33 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[33]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p034",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 34 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[34]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p035",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 35 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[35]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p036",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 36 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[36]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p037",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 37 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[37]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p038",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 38 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[38]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p039",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 39 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[39]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p040",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 40 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[40]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p041",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 41 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[41]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p042",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 42 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[42]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p043",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 43 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[43]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p044",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 44 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[44]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p045",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 45 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[45]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p046",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 46 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[46]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p047",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 47 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[47]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p048",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 48 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[48]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p049",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 49 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[49]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p050",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 50 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[50]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p051",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 51 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[51]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p052",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 52 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[52]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p053",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 53 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[53]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p054",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 54 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[54]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p055",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 55 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[55]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p056",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 56 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[56]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p057",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 57 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[57]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p058",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 58 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[58]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p059",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 59 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[59]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    },
+    {
+      "node_id": "n_p060",
+      "frame_id": "frame_main",
+      "role": "PARAGRAPH",
+      "text_runs": [
+        {
+          "text": "Paragraph 60 of a document deliberately built past the byte bound this fixture declares, so that the size check is the only thing that can reject it.",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.93,
+      "evidence": [
+        {
+          "field": "TEXT_RUNS",
+          "source_kind": "DOM",
+          "source_locator": "dom:/article/p[60]",
+          "extraction_rule_version": "dom-1.0.0",
+          "transformation": "NONE"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p001",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p002",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p003",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p004",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p005",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p006",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p007",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p008",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p009",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p010",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p011",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p012",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p013",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p014",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p015",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p016",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p017",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p018",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p019",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p020",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p021",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p022",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p023",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p024",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p025",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p026",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p027",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p028",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p029",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p030",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p031",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p032",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p033",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p034",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p035",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p036",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p037",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p038",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p039",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p040",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p041",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p042",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p043",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p044",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p045",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p046",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p047",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p048",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p049",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p050",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p051",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p052",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p053",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p054",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p055",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p056",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p057",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p058",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p059",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_p060",
+      "relationship": "CONTAINS",
+      "inferred": false
+    }
+  ],
+  "frames": [
+    {
+      "frame_id": "frame_main",
+      "is_main_frame": true,
+      "is_out_of_process": false,
+      "is_cross_origin_to_parent": false,
+      "origin_metadata": {
+        "origin": {
+          "kind": "TUPLE",
+          "serialization": "https://docs.example.test"
+        },
+        "is_potentially_trustworthy": true,
+        "is_incognito": false
+      },
+      "page_epoch": "epoch_a1",
+      "graph_revision": 3,
+      "lifecycle_state": "ACTIVE",
+      "included": true
+    }
+  ],
+  "truncation": {
+    "truncated": false,
+    "budgets_reached": [],
+    "omitted_node_count": 0,
+    "omitted_text_bytes": 0,
+    "omitted_frame_count": 0,
+    "may_change_answer": false
+  },
+  "redaction_summary": {
+    "applied_features": [
+      "URL_MINIMIZATION"
+    ],
+    "redacted_field_count": 0,
+    "suppressed_secret_value_count": 0,
+    "sensitive_zone_count": 0,
+    "policy_filtered_frame_count": 0
+  },
+  "warnings": []
+}

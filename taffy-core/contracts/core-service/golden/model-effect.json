@@ -1,0 +1,53 @@
+{
+  "operation": {
+    "operation_id": "op-17",
+    "service_generation": 4,
+    "task_revision": 9,
+    "deadline_monotonic_ms": 120000,
+    "idempotency_key": "task-9-model-1"
+  },
+  "effect_id": "effect-1",
+  "kind": 2,
+  "retry_class": 0,
+  "storage_commit": null,
+  "page_observation": null,
+  "model_request": {
+    "route_id": "managed.primary",
+    "model_id": "fixture-model",
+    "disclosure": 2,
+    "request_body": [
+      1,
+      0,
+      2,
+      7
+    ],
+    "max_output_bytes": 4096,
+    "task_id": "task-9",
+    "provider_id": "fixture-provider",
+    "wire_api": 0,
+    "endpoint": "https://provider.taffy.test",
+    "credential_handle": "credential-handle-1",
+    "static_headers": [
+      {
+        "name": "anthropic-version",
+        "value": "2023-06-01"
+      }
+    ],
+    "probe": false,
+    "endpoint_kind": 0,
+    "media_attachment_handle": null,
+    "media_attachment_mime_type": null,
+    "not_before_monotonic_ms": 0
+  },
+  "network_request": null,
+  "browser_action": null,
+  "tool_job": null,
+  "secure_store": null,
+  "auth_surface": null,
+  "permission_request": null,
+  "asset_delivery": null,
+  "catalog_fetch": null,
+  "provider_listing_fetch": null,
+  "composer_completion": null,
+  "custom_endpoint_probe": null
+}

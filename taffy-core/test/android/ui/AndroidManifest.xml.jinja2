@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Self-instrumenting manifest for TaffyGo's Compose device suite. The Compose
+test-manifest dependency contributes its blank ComponentActivity. Keeping the
+test in its own process prevents a semantics test from acquiring browser
+profile state or permissions merely because the shipping APK has them.
+
+The target package is generated from the one branding value because debug and
+release application ids differ. aapt can rename this manifest's package, but
+it cannot rewrite android:targetPackage for us.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="{{manifest_package}}.tests">
+
+  <uses-permission android:name="android.permission.RUN_INSTRUMENTATION" />
+
+  <application android:label="TaffyGo tests">
+    <!-- Test-only authority for exact-byte private-share platform tests. -->
+    <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="{{manifest_package}}.tests.FileProvider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+      <meta-data
+          android:name="android.support.FILE_PROVIDER_PATHS"
+          android:resource="@xml/taffy_test_file_paths" />
+    </provider>
+  </application>
+
+  <instrumentation
+      android:name="androidx.test.runner.AndroidJUnitRunner"
+      android:targetPackage="{{manifest_package}}.tests"
+      android:label="TaffyGo device tests" />
+</manifest>

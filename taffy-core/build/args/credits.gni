@@ -1,0 +1,23 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# Keep the generated notice in every Android APK. The published notice route
+# is separate from packaging (decision 0127).
+generate_about_credits = true
+
+# The upstream filesystem scan does not descend through the src/taffy mount.
+# Each directory contributes its shipped README.chromium entries and licenses,
+# so every //taffy/third_party directory whose README.chromium says
+# `Shipped: yes` has to be named here, or the notice the package carries leaves
+# it out without an error (decision 0206, point 4).
+extra_third_party_notice_dirs = [
+  "taffy/third_party/adblock-rust",
+  "taffy/third_party/commonmark",
+  "taffy/third_party/cpython",
+  "taffy/third_party/dagger",
+  "taffy/third_party/easylist",
+  "taffy/third_party/flag-icons",
+]

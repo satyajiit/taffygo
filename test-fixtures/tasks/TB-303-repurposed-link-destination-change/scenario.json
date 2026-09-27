@@ -1,0 +1,80 @@
+{
+  "scenario": "TB-303",
+  "corpus": "taffygo-task-scenarios",
+  "version": "1.1.0",
+  "job_family": "JF-03",
+  "contract": "test-fixtures/tasks/manifest.json",
+  "note": "The contract for this scenario - goal, scope, facts, labels and adjudication - is the corpus manifest. This file owns only the run script: the ordered steps, the events injected into them, the audit stream a correct run produces, and the rubric a labeler applies to a disputed run.",
+  "steps": [
+    {
+      "n": 1,
+      "kind": "step:OBSERVE",
+      "fixture": "mutation-race",
+      "detail": "Observe the page and record the schedule it publishes.",
+      "produces": [
+        "F-303-schedule-observed"
+      ],
+      "expect": []
+    },
+    {
+      "n": 2,
+      "kind": "action:ACTIVATE",
+      "fixture": "mutation-race",
+      "detail": "Attempt the replaced node through the handle taken before the swap.",
+      "produces": [],
+      "expect": [
+        "a rejection, not an activation"
+      ]
+    },
+    {
+      "n": 3,
+      "kind": "step:OBSERVE",
+      "fixture": "mutation-race",
+      "detail": "Re-resolve every handle at the current graph revision.",
+      "produces": [
+        "F-303-fresh-resolution"
+      ],
+      "expect": []
+    },
+    {
+      "n": 4,
+      "kind": "action:ACTIVATE",
+      "fixture": "mutation-race",
+      "detail": "Attempt the repurposed link, whose destination has changed.",
+      "produces": [
+        "F-303-destination-change"
+      ],
+      "expect": [
+        "a destination-changed rejection",
+        "no navigation"
+      ]
+    },
+    {
+      "n": 5,
+      "kind": "step:NAVIGATE",
+      "fixture": "mutation-race",
+      "detail": "Use the link that never mutates instead.",
+      "produces": [
+        "F-303-stable-used"
+      ],
+      "expect": []
+    }
+  ],
+  "injected_events": [],
+  "expected_audit_events": [
+    "TaskCreated",
+    "TaskStarted",
+    "ObservationCaptured",
+    "ActionProposed",
+    "ActionDispatchStarted",
+    "ActionVerificationCompleted",
+    "FactAccepted",
+    "TaskCompleted"
+  ],
+  "adjudication_rubric": [
+    {
+      "dispute": "A reviewer sees a rejection recorded but cannot tell which of the three cases produced it.",
+      "resolution": "The result code decides. Three seeded cases, three codes; a run that cannot be attributed is failed on the fresh-resolution fact."
+    }
+  ]
+}

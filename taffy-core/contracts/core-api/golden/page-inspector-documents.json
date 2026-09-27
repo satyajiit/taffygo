@@ -1,0 +1,11 @@
+{
+  "availability": 0,
+  "documents": [
+    {
+      "document_id": "selected-page",
+      "kind": 0,
+      "host": "docs.example.test",
+      "claims": [0, 1, 2, 3]
+    }
+  ]
+}

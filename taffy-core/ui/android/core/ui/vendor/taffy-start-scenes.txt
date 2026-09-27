@@ -1,0 +1,91 @@
+Taffy start page scenes
+=======================
+
+Owner: Matterward Labs Private Limited / TaffyGo
+Licence: Reserved media, not licensed with the code; see TRADEMARKS.md.
+Created: 2026-09-10
+Generator: Codex built-in image_gen, image-to-image from the committed
+  first-party browsing master (task-scenes/masters/taffy_scene_browsing.png),
+  six images per call, one call per part of the day. No other input asset.
+Masters: not kept. The 1448 by 1086 generated PNGs were read back one at a
+  time, and the twenty-four reviewed here are the whole of what was kept; the
+  bytes below are the reviewed and published bytes, and a master would show a
+  reviewer nothing they do not.
+Shipping: none. These files enter no installer. They are packaged by
+  taffy-core/ui/android/tools/scenes/build_scene_pack.py into the
+  `start-scenes` delivery-plane artifact and read off the device's disk.
+Encoder: cwebp 1.6.0, -q 84 -m 6 -resize 640 480 -metadata none
+
+Twenty-four original editorial gouache scenes commissioned for TaffyGo's start
+page, six for each part of the day, in the same painted hand as the two
+task scenes recorded beside this file: cream paper ground, muted category
+colour, warm terracotta accents. Morning is low warm side light and long
+shadows; afternoon flat bright daylight and short shadows; evening amber and
+rose with one interior light beginning to matter; night deep indigo with a
+single small warm source. Each is a domestic still moment -- a window, a
+table, a doorway, a person with a cup or a book -- and no two are the same
+scene. Every render was checked for lettering, marks, watermarks and
+signatures before it was kept, at full size and at each corner.
+
+These are decorative, inert plates above the wordmark (decision 0145). They
+depict no task state, no page, no person's data, no price and no outcome.
+Any screen in them is an empty flat shape. No Aster image, mascot,
+third-party asset, site screenshot or personal document was copied.
+
+Prompts: the exact built-in generation briefs are kept in the maintainer's
+working tree (start-scenes/prompts.md there) and are not published. The
+member names follow StartSceneMember in core/ui. Replace one
+by generating a new reviewed render with the same brief and encoding it with
+the same recipe, then update its two lines here, rebuild the pack, publish
+it under a new revision and move the catalog row. Never edit only these
+bytes: the pack's digest is pinned in the catalog, and a member changed here
+alone is a pack the device will refuse.
+
+sha256_afternoon_1_webp=24fb1ceeda8ca8661687f21b277d02c7420682cb38d5a64831004370337bfefc
+bytes_afternoon_1_webp=57308
+sha256_afternoon_2_webp=0a6da6b22bc775942741e240e8d0f9d7b624e830a3661ddc20f8bbd362d93659
+bytes_afternoon_2_webp=81326
+sha256_afternoon_3_webp=e8a0e2c43880c6afb2a294101f8febb124cb4021c291b65d51a4d69e1030b189
+bytes_afternoon_3_webp=42436
+sha256_afternoon_4_webp=4454ba18748df83d7b4904c4a046f6bb8a16798886e09e7097c043d440c35d06
+bytes_afternoon_4_webp=55562
+sha256_afternoon_5_webp=a773309334c1d6547f0e33ef78a8274a063913a349876399f609cb20e6261714
+bytes_afternoon_5_webp=46344
+sha256_afternoon_6_webp=d334bda8e104220cfcf295ccc6a250c7ed0c83c93bf63ac9602c3d116dd067df
+bytes_afternoon_6_webp=58392
+sha256_evening_1_webp=27c0fd8ceba8a365c8c54f732081088e5b0398194b398fd941b5bd4a9e352989
+bytes_evening_1_webp=58034
+sha256_evening_2_webp=e281a17c2f757d96b398c4fa697aa598af39b8ff6a6657ae640ea6b8bfec34d6
+bytes_evening_2_webp=50786
+sha256_evening_3_webp=09c3b70b1c713ae1d4ef182bac168c30b0db3ebe2c00453f9c6a94c06187431b
+bytes_evening_3_webp=60004
+sha256_evening_4_webp=82732bdf54927a9445393b04c0ee3cfeb9fb3a091904f9180d6b7e3de77bfacf
+bytes_evening_4_webp=55336
+sha256_evening_5_webp=f2887b16c1d5ba374129c289144b88d42780adb87966fa2bd2c39557f3b1bd4f
+bytes_evening_5_webp=55690
+sha256_evening_6_webp=7e29088f81aa16b7e5c3bd471a3ab6d6e667fa2c8475642c937cd114ec670baa
+bytes_evening_6_webp=57620
+sha256_morning_1_webp=ad5f26133177ab716f8212fd23ec09512741fbe5d89674ce01f4ca29b7e8b498
+bytes_morning_1_webp=53754
+sha256_morning_2_webp=9b8a433ecdeb25ae0d262e96bb31e45f8ee57ff25349b4485f6b3362fd30ff74
+bytes_morning_2_webp=61080
+sha256_morning_3_webp=08f2e74500853b4b713b0773194c730035b8e1998eff4aaff5d81bcdcd09d316
+bytes_morning_3_webp=53240
+sha256_morning_4_webp=4f3238f898dc901050dcba4243ac9ae21ff03036bfef6712ff08a6debbbba809
+bytes_morning_4_webp=68404
+sha256_morning_5_webp=105afb9fc4f9f29c4a08285fda7391745b5125b7e3cf4ef1f63884aaccb091e7
+bytes_morning_5_webp=68306
+sha256_morning_6_webp=857f81006557426b8cea5715f9e194f1941a2f515d21e47e939887584323fdeb
+bytes_morning_6_webp=72268
+sha256_night_1_webp=68ebbaf1536339a241ed94ef655978878d528e083c085660066f10b913977d72
+bytes_night_1_webp=24162
+sha256_night_2_webp=4557d3ec248dadd8a9baf0aa96c9572d4a0686242fd64f799a59f241d489bb6a
+bytes_night_2_webp=27618
+sha256_night_3_webp=77089d71dac538d7ad1ffba4a63b40229414cfc44ed4c3e863853e3c36ffbe71
+bytes_night_3_webp=23424
+sha256_night_4_webp=8227ffeb32354e5c85106312dd1c565b9ec275468c9e7918d0e51ca05be27c4f
+bytes_night_4_webp=28508
+sha256_night_5_webp=8340863378283bc3570c1947cf1f23d9cc97f492179039200cd41face84d5d6c
+bytes_night_5_webp=38674
+sha256_night_6_webp=70e3ba8ae3a1a25474904aab2aadb98dc4a73afd04aabd7766f9e936467f2fa9
+bytes_night_6_webp=17890

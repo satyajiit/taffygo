@@ -1,0 +1,72 @@
+# TaffyGo GN args profile: diag-sanitizer-x64 — host leak and memory diagnosis
+# (decision 0013, docs/development/chromium-fork-and-build.md).
+#
+# Committed profile. Never hand-edit GN args in a checkout: edit this file and
+# re-run the commands in the fork-and-build document.
+#
+# This is the only committed profile that is not a product profile, and the
+# only one that does not target Android. It exists because nothing else in the
+# repository can answer "does TaffyGo leak". The product profiles build for a
+# phone, where LeakSanitizer does not run; a host build of the same first-party
+# sources does, and the sources are the same ones because //taffy is portable
+# by construction and its unit tests do not touch the embedder.
+#
+# It is deliberately absent from TAFFY_PROFILES in tools/chromium/lib/chromium.sh.
+# `./tools/chromium/build` installs and launches an APK on an attached device;
+# every step of that is meaningless here, and teaching an Android-shaped command
+# to special-case one host profile would buy nothing. Drive it directly:
+#
+#   gn gen out/diag-sanitizer-x64 --args="$(sed -e 's/#.*//' chromium/args/diag-sanitizer-x64.gn)"
+#   autoninja -C out/diag-sanitizer-x64 taffy_unittests
+#   ASAN_OPTIONS=detect_leaks=1:detect_odr_violation=0 \
+#     out/diag-sanitizer-x64/taffy_unittests --test-launcher-bot-mode
+#
+# detect_odr_violation=0 is required and is not a way of hiding a TaffyGo
+# defect. is_component_build below puts upstream's own media code in two
+# shared objects — media::VideoDecoderMixin's vtable is in both
+# libmedia_gpu.so and libmedia_mojo_services.so — and ASan aborts on that
+# before a single test runs. It is upstream's, it is a property of the
+# component build this profile needs for readable stacks, and Chromium's own
+# ASan bots switch the same check off for the same reason. Leak detection is
+# unaffected.
+#
+# A leak report names the allocation stack. Nothing else in the repository
+# produces one, so until this profile is run, "no leaks" is an unmeasured
+# claim rather than a result — decision 0023 point 4, and the honesty rule.
+
+target_os = "linux"
+target_cpu = "x64"
+taffy_capability_profile = "development"
+
+# The same de-Google and size posture as every product profile (decision 0019).
+# A diagnostic build that configured itself differently would be diagnosing a
+# configuration nobody ships. Every argument in the fragment is declared for
+# every platform in the pinned checkout; only their defaults are per-platform.
+import("//taffy/build/args/common.gni")
+
+# LeakSanitizer needs AddressSanitizer underneath it on Linux; the two are one
+# instrument here, not a choice between them. ASan alone is what the earlier
+# ad-hoc out directory carried, and it is why an out-of-bounds write was
+# attributable while a leak was not: ASan reports the write, LSan reports the
+# allocation nobody freed, and only the pair covers both.
+is_asan = true
+is_lsan = true
+
+# Not a debug build: assertions on, optimisation on. A leak that only appears
+# without optimisation is a different bug, and a debug build is slow enough
+# that the suite stops being run.
+is_debug = false
+dcheck_always_on = true
+
+# A component build keeps each library's symbols in its own object, which is
+# what makes an LSan stack readable rather than a list of addresses inside one
+# enormous binary. Android forbids this argument outright, which is one more
+# reason this profile is host-only.
+is_component_build = true
+
+# Enough symbols to attribute an allocation to a line. Full debug information
+# costs disk and link time for no extra attribution at this granularity.
+symbol_level = 1
+
+use_siso = true
+use_remoteexec = false

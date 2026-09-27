@@ -1,0 +1,79 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# The renderer is sandboxed and trusted for nothing (spec section 4). These
+# rules are the mechanical half of that sentence.
+#
+# The line that matters most is "-taffy/browser". The browser half
+# of BIP owns capabilities, actor leases, approval, and the postcondition
+# verifier. If renderer code could include one of its headers, the authority
+# boundary would be one #include away from being crossed by accident - and
+# the reviewer who noticed would have to be reading the right file. Making it
+# a build error instead means nobody has to notice.
+
+include_rules = [
+  # What the renderer half legitimately needs.
+  "+taffy/contracts/bip/mojom",
+  "+content/public/common/isolated_world_ids.h",
+  "+content/public/renderer",
+  "+third_party/blink/public/common/associated_interfaces",
+  # RESOLVED AT SP-01. blink::WebInputElement::FormControlType() returns
+  # blink::mojom::FormControlType, so the adapters that classify a control
+  # cannot name what Blink handed them without this. Scoped to the one mojom
+  # directory rather than to public/mojom: this grants a closed vocabulary
+  # enumeration of form control kinds, not the Blink IPC surface.
+  "+third_party/blink/public/mojom/forms",
+  "+third_party/blink/public/platform",
+  "+third_party/blink/public/web",
+  "+ui/accessibility",
+  # Geometry types only. The layout adapter measures bounds and intersects
+  # them with the viewport; nothing here paints, composites, or rasterizes.
+  "+ui/gfx/geometry",
+  "+v8/include",
+
+  # The authority boundary.
+  "-taffy/browser",
+  "-taffy/app/android",
+  "-taffy/services/core",
+  "-content/public/browser",
+  "-content/browser",
+
+  # A sandboxed process does not open sockets, read files, or talk to the
+  # network service. If any of these is ever needed, it is a decision record
+  # and a threat-model change, not a DEPS edit.
+  "-net",
+  "-services/network",
+  "-sql",
+  "-storage",
+
+  # //taffy/common/public is the trusted browser-side API surface. The
+  # renderer must not mirror it: sharing those types would make it look
+  # reasonable to pass one across the process boundary.
+  "-taffy/common/public",
+]
+
+specific_include_rules = {
+  # The tests exercise pure logic and need no renderer at all - that is the
+  # point of splitting them out. Keeping them on the same rules as the
+  # production code stops a test from becoming the reason a dependency edge
+  # exists.
+  ".*_unittest\.cc": [
+    "+testing/gtest",
+  ],
+  # The render-view and browser tests in test/ do need a renderer, which is
+  # exactly why they are not in the fast lane. They still may not reach across
+  # the authority boundary: the rules above apply to them unchanged, and the
+  # only additions are the harnesses themselves.
+  #
+  # Headers as well as sources: a test harness that derives from
+  # RenderViewTest has to name it in its own header, and splitting the
+  # allowance so that the .cc may include what the .h may not would only push
+  # the harness into being one long .cc.
+  "test/.*\.(cc|h)": [
+    "+content/public/test",
+    "+testing/gtest",
+  ],
+}

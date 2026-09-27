@@ -1,0 +1,26 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//build/rust/rust_static_library.gni")
+import("//taffy/services/core/crate_sources.gni")
+
+rust_static_library("tool_entrypoints") {
+  crate_name = "tool_entrypoints"
+  crate_root = taffy_tool_entrypoints_crate_root
+  sources = taffy_tool_entrypoints_sources
+  edition = "2021"
+
+  # No dependency, first-party or otherwise. A registry that could deserialize
+  # could be handed a second registry, so this crate has no serializer, no
+  # reader and nothing that owns one: it answers one question about one string
+  # against a table the build compiled in.
+  deps = []
+
+  # The sandboxed core only. The browser reads the same rows through the
+  # generated C++ table beside them, because no first-party Rust is linked into
+  # the browser process.
+  visibility = [ "//taffy/components/intelligence/core/rust/core-runtime:*" ]
+}

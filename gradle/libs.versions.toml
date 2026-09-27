@@ -1,0 +1,93 @@
+# Machine owner file for the Gradle-side rows of TOOLCHAIN.md.
+# One component per change, bumped by hand (decision 0023).
+#
+# TWO RULES THIS FILE ENFORCES, BOTH PROVED BY BUILDING THEM:
+#
+# 1. Android modules MUST NOT apply `org.jetbrains.kotlin.android`. Kotlin is
+#    built into the Android Gradle Plugin from AGP 9.0, and applying the old
+#    plugin is a hard configuration error:
+#      "The 'org.jetbrains.kotlin.android' plugin is no longer required for
+#       Kotlin support since AGP 9.0."
+#    Android modules apply the AGP plugin plus, where they use Compose,
+#    `org.jetbrains.kotlin.plugin.compose`. `org.jetbrains.kotlin.jvm` remains
+#    correct for pure-JVM modules. There is deliberately no kotlin-android
+#    alias below so it cannot be reintroduced by autocomplete.
+#
+# 2. compileSdk is 37 because the pinned Compose BOM requires it:
+#      "androidx.compose.runtime:runtime-saveable-android:1.12.0 requires
+#       libraries and applications that depend on it to compile against
+#       version 37 or later of the Android APIs."
+#    Android UI compilation needs SDK platform `platforms;android-37.1`.
+#
+# Verified together on 2026-08-17: AGP 9.3.1 (built-in Kotlin) + Compose
+# plugin 2.4.10 + KSP 2.3.11 + Dagger 2.60.1 + Compose BOM 2026.08.00 at
+# compileSdk 37 on Gradle 9.7 / JDK 21 — kspDebugKotlin, compileDebugKotlin
+# and assembleDebug all succeed.
+[versions]
+agp = "9.3.1"
+kotlin = "2.4.10"
+ksp = "2.3.11"
+dagger = "2.60.1"
+commonmark = "0.30.0"
+composeBom = "2026.08.00"
+coroutines = "1.11.0"
+coreKtx = "1.19.0"
+appcompat = "1.7.1"
+activityCompose = "1.13.0"
+lifecycle = "2.11.0"
+navigationCompose = "2.9.8"
+splashscreen = "1.2.0"
+androidxBrowser = "1.10.0"
+# Credential Manager and the Google identity option it reads, which also move
+# together: the option type lives in googleid and is parsed by credentials.
+credentials = "1.6.0"
+googleid = "1.2.0"
+junit = "4.13.2"
+androidxTestExtJunit = "1.3.0"
+androidxTestRunner = "1.7.0"
+espresso = "3.7.0"
+turbine = "1.2.1"
+compileSdk = "37"
+targetSdk = "37"
+minSdk = "29"
+jvmToolchain = "21"
+[libraries]
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
+androidx-browser = { module = "androidx.browser:browser", version.ref = "androidxBrowser" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
+dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
+commonmark = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
+commonmark-tables = { module = "org.commonmark:commonmark-ext-gfm-tables", version.ref = "commonmark" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+junit = { module = "junit:junit", version.ref = "junit" }
+androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExtJunit" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

@@ -1,0 +1,96 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//build/config/android/config.gni")
+import("//taffy/third_party/cpython/python_sources.gni")
+
+assert(is_android, "the bundled CPython interpreter is Android-only")
+assert(current_cpu == "arm64" || current_cpu == "x64",
+       "CPython has committed configuration only for Android arm64 and x64")
+
+if (current_cpu == "arm64") {
+  _abi_config = "generated/android-arm64"
+  _soabi = "cpython-314-aarch64-linux-android"
+} else {
+  _abi_config = "generated/android-x64"
+  _soabi = "cpython-314-x86_64-linux-android"
+}
+
+config("python_headers") {
+  include_dirs = [
+    _abi_config,
+    "generated",
+    "generated/Python",
+    "src",
+    "src/Include",
+  ]
+}
+
+config("python_warnings") {
+  cflags = [
+    "-Wno-error=macro-redefined",
+    "-Wno-error=string-conversion",
+    "-Wno-unused-function",
+  ]
+}
+
+# CPython is compiled from the checksum-pinned source mount.  The only
+# configure products are the committed ABI headers and reviewed module table
+# under generated/; no action in this graph executes configure or make.
+static_library("python") {
+  sources = taffy_cpython_core_sources + taffy_cpython_builtin_sources
+
+  public_configs = [ ":python_headers" ]
+  include_dirs = [
+    "src/Include/internal",
+    "src/Modules/_io",
+  ]
+  defines = [
+    "Py_BUILD_CORE",
+    "Py_BUILD_CORE_BUILTIN",
+    "__BIONIC_NO_PAGE_SIZE_MACRO",
+    "PLATFORM=\"android\"",
+    "GITVERSION=\"\"",
+    "GITTAG=\"\"",
+    "GITBRANCH=\"\"",
+    "DATE=\"Jan 01 1970\"",
+    "TIME=\"00:00:00\"",
+    "PYTHONPATH=\"\"",
+    "PREFIX=\"\"",
+    "EXEC_PREFIX=\"\"",
+    "VERSION=\"3.14\"",
+    "VPATH=\"\"",
+    "PLATLIBDIR=\"lib\"",
+    "PYTHONFRAMEWORK=\"\"",
+    "SOABI=\"${_soabi}\"",
+  ]
+
+  configs -= [
+    "//build/config/clang:unsafe_buffers",
+    "//build/config/compiler:chromium_code",
+  ]
+  configs += [
+    "//build/config/compiler:no_chromium_code",
+
+    # Must follow no_chromium_code so these flags follow -Wall and -Werror.
+    ":python_warnings",
+  ]
+
+  # Keep dependencies outside libpython.a. A complete static archive would
+  # absorb zlib (and zlib's cpu_features dependency), then collide with the
+  # same Chromium-owned objects when the utility/browser binary links them.
+  deps = [ "//third_party/zlib" ]
+  libs = [
+    "dl",
+    "log",
+    "m",
+  ]
+
+  visibility = [
+    ":*",
+    "//taffy/services/tool-runtime/python:*",
+  ]
+}

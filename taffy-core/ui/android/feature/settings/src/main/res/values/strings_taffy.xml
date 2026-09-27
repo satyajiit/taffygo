@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Taffy hub, skills, and Personality copy (SCR-405, SCR-601–604). -->
+<resources>
+    <!-- Screen SCR-405 -->
+    <string name="taffy_taffy_hub_title">Taffy</string>
+    <string name="taffy_taffy_hub_talk">How Taffy talks</string>
+    <string name="taffy_taffy_hub_talk_summary">Personality</string>
+    <string name="taffy_taffy_hub_skills">What Taffy can do</string>
+    <string name="taffy_taffy_hub_skills_summary">Skills on this phone</string>
+    <string name="taffy_taffy_hub_ai">AI and providers</string>
+    <string name="taffy_taffy_hub_ai_summary">Your keys</string>
+    <string name="taffy_taffy_hub_opens">%1$s. %2$s. Opens the next screen.</string>
+    <!-- Suggestions while you type (decision 0097). Every claim below is one
+         of that decision's own: the composer's own text and nothing else
+         (section 4), the person's own credential (section 2), no task and
+         no record (section 1). -->
+    <string name="taffy_taffy_hub_suggestions_title">Suggestions while you type</string>
+    <string name="taffy_taffy_hub_suggestions_body">Taffy offers the next few words while you type in the Ask box. What you typed there is sent to the provider you connected yourself. It is not part of a task, and nothing about it is recorded.</string>
+
+    <!-- Screen SCR-601 -->
+    <string name="taffy_skills_title">What Taffy can do</string>
+    <string name="taffy_skills_intro">Abilities Taffy already has, plus site routines you teach while browsing. Turn one off if you do not want Taffy to use it.</string>
+    <string name="taffy_skills_search">Search abilities</string>
+    <string name="taffy_skills_group_pages">Pages</string>
+    <string name="taffy_skills_group_shopping">Shopping</string>
+    <string name="taffy_skills_group_forms">Forms and files</string>
+    <string name="taffy_skills_group_research">Research</string>
+    <string name="taffy_skills_group_media">Pictures and video</string>
+    <string name="taffy_skills_group_library">Library</string>
+    <string name="taffy_skills_unavailable_title">What Taffy can do isn\'t available right now.</string>
+    <string name="taffy_skills_unavailable_body">Taffy still browses with you.</string>
+    <string name="taffy_skills_no_extras">No extra abilities yet. Taffy already browses with you.</string>
+    <string name="taffy_skills_added_unavailable">Added site abilities are temporarily unavailable. Built-in abilities are still shown below.</string>
+    <string name="taffy_skills_on">On</string>
+    <string name="taffy_skills_off">Off</string>
+    <string name="taffy_skills_loading">Loading what Taffy can do</string>
+    <string name="taffy_skills_row_opens">%1$s. %2$s. %3$s. Opens the details.</string>
+    <plurals name="taffy_site_skill_summary">
+        <item quantity="one">For %1$s · %2$d observed step</item>
+        <item quantity="other">For %1$s · %2$d observed steps</item>
+    </plurals>
+    <string name="taffy_skill_pages_lookup">Answer from pages you pick</string>
+    <string name="taffy_skill_pages_lookup_summary">Taffy reads the pages you choose and answers with sources.</string>
+    <string name="taffy_skill_pages_compare">Compare open pages</string>
+    <string name="taffy_skill_pages_compare_summary">Puts the pages you pick side by side.</string>
+    <string name="taffy_skill_pages_summarize">Summarize this page</string>
+    <string name="taffy_skill_pages_summarize_summary">A short reading of this page, with sources.</string>
+    <string name="taffy_skill_pages_table">Pull a table from a page</string>
+    <string name="taffy_skill_pages_table_summary">Turns fields on a page into a table you can keep.</string>
+    <string name="taffy_skill_products">Compare products</string>
+    <string name="taffy_skill_products_summary">A comparison table from the product pages you pick.</string>
+    <string name="taffy_skill_offers">Compare offers</string>
+    <string name="taffy_skill_offers_summary">Finds offers and waits for you before anything is bought.</string>
+    <string name="taffy_skill_form">Fill a form</string>
+    <string name="taffy_skill_form_summary">Prepares a form. You see the exact values and approve first.</string>
+    <string name="taffy_skill_downloads">File downloads</string>
+    <string name="taffy_skill_downloads_summary">Starts downloads, checks their progress, and can cancel them.</string>
+    <string name="taffy_skill_pdf">Read this PDF</string>
+    <string name="taffy_skill_pdf_summary">Answers questions about a PDF you opened.</string>
+    <string name="taffy_skill_sheet">Make a spreadsheet</string>
+    <string name="taffy_skill_sheet_summary">Turns research into a spreadsheet you can open.</string>
+    <string name="taffy_skill_document">Make a document</string>
+    <string name="taffy_skill_document_summary">Turns research into a file you can keep.</string>
+    <string name="taffy_skill_depth">Look something up in depth</string>
+    <string name="taffy_skill_depth_summary">A longer look across several pages, with a brief.</string>
+    <string name="taffy_skill_trip">Plan a trip</string>
+    <string name="taffy_skill_trip_summary">Dates, prices, and sources for a trip you asked about.</string>
+    <string name="taffy_skill_pictures">Read pictures on a page</string>
+    <string name="taffy_skill_pictures_summary">Describes pictures you pointed Taffy at.</string>
+    <string name="taffy_skill_video">Read a video transcript</string>
+    <string name="taffy_skill_video_summary">Answers from a transcript, with times.</string>
+    <string name="taffy_skill_keep">Keep this in Library</string>
+    <string name="taffy_skill_keep_summary">Saves a fact, extract, or file you chose to keep.</string>
+
+    <!-- Screen SCR-602 -->
+    <string name="taffy_skill_detail_title">Skill</string>
+    <string name="taffy_skill_detail_does">What it does</string>
+    <string name="taffy_skill_detail_may_use">What it may use</string>
+    <string name="taffy_skill_detail_comes_with">Comes with Taffy</string>
+    <plurals name="taffy_site_skill_version">
+        <item quantity="one">Version %1$d · %2$d observed step</item>
+        <item quantity="other">Version %1$d · %2$d observed steps</item>
+    </plurals>
+    <string name="taffy_skill_may_use_pages">Read pages you pick</string>
+    <string name="taffy_skill_may_use_form">Prepare a form, wait for you</string>
+    <string name="taffy_skill_may_use_downloads">Start downloads, check their progress, and cancel them.</string>
+    <string name="taffy_skill_may_use_files">Make a file you can keep</string>
+    <string name="taffy_skill_may_use_library">Keep a fact, extract, or file you chose</string>
+    <string name="taffy_skill_may_use_pictures">Read pictures you pointed Taffy at</string>
+    <string name="taffy_skill_may_use_video">Read a transcript, with times</string>
+    <string name="taffy_skill_approvals">Taffy still waits for you on anything that changes a site or leaves this phone.</string>
+    <string name="taffy_skill_remove">Remove</string>
+    <string name="taffy_skill_cannot_remove">This ability comes with Taffy and stays installed.</string>
+    <string name="taffy_skill_remove_unavailable">This ability can\'t be removed right now.</string>
+    <string name="taffy_skill_missing_title">That ability isn\'t installed.</string>
+    <string name="taffy_skill_missing_body">It is not on this phone.</string>
+    <string name="taffy_skill_detail_loading">Loading this ability</string>
+    <string name="taffy_skill_enabled_toggle">Use this ability</string>
+    <string name="taffy_skill_required_tool_unavailable">A required browser tool isn\'t ready yet.</string>
+    <string name="taffy_skill_required_part_missing">A required product part isn\'t installed yet.</string>
+    <string name="taffy_skill_profile_unavailable">This ability isn\'t available in this profile.</string>
+    <string name="taffy_skill_policy_unavailable">Your current safety settings don\'t allow this ability.</string>
+
+    <!-- Screen SCR-603 -->
+    <string name="taffy_personality_title">How Taffy talks</string>
+    <string name="taffy_personality_intro">A preset is a starting point for how Taffy talks. It does not change what Taffy may do.</string>
+    <string name="taffy_personality_empty_title">Personality presets are not on this phone yet.</string>
+    <string name="taffy_personality_empty_body">Taffy talks in one careful voice until they are.</string>
+    <string name="taffy_personality_not_saved">Personality isn\'t saved on this phone yet.</string>
+    <string name="taffy_personality_loading">Loading how Taffy talks</string>
+    <string name="taffy_personality_selected">Selected</string>
+    <string name="taffy_personality_preset_description">%1$s. %2$s</string>
+    <string name="taffy_personality_preset_selected_description">%1$s. %2$s. Selected.</string>
+    <string name="taffy_personality_preset_researcher">Careful researcher</string>
+    <string name="taffy_personality_preset_researcher_summary">Checks more, names sources, and asks before widening the work.</string>
+    <string name="taffy_personality_preset_shopper">Quick shopper</string>
+    <string name="taffy_personality_preset_shopper_summary">Short answers, and quicker through shopping steps you already approved.</string>
+    <string name="taffy_personality_preset_trip">Trip planner</string>
+    <string name="taffy_personality_preset_trip_summary">Lays out dates, prices, and sources for a trip you asked about.</string>
+    <string name="taffy_personality_tune">Adjust how Taffy talks</string>
+    <string name="taffy_personality_tune_summary">Careful or quick, short or chatty</string>
+
+    <!-- Screen SCR-604 -->
+    <string name="taffy_tuning_title">Adjust how Taffy talks</string>
+    <string name="taffy_tuning_caption">These choices change how Taffy talks. They do not change what Taffy may do.</string>
+    <string name="taffy_tuning_pace">How careful Taffy is</string>
+    <string name="taffy_tuning_pace_careful">Careful</string>
+    <string name="taffy_tuning_pace_quick">Quick</string>
+    <string name="taffy_tuning_length">How much Taffy says</string>
+    <string name="taffy_tuning_length_concise">Concise</string>
+    <string name="taffy_tuning_length_chatty">Chatty</string>
+    <string name="taffy_tuning_checkin">When Taffy checks in</string>
+    <string name="taffy_tuning_checkin_asks">Asks first</string>
+    <string name="taffy_tuning_checkin_acts">Acts on approved plans</string>
+    <string name="taffy_tuning_mid">In between</string>
+    <string name="taffy_tuning_loading">Loading how Taffy talks</string>
+</resources>

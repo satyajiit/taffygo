@@ -1,0 +1,75 @@
+From a5c016fd74c427cf5202cdc682ce7a455183d778 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Mon, 17 Aug 2026 16:44:00 +0530
+Subject: create the TaffyGo render frame observer
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The build edge links TaffyGo's renderer component into //chrome/renderer,
+and the call-site edit constructs the observer in
+ChromeContentRendererClient::RenderFrameCreated. That call is the embedder's
+one notification that a frame exists — content offers no downstream
+registration for additional observers, so an overlay component has nothing
+to attach to before it. DEPS admits the component header.
+
+Rebase risk: low. One line in a long sorted list, one include and one call
+in the renderer client.
+
+Needed by: WP-M2-03.
+Retirement: permanent while page intelligence exists.
+
+Taffy-Patch: 0007
+
+diff --git a/chrome/renderer/BUILD.gn b/chrome/renderer/BUILD.gn
+index 918ed2c840dbc..ab3c1e6f1146e 100644
+--- a/chrome/renderer/BUILD.gn
++++ b/chrome/renderer/BUILD.gn
+@@ -182,6 +182,7 @@ static_library("renderer") {
+     "//components/supervised_user/core/common:buildflags",
+     "//components/surface_embed/common",
+     "//components/surface_embed/renderer",
++    "//taffy/renderer",
+     "//components/translate/content/renderer",
+     "//components/translate/core/common",
+     "//components/translate/core/language_detection",
+diff --git a/chrome/renderer/DEPS b/chrome/renderer/DEPS
+index 1133bac1045ab..3688e876b92ce 100644
+--- a/chrome/renderer/DEPS
++++ b/chrome/renderer/DEPS
+@@ -80,6 +80,7 @@ include_rules = [
+   "+components/surface_embed/common",
+   "+components/surface_embed/renderer",
+   "+components/sync/base/features.h",
++  "+taffy/renderer",
+   "+components/translate/content/common",
+   "+components/translate/content/renderer",
+   "+components/translate/core/common",
+diff --git a/chrome/renderer/chrome_content_renderer_client.cc b/chrome/renderer/chrome_content_renderer_client.cc
+index bb16469783abb..ec3103056223d 100644
+--- a/chrome/renderer/chrome_content_renderer_client.cc
++++ b/chrome/renderer/chrome_content_renderer_client.cc
+@@ -122,6 +122,7 @@
+ #include "components/subresource_filter/core/common/common_features.h"
+ #include "components/surface_embed/common/features.h"
+ #include "components/surface_embed/renderer/create_plugin.h"
++#include "taffy/renderer/taffy_render_frame_observer.h"
+ #include "components/variations/net/variations_http_headers.h"
+ #include "components/variations/variations_switches.h"
+ #include "components/version_info/version_info.h"
+@@ -684,6 +685,10 @@ void ChromeContentRendererClient::RenderFrameCreated(
+ 
+   new NetErrorHelper(render_frame);
+ 
++  // Self-deleting in OnDestruct(). Which frames may be read is decided in
++  // //taffy/components/intelligence/content/frame_inclusion_policy.cc, not here.
++  new taffy::TaffyRenderFrameObserver(render_frame);
++
+   new security_interstitials::SecurityInterstitialPageControllerDelegateImpl(
+       render_frame);
+ 
+@@ -1664,4 +1669,3 @@ void ChromeContentRendererClient::AppendContentSecurityPolicy(
+                   network::mojom::ContentSecurityPolicySource::kHTTP});
+ #endif
+ }
+-

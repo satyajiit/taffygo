@@ -1,0 +1,19 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# No addresses yet: review falls through to ../../../OWNERS. See that file.
+#
+# This directory decides what a sandboxed interpreter may ever be asked to do.
+# Two things here need a second reader, and neither is caught by a build:
+#
+#   source/entrypoints.json          a new row widens what a worker may be
+#                                    asked for, and removing a
+#                                    `native_alternative` widens it further -
+#                                    that edit moves a capability from the
+#                                    product's own code into a sandbox.
+#   tool_entrypoint_registry.cc      the only gate. Everything it refuses is a
+#                                    process this build would otherwise start.
+per-file tool_entrypoint_registry*=file://ipc/SECURITY_OWNERS

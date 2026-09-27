@@ -1,0 +1,163 @@
+{
+  "schema_version": "0.6",
+  "snapshot_id": "snap_kernel_payload_01",
+  "request_id": "obs-1",
+  "profile_id": "prof_default",
+  "browser_window_id": "win_01",
+  "tab_id": "tab-1",
+  "root_frame_id": "frame-1",
+  "page_epoch": "epoch-1",
+  "graph_revision": 7,
+  "event_sequence": 1,
+  "lifecycle_state": "ACTIVE",
+  "committed_url_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://example.test"
+    },
+    "disclosure": "ORIGIN_ONLY",
+    "has_query": false,
+    "has_fragment": false
+  },
+  "origin_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://example.test"
+    },
+    "is_potentially_trustworthy": true,
+    "is_incognito": false
+  },
+  "capture_time_monotonic_ms": 1000,
+  "scope": "DOCUMENT",
+  "adapters": [
+    {
+      "adapter": "BROWSER",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    },
+    {
+      "adapter": "FORMS",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "forms-1.0.0"
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "n1",
+      "frame_id": "frame-1",
+      "role": "BUTTON",
+      "name": "Sign in",
+      "text_runs": [
+        {
+          "text": "Sign in",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE",
+        "ENABLED"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.99
+    },
+    {
+      "node_id": "n2",
+      "frame_id": "frame-1",
+      "role": "TEXT_FIELD",
+      "name": "Password",
+      "value_descriptor": {
+        "kind": "SECRET_WITHHELD",
+        "present": true,
+        "redacted": true
+      },
+      "sensitivity": "CREDENTIAL",
+      "sources": [
+        "FORM_CONTROL"
+      ],
+      "confidence": 0.99
+    }
+  ],
+  "edges": [
+    {
+      "from_frame_id": "frame-1",
+      "from_node_id": "n1",
+      "to_frame_id": "frame-1",
+      "to_node_id": "n2",
+      "relationship": "LABELS",
+      "inferred": false
+    }
+  ],
+  "frames": [
+    {
+      "frame_id": "frame-1",
+      "is_main_frame": true,
+      "is_out_of_process": false,
+      "is_cross_origin_to_parent": false,
+      "origin_metadata": {
+        "origin": {
+          "kind": "TUPLE",
+          "serialization": "https://example.test"
+        },
+        "is_potentially_trustworthy": true,
+        "is_incognito": false
+      },
+      "page_epoch": "epoch-1",
+      "graph_revision": 7,
+      "lifecycle_state": "ACTIVE",
+      "included": true
+    },
+    {
+      "frame_id": "frame-2",
+      "parent_frame_id": "frame-1",
+      "is_main_frame": false,
+      "is_out_of_process": true,
+      "is_cross_origin_to_parent": true,
+      "origin_metadata": {
+        "origin": {
+          "kind": "TUPLE",
+          "serialization": "https://ads.example.test"
+        },
+        "is_potentially_trustworthy": true,
+        "is_incognito": false
+      },
+      "page_epoch": "epoch-1",
+      "graph_revision": 7,
+      "lifecycle_state": "ACTIVE",
+      "included": false,
+      "exclusion_reason": "CROSS_ORIGIN_POLICY"
+    }
+  ],
+  "truncation": {
+    "truncated": false,
+    "budgets_reached": [],
+    "omitted_node_count": 0,
+    "omitted_text_bytes": 0,
+    "omitted_frame_count": 0,
+    "may_change_answer": false
+  },
+  "redaction_summary": {
+    "applied_features": [
+      "SECRET_VALUE_SUPPRESSION",
+      "SENSITIVE_ZONE_CLASSIFICATION"
+    ],
+    "redacted_field_count": 1,
+    "suppressed_secret_value_count": 1,
+    "sensitive_zone_count": 1,
+    "policy_filtered_frame_count": 1
+  },
+  "warnings": [
+    {
+      "code": "SENSITIVE_ZONE_SUPPRESSED",
+      "frame_id": "frame-1",
+      "node_id": "n2",
+      "detail_code": "credential_zone"
+    }
+  ]
+}

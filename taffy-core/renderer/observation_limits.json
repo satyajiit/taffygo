@@ -1,0 +1,235 @@
+{
+ "title": "TaffyGo renderer observation limits",
+ "description": "The single committed owner of every provisional numeric bound the BIP renderer endpoint enforces. No other file in this component may contain one of these numbers: observation_limits.h declares the field set and the accessors, tools/generate_observation_limits.py turns this file into the generated header the build compiles, and every call site receives an ObservationLimits object it cannot construct a value for. A number that appears in a second file is a defect, not a duplicate.",
+ "status": "Proposed",
+ "owned_by_open_decision": "OD-031",
+ "owner_note": "Every value below is a placeholder chosen so the code has a bound at all. None of them is a quality target and none may be quoted as one. The real numbers come from the supported-device floor and the page corpus and are owned by OD-031 in docs/open-decisions.md; SP-04 replaces this file wholesale with measured values, and replacing it is a data change with no code change.",
+ "generated_header": "observation_limits_generated.h",
+ "generated_symbol": "kProcessSafeCeilingValues",
+ "declares_struct": "ObservationLimitsValues",
+ "declared_in": "observation_limits.h",
+ "fields": [
+  {
+   "name": "snapshot_max_nodes",
+   "value": 4000,
+   "unit": "nodes",
+   "why": "Ceiling on semantic nodes per extraction, shared across every adapter through one BudgetLedger so the total is a real total rather than a per-adapter bound multiplied by the adapter count."
+  },
+  {
+   "name": "snapshot_max_text_bytes",
+   "value": 262144,
+   "unit": "bytes",
+   "why": "Ceiling on page-derived text copied out of the document in one extraction."
+  },
+  {
+   "name": "snapshot_max_total_bytes",
+   "value": 1048576,
+   "unit": "bytes",
+   "why": "Ceiling on everything charged during one extraction, text included."
+  },
+  {
+   "name": "snapshot_node_framing_bytes",
+   "value": 64,
+   "unit": "bytes",
+   "why": "What one semantic node costs in the framing it is encoded into, before its own strings. Charged instead of sizeof(SemanticNode), which is this process's resident cost for a struct whose empty optionals and empty vectors are dozens of bytes here and nothing on either hop out. Charging the struct made snapshot_max_total_bytes mean a different quantity in this process than it means in the browser, which spends the same number on the encoded payload and then compares the same number against graph_payload.size(): a phone read 397 of 658 nodes while 24 KB of a 256 KB budget actually travelled. Derived from the row framing bip_graph_payload_row.cc writes, not measured on a device."
+  },
+  {
+   "name": "snapshot_edge_framing_bytes",
+   "value": 16,
+   "unit": "bytes",
+   "why": "The same, for one relationship row, before its four identifier strings."
+  },
+  {
+   "name": "snapshot_text_run_framing_bytes",
+   "value": 8,
+   "unit": "bytes",
+   "why": "The same, for one text run, before its own text."
+  },
+  {
+   "name": "snapshot_list_element_bytes",
+   "value": 2,
+   "unit": "bytes",
+   "why": "The same, for one element of a closed-vocabulary list: a state, a content signal, an action kind, a source kind, an attribute or a field-evidence row. Each is an enumeration member or a short record on the wire, never the vector element this process holds."
+  },
+  {
+   "name": "snapshot_max_depth",
+   "value": 64,
+   "unit": "levels",
+   "why": "Traversal depth ceiling. Every walk in this component is iterative with an explicit stack, so this bounds work rather than call depth."
+  },
+  {
+   "name": "snapshot_deadline_ms",
+   "value": 750,
+   "unit": "milliseconds",
+   "why": "Wall-clock ceiling for one extraction. A renderer timeout must produce a bounded failure rather than stall the interface (protocol section 15)."
+  },
+  {
+   "name": "snapshot_max_frames",
+   "value": 1,
+   "unit": "frames",
+   "why": "One frame per endpoint. The broker assembles the frame tree from browser-owned topology, so this endpoint never reports another frame's content (protocol section 8.1)."
+  },
+  {
+   "name": "delta_max_queued_signals",
+   "value": 512,
+   "unit": "signals",
+   "why": "Queue depth before the coalescer sheds droppable classes and then invalidates the projection."
+  },
+  {
+   "name": "delta_max_queued_bytes",
+   "value": 131072,
+   "unit": "bytes",
+   "why": "Queue byte budget, charged with the estimated serialized cost of each signal."
+  },
+  {
+   "name": "delta_coalescing_window_ms",
+   "value": 100,
+   "unit": "milliseconds",
+   "why": "How long a batching window stays open when no action barrier is held."
+  },
+  {
+   "name": "delta_min_interval_ms",
+   "value": 16,
+   "unit": "milliseconds",
+   "why": "Floor between two delta messages, reported in ProtocolLimits and enforced by the publisher."
+  },
+  {
+   "name": "delta_max_coalescing_window_ms",
+   "value": 500,
+   "unit": "milliseconds",
+   "why": "Ceiling the renderer clamps a broker-supplied coalescing window to, so a broker defect cannot become a renderer stall."
+  },
+  {
+   "name": "delta_estimated_signal_bytes",
+   "value": 64,
+   "unit": "bytes",
+   "why": "Charged per queued signal. A signal carries an identity and a class, never a payload, so one figure is accurate enough to bound the queue."
+  },
+  {
+   "name": "delta_max_tracked_cancellations",
+   "value": 64,
+   "unit": "command identifiers",
+   "why": "How many cancelled command identifiers the endpoint remembers. A browser that cancels without limit must not be able to grow renderer memory."
+  },
+  {
+   "name": "structured_data_max_block_bytes",
+   "value": 65536,
+   "unit": "bytes",
+   "why": "Applied to one structured-data block before the parser sees it. A page does not get to choose the renderer's peak memory."
+  },
+  {
+   "name": "structured_data_max_json_depth",
+   "value": 12,
+   "unit": "levels",
+   "why": "Nesting ceiling for attacker-authored JSON-LD. Deep nesting is the cheapest way to burn renderer stack."
+  },
+  {
+   "name": "structured_data_max_blocks",
+   "value": 32,
+   "unit": "blocks",
+   "why": "How many structured-data blocks one document may contribute before the rest are named as omitted."
+  },
+  {
+   "name": "structured_data_max_values_per_property",
+   "value": 8,
+   "unit": "candidates",
+   "why": "How many disagreeing candidates one property may carry. Conflicting evidence is preserved, but not without a bound."
+  },
+  {
+   "name": "forms_max_forms",
+   "value": 64,
+   "unit": "forms",
+   "why": "How many form elements one document may contribute."
+  },
+  {
+   "name": "forms_max_controls_per_form",
+   "value": 128,
+   "unit": "controls",
+   "why": "How many controls one form may contribute."
+  },
+  {
+   "name": "forms_max_formless_controls",
+   "value": 128,
+   "unit": "controls",
+   "why": "How many controls outside any form element the second pass may contribute. A sign-in box with no form element is the common shape, so this pass is not optional."
+  },
+  {
+   "name": "selection_max_text_bytes",
+   "value": 16384,
+   "unit": "bytes",
+   "why": "Ceiling on selected text copied out of the document."
+  },
+  {
+   "name": "selection_max_nodes",
+   "value": 512,
+   "unit": "nodes",
+   "why": "Ceiling on nodes reported as inside the user's current selection."
+  },
+  {
+   "name": "layout_max_occlusion_probes",
+   "value": 128,
+   "unit": "probes",
+   "why": "How many accessibility hit tests one extraction may run. A node past this bound receives no occlusion determination at all, which fails an anti-occlusion precondition closed."
+  },
+  {
+   "name": "layout_min_visible_area_px",
+   "value": 4,
+   "unit": "square device-independent pixels",
+   "why": "Below this area a node is treated as not visible. Zero-size and near-zero-size decoys are a documented fixture shape."
+  },
+  {
+   "name": "layout_viewport_margin_px",
+   "value": 0,
+   "unit": "device-independent pixels",
+   "why": "How far outside the visible viewport a node may extend and still count as on-screen. Zero until the corpus says otherwise."
+  },
+  {
+   "name": "content_signal_max_text_scan_bytes",
+   "value": 8192,
+   "unit": "bytes",
+   "why": "How much of one already-bounded text unit the content-signal detector examines. Signal absence is not an assertion that no signal exists, so bounded evidence is preferable to attacker-controlled work."
+  },
+  {
+   "name": "content_signal_min_encoded_blob_chars",
+   "value": 64,
+   "unit": "characters",
+   "why": "Minimum contiguous encoding-alphabet run that may be reported as an encoded blob. Short ordinary identifiers must not make the detector fire everywhere."
+  },
+  {
+   "name": "redaction_min_digit_run",
+   "value": 12,
+   "unit": "digits",
+   "why": "Length at which a digit run in free text is treated as a high-risk identifier and dropped whole."
+  },
+  {
+   "name": "redaction_max_digit_separators",
+   "value": 6,
+   "unit": "separators",
+   "why": "How many spaces, hyphens, or dots a digit run may contain and still match the detector."
+  },
+  {
+   "name": "redaction_min_hex_run",
+   "value": 32,
+   "unit": "characters",
+   "why": "Length at which an unbroken hexadecimal run is treated as key material."
+  },
+  {
+   "name": "redaction_min_token_run",
+   "value": 24,
+   "unit": "characters",
+   "why": "Length at which a mixed-case alphanumeric run with token punctuation is treated as an authentication token."
+  },
+  {
+   "name": "redaction_min_seed_phrase_words",
+   "value": 11,
+   "unit": "words",
+   "why": "How many consecutive short lowercase alphabetic words constitute a seed-phrase shape."
+  },
+  {
+   "name": "redaction_max_text_scan_bytes",
+   "value": 8192,
+   "unit": "bytes",
+   "why": "How much of one string the pattern detectors examine. The detectors are a second line, so they are bounded rather than exhaustive; not reading a prohibited value is the first line."
+  }
+ ]
+}

@@ -1,0 +1,12 @@
+{
+  "contract_version": "2.0",
+  "message": {
+    "tab_id": "tab-1",
+    "title": "Example",
+    "host": "example.test",
+    "has_been_nowhere": false,
+    "owner": 1,
+    "privacy": 0,
+    "selected": true
+  }
+}

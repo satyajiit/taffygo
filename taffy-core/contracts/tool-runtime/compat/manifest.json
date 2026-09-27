@@ -1,0 +1,210 @@
+{
+  "description": "Compatibility fixtures for the Tool Runtime boundary, the only broker-to-worker wire. Each fixture is one deliberate deviation from a message that would otherwise be accepted, and states the verdict a conforming decoder must reach. The kind of each fixture says which artifact reaches that verdict, so no row claims more than was run. This contract declares no byte codec, so it has no payload fixtures: the generated Rust reached here is the closed-enumeration gate and the bound constants, not a decoder. Run them with: python3 taffy-core/contracts/tool-runtime/codegen/generate.py --verify",
+  "verdicts": {
+    "ACCEPT": "The message is valid at this version and is accepted.",
+    "REJECT_CLOSED_ENUM": "A closed enumeration carries a value outside the members this version defines. The message is unsupported and fails closed; the value is never coerced to a known member.",
+    "REJECT_MALFORMED": "The message breaks a shape rule: a missing or extra field, a body that does not match its tag, a presence combination the contract forbids, a truncated or over-long frame, or bytes that are not what they claim to be.",
+    "REJECT_OVERSIZED": "The message is otherwise valid and is refused only because it exceeds a bound the contract declares.",
+    "REJECT_VERSION": "The declared contract version is one this build does not speak, so the required meaning may have changed. The message is refused on the version alone."
+  },
+  "kinds": {
+    "enum": "A committed document whose closed enumeration carries a value outside the contract. The generated Rust `from_wire` must answer that the value is unsupported.",
+    "bound": "A committed document measured against the generated limit constant the product compiles in. The generated Rust constant must answer that the measurement is over.",
+    "version": "A committed document at a declared contract version, answered against the version this build speaks.",
+    "record": "A committed document answered by this contract's own shape rules - tagged-union exactness, conditional presence, enum pairing, field completeness - in the generator. No shipped decoder runs; the records cross this seam as Mojo, and no Mojo decoder can be driven from a stdlib-only Python generator.",
+    "declaration": "A committed schema fragment the schema validator must refuse. This is how a rule about what the contract may declare is executed rather than asserted.",
+    "unexecuted": "A rule this contract does not express and nothing here can run. It carries a written reason and is never counted as covered."
+  },
+  "fixtures": [
+    {
+      "case": "unknown-runtime",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "ToolJob",
+      "enum": "ToolRuntimeKind",
+      "path": "runtime",
+      "file": "unknown-runtime.json",
+      "rule": "Every enumeration is closed. A runtime outside the set this version defines is unsupported and fails closed.",
+      "deviation": "A job names a runtime no member of ToolRuntimeKind holds.",
+      "note": "Each runtime is a separate service with its own dependency closure. Rounding an unknown runtime to a known one would start a worker in a sandbox chosen by a decoder rather than by the broker."
+    },
+    {
+      "case": "unknown-terminal-status",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "ToolCompletion",
+      "enum": "ToolTerminalStatus",
+      "path": "status",
+      "file": "unknown-terminal-status.json",
+      "rule": "Every enumeration is closed, including how a job ended.",
+      "deviation": "A completion carries a terminal status no member of ToolTerminalStatus holds.",
+      "note": "Every member except COMPLETED is a failure or indeterminate outcome. COMPLETED is the neighbour a lenient reader must never round to, and the three local-model availability members deliberately keep missing bytes, incompatible bytes and a missing compiled adapter distinct."
+    },
+    {
+      "case": "unknown-chunk-kind",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "ToolOutputChunk",
+      "enum": "ToolChunkKind",
+      "path": "kind",
+      "file": "unknown-chunk-kind.json",
+      "rule": "Every enumeration is closed, including what a chunk contains.",
+      "deviation": "An output chunk names a kind no member of ToolChunkKind holds.",
+      "note": "The two known kinds decide whether the bytes are treated as text or as an opaque blob. Guessing text would hand a caller a string built from bytes the worker never claimed were text."
+    },
+    {
+      "case": "unknown-model-artifact-kind",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "ToolJob",
+      "enum": "ToolModelArtifactKind",
+      "path": "local_model.model.kind",
+      "file": "unknown-model-artifact-kind.json",
+      "rule": "Every enumeration is closed, including the format an opened model artifact is to be loaded as.",
+      "deviation": "A job names an artifact format no member of ToolModelArtifactKind holds.",
+      "note": "The format decides which loader is handed a file the worker did not open and cannot inspect ahead of time. Rounding an unknown format to a known one hands several hundred megabytes to a parser that was never told what it is reading, inside the process that is meant to contain exactly that mistake."
+    },
+    {
+      "case": "unknown-input-transport",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "ToolJob",
+      "enum": "ToolInputTransport",
+      "path": "input_payload.transport",
+      "file": "unknown-input-transport.json",
+      "rule": "Every enumeration is closed, including how the job's input arrives.",
+      "deviation": "A job names an input transport no member of ToolInputTransport holds.",
+      "note": "The transport is what tells the worker where the bytes are. A reader that guessed INLINE would run the job on the empty argument field while a mapped region sat unread beside it, and report a result for input nobody supplied."
+    },
+    {
+      "case": "v1-opaque-arguments",
+      "kind": "version",
+      "verdict": "REJECT_VERSION",
+      "type": "ToolJob",
+      "file": "v1-opaque-arguments.json",
+      "rule": "A different major version changes required meaning. The message is refused on the version alone, without inspecting the body.",
+      "deviation": "A job declared at major version 1, carrying the opaque argument payload that version had.",
+      "note": "Opaque catch-all arguments are not part of version 2, and this is the fixture that says so where a decoder can act on it. A build that accepted the message and ignored the field it did not know would be running a job whose arguments it did not read."
+    },
+    {
+      "case": "job-at-next-minor",
+      "kind": "version",
+      "verdict": "ACCEPT",
+      "declares_next_minor": true,
+      "type": "ToolJob",
+      "file": "job-at-next-minor.json",
+      "rule": "A higher minor version of the same major is additive. A reader accepts the message and ignores the fields it does not define.",
+      "deviation": "A job declared at the next minor version of this major, carrying one field this build does not define.",
+      "note": "This is the rule that lets a broker and a worker built at different minor versions still speak. It is only safe because a minor step may add fields and may not change what an existing one means."
+    },
+    {
+      "case": "mismatched-operation-body",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "ToolJob",
+      "file": "mismatched-operation-body.json",
+      "rule": "A job carries exactly one argument record, and it is the one its operation names.",
+      "deviation": "The operation says RUN_BUNDLED_PYTHON_MODULE and the argument record present is the local model's.",
+      "note": "Reading whichever body is present is how a job dispatched to the Python service arrives carrying a prompt. The operation is the only field that says what the broker meant."
+    },
+    {
+      "case": "multiple-operation-bodies",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "ToolJob",
+      "file": "multiple-operation-bodies.json",
+      "rule": "Exactly one argument record, not at least one.",
+      "deviation": "Both the bundled-python and the local-model argument records are present.",
+      "note": "Taking the one that matches the operation and dropping the other looks tidy and hides the fact that the sender's own state was inconsistent when it built the job."
+    },
+    {
+      "case": "runtime-operation-pairing-violation",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "ToolJob",
+      "file": "runtime-operation-pairing-violation.json",
+      "rule": "A runtime executes only the operations the contract pairs with it, and the pairing covers both enumerations exactly.",
+      "deviation": "A job names the media runtime and the bundled-python operation, with the matching Python arguments.",
+      "note": "The body matches the operation, so a decoder that checked only the tagged union would accept this. What it would have accepted is a Python module scheduled onto the media service, which is the shortest path this contract has between two sandboxes."
+    },
+    {
+      "case": "embedding-on-python-runtime",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "ToolJob",
+      "file": "embedding-on-python-runtime.json",
+      "rule": "The runtime/operation pairing covers both enumerations exactly, and it covers the operations added after it as strictly as the ones it was written for.",
+      "deviation": "A job names the Python runtime and the embedding operation, carrying matching embedding arguments.",
+      "note": "This is the pairing rule tested against the newest operation rather than the oldest. An operation added to a shared enumeration is reachable from every runtime the moment nothing says otherwise, and an embedding scheduled onto the Python service would hand a bundled interpreter a model artifact the browser opened for a different sandbox."
+    },
+    {
+      "case": "completion-success-on-failure",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "ToolCompletion",
+      "file": "completion-success-on-failure.json",
+      "rule": "The contract binds the success record's presence to the one terminal status that produces it.",
+      "deviation": "A completion reports RUNTIME_CRASHED and carries a success record.",
+      "note": "A crashed job with a result attached is the shape that gets a result recorded for work that did not finish. The status is the field that decides whether anything downstream may be believed."
+    },
+    {
+      "case": "completion-without-success",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "ToolCompletion",
+      "file": "completion-without-success.json",
+      "rule": "The same binding in the other direction: COMPLETED carries the success record.",
+      "deviation": "A completion reports COMPLETED and carries no success record.",
+      "note": "This direction fails quietly rather than dangerously, and it is still a defect: a caller waiting for exactly one typed terminal result would get a completion it cannot read anything out of."
+    },
+    {
+      "case": "oversized-output",
+      "kind": "bound",
+      "verdict": "REJECT_OVERSIZED",
+      "limit": "MAX_OUTPUT_CHUNK_BYTES",
+      "path": "chunk_bytes",
+      "file": "oversized-output.json",
+      "rule": "An output chunk is bounded by MAX_OUTPUT_CHUNK_BYTES, and the bound is the one the product compiles in.",
+      "deviation": "A measured chunk length one byte past that bound.",
+      "note": "This row measures a length rather than carrying sixty-five thousand JSON integers. The bound is what a worker's output is held to, and a worker is the least trusted thing this contract talks to, so the number itself is worth executing against the generated constant."
+    },
+    {
+      "case": "oversized-embedding",
+      "kind": "bound",
+      "verdict": "REJECT_OVERSIZED",
+      "limit": "MAX_EMBEDDING_DIMENSIONS",
+      "path": "dimensions",
+      "file": "oversized-embedding.json",
+      "rule": "An embedding vector is bounded by MAX_EMBEDDING_DIMENSIONS, and the bound is the one the product compiles in.",
+      "deviation": "A measured vector length one element past that bound.",
+      "note": "The declared length and the byte count are two numbers that have to agree, and this is the one a caller can inflate without sending anything. A reader that trusted it would size a buffer from a worker's arithmetic."
+    },
+    {
+      "case": "raw-command-field",
+      "kind": "declaration",
+      "verdict": "REJECT_MALFORMED",
+      "file": "raw-command-field.json",
+      "rule": "This contract may not declare a field whose name carries an authority-bearing substring; argv is on that list.",
+      "deviation": "An argument record that would hand a worker the command line to launch.",
+      "note": "No worker receives an arbitrary path, URL, command line, or executable source. A command-line field is how that sentence stops being true, and the generator's own validator is what stops it."
+    },
+    {
+      "case": "chunk-after-final-chunk",
+      "kind": "unexecuted",
+      "verdict": "REJECT_MALFORMED",
+      "reason": "The end of a stream is a property of the stream. Reaching this verdict needs the chunk that already claimed to be final, which this message does not carry and a single-document fixture cannot supply.",
+      "rule": "A streamed output ends at the chunk that marks itself final. A chunk after it is refused rather than appended.",
+      "deviation": "A chunk arriving after the chunk that already said it was the last one.",
+      "note": "Appending is the tempting implementation and it removes the only signal a reader has that the stream ended, which is the whole reason the marker was added rather than left to the terminal completion. Executing this row needs a stream fixture, which is a shape the corpus does not have."
+    },
+    {
+      "case": "out-of-order-output-chunk",
+      "kind": "unexecuted",
+      "verdict": "REJECT_MALFORMED",
+      "reason": "Chunk ordering is a property of a stream, not of a message. Reaching this verdict needs the sequence number of the chunk before it, which this message does not carry and a single-document fixture cannot supply.",
+      "rule": "Output chunks arrive in order. A chunk whose sequence number is not the next one is refused rather than reordered or dropped.",
+      "deviation": "A chunk numbered behind the chunk already delivered.",
+      "note": "Buffering and reordering is the tempting implementation, and it turns a bounded stream into an unbounded one held by the broker. Refusing keeps the bound where the contract put it. Executing this row needs a stream fixture, which is a shape the corpus does not have."
+    }
+  ]
+}

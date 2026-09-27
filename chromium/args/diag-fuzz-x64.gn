@@ -1,0 +1,79 @@
+# TaffyGo GN args profile: diag-fuzz-x64 — host libFuzzer build of the
+# thirteen //taffy/test/fuzz targets (decision 0013,
+# docs/development/chromium-fork-and-build.md).
+#
+# Committed profile. Never hand-edit GN args in a checkout: edit this file and
+# re-run `./tools/chromium/build --profile diag-fuzz-x64`.
+#
+# The second host profile, and the only one under which a fuzzer exists at
+# all. taffy-core/test/fuzz/BUILD.gn gates every target on
+# `use_fuzzing_engine`, which is derived from `use_libfuzzer` below; in every
+# product profile and in diag-sanitizer-x64 that condition is false and each
+# fuzzer collapses to an empty test-only group, so `gn ls` names them and
+# nothing ever compiles a fuzzer body. TEST-INDEX.md section 6 records the
+# thirteen surfaces; this profile is what turns that table from a list of
+# files into binaries that can be run.
+#
+# Like diag-sanitizer-x64 it is absent from TAFFY_PROFILES in
+# tools/chromium/lib/chromium.sh and present in TAFFY_HOST_PROFILES: there is
+# no APK to install, and `run` refuses it with a sentence rather than failing
+# on a missing file. `./tools/chromium/test` has no runner for a fuzzer either
+# — libFuzzer binaries are driven directly:
+#
+#   ./tools/chromium/build --profile diag-fuzz-x64          # all thirteen
+#   out/diag-fuzz-x64/taffy_bip_snapshot_result_fuzzer \
+#       -runs=100000 out/diag-fuzz-x64/gen/taffy/test/fuzz/wire_seeds
+#
+# The wire fuzzers seed from the generated Mojo corpus above; the graph
+# payload fuzzer seeds from //taffy/test/data/contract/golden; the four
+# byte-input fuzzers (origin codec, secret shape scanner, omnibox classifier,
+# scrubbing serializer) declare no seed corpus and start from libFuzzer's
+# empty input. taffy-core/test/fuzz/README.md section 3 says what to check on
+# the first run, starting with whether the seed directory is empty.
+#
+# NOT YET RUN ON THE BUILDER. `gn gen` fails loudly on an argument it does not
+# recognise at the pinned milestone, which is the failure worth having; the
+# first build records what it found in
+# docs/development/chromium-fork-and-build.md section 6, the way SP-01 did for
+# the product profiles.
+
+target_os = "linux"
+target_cpu = "x64"
+taffy_capability_profile = "development"
+
+# The same de-Google and size posture as every other profile (decision 0019).
+# A fuzzer that exercised a configuration nobody ships would find bugs in a
+# binary nobody runs.
+import("//taffy/build/args/common.gni")
+
+# libFuzzer is the engine. Setting it is what makes `use_fuzzing_engine` true,
+# which is the condition //taffy/test/fuzz/BUILD.gn instantiates its targets
+# under. AddressSanitizer beneath it is what turns an out-of-bounds read the
+# fuzzer provokes into a report with a stack rather than a silent success;
+# libFuzzer runs its own leak check on top of the ASan runtime, so no separate
+# LeakSanitizer switch is needed here.
+use_libfuzzer = true
+is_asan = true
+
+# -O1 with the fuzzing-friendly flags Chromium's own fuzzing builds use, so a
+# run of a hundred thousand iterations is minutes rather than an afternoon.
+optimize_for_fuzzing = true
+
+# Not a debug build, assertions on: a DCHECK a fuzzer trips is a finding, and
+# the corpus these targets consume is small enough that the cost of checking
+# is nothing.
+is_debug = false
+dcheck_always_on = true
+
+# Static link. Each fuzzer links //base, Mojo and the browser-shared library
+# and nothing heavier, so thirteen static binaries are cheap — and a static
+# link keeps every instrumented function inside the binary libFuzzer measures
+# coverage of. It also sidesteps the one-definition-rule report that the
+# sanitizer profile's component build has to switch off.
+is_component_build = false
+
+# Enough symbols to attribute a crash to a line.
+symbol_level = 1
+
+use_siso = true
+use_remoteexec = false

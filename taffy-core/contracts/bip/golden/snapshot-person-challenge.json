@@ -1,0 +1,203 @@
+{
+  "schema_version": "0.12",
+  "snapshot_id": "snap_challenge_01",
+  "request_id": "req_challenge_01",
+  "profile_id": "prof_default",
+  "browser_window_id": "win_01",
+  "tab_id": "tab_01",
+  "root_frame_id": "frame_main",
+  "page_epoch": "epoch_challenge_01",
+  "graph_revision": 9,
+  "event_sequence": 31,
+  "lifecycle_state": "ACTIVE",
+  "committed_url_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://accounts.example.test"
+    },
+    "disclosure": "ORIGIN_ONLY",
+    "has_query": false,
+    "has_fragment": false
+  },
+  "origin_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://accounts.example.test"
+    },
+    "is_potentially_trustworthy": true,
+    "is_incognito": false
+  },
+  "capture_time_monotonic_ms": 3100,
+  "scope": "INTERACTIVE",
+  "adapters": [
+    {
+      "adapter": "BROWSER",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "browser-1.0.0"
+    },
+    {
+      "adapter": "FORMS",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "forms-1.0.0"
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "n_otp",
+      "frame_id": "frame_main",
+      "role": "TEXT_FIELD",
+      "name": "Verification code",
+      "description": "A one-time code field is present. Its value is never observed or carried.",
+      "states": [
+        "VISIBLE",
+        "ENABLED",
+        "EDITABLE",
+        "REQUIRED"
+      ],
+      "value_descriptor": {
+        "kind": "SECRET_WITHHELD",
+        "present": true,
+        "redacted": true
+      },
+      "actions": [
+        "FOCUS",
+        "SET_TEXT",
+        "SCROLL_INTO_VIEW"
+      ],
+      "sensitivity": "ONE_TIME_CODE",
+      "sources": [
+        "FORM_CONTROL"
+      ],
+      "confidence": 0.99,
+      "attributes": [
+        {
+          "name": "AUTOCOMPLETE_TOKEN",
+          "value": "one-time-code"
+        }
+      ],
+      "evidence": [
+        {
+          "field": "SENSITIVITY",
+          "source_kind": "FORM_CONTROL",
+          "source_locator": "form:field:0",
+          "extraction_rule_version": "forms-1.0.0",
+          "transformation": "INFERRED",
+          "confidence": 0.99
+        },
+        {
+          "field": "CHALLENGE_KIND",
+          "source_kind": "FORM_CONTROL",
+          "source_locator": "form:field:0",
+          "extraction_rule_version": "forms-1.0.0",
+          "transformation": "INFERRED",
+          "confidence": 0.99
+        }
+      ],
+      "challenge_kind": "ONE_TIME_CODE"
+    },
+    {
+      "node_id": "n_image_response",
+      "frame_id": "frame_main",
+      "role": "TEXT_FIELD",
+      "name": "Enter the characters shown",
+      "description": "An image challenge response field is present. Its response is never observed or carried.",
+      "states": [
+        "VISIBLE",
+        "ENABLED",
+        "EDITABLE",
+        "REQUIRED"
+      ],
+      "value_descriptor": {
+        "kind": "SECRET_WITHHELD",
+        "present": false,
+        "redacted": true
+      },
+      "actions": [
+        "FOCUS",
+        "SET_TEXT",
+        "SCROLL_INTO_VIEW"
+      ],
+      "sensitivity": "CHALLENGE_RESPONSE",
+      "sources": [
+        "FORM_CONTROL"
+      ],
+      "confidence": 0.98,
+      "evidence": [
+        {
+          "field": "SENSITIVITY",
+          "source_kind": "FORM_CONTROL",
+          "source_locator": "form:field:1",
+          "extraction_rule_version": "forms-1.0.0",
+          "transformation": "INFERRED",
+          "confidence": 0.98
+        },
+        {
+          "field": "CHALLENGE_KIND",
+          "source_kind": "FORM_CONTROL",
+          "source_locator": "form:field:1",
+          "extraction_rule_version": "forms-1.0.0",
+          "transformation": "INFERRED",
+          "confidence": 0.98
+        }
+      ],
+      "challenge_kind": "IMAGE"
+    }
+  ],
+  "edges": [],
+  "frames": [
+    {
+      "frame_id": "frame_main",
+      "is_main_frame": true,
+      "is_out_of_process": false,
+      "is_cross_origin_to_parent": false,
+      "origin_metadata": {
+        "origin": {
+          "kind": "TUPLE",
+          "serialization": "https://accounts.example.test"
+        },
+        "is_potentially_trustworthy": true,
+        "is_incognito": false
+      },
+      "page_epoch": "epoch_challenge_01",
+      "graph_revision": 9,
+      "lifecycle_state": "ACTIVE",
+      "included": true
+    }
+  ],
+  "truncation": {
+    "truncated": false,
+    "budgets_reached": [],
+    "omitted_node_count": 0,
+    "omitted_text_bytes": 0,
+    "omitted_frame_count": 0,
+    "may_change_answer": false
+  },
+  "redaction_summary": {
+    "applied_features": [
+      "SECRET_VALUE_SUPPRESSION",
+      "SENSITIVE_ZONE_CLASSIFICATION",
+      "PATTERN_DETECTORS",
+      "URL_MINIMIZATION"
+    ],
+    "redacted_field_count": 2,
+    "suppressed_secret_value_count": 2,
+    "sensitive_zone_count": 2,
+    "policy_filtered_frame_count": 0
+  },
+  "warnings": [
+    {
+      "code": "SENSITIVE_ZONE_SUPPRESSED",
+      "frame_id": "frame_main",
+      "node_id": "n_otp",
+      "detail_code": "one_time_code_zone"
+    },
+    {
+      "code": "SENSITIVE_ZONE_SUPPRESSED",
+      "frame_id": "frame_main",
+      "node_id": "n_image_response",
+      "detail_code": "challenge_response_zone"
+    }
+  ]
+}

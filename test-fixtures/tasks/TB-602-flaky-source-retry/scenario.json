@@ -1,0 +1,48 @@
+{
+  "scenario": "TB-602",
+  "corpus": "taffygo-task-scenarios",
+  "version": "1.1.0",
+  "job_family": "JF-06",
+  "contract": "test-fixtures/tasks/manifest.json",
+  "note": "The contract for this scenario - goal, scope, facts, labels and adjudication - is the corpus manifest. This file owns only the run script: the ordered steps, the events injected into them, the audit stream a correct run produces, and the rubric a labeler applies to a disputed run.",
+  "steps": [
+    {
+      "n": 1,
+      "kind": "step:OBSERVE",
+      "fixture": "slow-and-flaky",
+      "detail": "Observe the page; one section is still loading and one has failed.",
+      "produces": [],
+      "expect": [
+        "neither section claimed yet"
+      ]
+    },
+    {
+      "n": 2,
+      "kind": "step:OBSERVE",
+      "fixture": "slow-and-flaky",
+      "detail": "Retry within the declared budget until both sections resolve.",
+      "produces": [
+        "F-602-slow-section",
+        "F-602-flaky-section",
+        "F-602-no-duplicate"
+      ],
+      "expect": [
+        "no duplicated effect"
+      ]
+    }
+  ],
+  "injected_events": [],
+  "expected_audit_events": [
+    "TaskCreated",
+    "TaskStarted",
+    "ObservationCaptured",
+    "FactAccepted",
+    "TaskCompleted"
+  ],
+  "adjudication_rubric": [
+    {
+      "dispute": "A reviewer sees several observation events and asks whether that is duplication.",
+      "resolution": "Observation is a read. Duplication is scored on dispatched side effects, not on reads."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+# The performing half of the filtering plane: the request-path throttle, the
+# per-tab counters, the preference-backed posture and the ruleset lifecycle.
+# Browser process only. It never names //chrome — the browser host injects
+# everything profile-shaped (the pref service, the list reader), which is what
+# keeps this component below the host in the layer graph.
+
+include_rules = [
+  "+base",
+  "+components/prefs",
+  "+components/url_pattern_index",
+  "+content/public/browser",
+  "+net/base",
+  "+net/url_request",
+  "+services/network/public/cpp",
+  "+services/network/public/mojom",
+  "+taffy/components/filtering/browser",
+  "+taffy/components/filtering/core",
+  "+taffy/components/filtering/mojom",
+  "+mojo/public/cpp/bindings",
+  "+third_party/blink/public/common",
+  "+url",
+
+  "-chrome",
+]
+
+specific_include_rules = {
+  ".*_unittest\\.(cc|h)": [
+    "+base/test",
+    "+content/public/test",
+    "+testing/gtest",
+  ],
+}

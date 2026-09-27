@@ -1,0 +1,40 @@
+# Machine owner file for the "ccache" and "sccache" rows in TOOLCHAIN.md.
+# Format: `key=value`, `#` comments. Consumed by tools/bootstrap and tools/doctor.
+#
+# The two are registered separately in tools/lib/pins.sh because they are
+# separate tools with separate evidence: ccache has a measured result and
+# sccache has none. A single row read only its first key, so the second version
+# reached TOOLCHAIN.md with no gate behind it.
+#
+# ccache is the clang warm-rebuild layer (`cc_wrapper` in the dev GN args
+# profiles); sccache is the Rust RUSTC_WRAPPER, local disk only. Decision 0013
+# also specified a shared object-store backend for a hosted CI runner; decision
+# 0023 abolished the runner and decision 0200 rules out this project operating
+# the store, so that half is retired rather than pending. Siso's own local
+# cache is part of Chromium and is not pinned here.
+#
+# Pinned at SP-01 (2026-08-17, Chromium milestone 152) to the versions that
+# produced the first recorded build. Both are host tooling, so these are the
+# versions a builder must have, not versions the Chromium build selects.
+#
+# The ccache-under-Siso question this file was waiting on is answered, and the
+# answer is uncomfortable: ccache runs, but 90.06% of the build's 44,338
+# compiler invocations were uncacheable, every one reported as "Could not use
+# modules" — Chromium 152 compiles Android targets with C++ modules that ccache
+# 4.9.1 will not handle. Siso was not the obstacle. Only 9.94% of calls were
+# cacheable and a cold cache cannot hit any of them, so the warm-rebuild value
+# of that remainder is still unmeasured. Whether `cc_wrapper = "ccache"` stays
+# in the dev profiles is OD-075 (decide by M1), with the measurement written up
+# in docs/development/chromium-fork-and-build.md section 6 item 2.
+#
+# sccache is unexercised: it is the Rust RUSTC_WRAPPER and no Rust target has
+# been built under GN yet. The version below is what is installed, not a
+# measured result.
+
+ccache=4.9.1
+sccache=0.17.0
+
+# Local cache sizes applied by tools/bootstrap. Sized for the Chromium host
+# hardware guidance in decision 0013 (>= 400 GB free on a 1 TB NVMe).
+ccache_max_size=100G
+sccache_cache_size=50G

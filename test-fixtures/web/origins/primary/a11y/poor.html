@@ -1,0 +1,60 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="accessibility-poor">
+<title>Lumen Arc order page (inaccessible markup)</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+<style>
+  .headingish { font-size: 1.15rem; font-weight: 700; margin: 1.5rem 0 .5rem; }
+  .titleish { font-size: 1.6rem; font-weight: 700; }
+  .gridish { display: grid; grid-template-columns: 1fr 1fr; gap: .3rem; max-width: 28rem; }
+  .cellish { border: 1px solid var(--line); padding: .4rem .6rem; }
+  .linkish { color: #1a4fa0; text-decoration: underline; cursor: pointer; }
+  .buttonish { display: inline-block; border: 1px solid var(--line); padding: .4rem .8rem;
+               border-radius: .35rem; cursor: pointer; background: rgba(0, 0, 0, .03); }
+</style>
+
+<div class="fixture" style="border-bottom: 1px solid var(--line); padding-bottom: .75rem; margin-bottom: 1.25rem;">
+  <div class="titleish">Lumen Arc desk lamp</div>
+  <div class="note">Inaccessible twin. Same words, same numbers, same order as its
+  accessible twin; only the semantics differ.</div>
+</div>
+
+<div>
+  <span class="linkish" tabindex="3" onclick="location.hash='#price-section'">Price</span>
+  <span class="linkish" tabindex="1" onclick="location.hash='#spec-section'">Specification</span>
+  <span class="linkish" tabindex="2" onclick="location.hash='#order-section'">Order</span>
+</div>
+
+<div id="price-section">
+  <div class="headingish">Price</div>
+  <div id="price">Price today: <b>$129.00</b></div>
+  <div id="availability">Availability: <b>In stock</b></div>
+</div>
+
+<div id="spec-section">
+  <div class="headingish">Specification</div>
+  <div id="spec" class="gridish">
+    <div class="cellish">Attribute</div><div class="cellish">Value</div>
+    <div class="cellish">Brightness</div><div class="cellish">800 lumens</div>
+    <div class="cellish">Warranty</div><div class="cellish">2 years</div>
+    <div class="cellish">Power</div><div class="cellish">12 W</div>
+  </div>
+  <img id="chart" src="/media/diagram.svg" width="320" height="120">
+</div>
+
+<div id="order-section">
+  <div class="headingish">Order</div>
+  <div id="order-form">
+    <div>Quantity</div>
+    <input id="quantity" type="number" min="1" max="5" value="1" placeholder="Quantity">
+    <div>Finish</div>
+    <div id="finish" class="linkish" tabindex="-1">Black</div>
+    <div class="buttonish" id="add-to-basket" onclick="document.getElementById('order-status').textContent='Added.'">Add to basket</div>
+  </div>
+  <div id="order-status">Nothing added yet.</div>
+</div>
+
+<div class="note">Fixture footer. Focus order does not follow reading order.</div>

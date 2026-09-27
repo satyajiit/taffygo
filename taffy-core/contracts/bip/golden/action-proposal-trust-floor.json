@@ -1,0 +1,124 @@
+{
+  "schema_version": "0.5",
+  "action_id": "act_05",
+  "task_id": "task_05",
+  "principal": {
+    "kind": "ASSISTANT"
+  },
+  "action_type": "ACTIVATE",
+  "target_handle": {
+    "tab_id": "tab_05",
+    "frame_id": "frame_main",
+    "page_epoch": "epoch_e1",
+    "graph_revision": 11,
+    "node_id": "n_offer_link",
+    "expected_origin": {
+      "kind": "TUPLE",
+      "serialization": "https://forum.example.test"
+    }
+  },
+  "preconditions": [
+    {
+      "kind": "EXACT_PAGE_EPOCH",
+      "page_epoch": "epoch_e1"
+    },
+    {
+      "kind": "ACCEPTABLE_GRAPH_REVISION",
+      "min_graph_revision": 11
+    },
+    {
+      "kind": "DOCUMENT_ACTIVE"
+    },
+    {
+      "kind": "EXACT_ORIGIN",
+      "origin": {
+        "kind": "TUPLE",
+        "serialization": "https://forum.example.test"
+      }
+    },
+    {
+      "kind": "NODE_EXISTS"
+    },
+    {
+      "kind": "NODE_ROLE_UNCHANGED",
+      "expected_role": "LINK"
+    },
+    {
+      "kind": "NODE_ACTION_AVAILABLE",
+      "expected_action_type": "ACTIVATE"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "VISIBLE"
+    },
+    {
+      "kind": "EXPECTED_DESTINATION",
+      "expected_destination": {
+        "url_metadata": {
+          "origin": {
+            "kind": "TUPLE",
+            "serialization": "https://docs.example.test"
+          },
+          "disclosure": "ORIGIN_AND_PATH",
+          "has_query": false,
+          "has_fragment": false,
+          "path": "/refund-policy"
+        },
+        "is_cross_origin": true,
+        "opens_new_tab": false,
+        "is_download": false
+      }
+    },
+    {
+      "kind": "DESTINATION_CLASS_ALLOWED"
+    },
+    {
+      "kind": "CONTENT_TRUST_AT_LEAST",
+      "min_content_trust": "USER_GENERATED_CONTENT"
+    },
+    {
+      "kind": "NOT_SENSITIVE_FIELD",
+      "max_sensitivity": "NOT_SENSITIVE"
+    },
+    {
+      "kind": "NO_USER_INTERACTION_SINCE_LEASE"
+    },
+    {
+      "kind": "BUDGET_REMAINING"
+    }
+  ],
+  "expected_postconditions": [
+    {
+      "kind": "COMMITTED_NAVIGATION",
+      "expected_destination": {
+        "url_metadata": {
+          "origin": {
+            "kind": "TUPLE",
+            "serialization": "https://docs.example.test"
+          },
+          "disclosure": "ORIGIN_AND_PATH",
+          "has_query": false,
+          "has_fragment": false,
+          "path": "/refund-policy"
+        },
+        "is_cross_origin": true,
+        "opens_new_tab": false,
+        "is_download": false
+      },
+      "allowed_origins": [
+        {
+          "kind": "TUPLE",
+          "serialization": "https://docs.example.test"
+        }
+      ],
+      "timeout_ms": 8000
+    }
+  ],
+  "idempotency_policy": "CONDITIONALLY_IDEMPOTENT",
+  "deadline_monotonic_ms": 21000,
+  "user_visible_reason": "Open the refund policy the forum post links to.",
+  "proposal_digest": {
+    "algorithm": "SHA_256",
+    "value": "5b1c0a3e4d9f6a2b8c7d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d"
+  }
+}

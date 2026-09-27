@@ -1,0 +1,30 @@
+# Renderer half of Ads and trackers. Sandboxed: cosmetics observe class and id
+# and apply a user-origin stylesheet; the request adapter only defers a loader
+# while the browser decides. Neither reaches the engine, browser host, or BIP.
+
+include_rules = [
+  "+taffy/components/filtering/mojom",
+  "+content/public/renderer",
+  "+mojo/public/cpp/bindings",
+  "+net/base/net_errors.h",
+  "+net/url_request/redirect_info.h",
+  "+services/network/public/cpp/resource_request.h",
+  "+services/network/public/mojom",
+  "+third_party/blink/public/common/associated_interfaces",
+  "+third_party/blink/public/common/loader",
+  "+third_party/blink/public/common/tokens",
+  "+third_party/blink/public/platform",
+  "+third_party/blink/public/web",
+  "+url/gurl.h",
+
+  "-taffy/browser",
+  "-taffy/renderer",
+  "-taffy/components/filtering/core",
+  "-taffy/components/filtering/browser",
+]
+
+specific_include_rules = {
+  ".*_unittest\\.(cc|h)": [
+    "+testing/gtest",
+  ],
+}

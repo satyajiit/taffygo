@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/website — the landing page: local development, static export, checks.
+#
+# The page itself is specified by docs/website/landing-page.md and implemented
+# in website/; this wrapper exists so onboarding never has to name a package
+# manager, a script, or an output directory
+# (docs/development/development-setup.md section 6).
+#
+# Unlike a lane of ./tools/check, this command does not skip when its toolchain
+# is missing: you asked for the website, so an absent toolchain is an error with
+# a remediation, not a quiet success.
+#
+# Exit codes: 0 = the requested work succeeded, 1 = it failed or could not run.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/versions.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/node.sh"
+
+PACKAGE_DIR='website'
+EXPORT_DIR="$TAFFY_ROOT/website/out"
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/website <command>
+
+Commands:
+  dev      run the local development server (long-running; Ctrl-C to stop)
+  build    produce the static export in website/out/
+  check    lint, type check, and run the tests
+  audit    Lighthouse budget audit of the export (needs a prior build)
+
+Options:
+  -h, --help   show this help
+
+Network: `dev` and `build` are local and offline once dependencies are
+installed. Nothing here deploys, uploads, or spends money — publishing the
+export is a separate, deliberate step.
+USAGE
+}
+
+resolved_state() {
+  step "website: resolved state"
+  local blocker manifest="$TAFFY_ROOT/$PACKAGE_DIR/package.json"
+  note "package        $PACKAGE_DIR ($(taffy_version_value json "$manifest" name 2>/dev/null || printf 'unnamed'))"
+  note "next.js        $(taffy_version_value json "$manifest" next 2>/dev/null || printf 'not recorded') (TOOLCHAIN.md row \"Next.js\")"
+  note "node           $(node --version 2>/dev/null || printf 'not installed') (engines: $(taffy_node_engine_range 2>/dev/null || printf 'not recorded'))"
+  note "pnpm           $(pnpm --version 2>/dev/null || printf 'not installed') (pinned: $(taffy_node_pnpm_pin 2>/dev/null || printf 'not recorded'))"
+  note "export         $EXPORT_DIR"
+  if blocker=$(taffy_node_blocker "$PACKAGE_DIR"); then
+    note "dependencies   installed"
+  else
+    die "cannot run: ${blocker%%	*}" "${blocker#*	}"
+  fi
+}
+
+run_script() { # <script>
+  step "website: pnpm --dir $PACKAGE_DIR $1"
+  if ( cd "$TAFFY_ROOT" && pnpm --dir "$PACKAGE_DIR" "$1" ); then
+    ok "$1"
+  else
+    die "\`pnpm --dir $PACKAGE_DIR $1\` failed" \
+      "Reproduce it directly and fix what it reports; this wrapper adds nothing to that command."
+  fi
+}
+
+cmd_dev() {
+  resolved_state
+  step "website: development server (Ctrl-C to stop)"
+  cd "$TAFFY_ROOT"
+  exec pnpm --dir "$PACKAGE_DIR" dev
+}
+
+cmd_build() {
+  resolved_state
+  run_script build
+
+  # A build that "succeeded" without producing an entry document is a failure
+  # the exit code did not notice.
+  [ -d "$EXPORT_DIR" ] || die "the build reported success but $EXPORT_DIR does not exist" \
+    "next.config.ts must keep output: \"export\"; see docs/website/landing-page.md."
+  [ -f "$EXPORT_DIR/index.html" ] || die "no index.html in $EXPORT_DIR" \
+    "The export is incomplete; do not upload it."
+
+  local files bytes
+  files=$(find "$EXPORT_DIR" -type f | wc -l | tr -d ' ')
+  bytes=$(du -sk "$EXPORT_DIR" 2>/dev/null | awk '{ printf "%.1f", $1/1024 }')
+  ok "static export: $files file(s), ${bytes} MiB in $EXPORT_DIR"
+  note "Self-contained files. Uploading that directory is the whole deployment; this command does not upload."
+}
+
+cmd_check() {
+  resolved_state
+  local script
+  for script in $TAFFY_NODE_CHECK_SCRIPTS; do
+    run_script "$script"
+  done
+  ok "website checks passed"
+}
+
+cmd_audit() {
+  resolved_state
+  # Explicit on purpose: the audit measures the committed export shape, so it
+  # refuses to build quietly in the background. Build first, then audit.
+  [ -f "$EXPORT_DIR/index.html" ] || die "no static export at website/out/ — the audit measures the built site" \
+    "Run ./tools/website build first, then ./tools/website audit."
+  # `pnpm audit` is a pnpm builtin (dependency vulnerability scan); the script
+  # only runs through `pnpm run`.
+  step "website: pnpm --dir $PACKAGE_DIR run audit"
+  if ( cd "$TAFFY_ROOT" && pnpm --dir "$PACKAGE_DIR" run audit ); then
+    ok "audit"
+  else
+    die "\`pnpm --dir $PACKAGE_DIR run audit\` failed" \
+      "Reproduce it directly and fix what it reports; this wrapper adds nothing to that command."
+  fi
+}
+
+case "${1:-}" in
+  dev) cmd_dev ;;
+  build) cmd_build ;;
+  check) cmd_check ;;
+  audit) cmd_audit ;;
+  -h|--help|'') usage; exit 0 ;;
+  *) usage >&2; die "unknown command: $1" ;;
+esac

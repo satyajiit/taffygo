@@ -1,0 +1,43 @@
+{
+  "schema_version": "0.1",
+  "action_id": "act_02",
+  "dispatch_id": "disp_02",
+  "result_code": "STALE_PAGE_EPOCH",
+  "dispatched": false,
+  "terminal": true,
+  "verified_by": [],
+  "postcondition_outcomes": [
+    {
+      "postcondition": {
+        "kind": "COMMITTED_NAVIGATION",
+        "expected_destination": {
+          "url_metadata": {
+            "origin": {
+              "kind": "TUPLE",
+              "serialization": "https://docs.example.test"
+            },
+            "disclosure": "ORIGIN_AND_PATH",
+            "has_query": false,
+            "has_fragment": false,
+            "path": "/deletion-request"
+          },
+          "is_cross_origin": false,
+          "opens_new_tab": false,
+          "is_download": false
+        },
+        "allowed_origins": [
+          {
+            "kind": "TUPLE",
+            "serialization": "https://docs.example.test"
+          }
+        ],
+        "timeout_ms": 8000
+      },
+      "satisfied": false,
+      "verifier": "FRESH_SNAPSHOT",
+      "detail_code": "epoch_retired_before_dispatch"
+    }
+  ],
+  "observed_page_epoch": "epoch_b2",
+  "completed_at_monotonic_ms": 13010
+}

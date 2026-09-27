@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Machine-translated (hi), pending native review. -->
+<resources>
+    <!-- Screen SCR-201 -->
+    <string name="taffy_pages_history_title">इतिहास</string>
+    <string name="taffy_pages_history_search">इतिहास खोजें</string>
+    <string name="taffy_pages_history_clear">साफ़ करें</string>
+    <string name="taffy_pages_history_caption">किसी काम के लिए Taffy ने जो पेज खोले, वे इतिहास में नहीं हैं।</string>
+    <string name="taffy_pages_history_empty_title">इस फ़ोन पर अभी कोई इतिहास नहीं है।</string>
+    <string name="taffy_pages_history_empty_body">किसी काम के लिए Taffy ने जो पेज खोले, वे इतिहास में नहीं हैं।</string>
+    <string name="taffy_pages_history_no_matches_title">यहाँ कुछ भी मेल नहीं खाता।</string>
+    <string name="taffy_pages_history_no_matches_body">इतिहास में उस खोज से कुछ भी मेल नहीं खाता।</string>
+    <string name="taffy_pages_history_unavailable_title">इतिहास अभी उपलब्ध नहीं है।</string>
+    <string name="taffy_pages_history_unavailable_body">TaffyGo के पास दिखाने के लिए कोई विज़िट सूची नहीं है, और वह एक गढ़ेगी भी नहीं।</string>
+    <string name="taffy_pages_history_loading">इतिहास लोड हो रहा है</string>
+    <string name="taffy_pages_history_today">आज</string>
+    <string name="taffy_pages_history_yesterday">कल</string>
+    <string name="taffy_pages_history_delete">इतिहास से हटाएँ</string>
+    <string name="taffy_pages_history_delete_confirm_title">इस पेज को इतिहास से हटाएँ?</string>
+    <string name="taffy_pages_history_delete_confirm_body">%1$s, %2$s. यह केवल इस फ़ोन पर की गई विज़िट हटाता है।</string>
+    <string name="taffy_pages_history_row_description">%1$s, %2$s, %3$s. यह पेज खोलता है।</string>
+    <string name="taffy_pages_history_supporting">%1$s · %2$s</string>
+
+    <!-- Screen SCR-202 -->
+    <string name="taffy_pages_bookmarks_title">बुकमार्क</string>
+    <string name="taffy_pages_bookmarks_search">बुकमार्क खोजें</string>
+    <string name="taffy_pages_bookmarks_import">इंपोर्ट करें</string>
+    <string name="taffy_pages_bookmarks_export">एक्सपोर्ट करें</string>
+    <string name="taffy_pages_bookmarks_imported">इंपोर्ट पूरा हुआ। जोड़े गए: %1$d; पहले से सहेजे गए: %2$d; असमर्थित: %3$d।</string>
+    <string name="taffy_pages_bookmarks_exported">बुकमार्क एक्सपोर्ट हो गए।</string>
+    <string name="taffy_pages_bookmarks_transfer_failed">वह बुकमार्क फ़ाइल पढ़ी या लिखी नहीं जा सकी।</string>
+    <string name="taffy_pages_bookmarks_empty_title">अभी कोई बुकमार्क नहीं है।</string>
+    <string name="taffy_pages_bookmarks_empty_body">This site → Save page से किसी पेज पर तारा लगाएँ। बुकमार्क वे पेज हैं जिन पर आपने तारा लगाया — Library नहीं, और Memory नहीं।</string>
+    <string name="taffy_pages_bookmarks_no_matches_title">यहाँ कुछ भी मेल नहीं खाता।</string>
+    <string name="taffy_pages_bookmarks_no_matches_body">बुकमार्क में उस खोज से कुछ भी मेल नहीं खाता।</string>
+    <string name="taffy_pages_bookmarks_unavailable_title">बुकमार्क अभी उपलब्ध नहीं हैं।</string>
+    <string name="taffy_pages_bookmarks_unavailable_body">TaffyGo के पास दिखाने के लिए कोई बुकमार्क सूची नहीं है, और वह एक गढ़ेगी भी नहीं।</string>
+    <string name="taffy_pages_bookmarks_loading">बुकमार्क लोड हो रहे हैं</string>
+    <string name="taffy_pages_bookmarks_folder_all">सभी</string>
+    <string name="taffy_pages_bookmarks_folder_description">%1$s. इस फ़ोल्डर के बुकमार्क दिखाता है।</string>
+    <string name="taffy_pages_bookmarks_delete">बुकमार्क हटाएँ</string>
+    <string name="taffy_pages_bookmarks_edit">बुकमार्क संपादित करें</string>
+    <string name="taffy_pages_bookmarks_delete_confirm_title">यह बुकमार्क हटाएँ?</string>
+    <string name="taffy_pages_bookmarks_delete_confirm_body">%1$s, %2$s. यह केवल इस फ़ोन पर लगा तारा हटाता है।</string>
+    <string name="taffy_pages_bookmarks_row_description">%1$s, %2$s. यह पेज खोलता है।</string>
+    <string name="taffy_pages_bookmarks_edit_title">बुकमार्क संपादित करें</string>
+    <string name="taffy_pages_bookmarks_edit_name">नाम</string>
+    <string name="taffy_pages_bookmarks_edit_folder">फ़ोल्डर</string>
+    <string name="taffy_pages_bookmarks_save">सहेजें</string>
+
+    <string name="taffy_pages_remove">हटाएँ</string>
+    <string name="taffy_pages_cancel">रद्द करें</string>
+</resources>

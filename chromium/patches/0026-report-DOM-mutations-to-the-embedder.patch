@@ -1,0 +1,397 @@
+From 75d0f2d247bffdcc092a9d6e03a60ccf92444c49 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Fri, 21 Aug 2026 23:48:44 +0530
+Subject: report DOM mutations to the embedder
+
+content::RenderFrameObserver has no DOM-mutation callback at this
+milestone, so the page-intelligence endpoint advanced its graph only on
+scroll, focus and layout-shift signals: an appendChild produced no delta at
+all, and node removal had no production caller. MutationObserver::Delegate
+is declared in blink's renderer core and reachable only from inside it, so
+the observer cannot live in the overlay. Three downstream-owned files
+export a minimal WebDomMutationObserver behind blink's public web API,
+modelled on web_form_element_observer_impl.cc, and two build-list lines
+register them. No existing upstream source line changes.
+
+Rebase risk: low. New files plus two sorted-list entries.
+
+Needed by: WP-M2-05.
+Retirement: permanent while page intelligence exists, or until upstream
+exposes an equivalent observer.
+
+Taffy-Patch: 0026
+
+diff --git a/third_party/blink/public/BUILD.gn b/third_party/blink/public/BUILD.gn
+index 8dfebb40910e4..37087abcfeb25 100644
+--- a/third_party/blink/public/BUILD.gn
++++ b/third_party/blink/public/BUILD.gn
+@@ -301,6 +301,7 @@ source_set("blink_headers") {
+     "web/web_dom_file_system.h",
+     "web/web_dom_media_stream_track.h",
+     "web/web_dom_message_event.h",
++    "web/web_dom_mutation_observer.h",
+     "web/web_drag_status.h",
+     "web/web_draggable_region.h",
+     "web/web_element.h",
+diff --git a/third_party/blink/public/web/web_dom_mutation_observer.h b/third_party/blink/public/web/web_dom_mutation_observer.h
+new file mode 100644
+index 0000000000000..bb0de037dee36
+--- /dev/null
++++ b/third_party/blink/public/web/web_dom_mutation_observer.h
+@@ -0,0 +1,87 @@
++// Copyright 2026 The TaffyGo Authors
++// Use of this source code is governed by a BSD-style license that can be found
++// in the LICENSE file.
++
++#ifndef THIRD_PARTY_BLINK_PUBLIC_WEB_WEB_DOM_MUTATION_OBSERVER_H_
++#define THIRD_PARTY_BLINK_PUBLIC_WEB_WEB_DOM_MUTATION_OBSERVER_H_
++
++#include <vector>
++
++#include "base/functional/callback.h"
++#include "third_party/blink/public/platform/web_common.h"
++#include "third_party/blink/public/platform/web_string.h"
++
++namespace blink {
++
++class WebDocument;
++
++// One delivered DOM mutation, reduced to the facts an embedder outside Blink
++// can act on: what kind of change it was, which nodes it names, and - for an
++// attribute change - which attribute.
++//
++// Nodes are named by blink::WebNode::GetDomNodeId() values rather than by
++// WebNode, so a consumer can match a mutation against records it keyed off
++// GetDomNodeId() without holding a reference to anything in the Blink heap.
++// Zero means "no node".
++struct WebDomMutation {
++  enum class Kind {
++    // Children of `target_dom_node_id` were added, removed, or both.
++    kChildList,
++    // `attribute_name` changed on `target_dom_node_id`.
++    kAttributes,
++    // The character data of `target_dom_node_id` changed. That node is a text
++    // node rather than an element, which is why `parent_dom_node_id` is
++    // reported beside it.
++    kCharacterData,
++  };
++
++  Kind kind = Kind::kChildList;
++
++  int target_dom_node_id = 0;
++  int parent_dom_node_id = 0;
++  std::vector<int> added_dom_node_ids;
++  std::vector<int> removed_dom_node_ids;
++
++  // Only meaningful when `kind` is kAttributes.
++  WebString attribute_name;
++};
++
++// Reports DOM mutations in one document to a callback outside Blink.
++//
++// This is the same mechanism Blink's own C++ consumers use - a
++// MutationObserver with a native delegate - exposed at the public boundary,
++// in the shape WebFormElementObserver already established for a narrower
++// question. It exists because content::RenderFrameObserver has no DOM
++// mutation callback at all, so an embedder that must know when a document
++// changed has no signal to subscribe to.
++//
++// The observer watches the whole document (childList, attributes and
++// character data, subtree) for as long as it is connected, so a consumer that
++// only sometimes needs the signal should create it only sometimes.
++class BLINK_EXPORT WebDomMutationObserver {
++ public:
++  using Callback =
++      base::RepeatingCallback<void(const std::vector<WebDomMutation>&)>;
++
++  // Creates an observer over `document`. The returned object keeps itself
++  // alive until Disconnect() is called, exactly as WebFormElementObserver
++  // does; Disconnect() also releases `callback`.
++  static WebDomMutationObserver* Create(const WebDocument& document,
++                                        Callback callback);
++
++  virtual void Disconnect() = 0;
++
++  // Pulls records MutationObserver has queued but not yet Delivered, and
++  // invokes the callback. Agent-event-loop microtasks are the normal path;
++  // this exists so a delta subscriber can drain while the page is not
++  // compositing, without a repeating timer on every observed document.
++  virtual void FlushPending() = 0;
++
++ protected:
++  WebDomMutationObserver() = default;
++  virtual ~WebDomMutationObserver() = default;
++};
++
++}  // namespace blink
++
++#endif  // THIRD_PARTY_BLINK_PUBLIC_WEB_WEB_DOM_MUTATION_OBSERVER_H_
+diff --git a/third_party/blink/renderer/core/exported/build.gni b/third_party/blink/renderer/core/exported/build.gni
+index 38b3aa136fc29..efda49d850a2e 100644
+--- a/third_party/blink/renderer/core/exported/build.gni
++++ b/third_party/blink/renderer/core/exported/build.gni
+@@ -19,6 +19,8 @@ blink_core_sources_exported = [
+   "web_dom_activity_logger.cc",
+   "web_dom_event.cc",
+   "web_dom_message_event.cc",
++  "web_dom_mutation_observer_impl.cc",
++  "web_dom_mutation_observer_impl.h",
+   "web_element.cc",
+   "web_element_collection.cc",
+   "web_form_control_element.cc",
+diff --git a/third_party/blink/renderer/core/exported/web_dom_mutation_observer_impl.cc b/third_party/blink/renderer/core/exported/web_dom_mutation_observer_impl.cc
+new file mode 100644
+index 0000000000000..5c4a5635e5832
+--- /dev/null
++++ b/third_party/blink/renderer/core/exported/web_dom_mutation_observer_impl.cc
+@@ -0,0 +1,196 @@
++// Copyright 2026 The TaffyGo Authors
++// Use of this source code is governed by a BSD-style license that can be found
++// in the LICENSE file.
++
++#include "third_party/blink/renderer/core/exported/web_dom_mutation_observer_impl.h"
++
++#include <utility>
++
++#include "third_party/blink/public/web/web_document.h"
++#include "third_party/blink/renderer/bindings/core/v8/v8_mutation_observer_init.h"
++#include "third_party/blink/renderer/core/dom/document.h"
++#include "third_party/blink/renderer/core/dom/dom_node_ids.h"
++#include "third_party/blink/renderer/core/dom/element.h"
++#include "third_party/blink/renderer/core/dom/mutation_observer.h"
++#include "third_party/blink/renderer/core/dom/mutation_record.h"
++#include "third_party/blink/renderer/core/dom/node.h"
++#include "third_party/blink/renderer/core/dom/node_traversal.h"
++#include "third_party/blink/renderer/core/dom/static_node_list.h"
++#include "third_party/blink/renderer/platform/bindings/exception_state.h"
++
++namespace blink {
++
++namespace {
++
++int DomNodeIdOf(Node* node) {
++  return node ? static_cast<int>(node->GetDomNodeId()) : 0;
++}
++
++// A removal is the removal of a subtree, but MutationObserver names only the
++// node that left its parent. A consumer told about that node alone would keep
++// every descendant's identity resolvable after the DOM those identities
++// described is gone, which is the exact shape of a stale handle that still
++// answers.
++//
++// Only nodes that already carry a DOM node id are reported. An id is assigned
++// the first time anything asks for one, so a node without one has never been
++// named to anybody and can appear in no consumer's records - and asking here
++// would assign ids to a subtree on its way out.
++void AppendRemovedSubtree(Node* removed, std::vector<int>& out) {
++  if (!removed) {
++    return;
++  }
++  for (Node& node : NodeTraversal::InclusiveDescendantsOf(*removed)) {
++    if (const DOMNodeId id = DOMNodeIds::ExistingIdForNode(&node)) {
++      out.push_back(static_cast<int>(id));
++    }
++  }
++}
++
++}  // namespace
++
++class WebDomMutationObserverImpl::ObserverCallback
++    : public MutationObserver::Delegate {
++ public:
++  ObserverCallback(Document& document,
++                   WebDomMutationObserver::Callback callback)
++      : document_(document),
++        mutation_observer_(MutationObserver::Create(this)),
++        callback_(std::move(callback)) {
++    // The whole tree, every kind of change. A narrower registration would be
++    // a decision about which mutations matter, and that decision belongs to
++    // the consumer rather than to this bridge.
++    //
++    // documentElement, not Document, is the target. Observing Document with
++    // subtree is spec-legal and is what a script typically writes, but a
++    // C++ observer on Document is easy to leave attached to the Document
++    // node while every later mutation is a descendant of <html>. Targeting
++    // the element the mutations actually live under is the same coverage
++    // with one less way to miss them. A document with no element yet falls
++    // back to the Document node so the first insertion is still seen.
++    MutationObserverInit* init = MutationObserverInit::Create();
++    init->setChildList(true);
++    init->setSubtree(true);
++    init->setAttributes(true);
++    init->setCharacterData(true);
++    Node* target = document_->documentElement();
++    if (!target) {
++      target = document_;
++    }
++    mutation_observer_->observe(target, init, ASSERT_NO_EXCEPTION);
++  }
++
++  ExecutionContext* GetExecutionContext() const override {
++    return document_ ? document_->GetExecutionContext() : nullptr;
++  }
++
++  void Deliver(const MutationRecordVector& records,
++               MutationObserver&) override {
++    if (callback_.is_null()) {
++      return;
++    }
++    std::vector<WebDomMutation> mutations;
++    mutations.reserve(records.size());
++    for (const auto& record : records) {
++      WebDomMutation mutation;
++      Node* target = record->target();
++      mutation.target_dom_node_id = DomNodeIdOf(target);
++      mutation.parent_dom_node_id =
++          target ? DomNodeIdOf(target->parentNode()) : 0;
++
++      if (record->type() == "childList") {
++        mutation.kind = WebDomMutation::Kind::kChildList;
++        if (StaticNodeList* added = record->addedNodes()) {
++          for (unsigned i = 0; i < added->length(); ++i) {
++            mutation.added_dom_node_ids.push_back(DomNodeIdOf(added->item(i)));
++          }
++        }
++        if (StaticNodeList* removed = record->removedNodes()) {
++          for (unsigned i = 0; i < removed->length(); ++i) {
++            AppendRemovedSubtree(removed->item(i),
++                                 mutation.removed_dom_node_ids);
++          }
++        }
++      } else if (record->type() == "attributes") {
++        mutation.kind = WebDomMutation::Kind::kAttributes;
++        mutation.attribute_name = WebString(record->attributeName());
++      } else {
++        mutation.kind = WebDomMutation::Kind::kCharacterData;
++      }
++      mutations.push_back(std::move(mutation));
++    }
++    callback_.Run(mutations);
++  }
++
++  void Disconnect() {
++    mutation_observer_->disconnect();
++    callback_.Reset();
++  }
++
++  void FlushPending() {
++    if (callback_.is_null() || !mutation_observer_) {
++      return;
++    }
++    const MutationRecordVector records = mutation_observer_->takeRecords();
++    if (!records.empty()) {
++      Deliver(records, *mutation_observer_);
++    }
++  }
++
++  void Trace(Visitor* visitor) const override {
++    visitor->Trace(document_);
++    visitor->Trace(mutation_observer_);
++    MutationObserver::Delegate::Trace(visitor);
++  }
++
++ private:
++  Member<Document> document_;
++  Member<MutationObserver> mutation_observer_;
++  WebDomMutationObserver::Callback callback_;
++};
++
++WebDomMutationObserver* WebDomMutationObserver::Create(
++    const WebDocument& document,
++    WebDomMutationObserver::Callback callback) {
++  Document* core_document = document;
++  // A document with no execution context cannot activate a MutationObserver.
++  // That is the initial empty document of a window.open, not a loaded page,
++  // and returning null is the honest answer rather than CHECKing — a CHECK
++  // here crashes the renderer the moment a page opens a popup.
++  if (!core_document || !core_document->GetExecutionContext()) {
++    return nullptr;
++  }
++  return MakeGarbageCollected<WebDomMutationObserverImpl>(
++      base::PassKey<WebDomMutationObserver>(), *core_document,
++      std::move(callback));
++}
++
++WebDomMutationObserverImpl::WebDomMutationObserverImpl(
++    base::PassKey<WebDomMutationObserver>,
++    Document& document,
++    WebDomMutationObserver::Callback callback) {
++  mutation_callback_ =
++      MakeGarbageCollected<ObserverCallback>(document, std::move(callback));
++}
++
++WebDomMutationObserverImpl::~WebDomMutationObserverImpl() = default;
++
++void WebDomMutationObserverImpl::Disconnect() {
++  if (mutation_callback_) {
++    mutation_callback_->Disconnect();
++    mutation_callback_ = nullptr;
++  }
++  self_keep_alive_.Clear();
++}
++
++void WebDomMutationObserverImpl::FlushPending() {
++  if (mutation_callback_) {
++    mutation_callback_->FlushPending();
++  }
++}
++
++void WebDomMutationObserverImpl::Trace(Visitor* visitor) const {
++  visitor->Trace(mutation_callback_);
++}
++
++}  // namespace blink
+diff --git a/third_party/blink/renderer/core/exported/web_dom_mutation_observer_impl.h b/third_party/blink/renderer/core/exported/web_dom_mutation_observer_impl.h
+new file mode 100644
+index 0000000000000..9a368886b1aa9
+--- /dev/null
++++ b/third_party/blink/renderer/core/exported/web_dom_mutation_observer_impl.h
+@@ -0,0 +1,48 @@
++// Copyright 2026 The TaffyGo Authors
++// Use of this source code is governed by a BSD-style license that can be found
++// in the LICENSE file.
++
++#ifndef THIRD_PARTY_BLINK_RENDERER_CORE_EXPORTED_WEB_DOM_MUTATION_OBSERVER_IMPL_H_
++#define THIRD_PARTY_BLINK_RENDERER_CORE_EXPORTED_WEB_DOM_MUTATION_OBSERVER_IMPL_H_
++
++#include "base/types/pass_key.h"
++#include "third_party/blink/public/web/web_dom_mutation_observer.h"
++#include "third_party/blink/renderer/core/core_export.h"
++#include "third_party/blink/renderer/platform/heap/garbage_collected.h"
++#include "third_party/blink/renderer/platform/heap/member.h"
++#include "third_party/blink/renderer/platform/heap/self_keep_alive.h"
++
++namespace blink {
++
++class Document;
++
++class CORE_EXPORT WebDomMutationObserverImpl final
++    : public GarbageCollected<WebDomMutationObserverImpl>,
++      public WebDomMutationObserver {
++ public:
++  WebDomMutationObserverImpl(base::PassKey<WebDomMutationObserver>,
++                             Document&,
++                             WebDomMutationObserver::Callback);
++  WebDomMutationObserverImpl(const WebDomMutationObserverImpl&) = delete;
++  WebDomMutationObserverImpl& operator=(const WebDomMutationObserverImpl&) =
++      delete;
++  ~WebDomMutationObserverImpl() override;
++
++  // WebDomMutationObserver implementation.
++  void Disconnect() override;
++  void FlushPending() override;
++
++  void Trace(Visitor*) const;
++
++ private:
++  class ObserverCallback;
++
++  Member<ObserverCallback> mutation_callback_;
++
++  // WebDomMutationObserverImpl must remain alive until Disconnect() is called.
++  SelfKeepAlive<WebDomMutationObserverImpl> self_keep_alive_{this};
++};
++
++}  // namespace blink
++
++#endif  // THIRD_PARTY_BLINK_RENDERER_CORE_EXPORTED_WEB_DOM_MUTATION_OBSERVER_IMPL_H_

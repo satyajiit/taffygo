@@ -1,0 +1,18 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# No addresses yet: review falls through to ../../OWNERS. See that file.
+#
+# This directory parses bytes an untrusted party wrote, which is the reason it
+# runs in a sandbox at all. Two properties are held by hand here and nowhere
+# else, and both need a second reader:
+#
+#   media_tool_service.cc  Admit() is the only gate. Everything it refuses is
+#                          authority this process would otherwise hold.
+#   media_probe.cc         the reading carries numbers and never a string, so
+#                          no container-controlled value crosses back.
+per-file media_tool_service*=file://ipc/SECURITY_OWNERS
+per-file media_probe*=file://ipc/SECURITY_OWNERS

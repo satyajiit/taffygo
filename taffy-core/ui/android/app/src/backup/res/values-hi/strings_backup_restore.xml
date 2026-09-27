@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<resources>
+    <string name="taffy_backup_recovery_review">बीच में रुकी बहाली की समीक्षा करें</string>
+    <string name="taffy_backup_recovery_help">इस प्रोफ़ाइल में बीच में रुकी बहाली की जाँच करें। उसके सहेजे गए परिणाम की समीक्षा के लिए रिकवरी कुंजी की ज़रूरत नहीं है। इससे बहाली दोबारा नहीं होती और न ही आपकी ओर से रखने या हटाने का विकल्प चुना जाता है।</string>
+    <string name="taffy_backup_recovery_checking">बहाली के सहेजे गए रिकॉर्ड और उसके परिणाम की जाँच हो रही है…</string>
+    <string name="taffy_backup_recovery_saved_review">यह समीक्षा बहाली के सहेजे गए रिकॉर्ड पर आधारित है। ये गिनतियाँ सहेजे गए चयन की हैं, अंदर के डेटा की जाँच नहीं हैं। प्रोफ़ाइल रखने या हटाने के लिए आपको फिर से चुनना होगा।</string>
+    <string name="taffy_backup_recovery_none">इस प्रोफ़ाइल में बीच में रुकी कोई बहाली नहीं मिली।</string>
+    <string name="taffy_backup_recovery_source_unavailable">उस प्रोफ़ाइल पर लौटें जहाँ आपने बहाली शुरू की थी और उसके तैयार होने पर फिर कोशिश करें। बहाली के लिए कोई नया विकल्प नहीं चुना गया।</string>
+    <string name="taffy_backup_recovery_unavailable">TaffyGo बीच में रुकी बहालियों की जाँच नहीं कर सका। कोई नया विकल्प नहीं चुना गया। यह प्रोफ़ाइल तैयार होने पर फिर कोशिश करें।</string>
+    <string name="taffy_backup_recovery_already_kept">पहले की बहाली पहले ही रखी जा चुकी थी। उसकी प्रोफ़ाइल, प्रोफ़ाइल सूची में उपलब्ध है। आपकी मौजूदा प्रोफ़ाइल नहीं बदली है।</string>
+    <string name="taffy_backup_recovery_already_discarded">पहले की बहाली पहले ही हटाई जा चुकी थी और उसकी नई प्रोफ़ाइल अब मौजूद नहीं है। आपकी मौजूदा प्रोफ़ाइल और बैकअप फ़ाइल नहीं बदली हैं।</string>
+    <string name="taffy_backup_recovery_closed">समीक्षा बंद कर दी गई। समीक्षा बंद करने से बहाली दोहराई, रखी या हटाई नहीं जाती।</string>
+    <string name="taffy_backup_recovery_precommit">सहेजा गया रिकॉर्ड बहाली पूरी होने की पुष्टि नहीं करता। इस रिकॉर्ड से TaffyGo रखने या हटाने का विकल्प नहीं दे सकता। उसे पूरा करने के लिए बहाली दोबारा न करें।</string>
+    <string name="taffy_backup_recovery_details_missing">समीक्षा के सहेजे गए विवरण नहीं मिले। उनके बिना TaffyGo रखने या हटाने का विकल्प नहीं दे सकता। बहाली दोबारा न करें।</string>
+    <string name="taffy_backup_recovery_format_mismatch">बहाली का सहेजा गया डेटा ऐसे प्रारूप में है जिसे यह संस्करण सुरक्षित रूप से जाँच नहीं सकता। रखने या हटाने का विकल्प उपलब्ध नहीं है। बहाली दोबारा न करें।</string>
+    <string name="taffy_backup_recovery_unknown">TaffyGo पहले की बहाली का परिणाम तय नहीं कर सका। रखने या हटाने का विकल्प उपलब्ध नहीं है। उसे पूरा करने के लिए बहाली दोबारा न करें।</string>
+    <string name="taffy_backup_recovery_busy_or_changed">सहेजी गई बहाली अभी उपयोग में है, बदल गई है या उसकी सुरक्षित जाँच नहीं हो सकी। रखने या हटाने का विकल्प उपलब्ध नहीं है। यह प्रोफ़ाइल तैयार होने पर फिर समीक्षा करें।</string>
+    <string name="taffy_backup_restore">बैकअप बहाल करें</string>
+    <string name="taffy_backup_restore_help">बैकअप की सामग्री एक नई प्रोफ़ाइल में बहाल करें। आपकी मौजूदा प्रोफ़ाइल अलग रहती है। कुछ भी बहाल होने से पहले आप सहेजे गए चुनाव की समीक्षा करते हैं।</string>
+    <string name="taffy_backup_restore_profile_name">बहाल की गई प्रोफ़ाइल</string>
+    <string name="taffy_backup_restore_name_label">नई प्रोफ़ाइल का नाम</string>
+    <string name="taffy_backup_restore_name_count">%1$d / %2$d</string>
+    <string name="taffy_backup_restore_file_checked">फ़ाइल आपकी रिकवरी कुंजी से जाँची गई। आगे बढ़ने के लिए उसमें सहेजे गए चुनाव की समीक्षा करें।</string>
+    <string name="taffy_backup_restore_review">बैकअप की समीक्षा करें</string>
+    <string name="taffy_backup_restore_review_title">समीक्षा करें कि क्या बहाल होगा</string>
+    <string name="taffy_backup_restore_target_named">जगह: %1$s (नई प्रोफ़ाइल)</string>
+    <string name="taffy_backup_restore_selection">सहेजा गया चुनाव</string>
+    <string name="taffy_backup_restore_count">%1$s: %2$d</string>
+    <string name="taffy_backup_restore_creates">बहाल की जाने वाली चीज़ें: %1$d</string>
+    <string name="taffy_backup_restore_deletions">सहेजे गए हटाने के चुनाव: %1$d</string>
+    <string name="taffy_backup_restore_unchanged">पहले से मौजूद चीज़ें: %1$d</string>
+    <string name="taffy_backup_restore_newer">रखी जाने वाली नई चीज़ें: %1$d</string>
+    <string name="taffy_backup_restore_blocked">हटाई हुई रहने वाली चीज़ें: %1$d</string>
+    <string name="taffy_backup_restore_conflicts">एक और चुनाव चाहने वाली चीज़ें: %1$d</string>
+    <string name="taffy_backup_restore_conflict_help">इस चुनाव को बहाल करने से पहले एक और चुनाव चाहिए। कुछ बहाल नहीं किया गया है।</string>
+    <string name="taffy_backup_restore_prepare">चुनाव की पुष्टि करके तैयार करें</string>
+    <string name="taffy_backup_restore_planning">सहेजा गया चुनाव पढ़ा जा रहा है और नई प्रोफ़ाइल तैयार हो रही है…</string>
+    <string name="taffy_backup_restore_staging">चुनी गई सामग्री तैयार और जाँची जा रही है…</string>
+    <string name="taffy_backup_restore_staged">चुनी गई सामग्री तैयार और जाँची जा चुकी है। क्या इसे नई प्रोफ़ाइल में बहाल करें?</string>
+    <string name="taffy_backup_restore_commit">नई प्रोफ़ाइल में बहाल करें</string>
+    <string name="taffy_backup_restore_committing">चुनी गई सामग्री बहाल हो रही है। यह चरण रद्द नहीं किया जा सकता…</string>
+    <string name="taffy_backup_restore_candidate">चुनी गई सामग्री बहाल और जाँची गई। नई प्रोफ़ाइल अभी छिपी हुई है। इस परिणाम की समीक्षा करके चुनें कि उसे रखना है या मिटाना है।</string>
+    <string name="taffy_backup_restore_keep">यह प्रोफ़ाइल रखें</string>
+    <string name="taffy_backup_restore_discard">यह प्रोफ़ाइल मिटाएँ</string>
+    <string name="taffy_backup_restore_discard_title">नई प्रोफ़ाइल मिटाएँ?</string>
+    <string name="taffy_backup_restore_discard_help">इससे केवल नई प्रोफ़ाइल मिटती है। आपकी मौजूदा प्रोफ़ाइल और बैकअप फ़ाइल नहीं बदलते।</string>
+    <string name="taffy_backup_restore_back_to_review">समीक्षा पर वापस जाएँ</string>
+    <string name="taffy_backup_restore_resolving">आपका चुनाव पूरा किया जा रहा है और परिणाम जाँचा जा रहा है…</string>
+    <string name="taffy_backup_restore_choice_not_completed">आपका चुनाव पूरा नहीं हुआ। नई प्रोफ़ाइल अभी छिपी हुई है। तैयार होने पर आप फिर से चुन सकते हैं।</string>
+    <string name="taffy_backup_restore_kept">बहाल की गई प्रोफ़ाइल अब प्रोफ़ाइल सूची में उपलब्ध है। आपकी मौजूदा प्रोफ़ाइल नहीं बदली है।</string>
+    <string name="taffy_backup_restore_discarded">नई प्रोफ़ाइल मिटा दी गई। आपकी मौजूदा प्रोफ़ाइल और बैकअप फ़ाइल नहीं बदले गए।</string>
+    <string name="taffy_backup_restore_not_committed">कुछ भी बहाल नहीं हुआ। नई प्रोफ़ाइल अभी छिपी हुई है और उसे साफ़ करना बाकी है। आप उसे नीचे मिटा सकते हैं। आपकी मौजूदा प्रोफ़ाइल नहीं बदली गई।</string>
+    <string name="taffy_backup_restore_needs_review">TaffyGo परिणाम की पुष्टि नहीं कर सका। आपकी मौजूदा प्रोफ़ाइल नहीं बदली गई। इसे पूरा करने की कोशिश में बहाली दोबारा न चलाएँ।</string>
+    <string name="taffy_backup_restore_refused">यह बैकअप बहाली के लिए तैयार नहीं किया जा सका। कोई बहाल प्रोफ़ाइल उपलब्ध नहीं है।</string>
+    <string name="taffy_backup_restore_stopped">बहाली की तैयारी रोक दी गई। आपकी मौजूदा प्रोफ़ाइल और बैकअप फ़ाइल नहीं बदले गए।</string>
+</resources>

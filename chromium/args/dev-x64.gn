@@ -1,0 +1,132 @@
+# TaffyGo GN args profile: dev-x64 — the fastest daily loop, on the x86-64
+# emulator (decision 0013, docs/development/chromium-fork-and-build.md §3).
+#
+# Committed profile. Never hand-edit GN args in a checkout: edit this file,
+# send a PR, and re-run `./tools/chromium/build --profile dev-x64`, which
+# writes this file to out/dev-x64/args.gn and re-runs `gn gen`.
+#
+# Every line marked `VERIFY AT SP-01` is an argument whose existence or
+# spelling has not been confirmed against the pinned milestone, because no
+# Chromium checkout exists on the host that wrote this file. `gn gen` fails
+# loudly on an argument it does not recognise, which is the failure mode
+# worth having: an unrecognised flag stops the build instead of silently
+# doing nothing. Each resolution lands as a one-line answer in
+# docs/development/chromium-fork-and-build.md §6.
+
+target_os = "android"
+target_cpu = "x64"
+taffy_enable_python_runtime = true
+taffy_capability_profile = "development"
+
+# The de-Google and size posture shared by every profile (decision 0019).
+# Resolves through the product-root mount; a checkout without //taffy fails
+# `gn gen` loudly here, by design. Citations live in the fragment.
+import("//taffy/build/args/common.gni")
+
+is_debug = false
+dcheck_always_on = true
+
+# Component build is impossible on Android, so the desktop dev-loop advice
+# does not transfer to this target.
+#
+# `//build/config/BUILDCONFIG.gn` asserts
+# `!(current_os == "android" && is_component_build)` — "Can't use component
+# build on Android". Every TaffyGo profile targets Android, so a profile that
+# set this true would be a profile on which `gn gen` cannot succeed.
+# `./tools/check fast` gates it as a hard failure for that reason.
+#
+# The remaining Android dev-loop wins are symbol_level = 0 and incremental
+# install, both below.
+#
+# CONFIRMED at SP-01 (2026-08-17, milestone 152): the assertion is present in
+# build/config/BUILDCONFIG.gn, and it is not theoretical — a profile carrying
+# `is_component_build = true` failed `gn gen` outright with "Can't use
+# component build on Android". Both dev profiles carried it until that run.
+is_component_build = false
+
+symbol_level = 0
+
+# --- Static analysis (Android Lint, Error Prone, dependency checks) ---------
+#
+# This line is what makes `./tools/chromium/build` a gate rather than a report.
+#
+# `build/config/android/config.gni` resolves the unset value to
+# `"build_server"` for any non-official build, and in that mode
+# `build/android/gyp/util/server_utils.py` hands lint, Error Prone,
+# `check_for_missing_direct_deps` and TraceReferences to
+# `build/android/fast_local_dev_server.py`, touches the stamp file so the build
+# step completes, and returns. autoninja then exits **before** any of that work
+# has run, so a failure in it cannot reach the command's exit code. Two runs on
+# this builder's own disk show what that looks like: `out/dev-arm64/
+# buildserver.log.3` records `FAILED: //chrome/android:chrome_public_apk__lint`
+# and `buildserver.log.1` records a failed Error Prone compile of
+# `shell_java`, both from builds whose wrapper had already printed success.
+#
+# `"on"` runs the same work as ordinary ninja actions instead. Nothing is
+# skipped and nothing is added — the analysis was always going to run; what
+# changes is that the build waits for it and fails on it. Measured cost is in
+# docs/development/chromium-fork-and-build.md section 6 item 18.
+#
+# Do not reach for `INVOKED_BY_BUILD_SERVER=1` as an alternative. It does force
+# the work inline, but `server_utils.MaybeTouch()` then deliberately skips
+# writing the stamp, and Siso reports a missing local output that reads like a
+# lint failure and is not one.
+#
+# `"off"` is the third accepted value and would be the wrong one here: it
+# removes the analysis rather than its asynchrony. It is also not simply the
+# inverse of this line — `enable_r8_tracerefs` is declared from the *raw*
+# argument, so writing `"off"` explicitly turns TraceReferences off as well,
+# which is why the release profile leaves the argument unset instead.
+#
+# `./tools/check fast --only chromium` requires this line in both dev profiles,
+# and `./tools/chromium/build` re-checks the graph it just generated, so the
+# two halves of the claim are checked on different hosts.
+android_static_analysis = "on"
+
+# CONFIRMED at SP-01 (milestone 152): the argument exists and is spelled this
+# way, and the flow behaves as intended — the build emitted
+# apks/ChromePublic_incremental.apk and its .idsig, and no plain APK.
+incremental_install = true
+
+# --- Caching (decision 0013 §"Build acceleration") --------------------------
+#
+# Three layers, and only two of them are GN's business:
+#
+#   1. Siso's local cache, enabled on every machine. `use_siso` is the GN-side
+#      lever; the cache's size and location are Siso's own configuration, set
+#      once by `./tools/bootstrap --profile chromium`. Do not look for them
+#      here — an args file is not where a cache directory belongs, because it
+#      would then be identical on every machine that shares this profile.
+#   2. ccache as the clang warm-rebuild layer, below.
+#   3. sccache for Rust, which is a `RUSTC_WRAPPER` environment variable on
+#      the Cargo host loop and is deliberately absent from this file: the GN
+#      build uses Chromium's own pinned Rust toolchain and its own cache.
+#
+# CONFIRMED at SP-01 (milestone 152): `use_siso` still exists, declared in
+# build/toolchain/siso.gni, where it already defaults to true — so this line
+# states the default explicitly rather than changing anything. Siso ran the
+# build. Keep it as an explicit statement of intent, not as a lever.
+use_siso = true
+
+# MEASURED at SP-01 (milestone 152), and the result is poor: ccache runs under
+# Siso, but 39,931 of the build's 44,338 compiler invocations (90.06%) were
+# uncacheable, every one reported as "Could not use modules" — Chromium
+# compiles Android targets with C++ modules that ccache 4.9.1 will not handle.
+# Siso was never the obstacle; the module flags are.
+#
+# This document's own instruction for the incompatible case is to delete this
+# line without replacement, since Siso's local cache remains either way. That
+# call is deliberately NOT made here: the 9.94% that is cacheable has never
+# been measured warm, because a cold cache cannot hit. Decide it with a
+# warm-rebuild number. The call is registered as OD-075 (decide by M1); see
+# docs/open-decisions.md and docs/development/chromium-fork-and-build.md
+# section 6 item 2 — do not leave this line in place on the assumption that it
+# is helping.
+cc_wrapper = "ccache"
+
+# Google's remote execution is not available to forks. Self-hosted RBE is
+# enabled in the CI profile only, and only past ~3 Chromium engineers
+# (decision 0013). `./tools/check fast` fails on `true` in any profile.
+use_remoteexec = false
+
+import("//taffy/build/args/credits.gni")

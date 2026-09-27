@@ -1,0 +1,602 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taffygo.com/schema/release-manifest/2",
+  "title": "TaffyGo release artifact manifest",
+  "description": "The machine-readable evidence record that accompanies every CI and release artifact. Field authority: docs/development/testing-and-delivery.md section 13. Signing separation is PAR-SEC-004; the dependency inventory is PAR-SEC-010; the Chromium provenance fields are PAR-SEC-002.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "generator",
+    "release",
+    "source",
+    "chromium",
+    "build",
+    "toolchain",
+    "platform",
+    "artifacts",
+    "dependencies",
+    "signing",
+    "provenance",
+    "tests",
+    "approvals"
+  ],
+  "x-profiles": {
+    "development": [],
+    "drill": [
+      "/release/package_id",
+      "/release/version_name",
+      "/release/version_code",
+      "/security_drill",
+      "/security_drill/record_path",
+      "/security_drill/detection_to_artifact_seconds",
+      "/chromium/security_patch_level",
+      "/signing/certificate/sha256_fingerprint",
+      "/dependencies/sbom/path"
+    ],
+    "candidate": [
+      "/release/package_id",
+      "/release/version_name",
+      "/release/version_code",
+      "/release/promotable",
+      "/signing/certificate/sha256_fingerprint",
+      "/signing/certificate/subject",
+      "/provenance/path",
+      "/provenance/invocation/run_id",
+      "/dependencies/sbom/path",
+      "/dependencies/license_inventory/path",
+      "/dependencies/vulnerability_scan/ran_at",
+      "/dependencies/vulnerability_scan/path",
+      "/tests/corpus_version",
+      "/tests/benchmark_baseline",
+      "/tests/benchmark_evidence",
+      "/tests/benchmark_evidence_sha256",
+      "/tests/benchmark_runs",
+      "/tests/benchmark_scenarios",
+      "/tests/benchmark_measured",
+      "/tests/benchmark_approved",
+      "/tests/device_matrix_id",
+      "/identity/capability_profile/name",
+      "/identity/capability_profile/projection_sha256",
+      "/identity/capability_profile/configuration_fingerprint",
+      "/identity/capability_profile/accepted_milestone",
+      "/identity/capability_profile/delegated_task_start",
+      "/identity/capability_profile/task_milestone",
+      "/identity/capability_profile/policy_milestone",
+      "/identity/evidence_index/path",
+      "/identity/evidence_index/sha256",
+      "/identity/evidence_index/source_revision",
+      "/rollback/result",
+      "/rollback/record_path",
+      "/rollback/record_sha256",
+      "/platform/sixteen_kb_alignment"
+    ]
+  },
+  "properties": {
+    "schema_version": {
+      "const": 2,
+      "x-remediation": "Set \"schema_version\": 2. The manifest generator writes it; a hand-edited manifest is not evidence."
+    },
+    "generated_at": {
+      "$ref": "#/$defs/timestamp",
+      "x-remediation": "Set \"generated_at\" to the UTC instant the manifest was assembled, in RFC 3339."
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "command"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "command": { "type": "string", "minLength": 1 },
+        "host": { "type": "string" }
+      },
+      "x-remediation": "Record which command produced this manifest: ./tools/release manifest."
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "environment"],
+      "properties": {
+        "kind": {
+          "enum": ["development", "drill", "candidate"],
+          "x-remediation": "Set \"release.kind\" to development, drill, or candidate. It selects which fields are mandatory; see the x-profiles block of this schema."
+        },
+        "package_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)+$",
+          "x-remediation": "Record the Android application id the artifact declares, read from the built package — never typed in."
+        },
+        "version_name": { "type": "string", "minLength": 1 },
+        "version_code": { "type": "integer", "minimum": 1 },
+        "environment": {
+          "enum": ["local", "internal-validation", "staging", "production"],
+          "x-remediation": "Name the verification environment from docs/development/testing-and-delivery.md section 10."
+        },
+        "promotable": {
+          "type": "boolean",
+          "x-remediation": "Record whether this exact artifact may be promoted. Development and drill artifacts say false; only a complete candidate may say true."
+        },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taffy"],
+      "properties": {
+        "taffy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["revision", "dirty"],
+          "properties": {
+            "revision": {
+              "$ref": "#/$defs/git_sha",
+              "x-remediation": "Record the full 40-character commit of this repository that produced the artifact."
+            },
+            "dirty": {
+              "type": "boolean",
+              "x-remediation": "Assert the working tree state. A release-candidate build asserts false; a true value must be explained in release.notes."
+            },
+            "branch": { "type": "string" },
+            "remote": { "type": "string" }
+          }
+        }
+      }
+    },
+    "chromium": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["milestone", "tag", "commit", "security_patch_level", "patch_queue", "depot_tools_revision"],
+      "properties": {
+        "milestone": { "type": "string", "minLength": 1 },
+        "tag": { "type": "string", "minLength": 1 },
+        "commit": {
+          "$ref": "#/$defs/git_sha",
+          "x-remediation": "Read the upstream commit from chromium/REVISION; it is the only pin a build may resolve."
+        },
+        "security_patch_level": {
+          "type": "integer",
+          "minimum": 0,
+          "x-remediation": "Read \"level\" from chromium/SECURITY_PATCH_LEVEL. The urgent-security fast path bumps it (chromium-fork-and-build section 1.4)."
+        },
+        "security_advisories": { "type": "array", "items": { "type": "string" } },
+        "patch_queue": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count", "modified_upstream_lines", "digest"],
+          "properties": {
+            "count": { "type": "integer", "minimum": 0 },
+            "modified_upstream_lines": { "type": "integer", "minimum": 0 },
+            "digest": {
+              "$ref": "#/$defs/sha256",
+              "x-remediation": "The patch-queue digest is the ordered hash of every file under chromium/patches/. Without it the checkout is not reproducible from the manifest."
+            },
+            "security_count": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "depot_tools_revision": { "type": "string", "minLength": 1 }
+      }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "args_digest", "hermetic", "host", "caches"],
+      "properties": {
+        "profile": {
+          "enum": ["dev-x64", "dev-arm64", "release-arm64"],
+          "x-remediation": "Name one of the committed profiles in chromium/args/. GN args are never typed by hand (decision 0013)."
+        },
+        "args_digest": {
+          "$ref": "#/$defs/sha256",
+          "x-remediation": "Hash the committed args profile the build used, so a manifest cannot claim a configuration the repository does not contain."
+        },
+        "hermetic": {
+          "type": "boolean",
+          "x-remediation": "The release lane builds without caches by design (decision 0013 lane table); assert that here."
+        },
+        "host": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["os", "arch"],
+          "properties": {
+            "os": { "type": "string", "minLength": 1 },
+            "arch": { "type": "string", "minLength": 1 },
+            "runner": { "type": "string" },
+            "image_digest": { "type": "string" }
+          }
+        },
+        "caches": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "siso": { "$ref": "#/$defs/cache" },
+            "ccache": { "$ref": "#/$defs/cache" },
+            "sccache": { "$ref": "#/$defs/cache" }
+          },
+          "x-remediation": "Record each cache layer's configuration and hit rate, or its enabled:false state. A hermetic build records all three as disabled."
+        },
+        "started_at": { "$ref": "#/$defs/timestamp" },
+        "finished_at": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "toolchain": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["component", "version", "owner_file"],
+        "properties": {
+          "component": { "type": "string", "minLength": 1 },
+          "version": { "type": "string", "minLength": 1 },
+          "owner_file": { "type": "string", "minLength": 1 }
+        }
+      },
+      "x-remediation": "Every toolchain row comes from its machine owner file behind TOOLCHAIN.md. Regenerate with ./tools/release manifest rather than editing rows."
+    },
+    "platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min_sdk", "target_sdk", "compile_sdk", "abis"],
+      "properties": {
+        "min_sdk": { "type": "integer", "minimum": 1 },
+        "target_sdk": { "type": "integer", "minimum": 1 },
+        "compile_sdk": { "type": "integer", "minimum": 1 },
+        "abis": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "sixteen_kb_alignment": {
+          "enum": ["pass", "fail", "not-measured"],
+          "x-remediation": "Every packaged native library must be checked for 16 KiB page alignment on the release lane; \"not-measured\" is not acceptable for a candidate."
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "kind", "sha256", "size_bytes"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "kind": {
+            "enum": ["apk", "test-apk", "bundle", "mapping", "symbols", "sbom", "license-inventory", "vulnerability-report", "test-report", "benchmark-report", "benchmark-run", "evidence-index", "rollback-evidence", "trace", "provenance", "drill-record"],
+            "x-remediation": "Classify each artifact. The verifier looks for the required kinds by name, not by filename."
+          },
+          "sha256": { "$ref": "#/$defs/sha256" },
+          "size_bytes": { "type": "integer", "minimum": 0 },
+          "abi": { "type": "string" }
+        }
+      },
+      "x-remediation": "List every uploaded file with its digest and size. An artifact absent from this list is unattested and must not be promoted."
+    },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lock_digests", "sbom", "license_inventory", "vulnerability_scan"],
+      "properties": {
+        "lock_digests": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["file", "sha256"],
+            "properties": {
+              "file": { "type": "string", "minLength": 1 },
+              "sha256": { "$ref": "#/$defs/sha256" }
+            }
+          },
+          "x-remediation": "Hash every committed lockfile: Cargo.lock, pnpm-lock.yaml, and the Gradle version catalog."
+        },
+        "sbom": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["format", "spec_version", "ecosystems"],
+          "properties": {
+            "format": { "const": "CycloneDX" },
+            "spec_version": { "type": "string", "minLength": 1 },
+            "path": { "type": "string" },
+            "sha256": { "$ref": "#/$defs/sha256" },
+            "component_count": { "type": "integer", "minimum": 0 },
+            "ecosystems": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/$defs/ecosystem" },
+              "x-remediation": "Every ecosystem this repository owns reports its own coverage. Generate with ./tools/release sbom; PAR-SEC-010 requires it from M1."
+            }
+          }
+        },
+        "license_inventory": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["unresolved"],
+          "properties": {
+            "path": { "type": "string" },
+            "sha256": { "$ref": "#/$defs/sha256" },
+            "entry_count": { "type": "integer", "minimum": 0 },
+            "unresolved": {
+              "type": "integer",
+              "minimum": 0,
+              "x-remediation": "Count the components whose license text could not be resolved. A candidate ships only at zero; the notices file is built from this inventory."
+            }
+          }
+        },
+        "vulnerability_scan": {
+          "type": "object",
+          "additionalProperties": false,
+          "x-remediation": "Record the dependency vulnerability scan: which tool, when, and what it found. A development artifact records status \"not-run\" and says so; a release candidate cannot (testing-and-delivery section 9.5). This repository pins no scanner, so the job that runs one supplies this fragment.",
+          "required": ["tool", "status"],
+          "properties": {
+            "tool": { "type": "string", "minLength": 1 },
+            "status": { "enum": ["clean", "findings", "not-run"] },
+            "ran_at": { "$ref": "#/$defs/timestamp" },
+            "findings": { "type": "integer", "minimum": 0 },
+            "path": { "type": "string" }
+          }
+        }
+      }
+    },
+    "signing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["separation", "credential_source", "long_lived_token"],
+      "properties": {
+        "separation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["build_job", "signing_job", "distinct"],
+          "properties": {
+            "build_job": { "type": "string", "minLength": 1 },
+            "signing_job": { "type": "string", "minLength": 1 },
+            "distinct": {
+              "const": true,
+              "x-remediation": "PAR-SEC-004: no single job both builds and signs. An unsigned artifact satisfies this trivially; a signed one names two different jobs with different permissions, which ./tools/release verify checks."
+            }
+          }
+        },
+        "credential_source": {
+          "enum": ["oidc", "hardware-custody", "none"],
+          "x-remediation": "Decision 0013 requires GitHub OIDC federation; a checked-in or long-lived credential is prohibited. \"none\" is only valid for an unsigned development artifact."
+        },
+        "long_lived_token": {
+          "const": false,
+          "x-remediation": "A long-lived deploy or signing token is prohibited (decision 0013). Move the job to OIDC federation before producing an artifact."
+        },
+        "certificate": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sha256_fingerprint": { "$ref": "#/$defs/sha256" },
+            "subject": { "type": "string" },
+            "custody": { "type": "string" }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["predicate_type", "builder_id", "invocation"],
+      "properties": {
+        "predicate_type": { "type": "string", "minLength": 1 },
+        "builder_id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "invocation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["workflow", "repository", "ref", "sha"],
+          "properties": {
+            "workflow": { "type": "string", "minLength": 1 },
+            "repository": { "type": "string", "minLength": 1 },
+            "ref": { "type": "string", "minLength": 1 },
+            "sha": { "$ref": "#/$defs/git_sha" },
+            "run_id": { "type": "string" },
+            "run_attempt": { "type": "string" }
+          }
+        }
+      },
+      "x-remediation": "Provenance answers who built this, from which revision, on which invocation. Without it the artifact is anonymous."
+    },
+    "tests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["suites"],
+      "properties": {
+        "corpus_version": { "type": "string" },
+        "benchmark_baseline": { "type": "string" },
+        "benchmark_evidence": { "type": "string" },
+        "benchmark_evidence_sha256": { "$ref": "#/$defs/sha256" },
+        "benchmark_runs": { "type": "integer", "minimum": 0 },
+        "benchmark_scenarios": { "type": "integer", "minimum": 0 },
+        "benchmark_measured": {
+          "type": "boolean",
+          "x-remediation": "A benchmark is evidence only after scenarios actually ran. Record true only from the measured-run adapter."
+        },
+        "benchmark_approved": {
+          "type": "boolean",
+          "x-remediation": "Record true only when the benchmark owner approved the measured report against the candidate's registered corpus and budgets."
+        },
+        "device_matrix_id": { "type": "string", "minLength": 1 },
+        "suites": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "result"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "result": { "enum": ["pass", "fail", "flaky", "skipped", "not-run"] },
+              "filter": { "type": "string" },
+              "shards": { "type": "integer", "minimum": 1 },
+              "retries": { "type": "integer", "minimum": 0 },
+              "skipped": { "type": "integer", "minimum": 0 },
+              "report_path": { "type": "string" }
+            }
+          }
+        },
+        "devices": {
+          "type": "array",
+          "x-remediation": "Record only observations tied to a ratified device-matrix row, including whether that row was approved for this candidate.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["model", "api", "matrix_row", "approved"],
+            "properties": {
+              "model": { "type": "string", "minLength": 1 },
+              "api": { "type": "integer", "minimum": 1 },
+              "abi": { "type": "string" },
+              "tier": { "enum": ["low", "mid", "high", "emulator"] },
+              "matrix_row": { "type": "string", "minLength": 1 },
+              "approved": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "capability_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "projection_sha256",
+            "configuration_fingerprint",
+            "accepted_milestone",
+            "delegated_task_start",
+            "task_milestone",
+            "policy_milestone"
+          ],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "projection_sha256": { "$ref": "#/$defs/sha256" },
+            "configuration_fingerprint": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "x-remediation": "Copy the configuration fingerprint from the generated product-capability projection; do not calculate a second identity."
+            },
+            "accepted_milestone": { "$ref": "#/$defs/milestone" },
+            "delegated_task_start": { "type": "boolean" },
+            "task_milestone": {
+              "enum": [null, "M2", "M3", "M4", "M5", "M6", "M7", "M8"]
+            },
+            "policy_milestone": {
+              "enum": [null, "M2", "M3", "M5", "M6", "M7"]
+            }
+          },
+          "x-remediation": "Attest the generated product-capability profile selected by the build so a candidate cannot expose development-only authority."
+        },
+        "evidence_index": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256", "source_revision"],
+          "properties": {
+            "path": { "type": "string", "minLength": 1 },
+            "sha256": { "$ref": "#/$defs/sha256" },
+            "source_revision": { "$ref": "#/$defs/git_sha" }
+          },
+          "x-remediation": "Attach the machine-readable evidence index for this exact source revision and record its digest."
+        }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["result", "record_path", "record_sha256"],
+      "properties": {
+        "result": { "enum": ["pass", "fail", "skipped", "not-run"] },
+        "record_path": { "type": "string", "minLength": 1 },
+        "record_sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "x-remediation": "Attach the completed rollback rehearsal record. A plan or an unrun checklist is not rollback evidence."
+    },
+    "approvals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "identity", "at"],
+        "properties": {
+          "role": { "enum": ["product", "browser", "security", "privacy", "release"] },
+          "identity": { "type": "string", "minLength": 1 },
+          "at": { "$ref": "#/$defs/timestamp" },
+          "evidence": { "type": "string" }
+        }
+      },
+      "x-remediation": "A release candidate carries named product, browser, security, privacy and release approvals (testing-and-delivery section 9.5). Development and drill artifacts carry an empty list."
+    },
+    "security_drill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["advisory", "record_path"],
+      "properties": {
+        "advisory": { "type": "string", "minLength": 1 },
+        "record_path": { "type": "string", "minLength": 1 },
+        "record_sha256": { "$ref": "#/$defs/sha256" },
+        "detection_to_artifact_seconds": { "type": "integer", "minimum": 0 },
+        "artifact_to_distribution_seconds": { "type": "integer", "minimum": 0 },
+        "objective_register_entry": { "const": "OD-052" }
+      },
+      "x-remediation": "A drill artifact carries the timing record produced by ./tools/chromium/security-patch. The measured intervals calibrate the candidate objective owned by OD-052; they never assert a service target."
+    }
+  },
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+      "x-remediation": "Timestamps are RFC 3339 with an explicit offset, for example 2026-08-17T09:30:00Z."
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "x-remediation": "Digests are lower-case hexadecimal SHA-256, 64 characters."
+    },
+    "git_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "x-remediation": "Git revisions are recorded in full, 40 hexadecimal characters — an abbreviated revision is not a pin."
+    },
+    "milestone": {
+      "enum": ["M0", "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8"]
+    },
+    "cache": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "backend": { "type": "string" },
+        "hit_rate_percent": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "ecosystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "status", "component_count"],
+      "properties": {
+        "name": { "enum": ["rust", "javascript", "gradle", "chromium", "android-native"] },
+        "status": {
+          "enum": ["complete", "partial", "unavailable", "deferred"],
+          "x-remediation": "An ecosystem reports complete, partial, unavailable or deferred. Only complete and deferred-with-owner are acceptable on a release candidate; partial and unavailable name their blocker."
+        },
+        "component_count": { "type": "integer", "minimum": 0 },
+        "evidence_command": { "type": "string" },
+        "blocker": { "type": "string" },
+        "owner": { "type": "string" },
+        "schema_version": { "type": "integer", "minimum": 1 },
+        "kind": { "type": "string", "minLength": 1 },
+        "source_revision": { "$ref": "#/$defs/git_sha" },
+        "upstream_revision": { "$ref": "#/$defs/git_sha" },
+        "profile": { "type": "string", "minLength": 1 },
+        "target": { "type": "string", "minLength": 1 },
+        "artifact": { "type": "string", "minLength": 1 },
+        "artifact_sha256": { "$ref": "#/$defs/sha256" },
+        "package_name": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

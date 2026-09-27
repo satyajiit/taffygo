@@ -1,0 +1,42 @@
+TaffyGo is a web browser with one AI assistant, called Taffy. Ask about the page you are reading, or hand over a piece of research. Every fact shows its source. Ads and trackers are blocked from the first page you open.
+
+Taffy does nothing until you ask, and you can take over at any time.
+
+Three ways to use it
+- You browse. Taffy stays out of the way.
+- Browse together. Ask about the page you are reading, or about several tabs at once.
+- Taffy browses. Hand over a piece of research and watch it work.
+
+You pick, page by page. Taffy works in its own tabs, which you can watch, touch and close. Take over whenever you want, and the task stops where it is.
+
+Setting up the assistant
+Taffy needs an AI provider before it can answer anything. On a fresh install it is not set up, and the browser works without it. Add a key from one of 38 providers, or sign in to a plan you already pay for with a provider that offers one. Your keys stay on your phone. To answer a question about a page, Taffy sends the text of that page to the provider you chose, and to nobody else. Any cost is between you and that provider.
+
+No account, and no TaffyGo server
+There is nothing to sign up for. TaffyGo runs no servers of its own, so your history, bookmarks, workspaces and keys stay on this phone, and nothing you browse or ask is sent to us.
+
+What the assistant never sees
+Passwords, one-time codes, payment details and passkeys are never sent to an AI provider. This is built in, and no setting turns it off.
+
+Taffy asks before it acts
+Before Taffy types into a form or saves a file, it stops and asks. Approve it, change it, or take over and do it yourself. When a site wants you to sign in, Taffy hands you the page. When it needs a code only you have, it asks you for it.
+
+What you get back
+Results collect in a workspace, with the source beside every fact, so you can check the answer yourself. Keep what you want in your Library.
+
+A complete browser underneath
+- The ad blocker is built into the browser and works in every tab. It uses the EasyList and EasyPrivacy rules, and you can turn it off for a site you trust.
+- Blocking works with or without an AI provider. TaffyGo is free, with no in-app purchases.
+- Tabs, bookmarks, history and downloads, including files you save from the web.
+- Private tabs, which keep no history or cookies after you close them.
+- One address bar for sites, searches and questions.
+
+Limits
+Taffy can be wrong, and pages can fail to load. It reports what it found and what it could not, and says when a task is only partly done. When it needs an answer, it asks you instead of guessing.
+
+TaffyGo has no VPN. The ad blocker works inside the browser, on the pages TaffyGo loads.
+
+Open source
+TaffyGo's code is published under the Mozilla Public License 2.0 at github.com/satyajiit/taffygo.
+
+Based on the Chromium open source project.

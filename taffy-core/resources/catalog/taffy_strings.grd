@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+The browser-process half of the TaffyGo string catalogue.
+
+Grit packs this into `taffy_strings_<locale>.pak`, which the resource bundle
+loads and browser-process C++ reads through `l10n_util::GetStringUTF16`. The
+only strings here are the ones a C++ surface renders — today, the version
+surface labels PAR-SEC-002 requires. Everything a Java or Kotlin surface
+renders is in `taffy_android_strings.grd`, and no message appears in both.
+
+Registering the generated pak with the product's resource bundle is the one
+part of this that cannot live in the overlay: the repack lists belong to
+files Chromium owns. That edit is specified in
+chromium/patches/0003-pack-taffy-string-resources.md.
+
+The outputs list every platform locale because the product's locale repack
+consumes one `taffy_strings_<locale>.pak` per locale it assembles, exactly as
+it does for every upstream catalogue in the same list. `<translations>` is
+still empty — the launch language set is `[Open (OD-060)]` — so every
+non-English pak carries the English strings through
+`fallback_to_english="true"` until .xtb files exist, and the pseudolocales
+are generated as usual.
+
+There is no `first_id` attribute here, and that is deliberate rather than an
+omission. Chromium allocates resource id ranges centrally in
+tools/gritsettings/resource_ids.spec and passes the allocated start to grit
+through its `first-ids-file` argument, precisely so that no catalogue can
+choose its own range and collide with another. Adding this catalogue to that spec is an
+upstream edit, specified in
+chromium/patches/0003-pack-taffy-string-resources.md, and until it lands grit
+has no range to give these messages.
+
+VERIFY AT SP-01: that the `first-ids-file` argument is still how a range
+reaches a catalogue at the pinned milestone, and what the next free start is.
+Upstream files to read: tools/gritsettings/resource_ids.spec and the `grit_defines`
+assembled in tools/grit/grit_rule.gni.
+-->
+<!-- `output_all_resource_defines` is deliberately absent: grit at milestone
+     152 removed the attribute and fails the parse on encountering it. This
+     file carried it from an older grit reference before any checkout
+     existed to test against. -->
+<grit latest_public_release="0" current_release="1"
+      source_lang_id="en"
+      enc_check="möl">
+  <outputs>
+    <output filename="grit/taffy_strings.h" type="rc_header">
+      <emit emit_type="prepend"></emit>
+    </output>
+    <output filename="taffy_strings_af.pak" type="data_package" lang="af" />
+    <output filename="taffy_strings_am.pak" type="data_package" lang="am" />
+    <output filename="taffy_strings_ar.pak" type="data_package" lang="ar" />
+    <output filename="taffy_strings_as.pak" type="data_package" lang="as" />
+    <output filename="taffy_strings_az.pak" type="data_package" lang="az" />
+    <output filename="taffy_strings_be.pak" type="data_package" lang="be" />
+    <output filename="taffy_strings_bg.pak" type="data_package" lang="bg" />
+    <output filename="taffy_strings_bn.pak" type="data_package" lang="bn" />
+    <output filename="taffy_strings_bs.pak" type="data_package" lang="bs" />
+    <output filename="taffy_strings_ca.pak" type="data_package" lang="ca" />
+    <output filename="taffy_strings_cs.pak" type="data_package" lang="cs" />
+    <output filename="taffy_strings_cy.pak" type="data_package" lang="cy" />
+    <output filename="taffy_strings_da.pak" type="data_package" lang="da" />
+    <output filename="taffy_strings_de.pak" type="data_package" lang="de" />
+    <output filename="taffy_strings_el.pak" type="data_package" lang="el" />
+    <output filename="taffy_strings_en-GB.pak" type="data_package" lang="en-GB" />
+    <output filename="taffy_strings_en-US.pak" type="data_package" lang="en" />
+    <output filename="taffy_strings_es.pak" type="data_package" lang="es" />
+      <output filename="taffy_strings_es-419.pak" type="data_package" lang="es-419" />
+    <output filename="taffy_strings_et.pak" type="data_package" lang="et" />
+    <output filename="taffy_strings_eu.pak" type="data_package" lang="eu" />
+    <output filename="taffy_strings_fa.pak" type="data_package" lang="fa" />
+    <output filename="taffy_strings_fi.pak" type="data_package" lang="fi" />
+    <output filename="taffy_strings_fil.pak" type="data_package" lang="fil" />
+    <output filename="taffy_strings_fr-CA.pak" type="data_package" lang="fr-CA" />
+    <output filename="taffy_strings_fr.pak" type="data_package" lang="fr" />
+    <output filename="taffy_strings_gl.pak" type="data_package" lang="gl" />
+    <output filename="taffy_strings_gu.pak" type="data_package" lang="gu" />
+    <output filename="taffy_strings_he.pak" type="data_package" lang="he" />
+    <output filename="taffy_strings_hi.pak" type="data_package" lang="hi" />
+    <output filename="taffy_strings_hr.pak" type="data_package" lang="hr" />
+    <output filename="taffy_strings_hu.pak" type="data_package" lang="hu" />
+    <output filename="taffy_strings_hy.pak" type="data_package" lang="hy" />
+    <output filename="taffy_strings_id.pak" type="data_package" lang="id" />
+    <output filename="taffy_strings_is.pak" type="data_package" lang="is" />
+    <output filename="taffy_strings_it.pak" type="data_package" lang="it" />
+    <output filename="taffy_strings_ja.pak" type="data_package" lang="ja" />
+    <output filename="taffy_strings_ka.pak" type="data_package" lang="ka" />
+    <output filename="taffy_strings_kk.pak" type="data_package" lang="kk" />
+    <output filename="taffy_strings_km.pak" type="data_package" lang="km" />
+    <output filename="taffy_strings_kn.pak" type="data_package" lang="kn" />
+    <output filename="taffy_strings_ko.pak" type="data_package" lang="ko" />
+    <output filename="taffy_strings_ky.pak" type="data_package" lang="ky" />
+    <output filename="taffy_strings_lo.pak" type="data_package" lang="lo" />
+    <output filename="taffy_strings_lt.pak" type="data_package" lang="lt" />
+    <output filename="taffy_strings_lv.pak" type="data_package" lang="lv" />
+    <output filename="taffy_strings_mk.pak" type="data_package" lang="mk" />
+    <output filename="taffy_strings_ml.pak" type="data_package" lang="ml" />
+    <output filename="taffy_strings_mn.pak" type="data_package" lang="mn" />
+    <output filename="taffy_strings_mr.pak" type="data_package" lang="mr" />
+    <output filename="taffy_strings_ms.pak" type="data_package" lang="ms" />
+    <output filename="taffy_strings_my.pak" type="data_package" lang="my" />
+    <output filename="taffy_strings_ne.pak" type="data_package" lang="ne" />
+    <output filename="taffy_strings_nl.pak" type="data_package" lang="nl" />
+    <output filename="taffy_strings_nb.pak" type="data_package" lang="no" />
+    <output filename="taffy_strings_pa.pak" type="data_package" lang="pa" />
+    <output filename="taffy_strings_pl.pak" type="data_package" lang="pl" />
+      <output filename="taffy_strings_pt-BR.pak" type="data_package" lang="pt-BR" />
+    <output filename="taffy_strings_pt-PT.pak" type="data_package" lang="pt-PT" />
+    <output filename="taffy_strings_or.pak" type="data_package" lang="or" />
+    <output filename="taffy_strings_ro.pak" type="data_package" lang="ro" />
+    <output filename="taffy_strings_ru.pak" type="data_package" lang="ru" />
+    <output filename="taffy_strings_si.pak" type="data_package" lang="si" />
+    <output filename="taffy_strings_sk.pak" type="data_package" lang="sk" />
+    <output filename="taffy_strings_sl.pak" type="data_package" lang="sl" />
+    <output filename="taffy_strings_sq.pak" type="data_package" lang="sq" />
+    <output filename="taffy_strings_sr-Latn.pak" type="data_package" lang="sr-Latn" />
+    <output filename="taffy_strings_sr.pak" type="data_package" lang="sr" />
+    <output filename="taffy_strings_sv.pak" type="data_package" lang="sv" />
+    <output filename="taffy_strings_sw.pak" type="data_package" lang="sw" />
+    <output filename="taffy_strings_ta.pak" type="data_package" lang="ta" />
+    <output filename="taffy_strings_te.pak" type="data_package" lang="te" />
+    <output filename="taffy_strings_th.pak" type="data_package" lang="th" />
+    <output filename="taffy_strings_tr.pak" type="data_package" lang="tr" />
+    <output filename="taffy_strings_uk.pak" type="data_package" lang="uk" />
+    <output filename="taffy_strings_ur.pak" type="data_package" lang="ur" />
+    <output filename="taffy_strings_uz.pak" type="data_package" lang="uz" />
+    <output filename="taffy_strings_vi.pak" type="data_package" lang="vi" />
+    <output filename="taffy_strings_zh-CN.pak" type="data_package" lang="zh-CN" />
+    <output filename="taffy_strings_zh-HK.pak" type="data_package" lang="zh-HK" />
+    <output filename="taffy_strings_zh-TW.pak" type="data_package" lang="zh-TW" />
+    <output filename="taffy_strings_zu.pak" type="data_package" lang="zu" />
+    <output filename="taffy_strings_ar-XB.pak" type="data_package" lang="ar-XB" />
+    <output filename="taffy_strings_en-XA.pak" type="data_package" lang="en-XA" />
+  </outputs>
+  <translations>
+    <!-- Empty until OD-060 sets the launch languages. -->
+  </translations>
+  <release seq="1" allow_pseudo="true">
+    <messages fallback_to_english="true">
+      <part file="strings/taffy_version_strings.grdp" />
+    </messages>
+  </release>
+</grit>

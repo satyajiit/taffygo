@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+The manifest of taffy_browsertests, the APK that runs //taffy's
+browser tests on a device.
+
+It is TaffyGo's own file rather than a reuse of upstream's
+content/shell/android/browsertests_apk/AndroidManifest.xml.jinja2, for two
+reasons that are both about identity rather than behaviour:
+
+  * The package name. Two APKs cannot share one, and this one is also the
+    FileProvider authority: ContentShellBrowserTestActivity builds it at run
+    time as getPackageName() + ".FileProvider", so the <provider> below must
+    agree with the package or file:// URIs in a test fail.
+  * The native library name, which the native-only sandboxed process service
+    loads by name. It is passed in as `library_name` by the jinja_template
+    target in //taffy/BUILD.gn.
+
+Everything else is upstream's shape, and the Java classes named below are
+upstream's classes, reached by their fully-qualified names so that this
+overlay carries no copy of them. Keep this file in step with upstream's
+template on a milestone rebase: it is a manifest, so a drift here fails at
+run time on a device rather than at compile time.
+-->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.taffygo.browsertests">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <application
+        android:name="org.chromium.content_browsertests_apk.ContentBrowserTestsApplication"
+        android:label="TaffyGo browser tests"
+        android:requestLegacyExternalStorage="true">
+        <activity
+            android:name="org.chromium.content_browsertests_apk.ContentBrowserTestsActivity"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize"
+            android:hardwareAccelerated="true"
+            android:exported="true"
+            android:process=":test_process">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <!-- The sandboxed and privileged process services. A browser test
+             starts a real browser, so it needs the same child-process slots a
+             browser needs; the count is upstream's. -->
+        {% set num_sandboxed_services = 40 %}
+        <meta-data android:name="org.chromium.content.browser.NUM_SANDBOXED_SERVICES"
+                   android:value="{{ num_sandboxed_services }}"/>
+        {% for i in range(num_sandboxed_services) %}
+        <service android:name="org.chromium.content.app.SandboxedProcessService{{ i }}"
+                 android:process=":sandboxed_process{{ i }}"
+                 android:isolatedProcess="true"
+                 android:exported="false" />
+        {% endfor %}
+
+        <service android:name="org.chromium.content.app.NativeOnlySandboxedProcessService0"
+                 android:process=":sandboxed_process0"
+                 android:isolatedProcess="true"
+                 android:nativeService="true"
+                 android:exported="false" >
+             <property android:name="android.app.PROPERTY_NATIVE_SERVICE_LIBRARY_NAME"
+                       android:value="lib{{ library_name }}.so" />
+             <property android:name="android.app.PROPERTY_NATIVE_SERVICE_FUNCTION_NAME"
+                       android:value="NativeChildProcessService_onCreate" />
+        </service>
+
+        {% set num_privileged_services = 5 %}
+        <meta-data android:name="org.chromium.content.browser.NUM_PRIVILEGED_SERVICES"
+                   android:value="{{ num_privileged_services }}"/>
+        {% for i in range(num_privileged_services) %}
+        <service android:name="org.chromium.content.app.PrivilegedProcessService{{ i }}"
+                 android:process=":privileged_process{{ i }}"
+                 android:isolatedProcess="false"
+                 android:exported="false" />
+        {% endfor %}
+
+        <!-- Must stay `<package>.FileProvider`: the authority is derived from
+             getPackageName() at run time, not read from here. -->
+        <provider android:name="androidx.core.content.FileProvider"
+            android:authorities="com.taffygo.browsertests.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- Disables at startup init of Emoji2, as upstream's test APKs do. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            tools:node="remove" />
+
+        <service android:name="org.chromium.build.gtest_apk.ProcessKeepaliveService"
+            android:process=":test_process"
+            android:exported="false" />
+    </application>
+
+    <instrumentation android:name="org.chromium.build.gtest_apk.NativeTestInstrumentationTestRunner"
+            android:label="TaffyGo browser tests"
+            android:targetPackage="com.taffygo.browsertests" />
+</manifest>

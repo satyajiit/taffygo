@@ -1,0 +1,8 @@
+# This directory is the contract three teams depend on: the browser broker,
+# the sandboxed core service, and the Android facade. A change here is a
+# change to all three.
+#
+# The assistant runtime lead and the Page Intelligence lead named at M0
+# (decisions 0002 and 0004) replace this rule. Until then the file is
+# deliberately unowned rather than falsely attributed.
+*

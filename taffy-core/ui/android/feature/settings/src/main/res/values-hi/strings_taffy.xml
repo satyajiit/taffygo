@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Machine-translated (hi), pending native review. Product names Taffy, Personality, Library stay as they are. -->
+<resources>
+    <!-- Screen SCR-405 -->
+    <string name="taffy_taffy_hub_title">Taffy</string>
+    <string name="taffy_taffy_hub_talk">Taffy कैसे बात करता है</string>
+    <string name="taffy_taffy_hub_talk_summary">Personality</string>
+    <string name="taffy_taffy_hub_skills">Taffy क्या कर सकता है</string>
+    <string name="taffy_taffy_hub_skills_summary">इस फ़ोन पर कौशल</string>
+    <string name="taffy_taffy_hub_ai">AI और प्रदाता</string>
+    <string name="taffy_taffy_hub_ai_summary">आपकी कुंजियाँ</string>
+    <string name="taffy_taffy_hub_opens">%1$s। %2$s। अगली स्क्रीन खोलता है।</string>
+    <!-- टाइप करते समय सुझाव (निर्णय 0097) -->
+    <string name="taffy_taffy_hub_suggestions_title">टाइप करते समय सुझाव</string>
+    <string name="taffy_taffy_hub_suggestions_body">पूछें बॉक्स में टाइप करते समय Taffy आगे के कुछ शब्द सुझाता है। आपने वहाँ जो लिखा है, वह उसी प्रदाता को भेजा जाता है जिसे आपने खुद जोड़ा है। यह किसी कार्य का हिस्सा नहीं है, और इसके बारे में कुछ भी दर्ज नहीं किया जाता।</string>
+
+    <!-- Screen SCR-601 -->
+    <string name="taffy_skills_title">Taffy क्या कर सकता है</string>
+    <string name="taffy_skills_intro">Taffy की मौजूदा योग्यताएँ और ब्राउज़ करते समय आपके सिखाए साइट के काम। अगर आप नहीं चाहते कि Taffy किसी का इस्तेमाल करे, तो उसे बंद कर दें।</string>
+    <string name="taffy_skills_search">योग्यताएँ खोजें</string>
+    <string name="taffy_skills_group_pages">पेज</string>
+    <string name="taffy_skills_group_shopping">खरीदारी</string>
+    <string name="taffy_skills_group_forms">फ़ॉर्म और फ़ाइलें</string>
+    <string name="taffy_skills_group_research">रिसर्च</string>
+    <string name="taffy_skills_group_media">तस्वीरें और वीडियो</string>
+    <string name="taffy_skills_group_library">Library</string>
+    <string name="taffy_skills_unavailable_title">Taffy क्या कर सकता है, यह अभी उपलब्ध नहीं है।</string>
+    <string name="taffy_skills_unavailable_body">Taffy आपके साथ ब्राउज़ करना जारी रखता है।</string>
+    <string name="taffy_skills_no_extras">अभी कोई अतिरिक्त योग्यता नहीं है। Taffy आपके साथ पहले से ब्राउज़ करता है।</string>
+    <string name="taffy_skills_added_unavailable">जोड़ी गई साइट योग्यताएँ अभी उपलब्ध नहीं हैं। नीचे मौजूद योग्यताएँ फिर भी दिखाई गई हैं।</string>
+    <string name="taffy_skills_on">चालू</string>
+    <string name="taffy_skills_off">बंद</string>
+    <string name="taffy_skills_loading">Taffy क्या कर सकता है, यह लोड हो रहा है</string>
+    <string name="taffy_skills_row_opens">%1$s। %2$s। %3$s। विवरण खोलता है।</string>
+    <plurals name="taffy_site_skill_summary">
+        <item quantity="one">%1$s के लिए · देखा गया %2$d चरण</item>
+        <item quantity="other">%1$s के लिए · देखे गए %2$d चरण</item>
+    </plurals>
+    <string name="taffy_skill_pages_lookup">आपके चुने पेजों से जवाब</string>
+    <string name="taffy_skill_pages_lookup_summary">Taffy आपके चुने पेज पढ़ता है और स्रोतों के साथ जवाब देता है।</string>
+    <string name="taffy_skill_pages_compare">खुले पेजों की तुलना</string>
+    <string name="taffy_skill_pages_compare_summary">आपके चुने पेजों को साथ-साथ रखता है।</string>
+    <string name="taffy_skill_pages_summarize">इस पेज का सार</string>
+    <string name="taffy_skill_pages_summarize_summary">इस पेज का छोटा पाठ, स्रोतों के साथ।</string>
+    <string name="taffy_skill_pages_table">पेज से तालिका निकालें</string>
+    <string name="taffy_skill_pages_table_summary">पेज के फ़ील्ड को एक तालिका बनाता है जिसे आप रख सकते हैं।</string>
+    <string name="taffy_skill_products">उत्पादों की तुलना</string>
+    <string name="taffy_skill_products_summary">आपके चुने उत्पाद पेजों से एक तुलना तालिका।</string>
+    <string name="taffy_skill_offers">ऑफ़र की तुलना</string>
+    <string name="taffy_skill_offers_summary">ऑफ़र ढूँढता है, और कुछ खरीदे जाने से पहले आपकी प्रतीक्षा करता है।</string>
+    <string name="taffy_skill_form">फ़ॉर्म भरें</string>
+    <string name="taffy_skill_form_summary">एक फ़ॉर्म तैयार करता है। आप सटीक मान देखते हैं और पहले अनुमति देते हैं।</string>
+    <string name="taffy_skill_downloads">फ़ाइल डाउनलोड</string>
+    <string name="taffy_skill_downloads_summary">डाउनलोड शुरू करता है, उनकी प्रगति देखता है और उन्हें रद्द कर सकता है।</string>
+    <string name="taffy_skill_pdf">यह PDF पढ़ें</string>
+    <string name="taffy_skill_pdf_summary">आपके खोले PDF के बारे में सवालों के जवाब देता है।</string>
+    <string name="taffy_skill_sheet">स्प्रेडशीट बनाएँ</string>
+    <string name="taffy_skill_sheet_summary">रिसर्च को एक स्प्रेडशीट बनाता है जिसे आप खोल सकते हैं।</string>
+    <string name="taffy_skill_document">दस्तावेज़ बनाएँ</string>
+    <string name="taffy_skill_document_summary">रिसर्च को एक फ़ाइल बनाता है जिसे आप रख सकते हैं।</string>
+    <string name="taffy_skill_depth">गहराई से पता लगाएँ</string>
+    <string name="taffy_skill_depth_summary">कई पेजों पर लंबी नज़र, एक संक्षेप के साथ।</string>
+    <string name="taffy_skill_trip">यात्रा की योजना</string>
+    <string name="taffy_skill_trip_summary">आपकी पूछी यात्रा के लिए तारीखें, कीमतें और स्रोत।</string>
+    <string name="taffy_skill_pictures">पेज की तस्वीरें पढ़ें</string>
+    <string name="taffy_skill_pictures_summary">जिन तस्वीरों की ओर आपने Taffy को दिखाया, उनका वर्णन करता है।</string>
+    <string name="taffy_skill_video">वीडियो ट्रांसक्रिप्ट पढ़ें</string>
+    <string name="taffy_skill_video_summary">ट्रांसक्रिप्ट से जवाब, समय के साथ।</string>
+    <string name="taffy_skill_keep">इसे Library में रखें</string>
+    <string name="taffy_skill_keep_summary">कोई तथ्य, अंश या फ़ाइल सहेजता है जिसे आपने रखना चुना।</string>
+
+    <!-- Screen SCR-602 -->
+    <string name="taffy_skill_detail_title">कौशल</string>
+    <string name="taffy_skill_detail_does">यह क्या करता है</string>
+    <string name="taffy_skill_detail_may_use">यह क्या इस्तेमाल कर सकता है</string>
+    <string name="taffy_skill_detail_comes_with">Taffy के साथ आता है</string>
+    <plurals name="taffy_site_skill_version">
+        <item quantity="one">संस्करण %1$d · देखा गया %2$d चरण</item>
+        <item quantity="other">संस्करण %1$d · देखे गए %2$d चरण</item>
+    </plurals>
+    <string name="taffy_skill_may_use_pages">आपके चुने पेज पढ़ें</string>
+    <string name="taffy_skill_may_use_form">फ़ॉर्म तैयार करें, आपकी प्रतीक्षा करें</string>
+    <string name="taffy_skill_may_use_downloads">डाउनलोड शुरू करें, उनकी प्रगति देखें और उन्हें रद्द करें।</string>
+    <string name="taffy_skill_may_use_files">एक फ़ाइल बनाएँ जिसे आप रख सकते हैं</string>
+    <string name="taffy_skill_may_use_library">कोई तथ्य, अंश या फ़ाइल रखें जिसे आपने चुना</string>
+    <string name="taffy_skill_may_use_pictures">जिन तस्वीरों की ओर आपने Taffy को दिखाया, उन्हें पढ़ें</string>
+    <string name="taffy_skill_may_use_video">ट्रांसक्रिप्ट पढ़ें, समय के साथ</string>
+    <string name="taffy_skill_approvals">कोई साइट बदलने या इस फ़ोन से बाहर जाने वाली हर बात पर Taffy आपकी प्रतीक्षा करता है।</string>
+    <string name="taffy_skill_remove">हटाएँ</string>
+    <string name="taffy_skill_cannot_remove">यह योग्यता Taffy के साथ आती है और लगी रहती है।</string>
+    <string name="taffy_skill_remove_unavailable">यह योग्यता अभी हटाई नहीं जा सकती।</string>
+    <string name="taffy_skill_missing_title">वह योग्यता इंस्टॉल नहीं है।</string>
+    <string name="taffy_skill_missing_body">वह इस फ़ोन पर नहीं है।</string>
+    <string name="taffy_skill_detail_loading">यह योग्यता लोड हो रही है</string>
+    <string name="taffy_skill_enabled_toggle">इस योग्यता का उपयोग करें</string>
+    <string name="taffy_skill_required_tool_unavailable">एक ज़रूरी ब्राउज़र टूल अभी तैयार नहीं है।</string>
+    <string name="taffy_skill_required_part_missing">एक ज़रूरी प्रोडक्ट भाग अभी इंस्टॉल नहीं है।</string>
+    <string name="taffy_skill_profile_unavailable">यह योग्यता इस प्रोफ़ाइल में उपलब्ध नहीं है।</string>
+    <string name="taffy_skill_policy_unavailable">आपकी मौजूद सुरक्षा सेटिंग इस योग्यता की अनुमति नहीं देतीं।</string>
+
+    <!-- Screen SCR-603 -->
+    <string name="taffy_personality_title">Taffy कैसे बात करता है</string>
+    <string name="taffy_personality_intro">एक प्रीसेट इस बात की शुरुआत है कि Taffy कैसे बात करता है। यह नहीं बदलता कि Taffy क्या कर सकता है।</string>
+    <string name="taffy_personality_empty_title">Personality प्रीसेट इस फ़ोन पर अभी नहीं हैं।</string>
+    <string name="taffy_personality_empty_body">तब तक Taffy एक सावधान आवाज़ में बात करता है।</string>
+    <string name="taffy_personality_not_saved">Personality इस फ़ोन पर अभी सहेजी नहीं जाती।</string>
+    <string name="taffy_personality_loading">Taffy कैसे बात करता है, यह लोड हो रहा है</string>
+    <string name="taffy_personality_selected">चुना गया</string>
+    <string name="taffy_personality_preset_description">%1$s। %2$s</string>
+    <string name="taffy_personality_preset_selected_description">%1$s। %2$s। चुना गया।</string>
+    <string name="taffy_personality_preset_researcher">सावधान शोधकर्ता</string>
+    <string name="taffy_personality_preset_researcher_summary">ज़्यादा जाँच करता है, स्रोत बताता है, और काम बढ़ाने से पहले पूछता है।</string>
+    <string name="taffy_personality_preset_shopper">तेज़ खरीदार</string>
+    <string name="taffy_personality_preset_shopper_summary">छोटे जवाब, और आपकी मंज़ूर खरीदारी के चरणों में तेज़।</string>
+    <string name="taffy_personality_preset_trip">यात्रा योजनाकार</string>
+    <string name="taffy_personality_preset_trip_summary">आपकी पूछी यात्रा के लिए तारीखें, कीमतें और स्रोत रखता है।</string>
+    <string name="taffy_personality_tune">Taffy की बातचीत समायोजित करें</string>
+    <string name="taffy_personality_tune_summary">सावधान या तेज़, संक्षिप्त या बातूनी</string>
+
+    <!-- Screen SCR-604 -->
+    <string name="taffy_tuning_title">Taffy की बातचीत समायोजित करें</string>
+    <string name="taffy_tuning_caption">ये विकल्प बदलते हैं कि Taffy कैसे बात करता है। ये नहीं बदलते कि Taffy क्या कर सकता है।</string>
+    <string name="taffy_tuning_pace">Taffy कितना सावधान है</string>
+    <string name="taffy_tuning_pace_careful">सावधान</string>
+    <string name="taffy_tuning_pace_quick">तेज़</string>
+    <string name="taffy_tuning_length">Taffy कितना कहता है</string>
+    <string name="taffy_tuning_length_concise">संक्षिप्त</string>
+    <string name="taffy_tuning_length_chatty">बातूनी</string>
+    <string name="taffy_tuning_checkin">Taffy कब पूछता है</string>
+    <string name="taffy_tuning_checkin_asks">पहले पूछता है</string>
+    <string name="taffy_tuning_checkin_acts">मंज़ूर योजनाओं पर काम करता है</string>
+    <string name="taffy_tuning_mid">बीच में</string>
+    <string name="taffy_tuning_loading">Taffy कैसे बात करता है, यह लोड हो रहा है</string>
+</resources>

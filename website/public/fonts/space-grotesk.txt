@@ -1,0 +1,24 @@
+Space Grotesk (latin subset, variable weight)
+=============================================
+
+Vendored asset: space-grotesk-latin-variable.woff2 (beside this file)
+Licence:        SIL Open Font License 1.1, reproduced in full in OFL.txt beside
+                this file — which is served publicly on purpose, because the
+                licence has to travel with the font a visitor downloads
+Source:         https://github.com/floriankarsten/space-grotesk, via the
+                google/fonts distribution; the same typeface the Android UI
+                vendors as a TTF in
+                taffy-core/ui/android/core/designsystem/vendor/space-grotesk.txt
+Recorded:       2026-08-19
+
+sha256=2a58e2d03e6377126327a2769b177ed250327e6aace74e02fbf64e4637084d94
+
+The two copies are deliberately different files, not a duplication to be
+resolved: the Android UI needs the full variable TTF that Android's font
+resources load, and the site needs a latin-subset woff2 small enough to be
+worth self-hosting. Neither build can consume the other's format. What they
+must share is the licence, and both carry it.
+
+Self-hosting rather than linking a font CDN is a privacy choice: a webfont
+request to a third party would tell that third party who visited the page, and
+website/README.md records the rule.

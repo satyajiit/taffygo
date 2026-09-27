@@ -1,0 +1,59 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="errand-framed-challenge">
+<title>Request a records statement (partner check)</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Request a records statement (partner check)</h1>
+  <p class="who">The negative twin of the picture challenge. The check is a
+  third-party widget in a cross-origin frame: a separate security context whose
+  content the top document cannot read and no sheet can render. The only honest
+  fallback is to highlight it on the page and hand the page back.</p>
+</header>
+
+<p id="step-indicator">Step 2 of 3 &middot;
+  <a id="back-to-portal" href="/errand/records-portal.html">Back to services</a></p>
+
+<form id="partner-statement-request" action="/forms/submit" method="post">
+  <fieldset>
+    <legend>Identify yourself</legend>
+
+    <label for="records-number">Civic Records Number (twelve digits)</label>
+    <input id="records-number" name="records_number" type="text" inputmode="numeric"
+           autocomplete="off" required maxlength="14" pattern="[0-9 ]{12,14}"
+           placeholder="0000 0000 0000" aria-describedby="records-number-help">
+    <p id="records-number-help" class="note">The same identifier the picture-check
+    entrance asks for.</p>
+  </fieldset>
+
+  <fieldset id="partner-check" aria-describedby="partner-check-help">
+    <legend>Verification partner check</legend>
+
+    <iframe id="challenge-widget" title="Verification partner check" height="180"
+            data-taffy-origin="embed" data-taffy-path="/errand/challenge-widget.html"></iframe>
+
+    <p id="partner-check-help" class="note">The widget draws its own controls, runs
+    its own script, and reports its result to this form through a hidden field it
+    alone writes. Nothing in the top document can read inside it, address a node
+    in it, or copy it into a sheet.</p>
+
+    <input type="hidden" id="partner-check-result" name="partner_check_result" value="">
+  </fieldset>
+
+  <p>
+    <button type="submit" id="partner-request-submit" disabled>Request the
+    statement</button>
+  </p>
+</form>
+
+<p id="partner-check-state" class="flag" role="status">The partner check has not
+been completed, so the submit control stays disabled.</p>
+
+<p class="note">This is the shape a sheet cannot serve. An image challenge can be
+lifted out and shown; an interactive third-party widget in another origin cannot,
+because lifting it would mean reproducing a security context. Highlighting it in
+place and returning control to the person is the whole of the fallback.</p>

@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "delta.schema.json",
+  "title": "BIP delta, invalidation, and backpressure contract",
+  "description": "Incremental page updates and the two ways a stream gives up honestly. Delta streams are an optimization: correctness can always fall back to a bounded fresh snapshot. Protocol specification section 10.",
+  "x-bip-module": "delta",
+  "$defs": {
+    "DeltaCategory": {
+      "title": "DeltaCategory",
+      "description": "A class of change carried by a delta, used to say what backpressure dropped. Optional text and layout changes are dropped first; lifecycle and node-removal signals are dropped last, because losing them would leave a subscriber acting on a node that no longer exists. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": ["TEXT", "LAYOUT", "ATTRIBUTE", "EDGE", "NODE_ADDED", "NODE_REMOVED", "LIFECYCLE"]
+    },
+    "ChangedNode": {
+      "title": "ChangedNode",
+      "description": "A node in its new form, with the fields that changed named explicitly so a subscriber can decide whether the change matters to its task.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "node": { "$ref": "snapshot.schema.json#/$defs/SemanticNode" },
+        "changed_fields": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": { "$ref": "snapshot.schema.json#/$defs/SemanticField" }
+        }
+      },
+      "required": ["node", "changed_fields"]
+    },
+    "InvalidationReason": {
+      "title": "InvalidationReason",
+      "description": "Why a projection must be thrown away. UNKNOWN_DELTA_FIELD is deliberately separate from the compatibility rule that accepts unknown optional fields on decode: decoding a minor-version message still succeeds, but a subscriber that cannot interpret a field inside a delta cannot prove its projection is still correct, so it resnapshots instead of guessing. FRAME_DETACHED is likewise separate from ENDPOINT_DISCONNECTED and RENDERER_CRASHED: a frame leaving the tree is ordinary lifecycle, and collapsing it into a lost-pipe reason would make a routine subframe navigation indistinguishable from a renderer that died. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "x-bip-added-in": {
+        "FRAME_DETACHED": "0.3"
+      },
+      "enum": [
+        "CROSS_DOCUMENT_COMMIT",
+        "HISTORY_ROUTE_CHANGE",
+        "CHILD_FRAME_NAVIGATION",
+        "ORIGIN_CHANGED",
+        "PRERENDER_ACTIVATION",
+        "BFCACHE_ENTERED",
+        "BFCACHE_RESTORED",
+        "SEQUENCE_GAP",
+        "DELTA_OVERFLOW",
+        "UNKNOWN_DELTA_FIELD",
+        "ADAPTER_RESTART",
+        "BROKER_INVALIDATION",
+        "MEMORY_PRESSURE",
+        "RENDERER_CRASHED",
+        "ENDPOINT_DISCONNECTED",
+        "TAB_CLOSED",
+        "PROFILE_TEARDOWN",
+        "FRAME_DETACHED"
+      ]
+    },
+    "PageInvalidation": {
+      "title": "PageInvalidation",
+      "description": "Notice that previously observed state can no longer be trusted. Navigation invalidation has priority over queued extraction and action work: a subscriber applies this before anything else it is holding.",
+      "type": "object",
+      "additionalProperties": true,
+      "x-bip-message": true,
+      "properties": {
+        "schema_version": { "$ref": "identity.schema.json#/$defs/ProtocolVersion" },
+        "subscription_id": { "$ref": "identity.schema.json#/$defs/SubscriptionId" },
+        "tab_id": { "$ref": "identity.schema.json#/$defs/TabId" },
+        "frame_id": { "$ref": "identity.schema.json#/$defs/FrameId" },
+        "page_epoch": { "$ref": "identity.schema.json#/$defs/PageEpoch" },
+        "event_sequence": { "$ref": "identity.schema.json#/$defs/EventSequence" },
+        "reason": { "$ref": "#/$defs/InvalidationReason" },
+        "retires_page_epoch": {
+          "description": "Whether the named epoch is retired outright. When true, every handle bound to it is dead and no refresh can revive it; a new binding is required.",
+          "type": "boolean"
+        },
+        "invalidates_child_frames_only": {
+          "description": "Whether only the named frame's handles die. A parent handle survives a child-frame navigation unless the parent's own assumptions changed.",
+          "type": "boolean"
+        },
+        "resnapshot_required": { "type": "boolean" },
+        "new_page_epoch": {
+          "$ref": "identity.schema.json#/$defs/PageEpoch",
+          "description": "The replacement epoch, when the broker has already bound one. It is a fresh binding, never a continuation: no handle from the retired epoch becomes valid under it."
+        },
+        "observed_at_monotonic_ms": { "$ref": "identity.schema.json#/$defs/MonotonicMillis" }
+      },
+      "required": [
+        "schema_version",
+        "tab_id",
+        "frame_id",
+        "page_epoch",
+        "event_sequence",
+        "reason",
+        "retires_page_epoch",
+        "invalidates_child_frames_only",
+        "resnapshot_required",
+        "observed_at_monotonic_ms"
+      ]
+    },
+    "PageDelta": {
+      "title": "PageDelta",
+      "description": "An incremental update to a subscriber's projection. A delta applies only when its page epoch, from-revision, and event sequence match what the subscriber currently holds. A gap, an overflow, an adapter restart, or a field the subscriber cannot interpret discards the projection and forces a fresh snapshot. The model is never called once per document mutation: task policy chooses the meaningful checkpoints.",
+      "type": "object",
+      "additionalProperties": true,
+      "x-bip-message": true,
+      "properties": {
+        "schema_version": { "$ref": "identity.schema.json#/$defs/ProtocolVersion" },
+        "subscription_id": { "$ref": "identity.schema.json#/$defs/SubscriptionId" },
+        "tab_id": { "$ref": "identity.schema.json#/$defs/TabId" },
+        "frame_id": { "$ref": "identity.schema.json#/$defs/FrameId" },
+        "page_epoch": { "$ref": "identity.schema.json#/$defs/PageEpoch" },
+        "from_revision": { "$ref": "identity.schema.json#/$defs/GraphRevision" },
+        "to_revision": { "$ref": "identity.schema.json#/$defs/GraphRevision" },
+        "event_sequence": { "$ref": "identity.schema.json#/$defs/EventSequence" },
+        "coalesced_mutation_count": {
+          "$ref": "identity.schema.json#/$defs/Count",
+          "description": "How many source mutations the adapter folded into this delta. Adapters may coalesce rapid mutations, but never across an action preflight and dispatch boundary in a way that hides a changed precondition."
+        },
+        "added_nodes": {
+          "type": "array",
+          "items": { "$ref": "snapshot.schema.json#/$defs/SemanticNode" }
+        },
+        "changed_nodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ChangedNode" }
+        },
+        "removed_node_ids": {
+          "description": "Identifiers retired by this delta. A retired identifier is never reissued within its epoch, so a recycled virtualized row appears as a removal plus an addition rather than a change.",
+          "type": "array",
+          "items": { "$ref": "identity.schema.json#/$defs/SemanticNodeId" }
+        },
+        "changed_edges": {
+          "type": "array",
+          "items": { "$ref": "snapshot.schema.json#/$defs/SemanticEdge" }
+        },
+        "invalidations": {
+          "type": "array",
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/PageInvalidation" }
+        },
+        "truncation": { "$ref": "snapshot.schema.json#/$defs/Truncation" },
+        "observed_at_monotonic_ms": { "$ref": "identity.schema.json#/$defs/MonotonicMillis" }
+      },
+      "required": [
+        "schema_version",
+        "subscription_id",
+        "tab_id",
+        "frame_id",
+        "page_epoch",
+        "from_revision",
+        "to_revision",
+        "event_sequence",
+        "coalesced_mutation_count",
+        "added_nodes",
+        "changed_nodes",
+        "removed_node_ids",
+        "changed_edges",
+        "invalidations",
+        "truncation",
+        "observed_at_monotonic_ms"
+      ]
+    },
+    "BackpressureAction": {
+      "title": "BackpressureAction",
+      "description": "What the broker did to protect renderer and interface health before queue growth hurt them. Closed enumeration: a consumer that receives a value outside this list MUST treat the message as unsupported and fail closed, and MUST NOT coerce the value to a known member (protocol section 6.2).",
+      "type": "string",
+      "x-bip-closed": true,
+      "enum": [
+        "COALESCED",
+        "SCOPE_REDUCED",
+        "SUBSCRIPTION_PAUSED",
+        "RESNAPSHOT_REQUESTED",
+        "SUBSCRIPTION_STOPPED"
+      ]
+    },
+    "BackpressureNotice": {
+      "title": "BackpressureNotice",
+      "description": "Honest notice that the stream could not keep up. Dropping updates silently would let a subscriber act on a stale projection, so the loss is always reported, always names which categories were dropped, and says whether a fresh snapshot is now required.",
+      "type": "object",
+      "additionalProperties": true,
+      "x-bip-message": true,
+      "properties": {
+        "schema_version": { "$ref": "identity.schema.json#/$defs/ProtocolVersion" },
+        "subscription_id": { "$ref": "identity.schema.json#/$defs/SubscriptionId" },
+        "tab_id": { "$ref": "identity.schema.json#/$defs/TabId" },
+        "frame_id": { "$ref": "identity.schema.json#/$defs/FrameId" },
+        "page_epoch": { "$ref": "identity.schema.json#/$defs/PageEpoch" },
+        "event_sequence": { "$ref": "identity.schema.json#/$defs/EventSequence" },
+        "action": { "$ref": "#/$defs/BackpressureAction" },
+        "dropped_delta_count": { "$ref": "identity.schema.json#/$defs/Count" },
+        "dropped_categories": {
+          "description": "Which categories were dropped, in drop order. A notice that lists NODE_REMOVED or LIFECYCLE always requires a fresh snapshot.",
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/DeltaCategory" }
+        },
+        "queue_depth_hint": { "$ref": "identity.schema.json#/$defs/Count" },
+        "reduced_scope": { "$ref": "protocol-info.schema.json#/$defs/ObservationScope" },
+        "resnapshot_required": { "type": "boolean" },
+        "observed_at_monotonic_ms": { "$ref": "identity.schema.json#/$defs/MonotonicMillis" }
+      },
+      "required": [
+        "schema_version",
+        "subscription_id",
+        "tab_id",
+        "frame_id",
+        "page_epoch",
+        "event_sequence",
+        "action",
+        "dropped_delta_count",
+        "dropped_categories",
+        "resnapshot_required",
+        "observed_at_monotonic_ms"
+      ],
+      "allOf": [
+        {
+          "if": { "properties": { "action": { "const": "SCOPE_REDUCED" } }, "required": ["action"] },
+          "then": { "required": ["reduced_scope"] }
+        }
+      ]
+    }
+  }
+}

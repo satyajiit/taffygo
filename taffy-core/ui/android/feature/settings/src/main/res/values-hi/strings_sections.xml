@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Settings home and search copy. Product names Taffy, Memory, Library, and Personality stay as they are. -->
+<resources>
+    <string name="taffy_settings_taffy_title">Taffy</string>
+    <string name="taffy_settings_taffy_summary">कौशल, और Taffy कैसे बात करता है</string>
+    <string name="taffy_settings_privacy_title">गोपनीयता</string>
+    <string name="taffy_settings_privacy_summary">इस फ़ोन पर क्या रखा जाता है</string>
+    <string name="taffy_settings_general_title">सामान्य</string>
+    <string name="taffy_settings_general_summary">खोज इंजन और फ़ाइलें</string>
+    <string name="taffy_settings_about_title">हमारे बारे में और मदद</string>
+    <string name="taffy_settings_about_summary">संस्करण, और हम तक कैसे पहुँचें</string>
+    <string name="taffy_settings_group_phone">यह फ़ोन</string>
+
+    <string name="taffy_settings_you_title">आप</string>
+    <string name="taffy_settings_you_summary">आपकी प्रोफ़ाइल, और इस फ़ोन पर क्या सहेजा है</string>
+    <string name="taffy_settings_time_on_sites_title">साइटों पर समय</string>
+    <string name="taffy_settings_time_on_sites_summary">इस सप्ताह इस ब्राउज़र ने हर साइट पर कितना समय बिताया</string>
+    <string name="taffy_settings_memory_title">Memory</string>
+    <string name="taffy_settings_memory_summary">Taffy आपके बारे में क्या याद रखता है</string>
+    <string name="taffy_settings_saved_sign_ins_title">सहेजे हुए साइन-इन</string>
+    <string name="taffy_settings_saved_sign_ins_summary">पासवर्ड और पासकी जो यह ब्राउज़र भर सकता है</string>
+    <string name="taffy_settings_saved_details_title">सहेजी हुई जानकारी</string>
+    <string name="taffy_settings_saved_details_summary">फ़ॉर्म के लिए रखा नाम, पता, ईमेल और फ़ोन</string>
+    <string name="taffy_settings_what_happened_title">क्या हुआ</string>
+    <string name="taffy_settings_what_happened_summary">टास्क के नतीजे और रोकने के कुल आँकड़े, बिना पेज की सामग्री</string>
+    <string name="taffy_settings_library_title">Library</string>
+    <string name="taffy_settings_library_summary">चीज़ें जो आपने रखीं</string>
+    <string name="taffy_settings_personality_title">Taffy कैसे बात करता है</string>
+    <string name="taffy_settings_personality_summary">Personality — Taffy कैसे लिखता है, और कितना सावधान रहता है</string>
+    <string name="taffy_settings_what_taffy_can_do_title">Taffy क्या कर सकता है</string>
+    <string name="taffy_settings_what_taffy_can_do_summary">इस फ़ोन पर कौशल</string>
+</resources>

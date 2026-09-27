@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Shadows the upstream resource of the same name: the notification small icon
+(price drops, notification-unsubscribe, actor surfaces). The shade reads a
+small icon as an alpha mask, so the referenced bitmap carries the mark in
+its alpha channel only (generate_icons.py, monochrome_alpha). The upstream
+vector's tint macro is deliberately not reproduced: a mask needs no tint,
+and the macro is private to the component that defines it.
+-->
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@drawable/taffygo_notification_glyph"
+    android:gravity="center" />

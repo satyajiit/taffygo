@@ -1,0 +1,169 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# THIS DIRECTORY IS THE ONE DECLARED EXCEPTION, AND IT IS DECLARED HERE RATHER
+# THAN WIDENED ACROSS THE COMPONENT.
+#
+# `//taffy/app/android/DEPS` rule 1 says the Android seam never reaches
+# into `//chrome`: a component the embedder depends on cannot depend back on the
+# embedder without inverting the direction and making the component unusable
+# anywhere else. That rule still holds for every library under
+# `//taffy`, and nothing here changes it.
+#
+# This directory is not a library. It is embedder assembly — the activity the
+# manifest launches — and decision 0024 says so in those words: the TaffyGo
+# activity target names `//chrome` because it extends
+# `AsyncInitializationActivity` and registers a tabbed selector through
+# `TabWindowManager`. An
+# assembly that may not name the thing it assembles is not an assembly.
+#
+# The seam it sits on is a class boundary that already exists upstream. At the
+# pinned milestone the chain is
+#
+#     ChromeTabbedActivity -> ChromeActivity -> AsyncInitializationActivity
+#                          -> ChromeBaseAppCompatActivity
+#
+# and `AsyncInitializationActivity` is `public abstract` with exactly three
+# abstract methods — `shouldStartGpuProcess()`, `createProfileProvider()` and
+# `triggerLayoutInflation()`. It carries browser-process startup sequencing,
+# native initialization, the profile supplier and the first-draw metrics, and it
+# inflates no browser UI of its own. `ChromeActivity` is where Chrome's UI
+# begins. So TaffyGo extends the third, never the second, and
+# `triggerLayoutInflation()` is where it inflates its own tree.
+#
+# What this exception does NOT permit: a `//chrome` edge from any library under
+# `//taffy`. If a type here needs to be reachable from one, it moves
+# up into the component and loses this directory's permissions.
+#
+# HOW TO READ THE RULES BELOW, AND THE ONE THING THAT SURPRISES EVERY READER.
+# `buildtools/checkdeps/java_checker.py` prescans the tree for `.java` files and
+# resolves an import to the *file it is declared in*, so every rule here is a
+# filesystem prefix rather than a package name. At this pin roughly half of the
+# tab-model classes this directory names are declared under
+# `chrome/android/java/src/org/chromium/chrome/browser/...` — including
+# `AsyncInitializationActivity`, `FirstRunFlowSequencer`, `ChromeTabCreator`,
+# `TabModelSelectorImpl`, `TabPersistentStoreImpl`,
+# `TabbedModeTabPersistencePolicy`, `CompositorViewHolder` and everything under
+# `app/tabmodel` and `app/tabwindow` — while the other half live in the
+# `//chrome/browser/<area>/android/java` targets their package names suggest.
+# Both spellings are therefore listed, one against the package the reader is
+# looking for and one against the path the checker resolves. A rule that names
+# only the first grants nothing.
+#
+# Two further limits of the checker, stated so nothing here is read as more
+# protection than it is: `EXTENSIONS = ['.java']`, so the Kotlin in this
+# directory is not checked at all; and generated classes live under `out/`,
+# which the prescan skips, so `TabLaunchType`, `TabSelectionType`,
+# `TabModelType` and `NetError` resolve to nothing and are neither allowed nor
+# denied. The rules are still written as if all four were checked, because the
+# file's job is to state the boundary and not only to enforce it.
+
+include_rules = [
+  "+base/android",
+
+  # THE STARTUP SEAM AND THE TAB MODEL — the whole of this directory's //chrome
+  # exception, and the reason decision 0024 wrote one. Each area is named
+  # separately rather than granted as one `+chrome`, so that an eleventh is a
+  # visible change rather than a silent one.
+  #
+  #   firstrun          FirstRunFlowSequencer, FirstRunStatus — the one-time
+  #                     write of upstream's own first-run state
+  #   init              AsyncInitializationActivity, ActivityProfileProvider
+  #   profiles          ProfileProvider and the profile-lifetime map
+  #   multiwindow       the same selector-count bound as TabWindowManager
+  #   android/crypto    CipherFactory, the key tab state is written with
+  #   android/lifecycle the dispatcher ActivityProfileProvider unregisters on
+  #   browser_controls  BrowserControlsStateProvider — the interface
+  #                     TabContentManager takes and TaffyGo answers with zeroes
+  #   tab               Tab, TabDelegateFactory, TabWebContentsDelegateAndroid
+  #   tab_ui            TabContentManager
+  #   tabmodel          the selector, the creators and the persistent store
+  #   tabwindow         TabWindowManager, which assigns every product selector
+  #   ui/android/...    NativePage and PdfInfo, the two native-page types the
+  #                     delegate factory declines to produce
+  #   util              WindowFeatures, PictureInPictureWindowOptions
+  "+chrome/browser/android/crypto",
+  "+chrome/browser/android/lifecycle",
+  "+chrome/browser/browser_controls",
+  "+chrome/browser/browsing_data",
+  "+chrome/browser/download",
+  "+chrome/browser/enterprise/util",
+  "+chrome/browser/first_run/android",
+  "+chrome/browser/firstrun",
+  "+chrome/browser/init",
+  "+chrome/browser/profiles",
+  "+chrome/browser/tab",
+  "+chrome/browser/tab_ui",
+  "+chrome/browser/tabmodel",
+  "+chrome/browser/tabwindow",
+  "+chrome/browser/ui/android/native_page",
+  "+chrome/browser/ui/android/pdf",
+  "+chrome/browser/util",
+
+  # The same permission, spelled the way the checker resolves it. See the note
+  # in this file's header: these classes are declared under `chrome/android`
+  # even though their packages read as `chrome.browser.<area>`, so without these
+  # path-specific lines the rules above grant nothing at all. They are deliberately
+  # written per package directory rather than as `+chrome/android`, which would
+  # open every class in Chrome's largest Java target to this directory.
+  "+chrome/android/java/src/org/chromium/chrome/browser/app/tabmodel",
+  "+chrome/android/java/src/org/chromium/chrome/browser/app/tabwindow",
+
+  # ONE FILE, AND ONLY SO THAT A TEST CAN SAY WHAT THIS ACTIVITY IS NOT.
+  # `TaffyExternalNavigationTest` asserts that `TaffyBrowserActivity` is not a
+  # `ChromeActivity`, because that is the fact `TabImpl.getActivity()` answers
+  # null on and therefore the fact
+  # `TaffyExternalNavigationDelegate.canCloseTabOnIntentLaunch()` is false for.
+  # A rule on the enclosing `app` directory would open Chrome's whole activity
+  # layer to this directory to state one negative, so the grant is the single
+  # file the assertion names.
+  "+chrome/android/java/src/org/chromium/chrome/browser/app/ChromeActivity.java",
+  "+chrome/android/java/src/org/chromium/chrome/browser/compositor",
+  "+chrome/android/java/src/org/chromium/chrome/browser/firstrun",
+  "+chrome/android/java/src/org/chromium/chrome/browser/init",
+  "+chrome/android/java/src/org/chromium/chrome/browser/multiwindow",
+  "+chrome/android/java/src/org/chromium/chrome/browser/site_settings",
+  "+chrome/android/java/src/org/chromium/chrome/browser/tab",
+  "+chrome/android/java/src/org/chromium/chrome/browser/tabmodel",
+
+  # Below the embedder, and therefore not part of this directory's exception —
+  # any library under //taffy could name these. They are listed here
+  # because checkdeps allows nothing that is not, and because this is where they
+  # are needed: the delegate factory's remaining return types, the URL fixup a
+  # typed address goes through, the exact-page find bridge, and the error codes
+  # the page-failure words are mapped from.
+  "+components/browser_ui/util",
+  "+components/browser_ui/site_settings",
+  # `AppModalPresenter`, which shows a page's own dialogs — a permission
+  # prompt, an alert — through the window's dialog manager (TaffyPageDialogs).
+  "+components/browser_ui/modaldialog",
+  "+components/embedder_support/android",
+  "+components/external_intents",
+  "+components/find_in_page",
+  "+taffy/app/android",
+  "+components/url_formatter",
+  "+components/webui/about",
+  "+content/public/android",
+  "+net/android",
+  "+ui/android",
+  "+url",
+
+  # `EdgeToEdgeSystemBarColorHelper`. Not a //chrome edge and not part of this
+  # directory's exception: `//ui` is below the embedder, so any library under
+  # //taffy could name it. It is listed here rather than in the
+  # component's own DEPS because this is the only place that needs it — the
+  # decision about what colour the bars stand on is made in
+  # `TaffyShellContent`, which cannot reach this type, and is carried across by
+  # `TaffyWindowBars`.
+  "+ui/edge_to_edge",
+
+  # The rest of the product rules still apply: no renderer, no Blink, and no
+  # core-service ownership from a view seam.
+  "-taffy/renderer",
+  "-taffy/services/core",
+  "-content/public/renderer",
+  "-third_party/blink",
+]

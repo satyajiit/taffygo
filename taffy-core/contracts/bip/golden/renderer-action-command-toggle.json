@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.8",
+  "command_id": "cmd_21",
+  "frame_id": "frame_main",
+  "page_epoch": "epoch_d4",
+  "required_graph_revision": 12,
+  "node_id": "n_save_address",
+  "operation": "TOGGLE",
+  "input": {
+    "kind": "TOGGLE_STATE",
+    "sensitivity": "NOT_SENSITIVE",
+    "checked": true
+  },
+  "renderer_preconditions": [
+    {
+      "kind": "NODE_EXISTS"
+    },
+    {
+      "kind": "NODE_ROLE_UNCHANGED",
+      "expected_role": "CHECKBOX"
+    },
+    {
+      "kind": "NODE_ACTION_AVAILABLE",
+      "expected_action_type": "TOGGLE"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "UNCHECKED"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "ENABLED"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "VISIBLE"
+    },
+    {
+      "kind": "NODE_STATE_ABSENT",
+      "node_state": "OBSCURED"
+    },
+    {
+      "kind": "NOT_SENSITIVE_FIELD",
+      "max_sensitivity": "NOT_SENSITIVE"
+    }
+  ],
+  "deadline_ms": 1500
+}

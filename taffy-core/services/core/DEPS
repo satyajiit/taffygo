@@ -1,0 +1,31 @@
+# The utility-process core boundary. The service may use Mojo and base sequence
+# primitives, but no browser/embedder object or ambient OS authority.
+
+include_rules = [
+  "+openssl",
+  "+rust",
+  "+base",
+  "+mojo/public/cpp/bindings",
+  "+taffy/contracts/core-service",
+  "+taffy/services/core",
+
+  "-chrome",
+  "-content",
+  "-net",
+  "-services/network",
+  "-third_party/blink",
+  "-ui",
+]
+
+specific_include_rules = {
+  ".*_unittest\\.(cc|h)": [
+    "+base/test",
+    "+testing/gtest",
+
+    # The generated state-payload version, and nothing else from Core API. The
+    # service carries that payload as opaque bytes and must never learn to read
+    # it; a test asserting the version a published state arrives with is the one
+    # place that needs the number, and a literal there goes stale in silence.
+    "+taffy/contracts/core-api",
+  ],
+}

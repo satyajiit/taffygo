@@ -1,0 +1,37 @@
+{
+  "operation": {
+    "operation_id": "entitlement-fetch-7",
+    "service_generation": 4,
+    "task_revision": 0,
+    "deadline_monotonic_ms": 120000,
+    "idempotency_key": "entitlement-fetch-key-7"
+  },
+  "effect_id": "account-entitlement-fetch-7",
+  "kind": 3,
+  "retry_class": 0,
+  "storage_commit": null,
+  "page_observation": null,
+  "model_request": null,
+  "network_request": {
+    "operation_kind": 5,
+    "exchange_authorization_code": null,
+    "exchange_native_credential": null,
+    "request_email_link": null,
+    "refresh_session": null,
+    "revoke_session": null,
+    "max_response_bytes": 65536,
+    "fetch_entitlement": {
+      "reason": 2
+    }
+  },
+  "browser_action": null,
+  "tool_job": null,
+  "secure_store": null,
+  "auth_surface": null,
+  "permission_request": null,
+  "asset_delivery": null,
+  "catalog_fetch": null,
+  "provider_listing_fetch": null,
+  "composer_completion": null,
+  "custom_endpoint_probe": null
+}

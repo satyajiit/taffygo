@@ -1,0 +1,9 @@
+{
+  "session_handle": "account-session-fixture",
+  "account_subject": "account-subject-fixture",
+  "expires_at_monotonic_ms": 3690000,
+  "rotation": 0,
+  "auth_method": 2,
+  "email": "reader@example.test",
+  "display_name": "Reader"
+}

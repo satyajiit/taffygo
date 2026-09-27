@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Every word a download notification can show — screen SCR-802.
+
+Committed here rather than added to `taffy_android_strings.grd`, following
+`../../../java/res/values/taffy_assistant_island_strings.xml`: a committed
+resource directory is where a package is pinned, and it is what produces the
+`R.string` a Kotlin or Java source can name. The grd's messages are the pak
+half, read by browser-process C++, and the two never carry the same message
+twice — a string with two homes is a string that will one day disagree with
+itself.
+
+Four states and three controls, and the set is closed. A download is not a task:
+it has no sources and no partial result, so none of the assistant's seven
+states appears here.
+-->
+<resources>
+  <string name="taffy_download_channel_name">Downloads</string>
+  <string name="taffy_download_channel_description">Progress and results for files you download.</string>
+  <string name="taffy_download_hidden">Download update</string>
+  <string name="taffy_download_share">Share download</string>
+
+  <string name="taffy_download_running">Downloading %1$s</string>
+  <string name="taffy_download_paused">Paused %1$s</string>
+  <string name="taffy_download_complete">Downloaded %1$s</string>
+  <!-- Not "Download failed": the catalog's copy rules ask for the actor and a
+       plain verb, and a person reads this to find out what to do next. -->
+  <string name="taffy_download_failed">Couldn\'t download %1$s</string>
+
+  <string name="taffy_download_pause">Pause</string>
+  <string name="taffy_download_resume">Resume</string>
+  <string name="taffy_download_cancel">Cancel</string>
+</resources>

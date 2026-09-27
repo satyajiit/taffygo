@@ -1,0 +1,27 @@
+CommonMark Java and GFM tables, vendored for the Chromium build
+============================================================
+
+Owner:         Atlassian Pty Ltd and the CommonMark Java contributors
+Licence:       BSD-2-Clause; LICENSE is copied unchanged from META-INF/LICENSE.txt
+Source:        Maven Central, org.commonmark:commonmark:0.30.0 and
+               org.commonmark:commonmark-ext-gfm-tables:0.30.0
+Version owner: gradle/libs.versions.toml, indexed by TOOLCHAIN.md
+Recorded:      2026-09-09
+
+Both artifacts ship and are byte-identical to Maven Central. Their published
+SHA-256 sidecars were verified when downloaded. These overlay-owned prebuilts
+follow the Dagger integration pattern: no new upstream Android dependency or
+fork-unwritable CIPD package is introduced. The two builds use the same version.
+The tables extension depends only on core; core has no runtime dependencies.
+
+Upstream release:
+https://github.com/commonmark/commonmark-java/releases/tag/commonmark-parent-0.30.0
+
+TaffyGo owns updates and vulnerability tracking for these artifacts. The parser
+has bounded input and nesting; parsing is off the UI thread. The native renderer
+does not interpret HTML or fetch images embedded in model output.
+
+sha256_commonmark_0_30_0_jar=090f0a758ac2f4f51aa86dff9dff0fdf7403666d0efd29f59886dc8e8b1eac53
+bytes_commonmark_0_30_0_jar=220139
+sha256_commonmark_ext_gfm_tables_0_30_0_jar=5e28b48e66f7697bee4dfeb4c8f8f08a84a2827d91b53bbd9bd5445e82d14bda
+bytes_commonmark_ext_gfm_tables_0_30_0_jar=24485

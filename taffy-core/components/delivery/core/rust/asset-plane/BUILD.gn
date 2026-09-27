@@ -1,0 +1,22 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//build/rust/rust_static_library.gni")
+import("//taffy/services/core/crate_sources.gni")
+
+rust_static_library("asset_plane") {
+  crate_name = "asset_plane"
+  crate_root = taffy_asset_plane_crate_root
+  sources = taffy_asset_plane_sources
+  edition = "2021"
+
+  # No dependency, first-party or otherwise. The plane is a pure function of a
+  # compiled-in catalog and the facts the browser reports, so it needs neither
+  # a serializer nor a contract type: what crosses a process boundary is the
+  # core-service contract's shape, and building that is the composition root's.
+  deps = []
+  visibility = [ "//taffy/components/intelligence/core/rust/core-runtime:*" ]
+}

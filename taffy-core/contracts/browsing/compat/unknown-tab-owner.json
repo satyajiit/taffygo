@@ -1,0 +1,9 @@
+{
+  "tab_id": "tab-1",
+  "title": "Example",
+  "host": "example.test",
+  "has_been_nowhere": false,
+  "owner": 200,
+  "privacy": 0,
+  "selected": true
+}

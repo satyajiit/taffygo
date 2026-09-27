@@ -1,0 +1,41 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The Python tool runtime's one build argument, declared beside the registry
+# that would name the worker.
+#
+# //taffy/utility is the only target allowed to depend on a tool runtime — the
+# media worker's own BUILD.gn says so in its visibility list — so it is where
+# the argument that decides whether a runtime exists belongs. The shape is the
+# one browser/account_plane_configuration.gni and
+# browser/asset_delivery_configuration.gni already use: a declare_args() block
+# in the component that consumes it, imported by that component's BUILD.gn,
+# rather than a fourth kind of args file.
+
+declare_args() {
+  # Whether this build carries the sandboxed Python tool runtime (decisions
+  # 0007, 0040, 0046 and 0066).
+  #
+  # False keeps non-Android and host diagnostic builds free of the interpreter.
+  # Android product profiles set it explicitly after the source-built worker,
+  # descriptor-backed library and browser launcher are all in their graph.
+  taffy_enable_python_runtime = false
+}
+
+assert(!taffy_enable_python_runtime || is_android,
+       "the Python worker is an Android utility-process feature")
+assert(!taffy_enable_python_runtime || target_cpu == "arm64" ||
+           target_cpu == "x64",
+       "the Python worker has committed configuration only for arm64 and x64")
+
+# An official 64-bit Android build evaluates native targets again in its
+# 32-bit secondary-ABI toolchain. GN arguments describe the product and remain
+# set in that evaluation, while current_cpu changes to arm or x86. Keep the
+# product intent validated above, but expose the runtime only to a toolchain
+# compiling the configured product ABI. The CPython target retains its own
+# current_cpu assertion as the final artifact-level boundary.
+taffy_python_runtime_in_current_toolchain =
+    taffy_enable_python_runtime && current_cpu == target_cpu

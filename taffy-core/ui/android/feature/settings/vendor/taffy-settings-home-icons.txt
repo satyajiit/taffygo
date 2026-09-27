@@ -1,0 +1,31 @@
+Taffy settings hero stills
+==========================
+
+Owner:            TaffyGo
+Licence:          Reserved media, not licensed with the code; see TRADEMARKS.md.
+Created:          2026-08-29
+Encoder:          cwebp -lossless -exact -z 9 -metadata none
+
+First-party hero stills for Ads and trackers, Privacy, Time on sites, and
+You. Row icons on those surfaces are Phosphor (decision 0030). These stills
+are artwork, drawn untinted. They carry no third-party mark and no generator
+watermark. The shipping bytes live in src/main/res/drawable-xxhdpi/; PNG
+masters sit beside this record in vendor/masters/.
+
+Removal trigger
+---------------
+
+Replace this set when a derived illustration pipeline owns these stills.
+Until then the committed WebP plus this checksum is the reviewable link.
+
+sha256_taffy_hero_ads_webp=b403a10cef65a5eb6fd046772f4424e4b69ad5dd41de9a23f99f718937a790bc
+bytes_taffy_hero_ads_webp=185162
+
+sha256_taffy_hero_privacy_webp=35de86afc3f7f711ca201c65c47d76f729b010ec923fe88995030077168985c9
+bytes_taffy_hero_privacy_webp=197840
+
+sha256_taffy_hero_time_webp=20d833921725483d76e6d9b06644703116c1ed9722dc4eed572d85d61fba585a
+bytes_taffy_hero_time_webp=154790
+
+sha256_taffy_hero_you_webp=0a865679bf313e0513320505f1d7428fa8033b13d72b11fad1ec52985cd7a7dc
+bytes_taffy_hero_you_webp=203228

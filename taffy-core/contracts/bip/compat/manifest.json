@@ -1,0 +1,210 @@
+{
+  "description": "Compatibility fixtures for the version rules in the protocol specification section 6.2. Each fixture is one deliberate deviation from a message that would otherwise be accepted, and states the verdict a conforming decoder must reach. Run them with: python3 taffy-core/contracts/bip/codegen/generate.py --verify",
+  "fixture_fields": {
+    "reader_protocol_version": "The protocol version of the consumer that reads this fixture. Absent, the reader is this build. Present, the checker derives that older reader's view of the contract from the one schema on disk by removing every enumeration member x-bip-added-in dates after that version, and then requires two things at once: the message is valid at the current version, and the older reader refuses it on the added member alone. That pair is what makes an additive step provably additive rather than merely declared so.",
+    "fixture_limit_bytes": "The byte bound this fixture is measured against, for an oversized-message verdict. Fixture data, deliberately small so the document stays readable; the bound a real endpoint enforces is advertised at runtime in ProtocolInfo."
+  },
+  "verdicts": {
+    "ACCEPT": "The decoder accepts the message and ignores what it does not understand.",
+    "REJECT_UNSUPPORTED": "The message decodes, but carries a value outside a closed enumeration. It is unsupported and fails closed; the value is never coerced to a known member.",
+    "REJECT_UNSUPPORTED_VERSION": "The major version differs from the version this build speaks, so the required meaning may have changed. The decoder rejects it without inspecting the body.",
+    "REJECT_INVALID": "The message decodes, but breaks a required-field or shape rule.",
+    "REJECT_OVERSIZED": "The message is otherwise valid and is rejected only because it exceeds the byte bound in force.",
+    "REJECT_MALFORMED": "The bytes are not well-formed JSON at all."
+  },
+  "fixtures": [
+    {
+      "file": "minor-unknown-optional-field.json",
+      "declares_next_minor": true,
+      "schema": "delta.schema.json",
+      "definition": "PageInvalidation",
+      "expected_verdict": "ACCEPT",
+      "rule": "A minor version adds optional fields. A reader of an older minor version accepts the message and ignores the fields it does not know.",
+      "deviation": "Declares a higher minor version and adds two fields this version does not define.",
+      "note": "This is the rule that lets the protocol grow. Rejecting here would make every additive change a breaking change. Accepting is not the same as understanding: a subscriber that meets an unknown field inside a page delta still discards its projection and takes a fresh snapshot, because it cannot prove the projection is still correct."
+    },
+    {
+      "file": "unknown-enum-value.json",
+      "schema": "delta.schema.json",
+      "definition": "PageInvalidation",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "rule": "Every consumer handles an unknown enumeration member as unsupported, never as the least restrictive known member.",
+      "deviation": "Carries an invalidation reason outside the closed enumeration.",
+      "note": "Coercing this to a known reason is the failure this fixture exists to prevent. Guessing that an unrecognised reason is harmless would let a subscriber keep acting on a projection the browser has already declared dead."
+    },
+    {
+      "file": "new-enum-member-at-previous-minor.json",
+      "schema": "protocol-info.schema.json",
+      "definition": "ProtocolInfo",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "reader_protocol_version": "0.1",
+      "rule": "A minor version may add an enumeration member. A consumer built before that member existed treats the message as unsupported and fails closed, and never coerces the member to one it does know.",
+      "deviation": "An endpoint advertisement naming SELECTION and LAYOUT, the two adapter kinds the minor step added, read by a consumer at the version before that step.",
+      "note": "This is the fixture that keeps an additive step honest, and it asserts both halves: the message is valid at the current version, and the older reader refuses it on the added member and on nothing else. The message chosen is the first one a caller reads, which is where leniency would do the most damage. Rounding SELECTION to a member the older reader does know would leave that caller believing it may ask for an adapter whose evidence it would then misattribute to another one; refusing costs it nothing it was entitled to, because a caller that cannot read what an endpoint advertises is a caller that must not act on it."
+    },
+    {
+      "file": "frame-detached-at-previous-minor.json",
+      "schema": "delta.schema.json",
+      "definition": "PageInvalidation",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "reader_protocol_version": "0.2",
+      "rule": "A minor version may add an enumeration member. A consumer built before that member existed treats the message as unsupported and fails closed, and never coerces the member to one it does know.",
+      "deviation": "A page invalidation naming FRAME_DETACHED, the reason the 0.3 minor step added, read by a consumer at the version before that step.",
+      "note": "The failure this prevents is the tempting one: FRAME_DETACHED sits beside ENDPOINT_DISCONNECTED and RENDERER_CRASHED, so a lenient reader would round it to one of those and be wrong in a specific way. Coercing to ENDPOINT_DISCONNECTED or RENDERER_CRASHED would report a dead renderer for a routine subframe navigation. Coercing the other direction is worse: this fixture sets retires_page_epoch and resnapshot_required to false, so a reader that guessed a milder known reason and kept acting would be acting on handles the browser has already declared dead. Refusing costs the reader only the frame it could not have interpreted anyway."
+    },
+    {
+      "file": "removed-required-field.json",
+      "schema": "delta.schema.json",
+      "definition": "PageInvalidation",
+      "expected_verdict": "REJECT_INVALID",
+      "rule": "Structures are extended append-only. Removing a required field is a major change, so a message missing one is invalid at this version.",
+      "deviation": "Omits the required field that says whether the page epoch is retired.",
+      "note": "Defaulting the missing field would silently answer a safety question the sender never answered."
+    },
+    {
+      "file": "unsupported-major-version.json",
+      "schema": "delta.schema.json",
+      "definition": "PageInvalidation",
+      "expected_verdict": "REJECT_UNSUPPORTED_VERSION",
+      "rule": "A major version changes required meaning or removes compatibility. A reader that does not know the major version rejects the message.",
+      "deviation": "Declares a major version this build does not speak; the body is otherwise valid.",
+      "note": "The body validating is the point. A decoder must refuse on the version alone, before the body persuades it that everything looks familiar."
+    },
+    {
+      "file": "oversized-message.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot",
+      "expected_verdict": "REJECT_OVERSIZED",
+      "fixture_limit_bytes": 4096,
+      "rule": "The endpoint reports a maximum message size and enforces it. A message past the bound is refused rather than parsed.",
+      "deviation": "A structurally valid snapshot padded past the byte bound this fixture declares.",
+      "note": "The bound named here is fixture data, not a product target: it is small on purpose so the fixture stays readable. The bound a real endpoint enforces is a device-floor measurement owned by open decision OD-031 and advertised at runtime in ProtocolInfo. The fixture also has to validate against the schema, so the only reason to reject it is its size."
+    },
+    {
+      "file": "malformed-message.json",
+      "schema": "delta.schema.json",
+      "definition": "PageInvalidation",
+      "expected_verdict": "REJECT_MALFORMED",
+      "rule": "Malformed payloads fail closed.",
+      "deviation": "A frame truncated mid-string, which is what a disconnect during a write produces.",
+      "note": "A decoder must not attempt repair, partial decode, or best-effort recovery of the fields that did arrive."
+    },
+    {
+      "file": "content-trust-field-at-previous-minor.json",
+      "schema": "delta.schema.json",
+      "definition": "PageDelta",
+      "reader_protocol_version": "0.3",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "rule": "Every consumer handles an unknown enumeration member as unsupported, never as the nearest known member.",
+      "deviation": "Names CONTENT_TRUST, added at 0.4, in a changed-node field list a reader at 0.3 does not know.",
+      "note": "The tempting failure here is by name rather than by shape. A lenient reader that rounded CONTENT_TRUST to SENSITIVITY would decode the message, believe it understood which field moved, and keep a projection in which a run written by a stranger is still labelled the way it was first observed. Refusing on the one member it does not know, and on nothing else, is what makes an additive step provably additive."
+    },
+    {
+      "file": "destination-class-precondition-at-previous-minor.json",
+      "schema": "action.schema.json",
+      "definition": "ActionProposal",
+      "reader_protocol_version": "0.4",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "rule": "Every consumer handles an unknown enumeration member as unsupported, never as the nearest known member.",
+      "deviation": "Names DESTINATION_CLASS_ALLOWED, added at 0.5, in a precondition list a broker at 0.4 does not know.",
+      "note": "This is the fixture that explains why the destination checks are precondition members and not optional fields. An optional field a reader does not know is accepted and ignored, which for a message that authorizes a browser effect fails open: the broker would dispatch an action whose author believed it was gated. A precondition kind it does not know fails the whole proposal closed, on that member and nothing else. A broker that skipped the unreadable entry and evaluated the four it recognized would look conformant and would have removed the only check standing between an assistant-chosen link and a live mailbox."
+    },
+    {
+      "file": "egress-result-code-at-previous-minor.json",
+      "schema": "action.schema.json",
+      "definition": "ActionResult",
+      "reader_protocol_version": "0.4",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "rule": "Every consumer handles an unknown enumeration member as unsupported, never as the nearest known member.",
+      "deviation": "Reports EGRESS_NOT_AUTHORIZED, added at 0.5, to a runtime at 0.4 that knows thirty-one codes and not this one.",
+      "note": "The tempting failure is a neighbour: DENIED_BY_POLICY sits beside this code in the taxonomy and would decode. It would also be wrong in the way that matters, because the two are not retried, reported, or recorded alike, and a runtime that quietly substituted one would write a record saying a decision was made that never was. The refusal is on the code alone; dispatched and terminal are already the values a refusal carries, so nothing else in the message is at issue."
+    },
+    {
+      "file": "prepared-effect-precondition-at-previous-minor.json",
+      "schema": "action.schema.json",
+      "definition": "ActionProposal",
+      "reader_protocol_version": "0.5",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "rule": "Every consumer handles an unknown enumeration member as unsupported, never as the nearest known member.",
+      "deviation": "Names PREPARED_EFFECT_UNCHANGED, added at 0.6, in a precondition list a broker at 0.5 does not know.",
+      "note": "The failure this forbids is the quiet one. A broker at 0.5 sees a proposal it can otherwise evaluate completely: the epoch matches, the document is active, the node exists, the budget holds. Skipping the one entry it cannot read would leave a well-formed submission with four satisfied preconditions and no remaining tie to the confirmation a person actually gave, which is the entire content of the check. Refusing the proposal on that member, and on nothing else, is what keeps a commit bound to its prepare across a version boundary the two endpoints do not share."
+    },
+    {
+      "file": "graph-moved-result-code-at-previous-minor.json",
+      "schema": "action.schema.json",
+      "definition": "ActionResult",
+      "reader_protocol_version": "0.6",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "rule": "Every consumer handles an unknown enumeration member as unsupported, never as the nearest known member.",
+      "deviation": "Reports GRAPH_MOVED_DURING_PREFLIGHT, added at 0.7, to a runtime at 0.6 that knows thirty-six codes and not this one.",
+      "note": "The neighbour here is not a distant one, it is the code this was split out of. STALE_GRAPH decodes, is adjacent in the taxonomy, and describes something that really did happen \u2014 which is exactly what makes substituting it the wrong answer. The two are not recovered from alike: a stale revision floor is answered by observing again at a newer revision, and a document the browser knows has moved is answered only by a fresh snapshot. A runtime that folded the new code into the old one would retry the cheaper way, fail, and record a refusal whose stated cause was never the cause. The refusal is on the code alone; dispatched and terminal already carry the values a preflight refusal carries."
+    },
+    {
+      "file": "value-reference-result-code-at-previous-minor.json",
+      "schema": "action.schema.json",
+      "definition": "ActionResult",
+      "reader_protocol_version": "0.10",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "rule": "Every consumer handles an unknown action terminal as unsupported, never as a neighbouring policy decision.",
+      "deviation": "Reports VALUE_REFERENCE_UNKNOWN, added at 0.11, to a runtime at 0.10 that knows the earlier terminal taxonomy.",
+      "note": "DENIED_BY_POLICY would decode and was the historical fallback, but it says policy made a decision when the actual cause was a browser-owned reference that could not be spent. The durable next move differs: policy can be asked again, while a spent or expired value must be requested from the person again. Refusing on the new member alone keeps that distinction across the version boundary."
+    },
+    {
+      "file": "unknown-node-sensitivity.json",
+      "schema": "snapshot.schema.json",
+      "definition": "PageSnapshot",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "rule": "Every enumeration is closed. A sensitivity outside the members this version defines is unsupported and fails closed; it is never coerced to a known member.",
+      "deviation": "The credential field's node names a sensitivity class, CREDENTIAL_MATERIAL, that this version of the contract does not define.",
+      "note": "This is the failure mode the kernel observation framing introduces, stated where the contract can state it. That framing carries every enumeration as its numeric member value, so a decoder that resolved an unknown sensitivity to its nearest neighbour would let a credential field cross the kernel boundary marked NOT_SENSITIVE \u2014 and the browser's withholding rule keys on exactly that member, so the node's name would cross with it. The Rust decoder refuses the byte-level form of this fixture in an_unknown_result_code_fails_closed's sibling tests; this row is what makes the rule the contract's rather than one codec's."
+    },
+    {
+      "file": "challenge-kind-at-previous-minor.json",
+      "schema": "delta.schema.json",
+      "definition": "PageDelta",
+      "reader_protocol_version": "0.11",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "rule": "A delta may name a field added in a minor version only to a reader that knows that field. An older reader refuses the delta and takes a fresh snapshot rather than guessing which earlier field changed.",
+      "deviation": "Names CHALLENGE_KIND and the two person-supplied response classifications added at 0.12 to a delta reader at 0.11.",
+      "note": "The optional challenge_kind field itself remains additive: a 0.11 snapshot reader may ignore it. A delta is different because accepting CHALLENGE_KIND as SENSITIVITY, or silently skipping it, would leave the reader claiming its existing projection was current after the structural challenge changed. Refusing the new closed members forces the bounded fresh-snapshot recovery path."
+    },
+    {
+      "file": "loading-stopped-at-previous-minor.json",
+      "schema": "action.schema.json",
+      "definition": "ActionProposal",
+      "reader_protocol_version": "0.12",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "rule": "A browser lifecycle effect added in a minor version is never rounded to a postcondition that requires no evidence.",
+      "deviation": "Declares LOADING_STOPPED to a reader that knows only the earlier postcondition set.",
+      "note": "NO_MUTATION is the dangerous neighbour: accepting it would let a renderer acknowledgement look like proof that an active network load stopped. The older reader refuses the whole proposal instead."
+    },
+    {
+      "file": "document-advanced-at-previous-minor.json",
+      "schema": "action.schema.json",
+      "definition": "ActionProposal",
+      "reader_protocol_version": "0.13",
+      "expected_verdict": "REJECT_UNSUPPORTED",
+      "rule": "A claim added in a minor version is never rounded to the claim that happens to be nearest.",
+      "deviation": "Declares DOCUMENT_ADVANCED to a reader that knows only the earlier postcondition set.",
+      "note": "NO_MUTATION is the dangerous neighbour and is this member's exact inverse: it is satisfied by a graph revision that did not move, while DOCUMENT_ADVANCED is satisfied only by one that did. A reader coercing the two would report a click that changed nothing as a click that worked."
+    },
+    {
+      "file": "proposal-authoring-a-literal-value.json",
+      "schema": "action.schema.json",
+      "definition": "ActionProposal",
+      "expected_verdict": "REJECT_INVALID",
+      "rule": "A proposal names the value that will enter a field; it never carries one. The bytes are resolved from the reference by the browser, after the decision and before the dispatch.",
+      "deviation": "Replaces the value_reference on a SET_TEXT proposal with the literal text it would have resolved to, changing nothing else.",
+      "note": "This is the rule that survives being wrong about everything else. Suppose the model is following an instruction hidden in the page, the approval sheet is misread, and the person presses through: what is typed is still a value the browser held on that person's behalf, because a proposal carrying bytes is not a proposal this contract can express. The deviation is deliberately the smallest possible one - the same action, the same node, the same sensitivity label, a value that is in fact correct - so that what refuses it is the authorship rule and not a coincidence of some other check. It is refused at the current version rather than at a previous minor, and that is not an omission: the four write action types have been on the wire since 0.1 under x-bip-reserved, so no reader view derived from x-bip-added-in can be built in which SET_TEXT is unknown, and a fixture claiming a reader at 0.7 refuses one would be claiming a refusal no conforming decoder ever owed."
+    },
+    {
+      "file": "renderer-command-carrying-a-value-reference.json",
+      "schema": "action.schema.json",
+      "definition": "RendererActionCommand",
+      "expected_verdict": "REJECT_INVALID",
+      "rule": "A one-use renderer command carries the resolved value and never the reference it was resolved from. The reference is spent in the browser process and is not forwarded.",
+      "deviation": "Names the value instead of carrying it: the input is a well-formed TEXT input holding only a value_reference, which is exactly the shape the proposal that produced this command was required to have.",
+      "note": "The other half of the authorship rule, and the half that is about the renderer rather than the model. A reference that arrived in a sandboxed process would be a name it could present again - to a later command, after a navigation, in a different frame - and a reference that survives its own use is a capability wearing a different name. The deviation is deliberately a shape that is valid everywhere else: this input passes every rule ActionInput states, and passes the same rules the proposal half is required to pass, so the only thing refusing it is the statement that a renderer command may carry a value and may not name one. Carrying both the text and the reference would have been refused twice over and would not have told anyone which rule was doing the work."
+    }
+  ]
+}

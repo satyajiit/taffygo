@@ -1,0 +1,241 @@
+{
+  "schema_version": "0.1",
+  "snapshot_id": "snap_shadow_01",
+  "request_id": "req_001",
+  "profile_id": "prof_default",
+  "browser_window_id": "win_01",
+  "tab_id": "tab_01",
+  "root_frame_id": "frame_main",
+  "page_epoch": "epoch_a1",
+  "graph_revision": 6,
+  "event_sequence": 31,
+  "lifecycle_state": "ACTIVE",
+  "committed_url_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://docs.example.test"
+    },
+    "disclosure": "ORIGIN_AND_PATH",
+    "has_query": false,
+    "has_fragment": false,
+    "path": "/"
+  },
+  "origin_metadata": {
+    "origin": {
+      "kind": "TUPLE",
+      "serialization": "https://docs.example.test"
+    },
+    "is_potentially_trustworthy": true,
+    "is_incognito": false
+  },
+  "capture_time_monotonic_ms": 1000,
+  "scope": "DOCUMENT",
+  "adapters": [
+    {
+      "adapter": "BROWSER",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    },
+    {
+      "adapter": "DOM",
+      "status": "INCOMPLETE",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    },
+    {
+      "adapter": "ACCESSIBILITY",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    },
+    {
+      "adapter": "FORMS",
+      "status": "OK",
+      "adapter_version": "1.0.0",
+      "extraction_rule_version": "dom-1.0.0"
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "n_doc",
+      "frame_id": "frame_main",
+      "role": "DOCUMENT",
+      "name": "Account settings",
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "node_id": "n_host",
+      "frame_id": "frame_main",
+      "role": "REGION",
+      "name": "Notification preferences",
+      "description": "Projected from an open shadow root.",
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "node_id": "n_shadow_label",
+      "frame_id": "frame_main",
+      "role": "LABEL_VALUE_PAIR",
+      "name": "Weekly summary",
+      "text_runs": [
+        {
+          "text": "Weekly summary",
+          "source_kind": "DOM",
+          "sensitivity": "NOT_SENSITIVE",
+          "truncated": false
+        }
+      ],
+      "states": [
+        "VISIBLE"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "DOM",
+        "ACCESSIBILITY"
+      ],
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "field": "NAME",
+          "source_kind": "ACCESSIBILITY",
+          "source_locator": "ax:shadow:41",
+          "extraction_rule_version": "ax-1.0.0",
+          "transformation": "NORMALIZED",
+          "confidence": 0.97
+        }
+      ]
+    },
+    {
+      "node_id": "n_shadow_toggle",
+      "frame_id": "frame_main",
+      "role": "CHECKBOX",
+      "name": "Weekly summary",
+      "states": [
+        "VISIBLE",
+        "ENABLED",
+        "CHECKED"
+      ],
+      "value_descriptor": {
+        "kind": "TOGGLE",
+        "present": true,
+        "redacted": false,
+        "normalized_value": "true"
+      },
+      "actions": [
+        "FOCUS",
+        "SCROLL_INTO_VIEW"
+      ],
+      "sensitivity": "NOT_SENSITIVE",
+      "sources": [
+        "ACCESSIBILITY",
+        "FORM_CONTROL"
+      ],
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "field": "STATES",
+          "source_kind": "ACCESSIBILITY",
+          "source_locator": "ax:shadow:42",
+          "extraction_rule_version": "ax-1.0.0",
+          "transformation": "NONE",
+          "confidence": 0.96
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_doc",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_host",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_host",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_shadow_label",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_host",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_shadow_toggle",
+      "relationship": "CONTAINS",
+      "inferred": false
+    },
+    {
+      "from_frame_id": "frame_main",
+      "from_node_id": "n_shadow_label",
+      "to_frame_id": "frame_main",
+      "to_node_id": "n_shadow_toggle",
+      "relationship": "LABELS",
+      "inferred": false
+    }
+  ],
+  "frames": [
+    {
+      "frame_id": "frame_main",
+      "is_main_frame": true,
+      "is_out_of_process": false,
+      "is_cross_origin_to_parent": false,
+      "origin_metadata": {
+        "origin": {
+          "kind": "TUPLE",
+          "serialization": "https://docs.example.test"
+        },
+        "is_potentially_trustworthy": true,
+        "is_incognito": false
+      },
+      "page_epoch": "epoch_a1",
+      "graph_revision": 6,
+      "lifecycle_state": "ACTIVE",
+      "included": true
+    }
+  ],
+  "truncation": {
+    "truncated": false,
+    "budgets_reached": [],
+    "omitted_node_count": 0,
+    "omitted_text_bytes": 0,
+    "omitted_frame_count": 0,
+    "may_change_answer": false
+  },
+  "redaction_summary": {
+    "applied_features": [
+      "SECRET_VALUE_SUPPRESSION",
+      "SENSITIVE_ZONE_CLASSIFICATION",
+      "URL_MINIMIZATION"
+    ],
+    "redacted_field_count": 0,
+    "suppressed_secret_value_count": 0,
+    "sensitive_zone_count": 0,
+    "policy_filtered_frame_count": 0
+  },
+  "warnings": [
+    {
+      "code": "CLOSED_SHADOW_ROOT_NOT_PROJECTED",
+      "frame_id": "frame_main",
+      "node_id": "n_host",
+      "detail_code": "closed_root_skipped"
+    }
+  ]
+}

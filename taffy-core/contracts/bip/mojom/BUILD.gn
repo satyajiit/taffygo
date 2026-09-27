@@ -1,0 +1,60 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//mojo/public/tools/bindings/mojom.gni")
+
+# The Browser Intelligence Protocol wire contract. Both the browser broker
+# (//taffy/browser) and the renderer endpoint
+# (//taffy/renderer) depend on this target and on nothing else of
+# each other's: the mojom file is the only coordination point between them.
+mojom("mojom") {
+  sources = [
+    "page_intelligence.mojom",
+    "page_intelligence_identity.mojom",
+  ]
+
+  # Deliberately empty. The contract carries its own Origin, its own
+  # UrlMetadata and its own monotonic-millisecond time type, so it has no
+  # dependency outside its own target: not mojo_base time, not url.mojom. The
+  # main interface imports only the identity vocabulary listed in `sources`.
+  # That is what lets the
+  # fixtures in taffy-core/contracts/bip/compat be decoded through the generated types
+  # with no translation layer, which is the only way the fixtures can prove the
+  # two representations agree. It also means the browser broker converts
+  # url::Origin and GURL at exactly one place it owns
+  # (//taffy/components/intelligence/content/origin_codec.h), rather than at every call site
+  # that happens to hold a mojom struct.
+  public_deps = []
+
+  # The Android UI does not talk BIP. BIP terminates at the browser-side page
+  # intelligence adapter; Java and Kotlin consume the separate, profile-scoped
+  # Core API. No Java bindings are generated here on purpose, and
+  # //taffy/app/android must not add generate_java without a decision change.
+
+  # VERIFY AT SP-04: whether the interface should be channel-associated
+  # (mojom "AssociatedRemote", ordered with navigation IPCs) or an ordinary
+  # interface. The broker binds it associated today because the stale-node
+  # algorithm depends on action and observation messages keeping their order
+  # relative to navigation commits. Measuring that is [Open (OD-027)] and the
+  # result is recorded in docs/architecture/browser-intelligence-protocol.md.
+}
+
+# The golden messages and compatibility fixtures in taffy-core/contracts/bip decoded
+# through the generated C++ types, so that a schema change the Rust and Kotlin
+# generators accept cannot silently diverge from what this wire contract
+# actually carries. It also asserts that the protocol version in
+# taffy-core/contracts/bip/schema/bip.version.json matches
+# //taffy/browser:bip_schema_version.h.
+#
+# VERIFY AT SP-04: the fixture files are data, so they have to reach the test
+# binary. Confirm at the pinned milestone whether they are best carried as GN
+# `data` on this target or generated into the output directory; the fixtures
+# themselves already exist under taffy-core/contracts/bip/golden and taffy-core/contracts/bip/compat.
+source_set("compatibility_fixtures") {
+  testonly = true
+  sources = []
+  public_deps = [ ":mojom" ]
+}

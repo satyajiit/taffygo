@@ -1,0 +1,35 @@
+{
+  "schema_version": "0.1",
+  "command_id": "cmd_01",
+  "frame_id": "frame_main",
+  "page_epoch": "epoch_a1",
+  "required_graph_revision": 3,
+  "node_id": "n_link",
+  "operation": "ACTIVATE",
+  "renderer_preconditions": [
+    {
+      "kind": "NODE_EXISTS"
+    },
+    {
+      "kind": "NODE_ROLE_UNCHANGED",
+      "expected_role": "LINK"
+    },
+    {
+      "kind": "NODE_ACTION_AVAILABLE",
+      "expected_action_type": "ACTIVATE"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "VISIBLE"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "ENABLED"
+    },
+    {
+      "kind": "NODE_STATE_ABSENT",
+      "node_state": "OBSCURED"
+    }
+  ],
+  "deadline_ms": 1500
+}

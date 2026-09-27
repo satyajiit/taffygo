@@ -1,0 +1,171 @@
+# The Play listing and track ladder, as this repository states them.
+#
+# `tools/lib/play_config.py` owns this schema and checks it; the `play` lane of
+# ./tools/check fast runs that checker on every host, with no network and no
+# credential. ./tools/play reads the same file when it talks to Google.
+#
+# Two rules about what may live here:
+#
+#   1. **No credential, ever.** The service-account key is a run-time input
+#      read from .taffy/play-service-account.json or $TAFFY_PLAY_CREDENTIAL,
+#      both untracked. The checker refuses this file if it grows a field whose
+#      name or value looks like one.
+#   2. **The copy below is user-facing text**, so docs/voice-and-naming.md
+#      section 4 binds it exactly as it binds a document. The checker applies
+#      the same banned-vocabulary rules ./tools/check docs applies, imported
+#      from the same table rather than copied — a store listing is the most
+#      widely read text this product will ever publish, and it was the one
+#      surface with no vocabulary gate at all.
+#
+# The package name is held equal to taffy-core/resources/branding/
+# taffy_branding.gni. That file is the single owner (its own header says so);
+# this is a projection of it and the checker fails on any disagreement.
+
+schema_version = 1
+
+[application]
+package = "com.taffygo.browser"
+default_language = "en-GB"
+
+# Where an upload lands unless ./tools/play upload is told otherwise. Never
+# "production": a first upload that goes straight to the store listing is one
+# typo away from publishing, and this file is not the place to make that cheap.
+default_track = "internal"
+
+[listing.en-GB]
+# Play's own limits, which the checker enforces: 30, 80, 4000 and 500
+# characters. Every count below was measured, not estimated.
+#
+# The listing leads with the assistant, in the title, the short description and
+# the first line above the "Read more" fold. That is the product owner's
+# positioning call, taken on 2026-09-08 against an ASO study that recommended
+# the opposite; decision 0142 section 8 records both the call and the study, so
+# whoever reads this next can see it was a decision rather than a default.
+#
+# The title is 29 of 30 characters and truncates in Play's search rows at about
+# twenty-one, which is why the second keyword pool sits after the comma: the row
+# reads "TaffyGo: AI Browser, ..." while the index still carries "ad block".
+# "Adblock" as one word is deliberately not used anywhere — it is eyeo GmbH's
+# product name and a live mark.
+#
+# Two sentences here are load-bearing for honesty rather than for search, and
+# must not be cut to save characters: "Taffy does nothing until you ask", in the
+# second line, and the whole "Setting up the assistant" block, which says
+# plainly that a fresh install has no provider. They are what stops a title
+# promising AI from becoming a one-star cohort on day one.
+#
+# Rewritten on 2026-09-26 for TaffyGo 1.0 (decisions 0251 and 0252): no
+# account, no server of TaffyGo's own, the person's own AI key, and the public
+# source. Each claim was checked against the tree that day, and each has one
+# place a reader can check it again:
+#
+#   * "38 providers" is the provider count of the embedded catalog,
+#     baseline-0011 (model-router/catalog/baseline.json). Change the number
+#     here when the catalog changes it.
+#   * "asks before it types into a form or saves a file" is the exact-approval
+#     rule: FillField and StartDownload are SensitiveDisclosure in
+#     policy-engine's action_class.rs, and risk.rs asks for exact approval
+#     for everything above ReversibleDisclosure. A press or a link-open is not
+#     in that set, so the listing claims no more than those two.
+#   * "sign in ... hands you the page" and "a code only you have ... asks you"
+#     are the user.handover and user.request_values tools (decision 0209).
+#   * "EasyList and EasyPrivacy" are the snapshots bundled in the package
+#     (taffy-core/third_party/easylist, decision 0202).
+#   * "TaffyGo runs no servers of its own" is decision 0200, and repeats the
+#     Get Started screen's own sentence (taffy_get_started_promise_servers).
+#   * "free, with no in-app purchases" holds because Play Billing left with
+#     decision 0200.
+#
+# The line "TaffyGo has no VPN" stays for Play's Device and Network Abuse
+# policy, which forbids blocking another app's ads: the blocker works only on
+# pages TaffyGo itself loads.
+title = "TaffyGo: AI Browser, Ad Block"
+short_description = "AI browser with a built-in ad blocker. Use your own AI key. No account needed."
+full_description = """
+TaffyGo is a web browser with one AI assistant, called Taffy. Ask about the page you are reading, or hand over a piece of research. Every fact shows its source. Ads and trackers are blocked from the first page you open.
+
+Taffy does nothing until you ask, and you can take over at any time.
+
+Three ways to use it
+- You browse. Taffy stays out of the way.
+- Browse together. Ask about the page you are reading, or about several tabs at once.
+- Taffy browses. Hand over a piece of research and watch it work.
+
+You pick, page by page. Taffy works in its own tabs, which you can watch, touch and close. Take over whenever you want, and the task stops where it is.
+
+Setting up the assistant
+Taffy needs an AI provider before it can answer anything. On a fresh install it is not set up, and the browser works without it. Add a key from one of 38 providers, or sign in to a plan you already pay for with a provider that offers one. Your keys stay on your phone. To answer a question about a page, Taffy sends the text of that page to the provider you chose, and to nobody else. Any cost is between you and that provider.
+
+No account, and no TaffyGo server
+There is nothing to sign up for. TaffyGo runs no servers of its own, so your history, bookmarks, workspaces and keys stay on this phone, and nothing you browse or ask is sent to us.
+
+What the assistant never sees
+Passwords, one-time codes, payment details and passkeys are never sent to an AI provider. This is built in, and no setting turns it off.
+
+Taffy asks before it acts
+Before Taffy types into a form or saves a file, it stops and asks. Approve it, change it, or take over and do it yourself. When a site wants you to sign in, Taffy hands you the page. When it needs a code only you have, it asks you for it.
+
+What you get back
+Results collect in a workspace, with the source beside every fact, so you can check the answer yourself. Keep what you want in your Library.
+
+A complete browser underneath
+- The ad blocker is built into the browser and works in every tab. It uses the EasyList and EasyPrivacy rules, and you can turn it off for a site you trust.
+- Blocking works with or without an AI provider. TaffyGo is free, with no in-app purchases.
+- Tabs, bookmarks, history and downloads, including files you save from the web.
+- Private tabs, which keep no history or cookies after you close them.
+- One address bar for sites, searches and questions.
+
+Limits
+Taffy can be wrong, and pages can fail to load. It reports what it found and what it could not, and says when a task is only partly done. When it needs an answer, it asks you instead of guessing.
+
+TaffyGo has no VPN. The ad blocker works inside the browser, on the pages TaffyGo loads.
+
+Open source
+TaffyGo's code is published under the Mozilla Public License 2.0 at github.com/satyajiit/taffygo.
+
+Based on the Chromium open source project.
+"""
+# Play created this app with en-GB as its default language, and the default is
+# what a person sees whose own locale has no listing — so the authored locale is
+# en-GB to match the app rather than to express a preference. en-US is published
+# from the same source because Play indexes every locale separately and this
+# copy differs by nothing between the two; add a locale here rather than a
+# second copy of the paragraphs.
+also_publish_as = ["en-US"]
+# Play's "What's new" text for the release this listing ships with, projected
+# into changelogs/default.txt. Play shows it beside the listing, so it names
+# the release and repeats the one fact a first-time installer most needs: the
+# assistant is not set up until they add a provider.
+release_notes = """
+TaffyGo 1.0: a Chromium browser that blocks ads and trackers from the first page, with one AI assistant, Taffy. Ask about a page or hand over a piece of research, and every fact shows its source.
+
+Taffy works with your own AI key, or a plan you already pay for. It is not set up on a fresh install, and the browser works without it.
+
+No account, and no TaffyGo server. The code is open at github.com/satyajiit/taffygo.
+"""
+
+# --- the track ladder -------------------------------------------------------
+#
+# Play's own track identifiers, which are wire values rather than product
+# vocabulary. `promotes_to` is the only direction ./tools/play promote will
+# move a release, so the ladder is stated once here instead of being a flag
+# somebody types correctly.
+#
+# There is deliberately no closed track yet. Google requires one — twelve
+# testers for fourteen continuous days — before a *personal* developer account
+# can reach production; an organization account verified with a D-U-N-S number
+# is exempt, and Matterward Labs Private Limited is the operating entity
+# (OD-060 owns the account type as a recorded fact rather than an assumption).
+# Add the track here the moment that answer comes back the other way.
+
+[[tracks]]
+id = "internal"
+promotes_to = "production"
+description = "Up to 100 named testers, no public listing, no review wait. Where every upload lands."
+requires_approval = false
+
+[[tracks]]
+id = "production"
+promotes_to = ""
+description = "The public store listing. TaffyGo 1.0 and nothing before it (decision 0008)."
+requires_approval = true

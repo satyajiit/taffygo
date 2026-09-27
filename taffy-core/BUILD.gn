@@ -1,0 +1,207 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The repository mounts this directory at Chromium //taffy. There are no
+# forwarding labels to the former component namespace: a dependency that was
+# not migrated must fail at GN generation time.
+
+import("//build/config/ui.gni")
+import("//taffy/build/generated/components.gni")
+import("//testing/test.gni")
+
+if (is_android) {
+  import("//build/config/android/rules.gni")
+}
+
+assert(taffy_components != [], "//taffy component projection must not be empty")
+
+# GN consumes the same generated ownership projection that the repository and
+# configured-graph checkers enforce. A stale projection is rejected by the
+# architecture lane before GN; a malformed or empty one fails here as soon as
+# the product root is loaded.
+_taffy_gn_component_graph =
+    read_file("//taffy/build/generated/gn-component-graph.json", "json")
+assert(_taffy_gn_component_graph.schema_version == 1,
+       "//taffy GN component graph schema is unsupported")
+assert(_taffy_gn_component_graph.root_label == "//taffy",
+       "//taffy GN component graph names the wrong product root")
+assert(_taffy_gn_component_graph.targets != [],
+       "//taffy GN component graph must own at least one target")
+
+# This target makes the architecture register discoverable to GN inspection
+# without claiming that a product or platform target exists. Component owners
+# add real targets only after changing their manifest state to `active` and
+# landing the source-owning BUILD.gn file in the same change.
+group("architecture_manifest") {
+  metadata = {
+    taffy_component_manifest = [ "//taffy/build/components.toml" ]
+    taffy_gn_component_graph =
+        [ "//taffy/build/generated/gn-component-graph.json" ]
+  }
+}
+
+# The generated contracts are the first active leaf graph in //taffy. This is
+# a new-root integration label, not a compatibility alias: it names only
+# targets whose sources already live under //taffy/contracts.
+group("contracts") {
+  public_deps = [ "//taffy/contracts" ]
+}
+
+# Native product code enters Chromium through the narrow browser, renderer,
+# and utility-service integration patches. Keeping that half separate from the
+# Android APK dependency is load-bearing: Chromium's APK template rejects
+# native dependencies on its Java/resource graph.
+group("native") {
+  public_deps = [
+    "//taffy/browser",
+    "//taffy/common/public",
+    "//taffy/contracts",
+    "//taffy/renderer",
+    "//taffy/utility:registry",
+  ]
+}
+
+# Complete first-party product assembly. This is the root a graph audit uses;
+# the installable Android label remains //taffy/app/android:taffy_public_apk so
+# upstream registration does not depend on a forwarding alias.
+group("product") {
+  public_deps = [
+    ":native",
+    "//taffy/resources/branding:upstream_provenance",
+    "//taffy/resources/catalog:resources",
+    "//taffy/resources/tokens",
+  ]
+
+  if (is_android) {
+    public_deps += [ "//taffy/app/android:taffy_public_apk" ]
+  }
+}
+
+# All native suites have a real binary. Java/Kotlin host tests retain their
+# Gradle and Robolectric runners and therefore do not enter this group.
+group("taffy_tests") {
+  testonly = true
+  deps = [
+    "//taffy/browser:browser_tests",
+    "//taffy/browser:unit_tests",
+    "//taffy/components/filtering/browser:unit_tests",
+    "//taffy/components/filtering/core:unit_tests",
+    "//taffy/components/filtering/renderer:unit_tests",
+    "//taffy/components/security/browser:unit_tests",
+    "//taffy/components/storage/browser:unit_tests",
+    "//taffy/renderer:unit_tests",
+    "//taffy/services/core:unit_tests",
+    "//taffy/services/tool-runtime/media:unit_tests",
+    "//taffy/services/tool-runtime/supervisor:unit_tests",
+    "//taffy/test:browser_tests",
+    "//taffy/test:benchmark_unit_tests",
+    "//taffy/test:fuzzers",
+    "//taffy/test:workspace_snapshot_compat_unit_tests",
+  ]
+}
+
+if (is_android) {
+  # The cross-platform aggregate above cannot own an Android-only component
+  # edge. This is the canonical Android aggregate: it keeps every native suite
+  # and adds the standalone Compose instrumentation APK without a one-target
+  # forwarding alias under //taffy/test.
+  group("taffy_android_tests") {
+    testonly = true
+    deps = [
+      ":taffy_tests",
+      "//taffy/test/android/ui:taffy_public_test_apk",
+    ]
+  }
+}
+
+test("taffy_unittests") {
+  # The content test suite creates Aura before the first test. Its host runner
+  # must provide a display even when this machine has no desktop session.
+  use_xvfb = use_xvfb_in_this_config
+
+  deps = [
+    "//components/test:run_all_unittests",
+    "//taffy/browser:unit_tests",
+    "//taffy/components/filtering/browser:unit_tests",
+    "//taffy/components/filtering/core:unit_tests",
+    "//taffy/components/filtering/renderer:unit_tests",
+    "//taffy/components/security/browser:unit_tests",
+    "//taffy/components/storage/browser:unit_tests",
+    "//taffy/renderer:unit_tests",
+    "//taffy/services/core:unit_tests",
+    "//taffy/services/tool-runtime/media:unit_tests",
+    "//taffy/services/tool-runtime/supervisor:unit_tests",
+    "//taffy/test:benchmark_unit_tests",
+    "//taffy/test:workspace_snapshot_compat_unit_tests",
+  ]
+
+  data_deps = [
+    "//components:components_tests_pak",
+    "//ui/resources:ui_test_pak_data",
+  ]
+
+  # The Java the suite's own C++ reaches through JNI. //components/test's
+  # run_all_unittests is the launcher components_unittests uses, and this is
+  # the same set it declares beside it: content_java is what
+  # content::TestBrowserContext needs — BackgroundSyncNetworkObserver is
+  # loaded during browser-context construction, and a class that is not in
+  # the APK aborts the process at NewGlobalRef rather than failing a test.
+  if (is_android) {
+    deps += [
+      "//content/public/android:content_java",
+      "//gin:v8_snapshot_assets",
+      "//ui/android:ui_java",
+    ]
+  }
+}
+
+# Browser tests need content's out-of-process launcher and cannot share the
+# unit-test main. Renderer RenderViewTest cases live here because that fixture
+# initializes Blink per test.
+test("taffy_browsertests") {
+  use_xvfb = use_xvfb_in_this_config
+
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  deps = [
+    "//content/shell:pak",
+    "//content/test:browsertest_support",
+    "//content/test:content_test_entry",
+    "//content/test:default_content_test_launcher",
+    "//content/test:test_support",
+    "//taffy/browser:browser_tests",
+    "//taffy/renderer:test_support",
+    "//taffy/test:browser_tests",
+  ]
+  data = [ "//content/test/data/" ]
+  data_deps = [ "//components:components_tests_pak" ]
+
+  if (is_android) {
+    deps += [
+      "//content/shell:content_shell_app",
+      "//content/shell/android:content_shell_assets",
+      "//content/shell/android:content_shell_jni_headers",
+      "//content/test:android_test_message_pump_support",
+      "//content/test:content_browsertests_java",
+      "//taffy/test:browser_test_launcher",
+      "//testing/android/native_test:native_test_support",
+      "//ui/android",
+      "//ui/android:test_support",
+    ]
+    android_manifest =
+        "$target_gen_dir/taffy_browsertests_manifest/AndroidManifest.xml"
+    android_manifest_dep = ":taffy_browsertests_manifest"
+    use_default_launcher = false
+  }
+}
+
+if (is_android) {
+  jinja_template("taffy_browsertests_manifest") {
+    testonly = true
+    input = "//taffy/test/android/AndroidManifest.xml.jinja2"
+    output = "$target_gen_dir/taffy_browsertests_manifest/AndroidManifest.xml"
+    variables = [ "library_name=taffy_browsertests__library" ]
+  }
+}

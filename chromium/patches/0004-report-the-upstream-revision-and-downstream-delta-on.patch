@@ -1,0 +1,166 @@
+From 30c956cf0509ae787f83d48486f3ce0270288da9 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sat, 22 Aug 2026 00:07:25 +0530
+Subject: report the upstream revision and downstream delta on the version
+ surface
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The version page is the surface a person can reach without a build server,
+and PAR-SEC-002 requires the build to report the Chromium version, the
+patch delta and the known lag. One section, fed entirely by
+taffy::GetUpstreamProvenance(): milestone, tag, commit, the date the pin
+was recorded (or the not-recorded string when the generator ran outside a
+Git checkout), the fork-debt figures counted the way ./tools/check fast
+counts them, and the security patch level with its references. Labels are
+IDS_TAFFY_VERSION_* from the TaffyGo catalogue (patch 0003 is the
+prerequisite); every value is a compile-time constant of the binary, so the
+section costs no handler and no script, and lag stays a display-time
+subtraction rather than an embedded build clock.
+
+The template lives in components/webui/version/resources at this milestone
+(the spec anticipated the version page moving between shapes); the rows are
+data, so a template migration is a mechanical rewrite of one loop.
+
+The product-logo half of the specification is not in this commit: the two
+IDR_PRODUCT_LOGO resource paths still serve Chromium's pak-packed art,
+because no pak-packed TaffyGo mark exists yet. The specification records
+that half as owed together with what it is blocked on.
+
+Rebase risk: medium — the version page is refactored occasionally, and all
+TaffyGo logic is behind one function call so a refactor moves the call site
+rather than rewriting the change.
+
+Needed by: PAR-SEC-002, an M1 Required row.
+Retirement: permanent. A derivative that cannot tell a person which
+upstream revision it is has no answer to the first question a security
+reviewer asks.
+
+Taffy-Patch: 0004
+
+diff --git a/chrome/browser/ui/webui/version/BUILD.gn b/chrome/browser/ui/webui/version/BUILD.gn
+index 8c207f69b19c3..ef94fc089553d 100644
+--- a/chrome/browser/ui/webui/version/BUILD.gn
++++ b/chrome/browser/ui/webui/version/BUILD.gn
+@@ -24,6 +24,8 @@ source_set("version") {
+     "//components/embedder_support:user_agent",
+     "//components/resources:components_scaled_resources",
+     "//components/strings",
++    "//taffy/resources/branding:upstream_provenance",
++    "//taffy/resources/catalog:taffy_strings",
+     "//components/variations",
+     "//components/variations/service",
+     "//components/version_info",
+diff --git a/chrome/browser/ui/webui/version/version_ui.cc b/chrome/browser/ui/webui/version/version_ui.cc
+index 6f1f293bacaef..d267f9ae7eaa9 100644
+--- a/chrome/browser/ui/webui/version/version_ui.cc
++++ b/chrome/browser/ui/webui/version/version_ui.cc
+@@ -27,6 +27,8 @@
+ #include "chrome/grit/branded_strings.h"
+ #include "chrome/grit/generated_resources.h"
+ #include "chrome/grit/theme_resources.h"
++#include "taffy/resources/branding/taffy_upstream_provenance.h"
++#include "taffy/resources/catalog/grit/taffy_strings.h"
+ #include "components/embedder_support/user_agent_utils.h"
+ #include "components/grit/components_scaled_resources.h"
+ #include "components/grit/version_ui_resources.h"
+@@ -111,6 +113,49 @@ void CreateAndAddVersionUIDataSource(Profile* profile) {
+   };
+   html_source->AddLocalizedStrings(kStrings);
+ 
++  // TaffyGo: the downstream-provenance section (parity row PAR-SEC-002).
++  // Labels come from the TaffyGo string catalogue; every value is a
++  // compile-time constant the overlay computed, so the section needs no
++  // handler and no script.
++  const taffy::UpstreamProvenance& taffy_provenance =
++      taffy::GetUpstreamProvenance();
++  static constexpr webui::LocalizedString kTaffyStrings[] = {
++      {"taffySectionTitle", IDS_TAFFY_VERSION_SECTION_TITLE},
++      {"taffyUpstreamMilestone", IDS_TAFFY_VERSION_UPSTREAM_MILESTONE},
++      {"taffyUpstreamTag", IDS_TAFFY_VERSION_UPSTREAM_TAG},
++      {"taffyUpstreamCommit", IDS_TAFFY_VERSION_UPSTREAM_COMMIT},
++      {"taffyPinRecorded", IDS_TAFFY_VERSION_PIN_RECORDED},
++      {"taffyDownstreamPatches", IDS_TAFFY_VERSION_DOWNSTREAM_PATCHES},
++      {"taffyDownstreamPatchLines", IDS_TAFFY_VERSION_DOWNSTREAM_PATCH_LINES},
++      {"taffySecurityPatchLevel", IDS_TAFFY_VERSION_SECURITY_PATCH_LEVEL},
++      {"taffySecurityAdvisories", IDS_TAFFY_VERSION_SECURITY_ADVISORIES},
++  };
++  html_source->AddLocalizedStrings(kTaffyStrings);
++  html_source->AddString("taffyChromiumMilestone",
++                         taffy_provenance.chromium_milestone);
++  html_source->AddString("taffyChromiumTag", taffy_provenance.chromium_tag);
++  html_source->AddString("taffyChromiumCommit",
++                         taffy_provenance.chromium_commit);
++  if (taffy_provenance.pin_recorded_date.empty()) {
++    html_source->AddLocalizedString("taffyPinRecordedValue",
++                                    IDS_TAFFY_VERSION_PIN_RECORDED_UNKNOWN);
++  } else {
++    html_source->AddString("taffyPinRecordedValue",
++                           taffy_provenance.pin_recorded_date);
++  }
++  html_source->AddString(
++      "taffyDownstreamPatchCount",
++      base::NumberToString(taffy_provenance.downstream_patch_count));
++  html_source->AddString(
++      "taffyDownstreamLineCount",
++      base::NumberToString(
++          taffy_provenance.downstream_modified_upstream_lines));
++  html_source->AddString(
++      "taffySecurityPatchLevelValue",
++      base::NumberToString(taffy_provenance.security_patch_level));
++  html_source->AddString("taffySecurityAdvisoriesValue",
++                         taffy_provenance.security_advisories);
++
+   VersionUI::AddVersionDetailStrings(html_source);
+ 
+   html_source->AddResourcePaths(kVersionUiResources);
+diff --git a/components/webui/version/resources/about_version.html b/components/webui/version/resources/about_version.html
+index 664cb15bf7ee5..ce9fd75808cc2 100644
+--- a/components/webui/version/resources/about_version.html
++++ b/components/webui/version/resources/about_version.html
+@@ -112,6 +112,44 @@ about:version template page
+         </tr>
+ </if>
+ </if>
++<!-- TaffyGo: the downstream-provenance section (parity row PAR-SEC-002).
++     Every value is a compile-time constant of this binary; the page adds no
++     script for it. -->
++        <tr>
++          <td class="label" colspan="2">$i18n{taffySectionTitle}</td>
++        </tr>
++        <tr>
++          <td class="label">$i18n{taffyUpstreamMilestone}</td>
++          <td class="version">$i18n{taffyChromiumMilestone}</td>
++        </tr>
++        <tr>
++          <td class="label">$i18n{taffyUpstreamTag}</td>
++          <td class="version">$i18n{taffyChromiumTag}</td>
++        </tr>
++        <tr>
++          <td class="label">$i18n{taffyUpstreamCommit}</td>
++          <td class="version">$i18n{taffyChromiumCommit}</td>
++        </tr>
++        <tr>
++          <td class="label">$i18n{taffyPinRecorded}</td>
++          <td class="version">$i18n{taffyPinRecordedValue}</td>
++        </tr>
++        <tr>
++          <td class="label">$i18n{taffyDownstreamPatches}</td>
++          <td class="version">$i18n{taffyDownstreamPatchCount}</td>
++        </tr>
++        <tr>
++          <td class="label">$i18n{taffyDownstreamPatchLines}</td>
++          <td class="version">$i18n{taffyDownstreamLineCount}</td>
++        </tr>
++        <tr>
++          <td class="label">$i18n{taffySecurityPatchLevel}</td>
++          <td class="version">$i18n{taffySecurityPatchLevelValue}</td>
++        </tr>
++        <tr>
++          <td class="label">$i18n{taffySecurityAdvisories}</td>
++          <td class="version">$i18n{taffySecurityAdvisoriesValue}</td>
++        </tr>
+ <if expr="is_chromeos">
+         <tr>
+           <td class="label">$i18n{platform}</td>

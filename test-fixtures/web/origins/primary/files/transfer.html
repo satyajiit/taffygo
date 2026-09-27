@@ -1,0 +1,32 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="download-and-upload">
+<title>Downloads and uploads</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Downloads and uploads</h1>
+  <p class="who">A file the browser saves, a file it renders inline, and a file
+  chooser the assistant may not operate.</p>
+</header>
+
+<h2>Downloads</h2>
+<ul>
+  <li><a id="download-attachment" href="/files/download?name=product-specs.csv">Product specifications (CSV, sent as an attachment)</a></li>
+  <li><a id="download-inline" href="/files/product-specs.csv">The same CSV, sent inline</a></li>
+  <li><a id="download-mismatch" href="/files/download?name=product-specs.csv&amp;as=invoice.pdf">CSV bytes offered under a PDF filename</a></li>
+  <li><a id="download-named-attribute" href="/files/product-specs.csv" download="renamed-specs.csv">CSV with a page-chosen download name</a></li>
+</ul>
+
+<h2>Upload</h2>
+<form id="upload" action="/files/upload" method="post" enctype="multipart/form-data">
+  <label for="file">Choose a file</label>
+  <input id="file" name="file" type="file" accept=".csv,text/csv">
+  <p><button type="submit" id="upload-submit">Upload</button></p>
+</form>
+
+<p class="note">The upload endpoint answers 403 and stores nothing. A file chooser
+is a trusted browser surface: it is opened by a person, never by the assistant.</p>

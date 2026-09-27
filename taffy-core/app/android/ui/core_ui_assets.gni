@@ -1,0 +1,81 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# Binary source and package-name ownership for core-ui assets.
+#
+# The profile tiles live in `core/ui/vendor/` because `:core:ui` is what
+# decodes them (`TaffyProfileAvatar.kt`), and they are renamed into the
+# `profile-banners/` asset directory that decoder asks for. Gradle reads
+# its own copy under `core/ui/src/main/assets/`; GN has no variant merge
+# and takes the vendor tree, which is the one carrying the provenance
+# record `core/ui/vendor/taffy-profile-banners.txt`.
+taffy_core_ui_profile_banner_asset_sources = [
+  "//taffy/ui/android/core/ui/vendor/profile-banners/a1.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/a2.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/a3.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/a4.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/a5.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/a6.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/a7.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/a8.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/a9.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/a10.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/b1.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/b2.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/b3.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/b4.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/b5.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/b6.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/b7.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/b8.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/b9.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/b10.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/c1.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/c2.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/c3.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/c4.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/c5.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/c6.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/c7.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/c8.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/c9.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/c10.webp",
+  "//taffy/ui/android/core/ui/vendor/profile-banners/fallback.webp",
+]
+
+taffy_core_ui_profile_banner_asset_destinations = [
+  "profile-banners/a1.webp",
+  "profile-banners/a2.webp",
+  "profile-banners/a3.webp",
+  "profile-banners/a4.webp",
+  "profile-banners/a5.webp",
+  "profile-banners/a6.webp",
+  "profile-banners/a7.webp",
+  "profile-banners/a8.webp",
+  "profile-banners/a9.webp",
+  "profile-banners/a10.webp",
+  "profile-banners/b1.webp",
+  "profile-banners/b2.webp",
+  "profile-banners/b3.webp",
+  "profile-banners/b4.webp",
+  "profile-banners/b5.webp",
+  "profile-banners/b6.webp",
+  "profile-banners/b7.webp",
+  "profile-banners/b8.webp",
+  "profile-banners/b9.webp",
+  "profile-banners/b10.webp",
+  "profile-banners/c1.webp",
+  "profile-banners/c2.webp",
+  "profile-banners/c3.webp",
+  "profile-banners/c4.webp",
+  "profile-banners/c5.webp",
+  "profile-banners/c6.webp",
+  "profile-banners/c7.webp",
+  "profile-banners/c8.webp",
+  "profile-banners/c9.webp",
+  "profile-banners/c10.webp",
+  "profile-banners/fallback.webp",
+]

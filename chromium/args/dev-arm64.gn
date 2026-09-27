@@ -1,0 +1,57 @@
+# TaffyGo GN args profile: dev-arm64 — on-device ARM64 development
+# (decision 0013, docs/development/chromium-fork-and-build.md §3).
+#
+# Committed profile. Never hand-edit GN args in a checkout: edit this file,
+# send a PR, and re-run `./tools/chromium/build --profile dev-arm64`.
+#
+# The same shape as dev-x64 with one deliberate difference: `symbol_level = 1`
+# instead of 0, so a device crash and its tombstone are readable without
+# paying for full debug information. Every comment in dev-x64.gn applies here
+# and is not repeated; read that file first.
+
+target_os = "android"
+target_cpu = "arm64"
+taffy_enable_python_runtime = true
+taffy_capability_profile = "development"
+
+# The de-Google and size posture shared by every profile (decision 0019).
+# See dev-x64.gn and the fragment itself for the reasoning and citations.
+import("//taffy/build/args/common.gni")
+
+is_debug = false
+dcheck_always_on = true
+
+# Impossible on Android — see dev-x64.gn for the assertion in
+# build/config/BUILDCONFIG.gn and for the SP-01 item that confirms it.
+is_component_build = false
+
+# The one difference from dev-x64: enough symbols to read a tombstone.
+symbol_level = 1
+
+# Static analysis runs inline, so a lint or Error Prone failure fails the
+# build instead of being handed to the build server and lost. The reasoning,
+# the two logged failures that prove the loss, and why neither `"off"` nor
+# `INVOKED_BY_BUILD_SERVER=1` is the answer are all in dev-x64.gn and are not
+# repeated here.
+android_static_analysis = "on"
+
+# CONFIRMED at SP-01 on dev-x64 (milestone 152). Not yet exercised on arm64:
+# no ARM64 build has been run.
+incremental_install = true
+
+# --- Caching (decision 0013 §"Build acceleration") --------------------------
+# See dev-x64.gn for why the Siso cache size and location are not in this file
+# and why sccache does not appear at all.
+
+# CONFIRMED at SP-01 (milestone 152): declared in build/toolchain/siso.gni and
+# already the default.
+use_siso = true
+
+# MEASURED at SP-01 and largely ineffective — 90.06% of compiler invocations
+# were uncacheable because of C++ modules, not because of Siso. See dev-x64.gn
+# for the numbers; the keep-or-drop call is OD-075, decide by M1.
+cc_wrapper = "ccache"
+
+use_remoteexec = false
+
+import("//taffy/build/args/credits.gni")

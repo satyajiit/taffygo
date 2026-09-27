@@ -1,0 +1,15 @@
+[package]
+name = "taffy-storage"
+description = "Portable assistant-storage schema, domain algorithms, and reference tests (decision 0006)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+
+[dev-dependencies]
+rusqlite = { workspace = true }

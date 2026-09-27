@@ -1,0 +1,780 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//mojo/public/tools/bindings/mojom.gni")
+import("//pdf/features.gni")
+import("//taffy/browser/account_plane_configuration.gni")
+import("//taffy/browser/asset_delivery_configuration.gni")
+import("//taffy/browser/backup_restore_targets.gni")
+import("//taffy/browser/core_api_targets.gni")
+import("//taffy/browser/managed_route_configuration.gni")
+import("//taffy/browser/platform_seams.gni")
+import("//taffy/browser/source_lists.gni")
+import("//taffy/build/capabilities/generated/product-capabilities.gni")
+import("//taffy/utility/python_runtime_configuration.gni")
+
+# Compile the same generated profile selection into the browser factory and
+# every test that consumes its public interface. The isolated Rust core reads
+# the Rust projection selected by the same GN argument.
+config("product_capability_profile") {
+  defines = [ taffy_capability_cpp_define ]
+}
+
+taffy_profile_platform_mojom("profile_platform_mojom") {
+}
+taffy_field_value_surface_mojom("field_value_surface_mojom") {
+}
+taffy_account_plane_config("account_plane_config") {
+}
+taffy_asset_delivery_config("asset_delivery_config") {
+}
+taffy_managed_route_config("managed_route_config") {
+}
+taffy_python_runtime_config("python_runtime_config") {
+}
+taffy_custom_provider_endpoint_policy("custom_provider_endpoint_policy") {
+}
+taffy_core_api_command_factory("core_api_command_factory") {
+}
+
+# ---------------------------------------------------------------------------
+# The browser-process half of //taffy: the M1 product-integration seams and the
+# M2 Browser Intelligence Protocol broker.
+#
+# Everything here runs in the trusted browser process, so the targets are kept
+# deliberately small and their dependency lists deliberately short. The three
+# rules a reviewer should check first:
+#
+#   * They do not depend on //taffy/renderer. The mojom target is the only
+#     thing the two halves share.
+#   * They do not parse untrusted structure. Mojo does the deserialization and
+#     the isolated Rust core does the interpretation (Rule of Two); C++ reads
+#     scalars and compares them with browser-owned facts.
+#   * Exactly one of them may name a //chrome Android object, and it is not in
+#     this file. ":browser" is a composition group; ":browser_shared" is the
+#     library, and every test binary links the library.
+# ---------------------------------------------------------------------------
+
+# The product-only adapter from Chromium's profile stores into Taffy's bounded
+# Saved Data projection. The Chrome factory targets expose interfaces while
+# //chrome/browser:browser supplies their implementations; keeping this source
+# outside browser_shared is what leaves standalone content_shell tests
+# dependency-closed.
+source_set("saved_data_profile_adapter") {
+  sources = [ "saved_data/profile_saved_data_broker.cc" ]
+  deps = [
+    ":core_service_client",
+    "//base",
+    "//chrome/browser/affiliations",
+    "//chrome/browser/autofill",
+    "//chrome/browser/password_manager/factories",
+    "//chrome/browser/profiles",
+    "//components/keyed_service/core",
+  ]
+}
+
+# The honest standalone-test answer: no Chrome profile composition means no
+# Saved Data repository. CoreServiceManager publishes the existing typed
+# unavailable snapshot, while all projection and mutation behavior remains
+# covered through injected brokers.
+source_set("saved_data_unavailable_test_adapter") {
+  testonly = true
+  sources = [ "saved_data/profile_saved_data_broker_unavailable.cc" ]
+  deps = [
+    "//base",
+    "//taffy/contracts/core-service",
+  ]
+}
+
+# A disk readback witness shared by Android's dormant-profile lifecycle and
+# host unit tests. It deliberately owns no PrefService or profile machinery:
+# callers drain their store, then this target verifies only the exact bounded
+# JSON values they name from the file that store owns.
+taffy_backup_restore_preference_readback("backup_restore_preference_readback") {
+}
+
+if (is_android) {
+  # The lifecycle source stays beside Android profile ownership, while this
+  # root-browser target is the only physical edge permitted to construct the
+  # storage component's dormant SQL owner. It exposes no path/UUID API.
+  taffy_backup_restore_dormant_target_owner(
+      "backup_restore_dormant_target_owner") {
+  }
+}
+
+# The browser-process half of //taffy, composed for this platform.
+#
+# This is the label //chrome/browser names (patches 0006 and 0032), and on
+# Android it is the ONLY edge that reaches the chrome-typed JNI bridges. Keeping
+# the composition in a group rather than in the library is what lets a
+# content_shell binary link ":browser_shared" and get none of it: see
+# //taffy/browser/android:jni_bridges for the two failures that edge causes in
+# any binary that is not libchrome.
+group("browser") {
+  public_deps = [
+    ":browser_shared",
+    ":saved_data_profile_adapter",
+    "//taffy/browser/profile_store:profile_adapter",
+  ]
+
+  if (is_android) {
+    public_deps += [ "//taffy/browser/android:jni_bridges" ]
+  }
+}
+
+# Everything in the browser-process half that a content_shell-based binary can
+# link: no JNI registration, and no //chrome Android object. It is shared by the
+# product (through ":browser") and by every //taffy test binary, which is the
+# whole reason it is a target of its own.
+#
+# It does still use the three narrow profile-ownership headers this directory's
+# DEPS file names — Profile, ProfileKeyedServiceFactory, ProfileSelections —
+# because CoreServiceManager is a profile-keyed service and //chrome registers
+# it. Those resolve in a content_shell binary; the Android JNI entry points do
+# not, and that is the line this split draws.
+static_library("browser_shared") {
+  configs += [
+    ":account_plane_config",
+    ":managed_route_config",
+    ":python_runtime_config",
+  ]
+  sources = taffy_browser_shared_sources
+
+  # Link-boundary assertion: these targets require Chrome's product profile
+  # composition and must never leak back into the content_shell-linkable
+  # library. saved_data_profile_adapter and //taffy/browser/profile_store
+  # are their only owners in //taffy.
+  assert_no_deps = [
+    "//chrome/browser/affiliations",
+    "//chrome/browser/autofill",
+    "//chrome/browser/bookmarks",
+    "//chrome/browser/history",
+    "//chrome/browser/password_manager/factories",
+  ]
+
+  # Desktop Chromium owns PDFDocumentHelper. Android deliberately disables
+  # that stack and displays PDFs as an AndroidX-backed native page, so its
+  # reader is installed by the Chrome-typed JNI composition edge instead.
+  if (enable_pdf) {
+    sources += [ "page_pdf_observation.cc" ]
+  } else if (is_android) {
+    sources += [
+      "page_pdf_observation_android.cc",
+      "page_pdf_observation_platform.h",
+    ]
+  } else {
+    sources += [ "page_pdf_observation_unavailable.cc" ]
+  }
+
+  public_deps = [
+    ":core_service_client",
+
+    # field_value_request_coordinator.h names the surface interface in its own
+    # declaration, so the edge is public: anything that holds a coordinator
+    # needs the generated header too.
+    ":field_value_surface_mojom",
+    "//taffy/common/public",
+    "//taffy/components/filtering/mojom",
+    "//taffy/components/intelligence/content",
+    "//taffy/components/security/browser:authority",
+    "//taffy/contracts/bip/mojom",
+    "//taffy/contracts/browsing",
+  ]
+
+  deps = [
+    ":core_api_command_factory",
+    "//base",
+    "//chrome/browser:browser_process",
+    "//chrome/browser/profiles",
+
+    # taffy_browser_effect_source.cc reads a download::DownloadItem's own
+    # state. It is the one file in //taffy that names the download component
+    # outside a test, and browser/DEPS scopes the allowance to it by name:
+    # witnessing a download means reading the download system, and reading it
+    # is the opposite of the mechanics ownership that rule exists to refuse —
+    # nothing here starts, pauses, retargets or opens anything.
+    "//components/download/public/common:public",
+    "//components/keyed_service/core",
+
+    # The register of tabs Taffy itself opened (decision 0151) lives in the
+    # profile's own preference file, and task_source_selection_registry_actions.cc
+    # reaches it through UserPrefs rather than through Profile — so that this
+    # registry's unit suites keep needing no Profile at all.
+    "//components/user_prefs",
+    "//components/viz/common",
+    "//content/public/browser",
+    "//crypto",
+    "//mojo/public/cpp/bindings",
+    "//net",
+    "//services/network/public/cpp",
+    "//skia",
+    "//taffy/components/filtering/browser",
+    "//taffy/components/storage/browser:storage",
+    "//taffy/components/tools/entrypoints",
+    "//taffy/services/tool-runtime/supervisor",
+    "//third_party/blink/public/common",
+    "//ui/base",
+    "//ui/gfx/codec",
+    "//ui/gfx/geometry",
+    "//url",
+  ]
+
+  if (enable_pdf) {
+    deps += [
+      "//components/pdf/browser",
+      "//pdf/mojom",
+    ]
+  }
+
+  # Product/browser seams consume the reusable content component downward.
+  # The content component never includes a profile or product assembly type.
+  public_deps += [ ":m1_seams" ]
+}
+
+# Browser-side owner of the per-profile isolated core connection. This target
+# contains no Rust and never links //taffy/services/core. Its only cross-process
+# surface is the generated Core Service Mojo contract.
+source_set("core_service_client") {
+  configs += [
+    ":account_plane_config",
+    ":asset_delivery_config",
+    ":managed_route_config",
+  ]
+  sources = taffy_core_service_client_sources
+
+  public_deps = [
+    ":profile_platform_mojom",
+    "//taffy/contracts/core-api",
+    "//taffy/contracts/core-service",
+  ]
+
+  deps = [
+    "//base",
+    "//base:i18n",
+    "//chrome/browser/profiles",
+    "//components/autofill/core/browser",
+    "//components/bookmarks/browser",
+    "//components/keyed_service/core",
+    "//components/password_manager/core/browser/ui",
+
+    # The standing model choice lives in the profile's own preference file
+    # (decision 0093): provider_model_preference_store.* reads and writes it,
+    # and core_service_manager_providerauth.cc replays it into every fresh core
+    # generation. `:feature_posture` is where the preference name is declared
+    # and registered, so it is the owner of the header this directory reads —
+    # not a second copy of the string.
+    ":feature_posture",
+    "//components/prefs",
+
+    # Replaying that choice builds the same command a surface's own request
+    # builds, through the same factory, so there is exactly one construction
+    # path and no second projection of the thinking ladder to drift from it.
+    ":core_api_command_factory",
+
+    # custom_provider_endpoint_store.cc applies the address policy on the way
+    # into the register, which is the one place registration is decided. The
+    # rule is shared with the command factory rather than copied, so both ask
+    # the same target the same question.
+    ":custom_provider_endpoint_policy",
+    "//content/public/browser",
+    "//crypto",
+    "//mojo/public/cpp/bindings",
+    "//net",
+    "//services/network/public/cpp",
+    "//taffy/components/filtering/browser",
+    "//taffy/components/security/browser:authority",
+    "//taffy/components/storage/browser:storage",
+    "//taffy/services/tool-runtime/supervisor",
+    "//third_party/icu",
+    "//third_party/zlib/google:zip",
+    "//url",
+  ]
+}
+
+# ---------------------------------------------------------------------------
+# WP-M1-02 — the browser-process seams of the milestone-M1 browser core
+# ---------------------------------------------------------------------------
+
+# Nine seams, each a small single-purpose class with its own header, source and
+# tests. browser/PARITY.md maps every one of them to the parity rows it covers
+# and to the test that covers it.
+#
+# What holds this target together is not a subsystem, it is an authority
+# boundary: everything here is a fact the browser process owns and no renderer
+# may influence — where the user is, which tabs exist, what the address bar
+# was asked, whether a credential is being entered, what a download is doing,
+# what the Android lifecycle did, what the build switched off, and what may
+# reach a log or a model projection.
+#
+# The rule that shapes every file: **none of it depends on the AI runtime.**
+# There is no include of the Rust bridge, no call into the core service, and
+# nothing that waits on a model. manual_browsing_guarantee.cc makes that
+# testable rather than aspirational (PAR-AI-BR-001).
+source_set("m1_seams") {
+  sources = [
+    "ai_runtime_availability.cc",
+    "ai_runtime_availability.h",
+    "ai_runtime_state.h",
+    "browser_navigation_record.cc",
+    "browser_navigation_record.h",
+    "credential_boundary.cc",
+    "credential_boundary.h",
+    "download_command_router.cc",
+    "download_command_router.h",
+    "download_record.cc",
+    "download_record.h",
+    "download_state_machine.cc",
+    "download_state_machine.h",
+    "lifecycle_continuity_ledger.cc",
+    "lifecycle_continuity_ledger.h",
+    "lifecycle_phase.h",
+    "manual_browsing_guarantee.cc",
+    "manual_browsing_guarantee.h",
+    "navigation_error_classifier.cc",
+    "navigation_error_classifier.h",
+    "navigation_lifecycle_tracker.cc",
+    "navigation_lifecycle_tracker.h",
+    "oauth_continuity_tracker.cc",
+    "oauth_continuity_tracker.h",
+    "oauth_return_facts.cc",
+    "oauth_return_facts.h",
+    "omnibox_classification.h",
+    "omnibox_input_classifier.cc",
+    "omnibox_input_classifier.h",
+    "restored_task_record.cc",
+    "restored_task_record.h",
+    "security_posture.h",
+    "security_posture_assertions.h",
+    "security_posture_evaluator.cc",
+    "security_posture_evaluator.h",
+    "security_posture_probe.cc",
+    "security_posture_probe.h",
+    "security_posture_report.cc",
+    "security_posture_report.h",
+    "session_recovery_planner.cc",
+    "session_recovery_planner.h",
+    "tab_record.h",
+    "tab_session_registry.cc",
+    "tab_session_registry.h",
+    "taffy_download_intent_router.cc",
+    "taffy_download_intent_router.h",
+  ]
+
+  public_deps = [
+    # PAR-SEC-002's provenance half. The version, the patch delta and the
+    # security patch level are generated once, in //taffy/resources/branding,
+    # from chromium/REVISION and chromium/patches/; security_posture_report.cc
+    # joins them to the run-time posture rather than restating either.
+    "//taffy/common/public",
+    "//taffy/resources/branding:upstream_provenance",
+  ]
+
+  deps = [
+    "//base",
+
+    # security_posture_assertions.h asserts !GOOGLE_CHROME_BRANDING (decision
+    # 0019); //base reaches this target only through a private dep, so the
+    # edge must be explicit here.
+    "//build:branding_buildflags",
+
+    # Decision 0019's metrics tripwire: the probe reads the metrics and UKM
+    # server URLs (components/metrics/server_urls.h) to assert they resolve
+    # empty in this build. One header pair, no metrics mechanics.
+    "//components/metrics",
+
+    # PAR-SEC-001's switch-name constants (network_switches.h). The DEPS
+    # include rule has always allowed the header; this is the GN edge that
+    # `gn check` demands beside it — the only upstream path to the target is a
+    # private dep inside the network service, which forwards nothing.
+    "//components/network_session_configurator/common",
+
+    # PAR-SEC-001's build-time half: whether Safe Browsing is compiled in at
+    # all. VERIFY AT SP-01 — the target name at the pinned milestone. Upstream
+    # file to read: components/safe_browsing/BUILD.gn.
+    "//components/safe_browsing:buildflags",
+    "//content/public/browser",
+    "//content/public/common",
+
+    # The public suffix list for the address-bar classifier, the net error
+    # table for the navigation classifier, and the certificate status bits for
+    # the interstitial classifier. Asking //net is what keeps this directory
+    # from growing a second, stale copy of any of the three.
+    "//net",
+
+    # PAR-SEC-001's switch table. RESOLVED AT SP-01: there is no `:switches`
+    # target at this milestone. `sandbox/policy/BUILD.gn` declares exactly one
+    # non-test target, `component("policy")`, and switches.cc/switches.h are
+    # sources inside it — so `//sandbox/policy` is the only label, and it is
+    # what security_posture_probe.cc's `#include "sandbox/policy/switches.h"`
+    # needs.
+    "//sandbox/policy",
+    "//services/network/public/cpp",
+    "//taffy/components/intelligence/content",
+    "//ui/base",
+    "//url",
+  ]
+}
+
+# The runtime half of the Google service posture (decision 0019,
+# docs/decisions/0019-google-service-posture.md): the feature-override list
+# patch 0015 installs at field-trial setup, and the pref-default list patch
+# 0016 installs at profile-pref registration.
+#
+# A separate source_set rather than a seam inside ":m1_seams", for two
+# reasons. The patch's dependency edge from //chrome/browser should carry
+# exactly the posture and nothing else — the seams target would drag the
+# whole M1 surface into a one-call patch. And the posture's dependencies run
+# in the opposite direction of the seams': every dep below exists to *name an
+# upstream feature or pref constant* so that a rename is a compile error here
+# rather than a silently revived service (the same rule the probe's switch
+# table follows).
+source_set("feature_posture") {
+  sources = [
+    "feature_posture.cc",
+    "feature_posture.h",
+    "profile_preferences.cc",
+    "profile_preferences.h",
+  ]
+
+  deps = [
+    "//base",
+
+    # kAutofillServerCommunication (autofill_debug_features.h).
+    "//components/autofill/core/common:features",
+
+    # kInterestFeedV2 (feed_feature_list.h).
+    "//components/feed:feature_list",
+
+    # kEnableSnippets, kArticlesListVisible (core/shared_prefs/pref_names.h).
+    "//components/feed/core/shared_prefs:feed_shared_prefs",
+
+    # kNetworkTimeServiceQuerying (network_time_tracker.h).
+    "//components/network_time",
+
+    # kOptimizationHints, kOptimizationTargetPrediction
+    # (optimization_guide_features.h).
+    "//components/optimization_guide/core:features",
+
+    # kPasswordLeakDetectionEnabled (password_manager_pref_names.h).
+    "//components/password_manager/core/common",
+
+    # PrefRegistry::SetDefaultPrefValue.
+    "//components/prefs",
+
+    # The filtering plane's preference names and registration (decision 0076),
+    # carried here because this target is where profile prefs register.
+    "//taffy/components/filtering/browser:prefs",
+
+    # kSigninAllowed (signin_pref_names.h) and
+    # kAvoidAutoTriggerListAccountsOnStale (signin_switches.h).
+    "//components/signin/public/base",
+    "//components/signin/public/base:signin_switches",
+
+    # kTranslateRankerQuery, kTranslateRankerEnforcement
+    # (translate_ranker_impl.h).
+    "//components/translate/core/browser",
+
+    # kMediaDrmPreprovisioning (media_switches.h).
+    "//media",
+  ]
+}
+
+# Host-runnable tests. Everything here is deterministic and needs no page: the
+# clamp, the authority ledger, the digest, the observability record shape, and
+# the M1 seams.
+source_set("unit_tests") {
+  testonly = true
+
+  sources = taffy_browser_unit_test_sources
+
+  if (is_android) {
+    sources += taffy_browser_android_unit_test_sources
+  }
+
+  deps = [
+    ":backup_restore_preference_readback",
+    ":browser_shared",
+    ":feature_posture",
+    ":saved_data_unavailable_test_adapter",
+    "//taffy/browser/profile_store:unavailable_test_adapter",
+
+    # WP-M1-02's host-runnable suites, so that the umbrella group in
+    # //taffy:taffy_tests reaches them without naming a second
+    # label.
+    ":m1_seams_unit_tests",
+
+    # bip_graph_payload_unittest.cc drives the browser's own redaction
+    # pass with the corpus's real canaries rather than a token copied by hand,
+    # for the reason seeded_secret_corpus.h states: a hand-copied list drifts
+    # silently past the next corpus change.
+    ":core_api_command_factory",
+
+    # model/custom_provider_endpoint_policy_unittest.cc asserts the address
+    # policy on its own, which is the point of it being a target of its own:
+    # a predicate this security-relevant should be answerable without also
+    # being asked about a provider record or a preference file.
+    ":custom_provider_endpoint_policy",
+    ":seeded_secret_corpus",
+    "//base",
+    "//base/test:test_support",
+    "//components/bookmarks/browser",
+    "//components/bookmarks/test",
+    "//taffy/components/storage/browser:storage",
+    "//taffy/services/tool-runtime/supervisor",
+    "//taffy/test:graph_payload_reader",
+
+    # feature_posture_unittest.cc registers prefs on a real
+    # PrefRegistrySimple and reads the default store back.
+    "//components/prefs",
+    "//components/prefs:test_support",
+
+    # task_source_selection_registry_restored_tabs_unittest.cc puts a real
+    # preference store on a TestBrowserContext, which is how the register of
+    # decision 0151 is read without a Profile.
+    "//components/user_prefs",
+
+    # The generated C++ decoders for the Core API contract. Named by this test
+    # target rather than by the library because nothing in the browser decodes
+    # a raw Core API integer yet; this is what puts the header in front of a
+    # compiler.
+    "//content/test:test_support",
+
+    # taffy_browser_effect_source_unittest.cc drives a content::FakeDownloadItem
+    # a state at a time, which is the only way to assert the three terminal
+    # states and the file-name rule without a network and a file system.
+    "//components/download/public/common:public",
+
+    # The same test needs a content::DownloadManager it can hand over twice, to
+    # assert what the witness stops holding when it changes managers. A mock is
+    # enough — nothing calls into it — and content::MockDownloadManager is
+    # the one upstream provides.
+    "//testing/gmock",
+
+    # And it constructs a blink::WebKeyboardEvent, because "the person acted"
+    # reaches the witness as content::WebContentsObserver::DidGetUserInteraction
+    # and that callback takes an input event. The event's contents are never
+    # read, by the test or by the witness.
+    "//third_party/blink/public/common",
+
+    # asset_transfer_unittest.cc dictates the origin's exact answer - a 206
+    # with half an artifact, a 200 to a range request, an empty 404 - which a
+    # real server cannot be asked for and a fake loader can.
+    "//services/network:test_support",
+    "//taffy/contracts/core-api:core_api_enums",
+    "//testing/gtest",
+  ]
+
+  if (is_android) {
+    deps += [ "//taffy/browser/android:regular_profile_token" ]
+  }
+}
+
+# Lifecycle and dispatch coverage that needs a real WebContents: the protocol
+# section 13 table row by row, and the refusals in the stale-node algorithm.
+#
+# RESOLVED: it reaches //taffy:taffy_browsertests, a standalone
+# test() target — the cheapest of the three options this comment used to list,
+# and the only one that needed no edit to a file Chromium owns. The APK it
+# produces runs on a device or an Android emulator; that target's comment
+# records why the host toolchain was not an option.
+source_set("browser_tests") {
+  testonly = true
+
+  # Upstream's browser-test define, on the source set rather than on the
+  # binary: content/public/test/browser_test.h refuses to compile without it
+  # ("Can't reliably terminate hanging event tests without OOP test runner"),
+  # and a `defines` on the test() target reaches only that target's own
+  # sources. Every upstream browsertest source_set carries it for the same
+  # reason — see apps/BUILD.gn's ":browser_tests".
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  sources = taffy_browser_browser_test_sources
+
+  deps = [
+    ":browser_shared",
+    ":m1_seams_browser_tests",
+    ":saved_data_unavailable_test_adapter",
+    ":test_support",
+    "//base",
+    "//base/test:test_support",
+    "//content/shell:content_shell_lib",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//net:test_support",
+    "//taffy/browser/profile_store:unavailable_test_adapter",
+    "//testing/gtest",
+
+    # blink::kChromeUICrashURL (third_party/blink/public/common/
+    # chrome_debug_urls.h), the URL the broker's renderer-crash test navigates
+    # to. It moved out of //content at the pinned milestone.
+    "//third_party/blink/public/common",
+  ]
+}
+
+# ---------------------------------------------------------------------------
+# WP-M1-02 — the seeded-secret corpus and the milestone-M1 test suites
+# ---------------------------------------------------------------------------
+
+# The canaries PAR-SEC-009 is measured against, generated from
+# test-fixtures/web/manifest.json.
+#
+# The manifest lives in this repository but outside the overlay mount, so GN
+# cannot name it in `inputs` — the same problem, and the same solution, as the
+# upstream provenance generator: the script resolves the repository root
+# through the mount and declares what it read in a depfile with absolute paths.
+# It imports repo_root.py from //taffy/resources/branding/tools rather than
+# copying it, so "where is the repository" has one definition.
+#
+# VERIFY AT SP-01: that a depfile naming paths outside the source root is
+# honoured by Siso as well as by Ninja. This is the same item
+# //taffy/resources/branding/BUILD.gn already carries; if the answer is no,
+# both generators take the same fallback and the trade belongs in one place in
+# the SP-01 report.
+_seeded_secret_cc = "$target_gen_dir/taffy_seeded_secret_corpus.cc"
+
+action("seeded_secret_corpus_source") {
+  testonly = true
+  script = "tools/write_seeded_secret_corpus.py"
+
+  inputs = [
+    "../resources/branding/tools/repo_root.py",
+    "seeded_secret_corpus.h",
+  ]
+  outputs = [ _seeded_secret_cc ]
+  depfile = "$target_gen_dir/taffy_seeded_secret_corpus.d"
+
+  args = [
+    "--output-cc",
+    rebase_path(_seeded_secret_cc, root_build_dir),
+    "--depfile",
+    rebase_path(depfile, root_build_dir),
+  ]
+}
+
+# Test-only, and the `testonly` is load bearing rather than habitual. These are
+# canaries, not secrets, and a shipping binary that contained the strings its
+# own leak detector looks for could not tell a leak from itself.
+source_set("seeded_secret_corpus") {
+  testonly = true
+
+  sources = [
+    "seeded_secret_corpus.h",
+    _seeded_secret_cc,
+  ]
+
+  deps = [ ":seeded_secret_corpus_source" ]
+
+  # Depends on nothing at all, by design: it is a table of compile-time
+  # constants, and the empty list is how that stays true.
+  public_deps = []
+}
+
+# Host-runnable coverage for the milestone-M1 seams. Everything here is
+# deterministic and needs no page: the classifiers, the planners, the ledgers,
+# the state machines and the scrubber. What genuinely needs a WebContents is in
+# ":m1_seams_browser_tests" instead, and the split is deliberate — a property
+# that can be proved on a laptop should not be waiting on a device lab.
+source_set("m1_seams_unit_tests") {
+  testonly = true
+
+  sources = taffy_m1_seams_unit_test_sources
+
+  deps = [
+    # For the three shared pieces the ":m1_seams" comment in ":browser_shared"
+    # names:
+    # these tests include origin_codec.h and observability_recorder.h, which
+    # live in the broker half, so the test target needs the edge even though
+    # the library under test does not.
+    ":browser_shared",
+    ":m1_seams",
+    ":seeded_secret_corpus",
+    "//base",
+    "//base/test:test_support",
+    "//content/test:test_support",
+    "//net",
+    "//testing/gmock",
+    "//testing/gtest",
+    "//url",
+  ]
+}
+
+# Behavior that is only observable with a real WebContents: committed
+# navigation and redirect chains, tab and session recovery, a real login
+# session, a real download through Chromium's download system, the lifecycle
+# sequence, the security posture of a running browser, and the assertion that
+# all of it works with the AI runtime absent.
+#
+# RESOLVED: it reaches //taffy:taffy_browsertests through
+# ":browser_tests", which depends on it — the same answer ":browser_tests"
+# records above.
+source_set("m1_seams_browser_tests") {
+  testonly = true
+
+  # Upstream's browser-test define, on the source set rather than on the
+  # binary: content/public/test/browser_test.h refuses to compile without it
+  # ("Can't reliably terminate hanging event tests without OOP test runner"),
+  # and a `defines` on the test() target reaches only that target's own
+  # sources. Every upstream browsertest source_set carries it for the same
+  # reason — see apps/BUILD.gn's ":browser_tests".
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  sources = taffy_m1_seams_browser_test_sources
+
+  deps = [
+    # For origin_codec.h, one of the shared pieces the ":m1_seams" comment in
+    # ":browser_shared" names — same reason as ":m1_seams_unit_tests".
+    ":browser_shared",
+    ":m1_seams",
+    "//base",
+    "//base/test:test_support",
+
+    # The download parity rows are asserted against Chromium's own download
+    # system rather than a fake, because the row is about that system's
+    # behavior being preserved. VERIFY AT SP-01: the target name at the pinned
+    # milestone. Upstream file to read:
+    # components/download/public/common/BUILD.gn.
+    "//components/download/public/common:public",
+    "//content/shell:content_shell_lib",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//net",
+    "//net:test_support",
+    "//testing/gtest",
+    "//url",
+  ]
+}
+
+# The browser-side reader of the deterministic and hostile web fixture corpus.
+#
+# It is a data dependency rather than a copy. The corpus is versioned and
+# immutable, and a browser test with a fixture path typed into it would keep
+# passing after the corpus moved the page it was about.
+#
+# //taffy/renderer/test has its own reader, and the duplication is
+# deliberate rather than accidental: that one answers the renderer's questions
+# (canary tokens, per-fixture omissions) and this one answers the browser's
+# (origins, declared navigation transitions, verifier postconditions), and the
+# two directories may not include each other. Merging them into a neutral
+# //taffy/test target is item 12 of README.md's verification list.
+source_set("test_support") {
+  testonly = true
+
+  sources = [
+    "test/bip_fixture_manifest.cc",
+    "test/bip_fixture_manifest.h",
+  ]
+
+  deps = [
+    "//base",
+    "//testing/gtest",
+  ]
+
+  # The corpus must be present at //taffy/test/data/web/ when the
+  # browser tests run. Until the fork tooling mounts it, every test that reads
+  # it fails at Load() with the expected path in the message — which is the
+  # correct behaviour, for the reason the header explains.
+  data = [ "//taffy/test/data/web/" ]
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version": "0.8",
+  "action_id": "act_22",
+  "task_id": "task_07",
+  "principal": {
+    "kind": "ASSISTANT"
+  },
+  "action_type": "SET_TEXT",
+  "target_handle": {
+    "tab_id": "tab_04",
+    "frame_id": "frame_main",
+    "page_epoch": "epoch_d4",
+    "graph_revision": 11,
+    "node_id": "n_shipping_city",
+    "expected_origin": {
+      "kind": "TUPLE",
+      "serialization": "https://shop.example.test"
+    }
+  },
+  "input": {
+    "kind": "TEXT",
+    "sensitivity": "PERSONAL",
+    "text": "Shrewsbury"
+  },
+  "preconditions": [
+    {
+      "kind": "EXACT_PAGE_EPOCH",
+      "page_epoch": "epoch_d4"
+    },
+    {
+      "kind": "ACCEPTABLE_GRAPH_REVISION",
+      "min_graph_revision": 11
+    },
+    {
+      "kind": "DOCUMENT_ACTIVE"
+    },
+    {
+      "kind": "EXACT_ORIGIN",
+      "origin": {
+        "kind": "TUPLE",
+        "serialization": "https://shop.example.test"
+      }
+    },
+    {
+      "kind": "NODE_EXISTS"
+    },
+    {
+      "kind": "NODE_ROLE_UNCHANGED",
+      "expected_role": "TEXT_FIELD"
+    },
+    {
+      "kind": "NODE_ACTION_AVAILABLE",
+      "expected_action_type": "SET_TEXT"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "EDITABLE"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "ENABLED"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "VISIBLE"
+    },
+    {
+      "kind": "NODE_STATE_ABSENT",
+      "node_state": "OBSCURED"
+    },
+    {
+      "kind": "NOT_SENSITIVE_FIELD",
+      "max_sensitivity": "PERSONAL"
+    },
+    {
+      "kind": "NO_USER_INTERACTION_SINCE_LEASE"
+    },
+    {
+      "kind": "BUDGET_REMAINING"
+    }
+  ],
+  "expected_postconditions": [
+    {
+      "kind": "NODE_VALUE_CHANGED",
+      "timeout_ms": 4000
+    }
+  ],
+  "idempotency_policy": "IDEMPOTENT_WRITE",
+  "deadline_monotonic_ms": 31000,
+  "user_visible_reason": "Fill in the delivery town on this checkout form.",
+  "proposal_digest": {
+    "algorithm": "SHA_256",
+    "value": "a4c2f61e5b0d8937c1e4a7f20b6d5391c8a0e73f4b2d19c65e8a03f7d21b4c9e"
+  }
+}

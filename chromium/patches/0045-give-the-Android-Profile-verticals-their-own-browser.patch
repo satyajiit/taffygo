@@ -1,0 +1,161 @@
+From 9130ed1711ee86fd5c4d5f3c7703225a73065022 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sun, 6 Sep 2026 19:06:59 +0530
+Subject: give the Android Profile verticals their own browser-test binary
+
+The Profile acceptance verticals need Chrome's shipping Profile, its
+utility-service registry and Android's browser-test process setup, but none
+of the thousands of unrelated cases or data roots android_browsertests
+carries. Declare taffy_profile_browsertests as its own test() so its runtime
+payload has one owner.
+
+Register the suite with the instrumentation runner the same way
+taffy_browsertests is: content::BrowserTestBase requires one fresh Android
+process per test, so the suite needs the one-test shard limit and the
+wildcard-expansion path that avoids BrowserTestBase's process-reuse CHECK.
+
+Specified by chromium/patches/0045-register-taffy-profile-browsertests.md.
+
+Taffy-Patch: 0045
+
+diff --git a/build/android/pylib/gtest/gtest_test_instance.py b/build/android/pylib/gtest/gtest_test_instance.py
+index 5fb3f5d433429..437eb9be62c21 100644
+--- a/build/android/pylib/gtest/gtest_test_instance.py
++++ b/build/android/pylib/gtest/gtest_test_instance.py
+@@ -32,6 +32,7 @@ BROWSER_TEST_SUITES = [
+     'components_browsertests',
+     'content_browsertests',
+     'taffy_browsertests',
++    'taffy_profile_browsertests',
+ ]
+ 
+ # The max number of tests to run on a batch during the test run.
+diff --git a/build/android/pylib/local/device/local_device_gtest_run_test.py b/build/android/pylib/local/device/local_device_gtest_run_test.py
+index 2a6b43c9e41d9..ed68653c30a96 100755
+--- a/build/android/pylib/local/device/local_device_gtest_run_test.py
++++ b/build/android/pylib/local/device/local_device_gtest_run_test.py
+@@ -61,7 +61,9 @@ class LocalDeviceGtestRunTest(unittest.TestCase):
+   def testGetTestsFromFiltersBrowserWildcardNeedsEnumeration(self):
+     self._obj._test_instance.extract_test_list_from_filter = True
+     self._obj._test_instance.gtest_filters = ['TestSuite.*']
+-    for suite in ('android_browsertests', 'taffy_browsertests'):
++    for suite in (
++        'android_browsertests', 'taffy_browsertests',
++        'taffy_profile_browsertests'):
+       with self.subTest(suite=suite):
+         self._obj._test_instance.suite = suite
+         self.assertIsNone(self._obj._GetTestsFromFilters())
+diff --git a/chrome/test/BUILD.gn b/chrome/test/BUILD.gn
+index 7e86f28d155c7..a1fe71517a70d 100644
+--- a/chrome/test/BUILD.gn
++++ b/chrome/test/BUILD.gn
+@@ -1638,7 +1638,6 @@ if (is_android) {
+       "//components/webapps/browser:test_support",
+       "//components/webui/chrome_urls",
+       "//content/test:android_test_message_pump_support",
+-      "//taffy/test/recovery:core_service_recovery_browser_tests",
+       "//testing/android/native_test:native_test_support",
+       "//third_party/crashpad/crashpad/handler:crashpad_handler_trampoline",
+       "//third_party/federated_compute:confidential_compute",
+@@ -1831,6 +1830,58 @@ if (is_android) {
+     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
+   }
+ 
++  # TaffyGo's Profile acceptance verticals need Chrome's shipping Profile,
++  # utility-service registry, and Android browser-test process setup, but none
++  # of the thousands of unrelated cases or data roots in android_browsertests.
++  # Keep this as its own binary so its runtime payload has one owner.
++  test("taffy_profile_browsertests") {
++    configs += [ "//build/config:precompiled_headers" ]
++    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
++    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
++    use_default_launcher = false
++    product_config_java_packages = [ "org.chromium.chrome.browser" ]
++    android_manifest =
++        "${target_gen_dir}/taffy_profile_browsertests_manifest/AndroidManifest.xml"
++    android_manifest_dep = ":taffy_profile_browsertests_manifest"
++
++    loadable_modules = [ "$root_out_dir/libcrashpad_handler_trampoline.so" ]
++
++    if (!is_java_debug) {
++      proguard_enabled = true
++      proguard_configs = [ "//chrome/android/proguard/main.flags" ]
++    }
++
++    sources =
++        [ "android/browsertests_apk/android_browsertests_jni_onload.cc" ]
++
++    deps = [
++      ":android_browsertests_assets",
++      ":android_browsertests_java",
++      ":browser_tests_runner",
++      ":test_support",
++      ":test_support_ui_android",
++      "//base",
++      "//chrome:chrome_android_core",
++      "//chrome/android:chrome_jni_headers",
++      "//chrome/android:delegate_public_impl_java",
++      "//chrome/browser:chrome_content_browser_client",
++      "//chrome/browser/android",
++      "//chrome/browser/profiles",
++      "//components/gcm_driver/instance_id/android:instance_id_driver_test_support_java",
++      "//content/shell:content_shell_lib",
++      "//content/test:android_test_message_pump_support",
++      "//taffy/test/recovery:core_service_recovery_browser_tests",
++      "//taffy/test/android/profile:task_pdf_handoff_java",
++      "//testing/android/native_test:native_test_support",
++      "//third_party/crashpad/crashpad/handler:crashpad_handler_trampoline",
++    ]
++
++    data = [
++      "//chrome/test/data/title1.html",
++      "//chrome/test/data/title2.html",
++    ]
++  }
++
+   test("android_sync_integration_tests") {
+     use_default_launcher = false
+     android_manifest = "${target_gen_dir}/android_sync_integration_tests_manifest/AndroidManifest.xml"
+@@ -1937,6 +1988,17 @@ if (is_android) {
+     ]
+   }
+ 
++  jinja_template("taffy_profile_browsertests_manifest") {
++    testonly = true
++    input = "//taffy/test/recovery/AndroidManifest.xml.jinja2"
++    includes = [ "//chrome/test/android/browsertests_apk/AndroidManifest.xml.jinja2" ]
++    output = "${target_gen_dir}/taffy_profile_browsertests_manifest/AndroidManifest.xml"
++    variables = [
++      "manifest_package=org.chromium.android_browsertests_apk",
++      "library_name=taffy_profile_browsertests__library",
++    ]
++  }
++
+   jinja_template("android_sync_integration_tests_manifest") {
+     testonly = true
+     input = "//chrome/test/android/browsertests_apk/AndroidManifest.xml.jinja2"
+diff --git a/chrome/test/android/browsertests_apk/AndroidManifest.xml.jinja2 b/chrome/test/android/browsertests_apk/AndroidManifest.xml.jinja2
+index c38f7ee74afab..204fc7f2683e7 100644
+--- a/chrome/test/android/browsertests_apk/AndroidManifest.xml.jinja2
++++ b/chrome/test/android/browsertests_apk/AndroidManifest.xml.jinja2
+@@ -223,6 +223,8 @@
+         <service android:name="org.chromium.build.gtest_apk.ProcessKeepaliveService"
+             android:process=":test_process"
+             android:exported="false" />
++        {% block extra_application_definitions %}
++        {% endblock %}
+     </application>
+ 
+     <instrumentation android:name="org.chromium.android_browsertests_apk.ChromeBrowserTestsInstrumentationTestRunner"
+diff --git a/third_party/jni_zero/jni_zero.gni b/third_party/jni_zero/jni_zero.gni
+index 11444da757128..5310789ae379e 100644
+--- a/third_party/jni_zero/jni_zero.gni
++++ b/third_party/jni_zero/jni_zero.gni
+@@ -407,6 +407,7 @@ template("generate_jni_impl") {
+     }
+ 
+     _invoke_jni_zero(_jni_zero_action_target_name) {
++      forward_variables_from(invoker, [ "testonly" ])
+       _subdir = rebase_path(target_gen_dir, root_gen_dir)
+       _jni_output_dir = "$jni_headers_dir/$_subdir/$_final_target_name"
+ 

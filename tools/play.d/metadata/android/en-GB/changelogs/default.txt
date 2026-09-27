@@ -1,0 +1,5 @@
+TaffyGo 1.0: a Chromium browser that blocks ads and trackers from the first page, with one AI assistant, Taffy. Ask about a page or hand over a piece of research, and every fact shows its source.
+
+Taffy works with your own AI key, or a plan you already pay for. It is not set up on a fresh install, and the browser works without it.
+
+No account, and no TaffyGo server. The code is open at github.com/satyajiit/taffygo.

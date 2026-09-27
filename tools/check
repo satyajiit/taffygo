@@ -1,0 +1,1103 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/check — the repository's own gates, runnable locally and in CI.
+#
+#   ./tools/check docs    Markdown, links, terminology, status claims
+#   ./tools/check fast    pins, GN profiles, fork debt, file and module
+#                         discipline, shell lint, secret scan, and one lane per
+#                         component that has host-runnable tests
+#   ./tools/check device  build and run the device/host integration suites
+#   ./tools/check all     docs + fast
+#
+# Read-only: it never writes a tracked file, never installs anything, and never
+# starts or resets a local service. The device lane writes one evidence record
+# per run, under the gitignored test-results/ or wherever --evidence names, so
+# that what it observed survives the terminal. Contract:
+# docs/development/development-setup.md section 6 and
+# docs/development/testing-and-delivery.md section 9.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
+
+N_FAIL=0
+N_WARN=0
+N_SKIP=0
+
+pass() { ok "$*"; }
+soft() { warn "$*"; N_WARN=$((N_WARN + 1)); }
+hard() { bad "$*"; N_FAIL=$((N_FAIL + 1)); }
+skip() { note "skipped: $*"; N_SKIP=$((N_SKIP + 1)); }
+
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/taffy-check.XXXXXX")
+trap 'rm -rf "$TMP"' EXIT
+
+# The gates themselves. Sourced after the reporting helpers above, which they
+# use, and after $TMP, which they write scratch files into.
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/pins.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/fork_debt.sh"
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/lanes.sh"
+# The patch queue's constants, TAFFY_PATCH_AUTHOR among them. This file holds
+# definitions only -- no checkout is required to source it -- so the identity
+# the exporter writes and the identity this gate demands are one string, and
+# the two cannot drift.
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/chromium/lib/chromium.sh"
+
+CHECK_ONLY=''
+CHECK_SKIP=''
+DEVICE_PROFILE=''
+DEVICE_SERIAL=''
+DEVICE_EVIDENCE=''
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/check <lane> [options]
+
+Lanes:
+  docs      Markdown, relative links and anchors, status labels, open-decision
+            ids, and the plain-language vocabulary rules
+  fast      pins, committed GN profiles, fork-debt budget, product-root hygiene,
+            file and module discipline, shell and Python lint, credential
+            scan, and the component lanes
+  device    build and run the native, browser, Compose instrumentation and
+            shell JVM suites against one attached Android device
+  all       docs, then fast
+
+Options (fast only):
+  --only NAMES   run only these fast lanes (comma or space separated)
+  --skip NAMES   run every fast lane except these
+
+Options (device only):
+  --profile NAME use dev-arm64 or dev-x64 instead of selecting from device ABI
+  --device SERIAL
+                 use exactly this adb device; required when more than one is
+                 attached (ANDROID_SERIAL is also honoured)
+  --evidence FILE
+                 write the run's evidence record here instead of under
+                 test-results/. The record names the host, the command, the
+                 target and the state each suite reached; it is never a claim
+                 that a suite ran
+  -h, --help     show this help
+
+Fast lane names:
+USAGE
+  # Printed from TAFFY_FAST_LANES rather than copied out of it: a hand-kept
+  # second list is how --help comes to name a lane that no longer runs, or to
+  # omit one that does.
+  printf '%s\n' "$TAFFY_FAST_LANES" | tr ' ' '\n' | fmt -w 66 | sed 's/^/  /'
+  cat <<'USAGE'
+
+A component lane skips — it does not fail — when its toolchain is absent, so a
+documentation-only host passes. Every skip names why and what to do about it;
+nothing is ever reported as passing unless it ran.
+USAGE
+}
+
+LANE=''
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --only) CHECK_ONLY=${2:-}; shift ;;
+    --only=*) CHECK_ONLY=${1#*=} ;;
+    --skip) CHECK_SKIP=${2:-}; shift ;;
+    --skip=*) CHECK_SKIP=${1#*=} ;;
+    --profile) DEVICE_PROFILE=${2:-}; shift ;;
+    --profile=*) DEVICE_PROFILE=${1#*=} ;;
+    --device) DEVICE_SERIAL=${2:-}; shift ;;
+    --device=*) DEVICE_SERIAL=${1#*=} ;;
+    --evidence) DEVICE_EVIDENCE=${2:-}; shift ;;
+    --evidence=*) DEVICE_EVIDENCE=${1#*=} ;;
+    -h|--help) usage; exit 0 ;;
+    -*) usage >&2; die "unknown option: $1" ;;
+    *) [ -z "$LANE" ] || { usage >&2; die "one lane at a time (got \"$LANE\" and \"$1\")"; }
+       LANE=$1 ;;
+  esac
+  shift
+done
+
+if [ -n "$CHECK_ONLY$CHECK_SKIP" ] && [ "$LANE" != fast ]; then
+  die "--only and --skip belong to the fast lane"
+fi
+if [ -n "$DEVICE_PROFILE$DEVICE_SERIAL$DEVICE_EVIDENCE" ] && [ "$LANE" != device ]; then
+  die "--profile, --device and --evidence belong to the device lane"
+fi
+
+CHECK_ONLY=$(printf '%s' "$CHECK_ONLY" | tr ',' ' ')
+CHECK_SKIP=$(printf '%s' "$CHECK_SKIP" | tr ',' ' ')
+for name in $CHECK_ONLY $CHECK_SKIP; do
+  taffy_lane_known "$name" || die "unknown fast lane: $name" \
+    "Known lanes: $TAFFY_FAST_LANES"
+done
+
+# enabled <lane-name> — honours --only and --skip.
+enabled() {
+  case " $CHECK_SKIP " in *" $1 "*) return 1 ;; esac
+  [ -z "$CHECK_ONLY" ] && return 0
+  case " $CHECK_ONLY " in *" $1 "*) return 0 ;; *) return 1 ;; esac
+}
+
+# --- docs lane --------------------------------------------------------------
+
+check_docs() {
+  step "docs: vocabulary, status labels, register ids, links"
+  have python3 || die "python3 is required by the docs lane" \
+    "It is already a prerequisite of depot_tools and gclient." \
+    "This is unrelated to decision 0007's sandboxed Python utility service."
+  if python3 "$TAFFY_ROOT/tools/lib/docs_lint.py" "$TAFFY_ROOT"; then
+    pass "documentation checks"
+  else
+    hard "documentation checks (see the findings above)"
+  fi
+}
+
+# --- chromium configuration -------------------------------------------------
+
+# Lines no GN args file may carry, whether it is a profile or the shared
+# fragment (decision 0019's build-time posture). $1 is the label used in
+# findings, $2 the file.
+check_gn_posture_lines() {
+  local label="$1" file="$2"
+  if grep -q '^use_official_google_api_keys = true' "$file"; then
+    hard "$label: official Google API keys are never a profile decision (decision 0019)"
+  fi
+  if grep -Eq '^google_(api_key|default_client_id|default_client_secret) = ".+"' "$file"; then
+    hard "$label: args files never carry key or client values (decision 0019); the secrets lane cannot recognise every key shape, so the gate is structural"
+  fi
+  if grep -q '^safe_browsing_mode' "$file"; then
+    hard "$label: Safe Browsing availability is not an args decision (PAR-SEC-001; the provider strategy is OD-053)"
+  fi
+  if grep -q '^enable_supervised_users' "$file"; then
+    hard "$label: gn asserts on this argument at the pinned milestone (chrome/android/BUILD.gn asserts enable_supervised_users) — removing it is a patch question, not an argument"
+  fi
+  if grep -q '^enable_reporting = true' "$file"; then
+    hard "$label: enable_reporting stays false (decision 0019)"
+  fi
+}
+
+check_gn_profiles() {
+  step "chromium: committed GN args profiles"
+  local profile file
+  # The shared de-Google/size fragment (decision 0019). Every profile imports
+  # it, and the import resolves through the //taffy mount, so a checkout
+  # without the product root fails `gn gen` loudly rather than silently reverting
+  # the posture.
+  local fragment="$TAFFY_ROOT/taffy-core/build/args/common.gni"
+  if [ ! -f "$fragment" ]; then
+    hard "missing shared args fragment: taffy-core/build/args/common.gni (decision 0019)"
+  else
+    grep -q '^use_official_google_api_keys = false' "$fragment" || \
+      hard "args fragment: use_official_google_api_keys = false is the keyless baseline (decision 0019)"
+    grep -q '^disable_fieldtrial_testing_config = true' "$fragment" || \
+      hard "args fragment: disable_fieldtrial_testing_config = true — without it the compiled-in config's first-wins overrides beat the patch 0015 posture"
+    check_gn_posture_lines "args fragment" "$fragment"
+    pass "taffy-core/build/args/common.gni"
+  fi
+  if python3 "$TAFFY_ROOT/tools/lib/android_sdk_agreement.py"; then
+    pass "shipping and instrumentation target SDKs match their version-catalog owner"
+  else
+    hard "an Android target SDK drifted from gradle/libs.versions.toml"
+  fi
+  if python3 "$TAFFY_ROOT/tools/lib/android_sdk_agreement.py" --self-test; then
+    pass "Android target SDK agreement self-test"
+  else
+    hard "Android target SDK agreement checker does not reject its broken fixtures"
+  fi
+  # The signing identity is not in this repository (decision 0203), so what is
+  # checked here is its absence: a committed keystore argument would be
+  # published with the source, and a key beside it would be published with the
+  # build that reads it. ./tools/chromium/build resolves the identity from the
+  # environment or from an untracked file and appends it to the configured
+  # build's args.gn, which is out/ and is not this tree.
+  local committed_args
+  committed_args=$(grep -rlE '^[[:space:]]*android_keystore_(path|name|password)[[:space:]]*=' \
+    "$TAFFY_ROOT/chromium/args" "$TAFFY_ROOT/taffy-core/build/args" 2>/dev/null || true)
+  if [ -n "$committed_args" ]; then
+    hard "a signing argument is committed in: $(printf '%s' "$committed_args" | tr '\n' ' ')"
+  else
+    pass "no committed signing arguments"
+  fi
+  local signing_imports
+  signing_imports=$(grep -rl 'build/args/signing.gni' "$TAFFY_ROOT/chromium/args" 2>/dev/null || true)
+  if [ -n "$signing_imports" ]; then
+    hard "a profile imports a signing fragment that must not exist: $(printf '%s' "$signing_imports" | tr '\n' ' ')"
+  fi
+  # Two classes of profile, and the split is load-bearing. A product profile
+  # targets Android and is what a device runs. The `diag-*` profiles are
+  # host-only and each exists to answer one question no product profile can:
+  # `diag-sanitizer-x64` whether TaffyGo leaks, because LeakSanitizer does not
+  # run on the phone; `diag-fuzz-x64` what the thirteen fuzzers under
+  # //taffy/test/fuzz find, because every one of them is compiled only under
+  # a fuzzing engine. Their rule sets are kept apart below so a relaxation
+  # written for a diagnostic build can never reach a profile that ships.
+  for profile in dev-x64 dev-arm64 release-arm64 diag-sanitizer-x64 diag-fuzz-x64; do
+    file="$TAFFY_ROOT/chromium/args/$profile.gn"
+    if [ ! -f "$file" ]; then
+      hard "missing GN args profile: chromium/args/$profile.gn"
+      continue
+    fi
+    grep -q '^target_cpu = ' "$file" || hard "$profile: no target_cpu"
+    grep -q '^import("//taffy/build/args/common.gni")' "$file" || \
+      hard "$profile: must import the shared posture fragment (decision 0019)"
+    check_gn_posture_lines "$profile" "$file"
+    if grep -q '^use_remoteexec = true' "$file"; then
+      hard "$profile: use_remoteexec stays false until a self-hosted backend exists (decision 0013)"
+    fi
+    if [ "${profile#diag-}" != "$profile" ]; then
+      grep -q '^target_os = "linux"' "$file" || \
+        hard "$profile: a diagnostic profile is host-only; target_os must be \"linux\""
+      # Every diagnostic instrument here sits on AddressSanitizer: LSan needs
+      # it underneath on Linux, and a fuzzer without it finds a crash and
+      # nothing else. A profile that lost the line would still build and would
+      # still report nothing, which is the failure worth catching here rather
+      # than in a run nobody made.
+      grep -q '^is_asan = true' "$file" || \
+        hard "$profile: is_asan = true — the sanitizer profile needs it under LeakSanitizer and the fuzz profile needs it to report what a fuzzer provokes"
+      case "$profile" in
+        diag-sanitizer-*)
+          grep -q '^is_lsan = true' "$file" || \
+            hard "$profile: is_lsan = true is the point of this profile; ASan alone reports no leak"
+          ;;
+        diag-fuzz-*)
+          # taffy-core/test/fuzz/BUILD.gn instantiates a fuzzer only under
+          # use_fuzzing_engine, which use_libfuzzer derives. Without the line
+          # every fuzzer is an empty group and the build reports thirteen
+          # targets built having compiled none of them.
+          grep -q '^use_libfuzzer = true' "$file" || \
+            hard "$profile: use_libfuzzer = true — without it use_fuzzing_engine is false and every //taffy/test/fuzz target is an empty group"
+          ;;
+        *)
+          hard "$profile: unknown diagnostic profile kind; this gate knows diag-sanitizer-* and diag-fuzz-*"
+          ;;
+      esac
+      grep -q '^is_official_build = true' "$file" && \
+        hard "$profile: a diagnostic profile never claims to be an official build"
+      # The two registers in tools/chromium/lib/chromium.sh, held in both
+      # directions. A host profile belongs in TAFFY_HOST_PROFILES, which is
+      # what lets `build` and `test` drive it; it must not be in
+      # TAFFY_PROFILES, which is the register `run` installs from, because
+      # there is no APK to install and the failure would come late.
+      if grep -q "^TAFFY_PROFILES=.*$profile" "$TAFFY_ROOT/tools/chromium/lib/chromium.sh"; then
+        hard "$profile: a host profile must not be in TAFFY_PROFILES — that register is what ./tools/chromium/run installs from"
+      fi
+      if ! grep -q "^TAFFY_HOST_PROFILES=.*$profile" "$TAFFY_ROOT/tools/chromium/lib/chromium.sh"; then
+        hard "$profile: a committed host profile must be in TAFFY_HOST_PROFILES, or no command can drive it"
+      fi
+      pass "chromium/args/$profile.gn"
+      continue
+    fi
+    grep -q '^target_os = "android"' "$file" || hard "$profile: target_os must be \"android\""
+    # Static analysis has to be a ninja action, not a background job. The
+    # default resolves to "build_server" for a non-official build, and in that
+    # mode autoninja returns before Android Lint, Error Prone and the
+    # dependency checks have run — so `./tools/chromium/build` exits 0 while
+    # lint fails. This gate needs no checkout, which is the point: the build
+    # command re-checks the generated graph, but only on the one host that has
+    # one, and a profile that loses this line should fail on any host.
+    if grep -q '^android_static_analysis = "build_server"' "$file"; then
+      hard "$profile: android_static_analysis = \"build_server\" makes the build exit 0 while lint fails (its failures reach a log, never an exit code)"
+    fi
+    case "$profile" in
+      dev-*)
+        grep -q '^android_static_analysis = "on"' "$file" || \
+          hard "$profile: android_static_analysis = \"on\" — without it the argument defaults to \"build_server\" and lint failures never reach the build's exit code"
+        # RESOLVED at SP-01 (milestone 152): this rule used to require
+        # `is_component_build = true`, carrying over a *desktop* Chromium
+        # result. Android forbids it outright — //build/config/BUILDCONFIG.gn
+        # asserts !(current_os == "android" && is_component_build) — so the
+        # old rule recommended a profile on which `gn gen` cannot succeed.
+        # Every TaffyGo profile targets Android, so this is now a hard gate.
+        grep -q '^is_component_build = true' "$file" && \
+          hard "$profile: component build is impossible on Android (gn gen asserts)"
+        ;;
+      release-*)
+        grep -q '^is_official_build = true' "$file" || hard "$profile: is_official_build must be true"
+        grep -q '^cc_wrapper' "$file" && hard "$profile: the release lane is hermetic — no cc_wrapper"
+        ;;
+    esac
+    pass "chromium/args/$profile.gn"
+  done
+}
+
+# TaffyGo's Android Lint baseline records what upstream's Java graph already
+# reported when the check was switched on for the product APK. It exists so that
+# lint could be switched on at all, and it is only safe while it stays a record
+# of inherited findings: an entry naming a file TaffyGo wrote would be a lint
+# failure in this week's code, filed away instead of fixed. That is a property a
+# reader cannot check by eye across two hundred entries, so it is checked here.
+# The authority for the rule is the file's own README.
+check_lint_baseline() {
+  step "chromium: the lint baseline hides nothing TaffyGo wrote"
+  local dir="$TAFFY_ROOT/taffy-core/app/android/expectations"
+  local baseline="$dir/lint-baseline.xml"
+  if [ ! -f "$baseline" ]; then
+    # Absent is a legitimate state: lint writes it on the next build and fails
+    # that one run. It is not a finding, and it is not a pass either.
+    note "no lint baseline yet — the next Chromium build writes one"
+    return 0
+  fi
+  [ -f "$dir/README.md" ] || \
+    hard "lint baseline: no README beside it; the rule for what may be in it has to be written down"
+
+  # `|| true` because "no match" is the passing case and grep reports it as a
+  # failure; without it `set -e` would take the whole run down on success.
+  local offenders
+  offenders=$(grep -oE 'file="\.\./\.\./taffy/[^"]*"' "$baseline" \
+    | sed 's/^file="//; s/"$//' | sort -u || true)
+  if [ -n "$offenders" ]; then
+    local n; n=$(printf '%s\n' "$offenders" | wc -l | tr -d ' ')
+    hard "lint baseline: $n TaffyGo source file(s) recorded in it — fix the lint finding, do not file it away"
+    printf '%s\n' "$offenders" | while IFS= read -r f; do note "  $f"; done
+    note "The rule and the reason: taffy-core/app/android/expectations/README.md"
+  else
+    # `<issue$`, not `<issue`: the root element is `<issues>` and would be
+    # counted as one more entry than the file holds.
+    pass "$(grep -cE '^[[:space:]]*<issue$' "$baseline" | tr -d ' ') baseline entries, none in a TaffyGo source file"
+  fi
+}
+
+check_patch_identity() {
+  step "chromium: the patch queue carries a project identity"
+  local queue="$TAFFY_ROOT/chromium/patches"
+  [ -d "$queue" ] || { note "no patch queue yet"; return 0; }
+
+  # `git format-patch` writes the commit author, `git am` reads it back, and
+  # the checkout those commits live in is whoever last ran sync. So the file
+  # on disk is the only place this can be held, and it is held against one
+  # constant that ./tools/chromium/export-patches writes from.
+  # Decision 0203 keeps the signing identity out of this repository for the
+  # same reason a queue that will be published should not carry a private
+  # mailbox.
+  local files offenders n
+  files=$(git -C "$TAFFY_ROOT" ls-files 'chromium/patches/**.patch' || true)
+  [ -n "$files" ] || { note "no patch files in the queue"; return 0; }
+
+  # The first `From:` only. A patch body may legitimately contain a line that
+  # starts `From: ` -- a quoted mail header inside a fixture -- and reading
+  # further would report a diff line as the queue's identity.
+  offenders=$(printf '%s\n' "$files" | while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    author=$(awk 'index($0, "From: ") == 1 { print; exit }' "$TAFFY_ROOT/$f")
+    if [ "$author" != "From: $TAFFY_PATCH_AUTHOR" ]; then
+      printf '%s\t%s\n' "$f" "${author:-<no From: line>}"
+    fi
+  done)
+
+  if [ -n "$offenders" ]; then
+    n=$(printf '%s\n' "$offenders" | wc -l | tr -d ' ')
+    hard "patch identity: $n patch file(s) do not carry \"From: $TAFFY_PATCH_AUTHOR\""
+    printf '%s\n' "$offenders" | while IFS="$(printf '\t')" read -r f a; do
+      note "  $f — $a"
+    done
+    note "Re-export with ./tools/chromium/export-patches, which normalises it,"
+    note "or fix TAFFY_PATCH_AUTHOR in tools/chromium/lib/chromium.sh if the"
+    note "identity itself changed."
+  else
+    pass "$(printf '%s\n' "$files" | grep -c '^') patch file(s) carry the project identity"
+  fi
+}
+
+check_taffy_core_root() {
+  step "chromium: //taffy product-root hygiene"
+  local core="$TAFFY_ROOT/taffy-core"
+  [ -d "$core" ] || { hard "missing product root: taffy-core"; return 0; }
+  [ -f "$core/BUILD.gn" ] || hard "taffy-core needs a root BUILD.gn so //taffy resolves"
+  [ -f "$core/build/components.toml" ] || hard "taffy-core/build/components.toml is missing"
+  [ -f "$core/build/component_graph.py" ] || hard "the component-manifest validator is missing"
+  [ -f "$core/build/component_gn_graph.py" ] || hard "the exact GN component-graph validator is missing"
+  if have python3 && [ -f "$core/build/component_gn_graph.py" ]; then
+    if python3 "$core/build/component_gn_graph.py"; then
+      pass "//taffy exact GN component graph"
+    else
+      hard "//taffy GN targets differ from build/components.toml"
+    fi
+    if python3 "$core/build/component_gn_graph.py" --self-test; then
+      pass "//taffy GN graph drift self-test"
+    else
+      hard "//taffy GN graph checker does not reject its broken fixtures"
+    fi
+  fi
+  # The checksum-verified CPython source mount is an upstream source tree, not
+  # TaffyGo's patch queue. Prune exactly that foreign root while keeping its
+  # first-party siblings (runtime, generated configuration and tools) under
+  # this check.
+  if find "$core" \
+      -path "$core/third_party/cpython/src" -prune -o \
+      -name '*.patch' -type f -print | grep -q .; then
+    hard "patch files under taffy-core/ — upstream edits belong in chromium/patches/"
+  fi
+  local tracked_links
+  tracked_links=$(git -C "$TAFFY_ROOT" ls-files -s -- taffy-core 2>/dev/null \
+    | awk '$1 == "120000" { sub(/^[^\t]*\t/, ""); print }')
+  if [ -n "$tracked_links" ]; then
+    soft "committed symlinks under taffy-core/ — source ownership must be explicit"
+    printf '%s\n' "$tracked_links" | while IFS= read -r link; do
+      [ -n "$link" ] && note "  tracked symlink: $link"
+    done
+  fi
+  pass "//taffy root layout"
+}
+
+# --- modularity -------------------------------------------------------------
+#
+# The two lanes decision 0014 item 3 asks the fast lane to carry. Both are
+# stdlib Python, so they run on every host: a rule that only holds where a JDK
+# and an Android SDK are installed is a rule that stops holding the moment
+# somebody works without them.
+
+# check_python_gate <lane> <script> <headline> [<remedy>...]
+# Runs one of the tools/lib gates. Exit 0 passes, 1 fails the lane, 2 is a
+# warning — which is what "approaching the cap" means for a *soft* cap.
+check_python_gate() {
+  local lane=$1 script=$2 headline=$3; shift 3
+  local out rc=0
+  out=$(python3 "$TAFFY_ROOT/tools/lib/$script" "$TAFFY_ROOT" 2>&1) || rc=$?
+  case "$rc" in
+    0) pass "$headline: $(printf '%s' "$out" | tail -n 1)" ;;
+    2) printf '%s\n' "$out" | sed 's/^/      /' >&2
+       soft "$headline: warnings only" ;;
+    *) printf '%s\n' "$out" | sed 's/^/      /' >&2
+       hard "$headline"
+       local line
+       for line in "$@"; do note "$line"; done ;;
+  esac
+  return 0
+}
+
+check_files() {
+  step "files: source discipline, first-party licence headers, and vendored-asset provenance"
+  if ! have python3; then
+    skip "python3 is not installed; the file-discipline gates are stdlib-only"
+    return 0
+  fi
+  check_python_gate files file_discipline.py "soft line cap" \
+    "Split the file along a responsibility seam." \
+    "If it genuinely cannot be split, add an entry with a reason and a ceiling" \
+    "to tools/check.d/file-size-exemptions.tsv."
+  check_python_gate files type_per_file.py "one public type per file" \
+    "Move each extra type into a file named for it."
+  check_python_gate files screen_view_model_keys.py "one view-model class per screen key" \
+    "A view-model store clears the model a second class replaces under one key," \
+    "so the screen that asked first keeps drawing a model that no longer moves." \
+    "Give the second model its own key through rememberScreenViewModelStoreOwner."
+  check_python_gate files android_junit_discovery.py "Android JUnit discovery" \
+    "Chromium's host runner ignores an unannotated test class even when it compiles." \
+    "Import org.junit.runner.RunWith and name the intended Robolectric runner."
+  check_python_gate files reviewable_sources.py "reviewable source diffs" \
+    "A NUL byte makes Git call the file binary, so its diff is unreviewable" \
+    "and git grep prints none of its lines. Use the language's escape."
+  check_python_gate files cpp_type_collisions.py "C++ one-definition names" \
+    "Rename or centralize each repeated namespace-level C++ type definition." \
+    "A linker is not required to diagnose this one-definition-rule violation."
+  check_python_gate files vendored_assets.py "vendored-asset provenance" \
+    "A vendored third-party file and its vendor/*.txt provenance record must" \
+    "agree: update the record in the same change as the asset. A new vendored" \
+    "asset needs an entry in tools/lib/vendored_assets.py."
+  check_python_gate files markup_documents.py "markup documents parse" \
+    "An Android resource, a GRIT bundle or an SVG that is not well-formed XML" \
+    "passes every other host lane: the string checker reads declared names and" \
+    "never parses the document. Chromium's resources_parser.py is the next" \
+    "thing that would notice, and it is on the far side of a build."
+  check_python_gate files third_party_notices.py "third-party licence notices" \
+    "A vendored component's README.chromium must name a licence file this" \
+    "repository tracks. CPython's PSF text was named at src/LICENSE, which is" \
+    "gitignored, so every clone was missing a notice NOTICE promises is there."
+  check_python_gate files license_headers.py "first-party licence headers" \
+    "First-party files below taffy-core are governed by the root LICENSE." \
+    "Remove Chromium's BSD boilerplate and the inaccurate TaffyGo Authors holder." \
+    "Do not rewrite a registered third-party asset or its inbound licence notice."
+  return 0
+}
+
+check_modules() {
+  step "modules: dependency direction (decision 0014 item 3)"
+  if ! have python3; then
+    skip "python3 is not installed; the module-graph gates are stdlib-only"
+    return 0
+  fi
+  check_python_gate modules module_graph.py "Kotlin module graph" \
+    "Features never depend on features, and dependencies point downward only." \
+    "The declared graph is taffy-core/build/components.toml; regenerate its" \
+    "committed projections after a reviewed edge change."
+  check_python_gate modules include_direction.py "product-root include direction" \
+    "The rule is the product root's own DEPS file, which is what a Chromium" \
+    "reviewer reads. Change the code, or change the DEPS with a reason."
+  return 0
+}
+
+# --- shell and secrets ------------------------------------------------------
+
+# Every script this repository owns: the executables plus the sourced libraries,
+# which carry most of the logic and would otherwise be linted only indirectly.
+shell_sources() {
+  find "$TAFFY_ROOT/tools" -type f \( -perm -u+x -o -name '*.sh' \) ! -name '*.py' \
+    | sort -u
+}
+
+check_shell() {
+  step "tools: shell syntax and lint"
+  local script bad_syntax=0
+  for script in $(shell_sources); do
+    bash -n "$script" 2>/dev/null || { hard "syntax error: ${script#"$TAFFY_ROOT"/}"; bad_syntax=1; }
+  done
+  [ "$bad_syntax" -eq 0 ] && pass "bash syntax ($(shell_sources | wc -l | tr -d ' ') scripts)"
+
+  if have shellcheck; then
+    local out
+    if out=$(shell_sources | tr '\n' '\0' | xargs -0 shellcheck -s bash -x 2>&1); then
+      pass "shellcheck"
+    else
+      printf '%s\n' "$out" >&2
+      hard "shellcheck — fix the finding or disable the rule with a reason on the line above it"
+    fi
+  else
+    skip "shellcheck not installed (CI runs it)"
+  fi
+
+  if have python3; then
+    local py failed=0
+    for py in "$TAFFY_ROOT"/tools/lib/*.py; do
+      [ -f "$py" ] || continue
+      python3 -m py_compile "$py" 2>/dev/null || { hard "python syntax: ${py#"$TAFFY_ROOT"/}"; failed=1; }
+    done
+    [ "$failed" -eq 0 ] && pass "python syntax"
+    rm -rf "$TAFFY_ROOT/tools/lib/__pycache__"
+  else
+    skip "python syntax (python3 not installed)"
+  fi
+}
+
+# Files the credential scan reads: everything Git tracks plus everything it
+# would track. A component that has been written but not yet committed is
+# exactly the material a secret scan exists to catch.
+scannable_files() {
+  git -C "$TAFFY_ROOT" ls-files --cached --others --exclude-standard 2>/dev/null \
+    | grep -v -E '^(tools/check|tools/check\.d/|tools/lib/|\.github/workflows/)' || true
+}
+
+# Reviewed public identifiers, keyed by the pattern that finds them. No Android
+# client identifier is committed; product registrations are provisioned only
+# by the release owner for the shipping package and signing identity.
+secrets_reviewed_identifiers() {
+  :
+}
+
+check_secrets() {
+  step "secrets: no credential material in tracked or stageable files"
+  local files hits=0
+  files=$(scannable_files)
+  [ -n "$files" ] || { skip "not a git checkout"; return 0; }
+
+  local pattern
+  # High-confidence credential shapes only: a scanner that cries wolf gets muted.
+  for pattern in \
+    'BEGIN [A-Z ]*PRIVATE KEY' \
+    'AKIA[0-9A-Z]{16}' \
+    'gh[pousr]_[A-Za-z0-9]{30,}' \
+    'xox[baprs]-[A-Za-z0-9-]{10,}' \
+    'AIza[0-9A-Za-z_-]{35}'
+  do
+    local found reviewed
+    found=$(printf '%s\n' "$files" | tr '\n' '\0' \
+      | (cd "$TAFFY_ROOT" && xargs -0 grep -l -E "$pattern" 2>/dev/null) || true)
+    reviewed=$(secrets_reviewed_identifiers "$pattern")
+    if [ -n "$found" ] && [ -n "$reviewed" ]; then
+      found=$(printf '%s\n' "$found" | grep -v -x -F "$reviewed" || true)
+    fi
+    if [ -n "$found" ]; then
+      hard "possible credential material matching /$pattern/ in: $(printf '%s' "$found" | tr '\n' ' ')"
+      hits=$((hits + 1))
+    fi
+  done
+  [ "$hits" -eq 0 ] && pass "no credential material in $(printf '%s\n' "$files" | wc -l | tr -d ' ') file(s)"
+
+  # Key material, by extension rather than by content: a keystore is a binary
+  # the credential patterns above cannot read, and the ignore rules in
+  # .gitignore only cover the file nobody added by hand. This is the rule that
+  # makes decision 0203 hold in the tree rather than in a procedure.
+  local tracked_keys
+  tracked_keys=$(git -C "$TAFFY_ROOT" ls-files -- \
+    '*.jks' '*.bks' '*.keystore' '*.p12' '*.pfx' '*.pkcs12' 2>/dev/null || true)
+  if [ -n "$tracked_keys" ]; then
+    hard "key material is tracked: $(printf '%s' "$tracked_keys" | tr '\n' ' ')"
+  else
+    pass "no tracked key material"
+  fi
+  # The value, not the name: ./tools/chromium/build writes the argument out of
+  # a format string, and a rule that cannot tell `"%s"` from a password would
+  # be one nobody could keep.
+  local password_lines
+  password_lines=$(printf '%s\n' "$files" | tr '\n' '\0' \
+    | (cd "$TAFFY_ROOT" && xargs -0 grep -nE '(android_keystore_password|storePassword|keyPassword)[[:space:]]*=[[:space:]]*"[^"]+"' 2>/dev/null) \
+    | grep -v '"%s"' || true)
+  if [ -n "$password_lines" ]; then
+    hard "a signing password is written into: $(printf '%s' "$password_lines" | cut -d: -f1 | sort -u | tr '\n' ' ')"
+  fi
+
+  # Operator identifiers: the hosts, keys and registrations of the services
+  # decision 0200 retired, over exactly what an export of this working tree
+  # would publish (decision 0251). One list and one scanner, shared with
+  # ./tools/export-public verify, so this gate and the export cannot disagree
+  # about what an operator identifier is. A tree exported from here does not
+  # carry the list, and says so.
+  if have python3; then
+    local vocabulary vocabulary_rc=0
+    vocabulary=$(python3 "$TAFFY_ROOT/tools/lib/operator_vocabulary.py" --repo "$TAFFY_ROOT" 2>&1) \
+      || vocabulary_rc=$?
+    case "$vocabulary_rc" in
+      0) pass "$(printf '%s\n' "$vocabulary" | tail -n 1)" ;;
+      3) skip "operator vocabulary: tools/check.d/operator-vocabulary.tsv is not in this tree; it stays with the private source" ;;
+      *) printf '%s\n' "$vocabulary" | sed '$d' | sed 's/^/      /' >&2
+         hard "$(printf '%s\n' "$vocabulary" | tail -n 1) — remove the identifier, or excuse a vocabulary hit (never a value) in tools/check.d/operator-vocabulary-allow.tsv with a reason" ;;
+    esac
+  else
+    skip "operator vocabulary (python3 not installed)"
+  fi
+
+  # Two questions, not one. "Not tracked" was the only thing this asked, and a
+  # path silently dropped from .gitignore answers it right up until somebody
+  # runs `git add` -- which is the moment the check exists to be before. So it
+  # asks both, and `keystore.properties` is why: it was on this list, claimed
+  # to be ignored, and was not in .gitignore at all.
+  local ignored
+  for ignored in .env local.properties keystore.properties .taffy/android-signing.env; do
+    if git -C "$TAFFY_ROOT" ls-files --error-unmatch "$ignored" >/dev/null 2>&1; then
+      hard "$ignored is tracked — it must stay ignored"
+    elif ! git -C "$TAFFY_ROOT" check-ignore -q "$ignored" 2>/dev/null; then
+      hard "$ignored is not ignored by .gitignore — it is one \`git add\` from being tracked"
+    fi
+  done
+}
+
+# The installable APK and the bundle's base module are two packagings of one
+# product, and the thing that keeps them one product is that both forward the
+# same private scope in product_targets.gni. Spelling manifest_package, the
+# target SDK or the flags file a second time in either template compiles, links
+# and ships — as a browser that shares a name with the one the device suites
+# passed against. GN cannot see it because each target is internally consistent,
+# and no configured-graph check can either: it is a source property, and this is
+# where it is caught.
+check_product_targets() {
+  step "chromium: the APK and the bundle are one product"
+  local file="$TAFFY_ROOT/taffy-core/app/android/product_targets.gni"
+  if [ ! -f "$file" ]; then
+    hard "missing taffy-core/app/android/product_targets.gni"
+    return 0
+  fi
+  # A template body can read this file's scope and the target block nested
+  # inside it cannot, so every template copies the shared scope to `_shared`
+  # first and forwards that. Both halves are counted: a forward with no copy
+  # above it does not configure at all, and it does not configure in a way no
+  # host lane can see, because `gn gen` needs a Chromium checkout.
+  local copies forwards
+  copies=$(grep -c '^ *_shared = _taffy_product_shared$' "$file" || true)
+  forwards=$(grep -c 'forward_variables_from(_shared, "\*"' "$file" || true)
+  if [ "$forwards" -lt 2 ]; then
+    hard "product_targets.gni forwards the shared product scope $forwards time(s); the APK and the bundle base module must each forward it"
+  elif [ "$copies" -lt "$forwards" ]; then
+    hard "product_targets.gni forwards _shared $forwards time(s) and copies it from _taffy_product_shared $copies time(s); a target block cannot see the template's own scope, so every forward needs the copy above it"
+  else
+    pass "the APK and the bundle base module both forward _taffy_product_shared through _shared"
+  fi
+  # chrome_public_apk_or_module_tmpl's bundle branch depends on this name and
+  # does not declare it; only chrome_bundle does, and this product is not one.
+  # A missing declaration configures on no host: gn gen reports an unresolved
+  # dependency and refuses the APK with it.
+  # shellcheck disable=SC2016  # the literal GN spelling of the name, not a shell expansion
+  if grep -q 'android_resources("${target_name}__all_dfm_resources")' "$file"; then
+    pass "the bundle base module declares the __all_dfm_resources target the chrome template names and does not create"
+  else
+    hard "product_targets.gni must declare \${target_name}__all_dfm_resources; chrome_public_apk_or_module_tmpl's bundle branch depends on it and only chrome_bundle declares it upstream"
+  fi
+  # The bundle enables R8 itself. An official build optimizes the base
+  # module's resources in a step that depends on the bundle's R8 target, so
+  # without this the release profile, the only one a bundle is built on,
+  # does not configure; the dev profiles are debug Java and never see it.
+  # module_name reaches compile_resources as --package-name, which makes the
+  # base module's root R class extend itself; javac then refuses the whole
+  # module an hour into a release build, and no other build reaches it.
+  if grep -q '^ *module_name = ' "$file"; then
+    hard "product_targets.gni sets module_name; on the base module it becomes --package-name, and the generated gen.base_module.R then extends itself (cycle in class hierarchy)"
+  else
+    pass "the bundle base module leaves module_name unset, so its R class is the root and not a feature module's"
+  fi
+  if grep -q '^ *proguard_enabled = !is_java_debug$' "$file"; then
+    pass "the bundle enables R8 on a release build, which the base module's resource optimization depends on"
+  else
+    hard "product_targets.gni: the bundle must set proguard_enabled = !is_java_debug; without it release-arm64 refuses the graph (taffy_public_bundle__optimize_resources needs taffy_public_bundle__dex)"
+  fi
+  if grep -q '_taffy_module_declines = \[ "command_line_flags_file" \]' "$file"; then
+    pass "the bundle base module forwards past command_line_flags_file, which is an argument of android_app_bundle and not of the module"
+  else
+    hard "product_targets.gni must decline command_line_flags_file on the base module; at milestone 152 it is not a module argument"
+  fi
+  # Each of these has exactly one *source*: the shared scope. Reading it back
+  # out — `command_line_flags_file = _shared.command_line_flags_file`, which
+  # the bundle template does because that argument is its own and must name
+  # the same file — is not a second source and is not counted. A literal is.
+  local key count
+  for key in manifest_package target_sdk_version command_line_flags_file jinja_input; do
+    count=$(grep "^ *$key = " "$file" | grep -cv '_shared\.' || true)
+    if [ "$count" -ne 1 ]; then
+      hard "product_targets.gni gives $key $count literal value(s); it belongs once, in _taffy_product_shared, and is read from there everywhere else"
+    fi
+  done
+}
+
+check_chromium_config() {
+  check_gn_profiles
+  check_fork_debt
+  check_taffy_core_root
+  check_product_targets
+  check_lint_baseline
+  check_patch_identity
+  if have python3; then
+    lane_run chromium "The Android Profile test wrapper must reject timeout scaling that moves Chrome startup off the UI thread." \
+      python3 tools/chromium/lib/test_runner_arguments_test.py
+  else
+    skip "python3 is not installed; the Profile test argument regression did not run"
+  fi
+}
+
+# --- lanes ------------------------------------------------------------------
+
+check_fast() {
+  local lane
+  for lane in $TAFFY_FAST_LANES; do
+    enabled "$lane" || continue
+    case "$lane" in
+      pins)      check_pins ;;
+      chromium)  check_chromium_config ;;
+      files)     check_files ;;
+      modules)   check_modules ;;
+      shell)     check_shell ;;
+      secrets)   check_secrets ;;
+      *)         "lane_run_$lane" ;;
+    esac
+  done
+}
+
+# --- device lane ------------------------------------------------------------
+#
+# The four suites this lane is responsible for, in the order it builds and runs
+# them. The list is here rather than inline because the evidence record reports
+# one row per suite whether or not the lane ever reached it, and two copies of
+# the list is how a suite comes to be run and not reported, or reported and not
+# run.
+# `taffy_profile_browsertests` is the fifth and it is not like the other four:
+# patch 0045 declares it in //chrome/test/BUILD.gn rather than under
+# taffy-core/, because Chrome owns the Profile-scoped browser-test runner. It
+# is the only binary that compiles taffy-core/test/recovery/ and the Task
+# Benchmark probes beside it, and until it was named here no repository command
+# built it at all — twenty-two sources whose only referrer is a numbered patch.
+DEVICE_SUITE_TARGETS='taffy_unittests taffy_browsertests taffy_public_test_apk taffy_shell_junit_tests taffy_profile_browsertests'
+
+DEVICE_ADB=''
+DEVICE_TARGET=''
+DEVICE_ABI=''
+DEVICE_PROFILE_USED=''
+DEVICE_COMMAND='./tools/check device'
+
+# The evidence record.
+#
+# The lane refuses to report a suite it did not run. It should refuse just as
+# firmly to leave no trace of what it did observe, which is what this record is
+# for: every path out of the lane — including the ones that stop before a build
+# — writes one, naming the host, the command, the target it selected, the state
+# each declared suite actually reached, and the lane's own findings verbatim.
+#
+# It follows the convention of tools/benchmark.d/evidence.py: an
+# `evidence_version`, a UTC `generated_at`, the host, what was requested, one
+# row per suite, and a closing note saying in words what the record is not.
+# That record's honesty field is `measured`; this one's is `suites[].state` —
+# `not-attempted` is a state a reader can see, never an omitted row.
+#
+# It is written under test-results/, which .gitignore excludes, so the lane
+# still writes no tracked file.
+
+# One line of what the lane saw, quoted into the record verbatim. Every finding
+# goes through device_fail or device_pass so that a reader of the record and a
+# reader of the terminal are looking at the same sentences.
+device_observe() { printf '%s\n' "$*" >> "$TMP/device-observations"; }
+
+device_fail() { hard "$*"; device_observe "$*"; }
+device_pass() { pass "$*"; device_observe "$*"; }
+
+# device_suite_state <suite> <state> — the furthest state a suite reached.
+# Appended rather than replaced; the record reads the last row per suite, so a
+# suite that was declared, built and then failed reports "failed".
+device_suite_state() { printf '%s\t%s\n' "$1" "$2" >> "$TMP/device-suites"; }
+
+# Whether the repository declares a suite at all. Static, so it answers on a
+# host with no checkout and no device: a suite named here and declared in no
+# build file is the "no instrumented suite exists" outcome, and the record has
+# to be able to say that rather than blame the absent device.
+# A commented-out target is not a declaration. `grep -q` alone would read the
+# comment that survived a deleted target as the target itself, which is the one
+# reading this probe exists to rule out: a suite that no build file declares any
+# more would keep reporting `declared` for as long as any BUILD.gn still named
+# it in prose. Counting the non-comment matches answers that, and counting
+# rather than piping into `grep -q` keeps `pipefail` from turning the early
+# close of a short-circuiting reader into a false "not declared".
+# A suite whose declaration is a numbered upstream patch is declared by this
+# repository too — the patch specification is a tracked file and the `chromium`
+# lane gates it. Reading only taffy-core/ would report
+# `taffy_profile_browsertests` as "no such suite exists" on every host, which
+# is the one answer that is certainly wrong: the target is in the graph, and
+# blaming an absent suite for what is really an absent device is exactly the
+# confusion this probe exists to prevent.
+device_suite_declared() {
+  local hits patch_hits
+  hits=$(grep -rh --include=BUILD.gn -- "(\"$1\")" "$TAFFY_ROOT/taffy-core" 2>/dev/null \
+         | grep -cv '^[[:space:]]*#' || true)
+  # A suite the product declares inside a numbered upstream patch is declared
+  # just as firmly as one in taffy-core/: the queue is the only writer of that
+  # upstream BUILD.gn, and the checkout it lands in is the one this lane would
+  # build. Match the exported diff's own added target line rather than a prose
+  # mention, so a specification that merely names a suite cannot stand in for
+  # one.
+  patch_hits=$(grep -rh --include='*.patch' -- "^+.*(\"$1\")" \
+         "$TAFFY_ROOT/chromium/patches" 2>/dev/null | grep -c '^' || true)
+  [ "${hits:-0}" -gt 0 ] || [ "${patch_hits:-0}" -gt 0 ]
+}
+
+# The body of a JSON string. Shell values reaching this record are single-line
+# — serials, ABIs, profile names, suite names and the lane's own sentences — so
+# a quote and a backslash are the only characters JSON cannot take as they are.
+device_json_string() {
+  printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' | tr -d '\n\r'
+}
+
+device_write_evidence() { # <verdict>
+  local verdict=$1 path dir stamp name state first line selected
+  stamp=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+  path=${DEVICE_EVIDENCE:-$TAFFY_ROOT/test-results/device-$(date -u '+%Y%m%dT%H%M%SZ').json}
+  dir=$(dirname "$path")
+  if ! mkdir -p "$dir" 2>/dev/null; then
+    soft "device: cannot create $dir, so no evidence record was written"
+    return 0
+  fi
+  if [ -n "$DEVICE_TARGET" ]; then selected=true; else selected=false; fi
+  {
+    printf '{\n'
+    printf '  "evidence_version": 1,\n'
+    printf '  "generated_at": "%s",\n' "$stamp"
+    printf '  "host": "%s",\n' "$(device_json_string "$(taffy_os)/$(taffy_arch)")"
+    printf '  "lane": "device",\n'
+    printf '  "command": "%s",\n' "$(device_json_string "$DEVICE_COMMAND")"
+    printf '  "target": {\n'
+    printf '    "selected": %s,\n' "$selected"
+    printf '    "adb": "%s",\n' "$(device_json_string "$DEVICE_ADB")"
+    printf '    "serial": "%s",\n' "$(device_json_string "$DEVICE_TARGET")"
+    printf '    "abi": "%s",\n' "$(device_json_string "$DEVICE_ABI")"
+    printf '    "profile": "%s"\n' "$(device_json_string "$DEVICE_PROFILE_USED")"
+    printf '  },\n'
+    printf '  "suites": [\n'
+    first=1
+    for name in $DEVICE_SUITE_TARGETS; do
+      state=$(awk -F'\t' -v want="$name" \
+        '$1 == want { last = $2 } END { print (last == "" ? "not-attempted" : last) }' \
+        "$TMP/device-suites")
+      if [ "$first" = 1 ]; then first=0; else printf ',\n'; fi
+      printf '    { "name": "%s", "state": "%s" }' "$name" "$state"
+    done
+    printf '\n  ],\n'
+    printf '  "observations": [\n'
+    first=1
+    while IFS= read -r line; do
+      [ -n "$line" ] || continue
+      if [ "$first" = 1 ]; then first=0; else printf ',\n'; fi
+      printf '    "%s"' "$(device_json_string "$line")"
+    done < "$TMP/device-observations"
+    if [ "$first" != 1 ]; then printf '\n'; fi
+    printf '  ],\n'
+    printf '  "verdict": "%s",\n' "$verdict"
+    printf '  "note": "%s"\n' "$(device_json_string "$DEVICE_EVIDENCE_NOTE")"
+    printf '}\n'
+  } > "$path"
+  note "device evidence record: ${path#"$TAFFY_ROOT"/}"
+  return 0
+}
+
+DEVICE_EVIDENCE_NOTE='This record says what the device lane observed on this host and nothing more. A suite carries the furthest state it actually reached, so not-attempted and not-declared are visible rather than absent, and no state here is a claim that a suite ran. A suite state of not-declared means no instrumented suite exists for that name in this tree. The verdict is the lane verdict, which this record does not decide.'
+
+check_device() {
+  local before
+  : > "$TMP/device-observations"
+  : > "$TMP/device-suites"
+  DEVICE_ADB=''
+  DEVICE_TARGET=''
+  DEVICE_ABI=''
+  DEVICE_PROFILE_USED=''
+  DEVICE_COMMAND='./tools/check device'
+  [ -n "$DEVICE_PROFILE" ] && DEVICE_COMMAND="$DEVICE_COMMAND --profile $DEVICE_PROFILE"
+  [ -n "$DEVICE_SERIAL" ] && DEVICE_COMMAND="$DEVICE_COMMAND --device $DEVICE_SERIAL"
+  # Including --evidence is what makes the record's own `command` field a
+  # command that reproduces this record, rather than one that writes a
+  # different file.
+  [ -n "$DEVICE_EVIDENCE" ] && DEVICE_COMMAND="$DEVICE_COMMAND --evidence $DEVICE_EVIDENCE"
+  before=$N_FAIL
+  device_lane
+  if [ "$N_FAIL" -gt "$before" ]; then
+    device_write_evidence failed
+  else
+    device_write_evidence passed
+  fi
+  return 0
+}
+
+device_lane() {
+  step "device: the suites this lane declares"
+  local adb_path sdk serial devices count abi profile expected_abi suite undeclared
+
+  # Before anything is selected or built, because it is the one question this
+  # lane can answer on any host: does the tree declare the suite at all. A "no"
+  # here is the honest reading of a failing lane, and without it a missing
+  # suite is indistinguishable from a missing device.
+  undeclared=0
+  for suite in $DEVICE_SUITE_TARGETS; do
+    if device_suite_declared "$suite"; then
+      device_suite_state "$suite" declared
+    else
+      device_suite_state "$suite" not-declared
+      undeclared=$((undeclared + 1))
+      device_observe "no instrumented suite exists: $suite is declared in no BUILD.gn under taffy-core/ and in no patch under chromium/patches/"
+    fi
+  done
+  if [ "$undeclared" -eq 0 ]; then
+    device_pass "declared: $DEVICE_SUITE_TARGETS"
+  else
+    note "$undeclared of the lane's suites are declared nowhere; the build below will say so too"
+  fi
+
+  step "device: select one attached Android target"
+  adb_path=$(command -v adb 2>/dev/null || true)
+  if [ -z "$adb_path" ]; then
+    sdk=$(taffy_android_sdk_root 2>/dev/null || true)
+    if [ -n "$sdk" ] && [ -x "$sdk/platform-tools/adb" ]; then
+      adb_path="$sdk/platform-tools/adb"
+      PATH="$sdk/platform-tools:$PATH"
+      export PATH
+    fi
+  fi
+  if [ -z "$adb_path" ]; then
+    device_fail "device: adb is unavailable; install the pinned Android SDK with ./tools/bootstrap --profile android"
+    return 0
+  fi
+  DEVICE_ADB=$adb_path
+
+  serial=${DEVICE_SERIAL:-${ANDROID_SERIAL:-}}
+  devices=$(
+    "$adb_path" devices 2>/dev/null \
+      | awk 'NR > 1 && $2 == "device" { print $1 }'
+  )
+  if [ -n "$serial" ]; then
+    if ! printf '%s\n' "$devices" | grep -Fqx "$serial"; then
+      device_fail "device: $serial is not online and authorized according to adb devices"
+      return 0
+    fi
+  else
+    count=$(printf '%s\n' "$devices" | awk 'NF { n += 1 } END { print n + 0 }')
+    case "$count" in
+      0)
+        device_fail "device: no online, authorized adb device is attached"
+        return 0
+        ;;
+      1) serial=$devices ;;
+      *)
+        device_fail "device: $count devices are attached; select one with --device <serial>"
+        printf '%s\n' "$devices" | while IFS= read -r candidate; do
+          [ -n "$candidate" ] && note "  $candidate"
+        done
+        return 0
+        ;;
+    esac
+  fi
+
+  abi=$("$adb_path" -s "$serial" shell getprop ro.product.cpu.abi 2>/dev/null \
+        | tr -d '\r[:space:]')
+  case "$abi" in
+    arm64-v8a) expected_abi=dev-arm64 ;;
+    x86_64) expected_abi=dev-x64 ;;
+    *)
+      DEVICE_TARGET=$serial
+      DEVICE_ABI=$abi
+      device_fail "device: unsupported ABI '$abi'; committed device profiles cover arm64-v8a and x86_64"
+      return 0
+      ;;
+  esac
+  profile=${DEVICE_PROFILE:-$expected_abi}
+  case "$profile" in
+    dev-arm64|dev-x64) : ;;
+    *)
+      DEVICE_TARGET=$serial
+      DEVICE_ABI=$abi
+      device_fail "device: --profile must be dev-arm64 or dev-x64 (got '$profile')"
+      return 0
+      ;;
+  esac
+  DEVICE_TARGET=$serial
+  DEVICE_ABI=$abi
+  if [ "$profile" != "$expected_abi" ]; then
+    device_fail "device: $serial reports $abi, which requires $expected_abi rather than $profile"
+    return 0
+  fi
+  DEVICE_PROFILE_USED=$profile
+  device_pass "$serial ($abi), profile $profile"
+
+  step "device: build every declared TaffyGo integration suite"
+  # One list, word-split into separate arguments, so that the suites the
+  # evidence record reports are exactly the suites the build is asked for.
+  # shellcheck disable=SC2086
+  if "$TAFFY_ROOT/tools/chromium/build" --profile "$profile" $DEVICE_SUITE_TARGETS; then
+    device_pass "device suite build"
+    for suite in $DEVICE_SUITE_TARGETS; do
+      device_suite_state "$suite" built
+    done
+  else
+    device_fail "device suite build"
+    return 0
+  fi
+
+  # Run separately. The wrapper rejects an exit-zero suite that reports zero
+  # tests, and separate invocations ensure one failure does not prevent the
+  # remaining suites from producing evidence.
+  for suite in $DEVICE_SUITE_TARGETS; do
+    step "device: $suite"
+    if "$TAFFY_ROOT/tools/chromium/test" --profile "$profile" \
+         --device "$serial" "$suite"; then
+      device_pass "$suite"
+      device_suite_state "$suite" passed
+    else
+      device_fail "$suite"
+      device_suite_state "$suite" failed
+    fi
+  done
+}
+
+summary() {
+  info ""
+  if [ "$N_FAIL" -gt 0 ]; then
+    printf '%s%d failing%s, %d warning(s), %d skipped\n' "$C_RED$C_BOLD" "$N_FAIL" "$C_RESET" "$N_WARN" "$N_SKIP" >&2
+    return 1
+  fi
+  printf '%sall checks passed%s — %d warning(s), %d skipped\n' "$C_GREEN" "$C_RESET" "$N_WARN" "$N_SKIP" >&2
+}
+
+case "$LANE" in
+  docs) check_docs ;;
+  fast) check_fast ;;
+  device) check_device ;;
+  all) check_docs; check_fast ;;
+  '') usage; exit 0 ;;
+  *) usage >&2; die "unknown lane: $LANE" ;;
+esac
+
+summary

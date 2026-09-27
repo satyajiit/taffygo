@@ -1,0 +1,27 @@
+# The portable half of the filtering plane: rule parsing, ruleset
+# compilation and the pure posture decision. It reaches the vendored
+# matching engine through a C ABI (decision 0086) and nothing
+# process-shaped: no content, no prefs, no network stack — a decision this
+# component makes must be reproducible in a host unit test from its
+# arguments alone.
+
+include_rules = [
+  "+base",
+  "+components/url_pattern_index",
+  "+taffy/components/filtering/core",
+  "+taffy/third_party/adblock-rust",
+  "+taffy_adblock.h",
+  "+url",
+
+  "-chrome",
+  "-content",
+  "-net",
+  "-services/network",
+]
+
+specific_include_rules = {
+  ".*_unittest\\.(cc|h)": [
+    "+base/test",
+    "+testing/gtest",
+  ],
+}

@@ -1,0 +1,76 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The sole browser-process actor-lease registry and capability ledger for one
+# profile. Rust policy may mint a grant; only this target may register, narrow,
+# spend, settle, or revoke that grant before a browser effect is dispatched.
+#
+# The value-reference vault is here for the same reason and under the same
+# rule. It is the only place in TaffyGo that holds bytes destined for a form
+# field, and it is a browser-process target on purpose: no renderer and nothing
+# in the sandboxed core service links against it, so "the model never authors
+# what enters a field" is a property of this build graph rather than a
+# convention (value_reference_vault.h).
+action("restricted_destination_table") {
+  script = "tools/generate_restricted_destination_table.py"
+  inputs = [ "//taffy/common/policy/restricted_destination_classes.tsv" ]
+  outputs = [ "$target_gen_dir/restricted_destination_table_generated.h" ]
+  args = [
+    "--generate",
+    "--input",
+    rebase_path(inputs[0], root_build_dir),
+    "--output",
+    rebase_path(outputs[0], root_build_dir),
+  ]
+}
+
+source_set("authority") {
+  sources = [
+    "action_authority.cc",
+    "action_authority.h",
+    "capability_ledger.cc",
+    "capability_ledger_registration.cc",
+    "capability_ledger_task_action.cc",
+    "capability_ledger_task_browser_command.cc",
+    "capability_ledger_task_download.cc",
+    "restricted_destination_classifier.cc",
+    "restricted_destination_classifier.h",
+    "value_reference_vault.cc",
+    "value_reference_vault.h",
+  ]
+  public_deps = [
+    "//taffy/common/public",
+    "//taffy/contracts/core-service",
+  ]
+  deps = [
+    ":restricted_destination_table",
+    "//base",
+    "//content/public/browser",
+    "//crypto",
+    "//url",
+  ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+  sources = [
+    "action_authority_unittest.cc",
+    "direct_observation_authority_unittest.cc",
+    "restricted_destination_classifier_unittest.cc",
+    "task_action_authority_control_unittest.cc",
+    "task_action_authority_unittest.cc",
+    "task_download_authority_unittest.cc",
+    "task_discovery_authority_unittest.cc",
+    "task_observation_authority_unittest.cc",
+    "value_reference_vault_unittest.cc",
+  ]
+  deps = [
+    ":authority",
+    "//base/test:test_support",
+    "//content/test:test_support",
+    "//testing/gtest",
+  ]
+}

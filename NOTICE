@@ -1,0 +1,120 @@
+TaffyGo — copyright, scope and third-party notices
+Copyright (c) 2026 Matterward Labs Private Limited
+
+TaffyGo's own source code is licensed under the Mozilla Public License,
+version 2.0. The root LICENSE file is that licence and nothing else: it is
+reproduced there unaltered, the way the licence itself asks to be reproduced.
+Everything a reader also needs to know — what the grant covers, what it does
+not, and where the other licences are — is in this file instead.
+
+
+1. WHAT THE LICENCE COVERS
+
+   "First-Party Work" means the contents of this repository, in source or
+   binary form, EXCEPT (a) any file that carries its own copyright or licence
+   notice, (b) any file generated from, or vendored from, a third-party work,
+   and (c) the Third-Party Components described in section 2. Where a file
+   carries its own notice, that notice governs the file and the root LICENSE
+   does not.
+
+   The MPL is a file-level licence and that is the reason it was chosen: a
+   change to a file TaffyGo owns comes back as a published change, and a
+   larger work built around those files does not. A source file of ours
+   carries the notice from the licence's own Exhibit A, so the file says so
+   wherever it travels.
+
+   Copyright and ownership sit with Matterward Labs Private Limited.
+   Accountability for the engineering and operating roles sits with the
+   individual repository owner and is recorded separately; the two are
+   deliberately not the same thing.
+
+
+2. THIRD-PARTY COMPONENTS
+
+   "Third-Party Components" means the Chromium source tree, its bundled
+   dependencies, and every other work of a third party that the TaffyGo
+   product incorporates, links against, or is built from. They are not part
+   of the First-Party Work and the root LICENSE does not license them to you.
+
+   Nothing in the root LICENSE or in this file licenses, relicenses,
+   sublicenses or restricts any Third-Party Component. Each one remains
+   governed solely by its own licence, and nothing here limits, reduces or
+   conditions any right that its own licence grants you. Where a component's
+   licence conflicts with ours as applied to that component, the component's
+   licence prevails for that component.
+
+   Some Third-Party Components are distributed under reciprocal licences —
+   including the GNU General Public License, the GNU Lesser General Public
+   License and the Mozilla Public License — whose conditions survive
+   incorporation. Those conditions bind us and are not disclaimed here. The
+   larger ones, and the parts of the product they are:
+
+   * Chromium and its bundled dependencies — the browser this product is a
+     fork of, under the terms in that tree's own LICENSE file and the licence
+     each component's README.chromium metadata names.
+   * adblock-rust, under MPL-2.0 — the matching engine behind ad and tracker
+     blocking, vendored under taffy-core/third_party/adblock-rust/.
+   * EasyList and its companion lists, under GPL-3.0 — the filter rules the
+     blocker is built from.
+   * CPython, under the Python Software Foundation licence — the interpreter
+     and standard library the assistant's tools run on.
+   * flag-icons, under MIT — the country artwork.
+   * FFmpeg, under LGPL-2.1-or-later — the demuxer the media tool's probe
+     pass runs on. It is Chromium's copy rather than one vendored here, and
+     the obligation it carries — the corresponding source, and the ability to
+     relink against a modified library — is the one section 4 answers.
+
+   Where those licences are reproduced:
+
+   * In a built product: the credits page generated at build time from the
+     upstream metadata of every component reachable from the shipped target,
+     reachable from the TaffyGo About screen. It is produced by Chromium's
+     own tools/licenses/licenses.py generator and is authoritative for the
+     build it ships with.
+   * In the Chromium source tree used to build the product: that tree's root
+     LICENSE file, and the licence file named by each component's own
+     README.chromium metadata.
+   * In this repository: the notices recorded beside each vendored component,
+     under taffy-core/third_party/ and each component's own vendor directory.
+
+   If a build reaches you without the credits page, or you need the
+   corresponding source for a reciprocally licensed component, ask at the
+   contact in section 4. That request is honoured on the terms the
+   component's own licence requires.
+
+
+3. TRADEMARKS AND MEDIA
+
+   The MPL grants no trademark rights, and this file grants none either. The
+   TaffyGo name, the Taffy character, the marks and the artwork are reserved
+   separately from the copyright grant. TRADEMARKS.md at the root of this
+   repository names exactly which files that covers and what a fork should do
+   instead.
+
+   Nothing here authorises use of any third party's marks — including the
+   names of the Chromium project, its contributors, or Google LLC — to
+   endorse or promote any product.
+
+
+4. CONTACT
+
+   Matterward Labs Private Limited is the contact of record. Send licensing
+   enquiries, permission requests and requests for the corresponding source
+   of a reciprocally licensed component to admin@matterwardlabs.com, the
+   address the app also gives for reports. Security vulnerabilities go
+   through SECURITY.md instead.
+
+
+5. NO WARRANTY
+
+   The warranty disclaimer and the limitation of liability are sections 6 and
+   7 of the root LICENSE and apply as written there. They are not restated
+   here, because restating a licence term is how two versions of it come to
+   exist.
+
+
+6. SCOPE AND CHANGE
+
+   This file describes the First-Party Work as of the commit that contains
+   it. A change to it applies from the commit that makes it and does not
+   retroactively alter the terms of an earlier distribution.

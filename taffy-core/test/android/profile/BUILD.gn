@@ -1,0 +1,27 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import("//build/config/android/rules.gni")
+import("//taffy/app/android/taffy_android_deps.gni")
+
+# Android-only composition above the shipping shell. The native recovery
+# assembly remains portable; only the Profile test APK includes this peer.
+android_library("task_pdf_handoff_java") {
+  testonly = true
+  sources = [ "../../recovery/java/src/org/chromium/taffy/shell/TaffyTaskPdfTestBridge.java" ]
+  srcjar_deps = [ "//taffy/test/recovery:task_pdf_handoff_jni_headers" ]
+  proguard_configs = [ "task_pdf_handoff.flags" ]
+  deps = [
+           "//base:base_java",
+           "//base:callback_java",
+           "//base:lifetime_java",
+           "//chrome/browser/profiles/android:java",
+           "//components/offline_items_collection/core:core_java",
+           "//taffy/app/android/shell:shell_java",
+           "//third_party/jni_zero:jni_zero_java",
+           "//ui/android:ui_java",
+         ] + taffy_kotlin_deps + taffy_kotlin_coroutines_deps
+}

@@ -1,0 +1,154 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The production Chrome-profile crash boundary. This suite is intentionally
+# separate from //taffy/test's portable Content Shell harness: only Chrome owns
+# a real Profile and installs the shipping Taffy utility-service registry.
+# Patch 0030 mounts this test-only source set into Chrome's host and Android
+# browser-test runners. No product target depends on it.
+if (is_android) {
+  import("//third_party/jni_zero/jni_zero.gni")
+
+  generate_jni("task_pdf_handoff_jni_headers") {
+    testonly = true
+    sources = [ "java/src/org/chromium/taffy/shell/TaffyTaskPdfTestBridge.java" ]
+  }
+
+}
+
+source_set("core_service_recovery_browser_tests") {
+  testonly = true
+
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  sources = [
+    "core_service_crash_recovery_browsertest.cc",
+    "core_service_manager_factory_browsertest.cc",
+    "download_authority_vertical_browsertest.cc",
+    "form_approval_vertical_browsertest.cc",
+    "form_approval_vertical_test_action.cc",
+    "form_approval_vertical_test_authority.cc",
+    "form_approval_vertical_test_backup.cc",
+    "form_approval_vertical_test_core.cc",
+    "form_approval_vertical_test_internal.h",
+    "form_approval_vertical_test_support.cc",
+    "form_approval_vertical_test_support.h",
+    "taffy_page_intelligence_host_browsertest.cc",
+  ]
+
+  deps = [
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser/profiles",
+    "//chrome/browser/tab_list",
+    "//components/tabs:public",
+    "//content/public/browser",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//crypto",
+    "//mojo/public/cpp/bindings",
+    "//net:test_support",
+    "//taffy/browser",
+    "//taffy/components/filtering/browser",
+    "//taffy/components/intelligence/content",
+    "//taffy/components/security/browser:authority",
+    "//taffy/contracts/core-api",
+    "//taffy/contracts/core-service",
+    "//taffy/test:benchmark_audit_support",
+    "//taffy/test:benchmark_support",
+    "//taffy/test:fixture_server_support",
+    "//taffy/test:graph_payload_reader",
+    "//testing/gtest",
+  ]
+
+  if (is_android) {
+    sources += [
+      "../benchmark/task_benchmark_cancellation_probe.cc",
+      "../benchmark/task_benchmark_dispatch_gate.cc",
+      "../benchmark/task_benchmark_dispatch_gate.h",
+      "../benchmark/task_benchmark_model_script.cc",
+      "../benchmark/task_benchmark_model_script.h",
+      "../benchmark/task_benchmark_model_script_unittest.cc",
+      "../benchmark/task_benchmark_page_read_probe.cc",
+      "../benchmark/task_benchmark_profile_probe.cc",
+      "../benchmark/task_benchmark_profile_probe.h",
+      "../benchmark/task_benchmark_profile_probe_internal.h",
+      "backup_restore_profile_commit_browsertest.cc",
+      "backup_restore_profile_discovery_browsertest.cc",
+      "backup_restore_profile_discovery_reconciliation_browsertest.cc",
+      "backup_restore_profile_discovery_source_unittest.cc",
+      "backup_restore_profile_discovery_terminal_browsertest.cc",
+      "backup_restore_profile_lifecycle_browsertest.cc",
+      "backup_restore_profile_precommit_cleanup_browsertest.cc",
+      "backup_restore_profile_precommit_presentation_browsertest.cc",
+      "backup_restore_profile_precommit_receipt_browsertest.cc",
+      "backup_restore_profile_presentation_browsertest.cc",
+      "backup_restore_profile_reconciliation_browsertest.cc",
+      "backup_restore_profile_resolution_browsertest.cc",
+      "backup_restore_profile_resolution_test_support.cc",
+      "backup_restore_profile_resolution_test_support.h",
+      "backup_workflow_restore_projection_unittest.cc",
+      "comparison_vertical_browsertest.cc",
+      "comparison_vertical_dispatch_gate.cc",
+      "comparison_vertical_dispatch_gate.h",
+      "comparison_vertical_model_endpoint.cc",
+      "comparison_vertical_model_endpoint.h",
+      "comparison_vertical_model_endpoint_unittest.cc",
+      "core_api_status_observer.cc",
+      "core_api_status_observer.h",
+      "core_api_status_reader.cc",
+      "core_api_status_reader.h",
+      "core_api_status_reader_delivery.cc",
+      "core_api_status_reader_memory.cc",
+      "core_api_status_reader_saved_work.cc",
+      "core_api_status_reader_skills.cc",
+      "core_api_status_reader_skills_unittest.cc",
+      "core_api_status_reader_task.cc",
+      "core_api_status_reader_workspace.cc",
+      "core_service_task_control_vertical_browsertest.cc",
+      "core_service_task_vertical_browsertest.cc",
+      "empty_vault_profile_platform_adapter.cc",
+      "empty_vault_profile_platform_adapter.h",
+      "errand_bootstrap_vertical_browsertest.cc",
+      "errand_download_vertical_browsertest.cc",
+      "errand_download_test_page.cc",
+      "errand_download_test_page.h",
+      "errand_task_model_endpoint.cc",
+      "errand_task_model_endpoint.h",
+      "errand_task_model_endpoint_unittest.cc",
+      "filtering_vertical_browsertest.cc",
+      "library_memory_vertical_browsertest.cc",
+      "library_memory_vertical_test_support.cc",
+      "library_memory_vertical_test_support.h",
+      "observed_site_skill.h",
+      "task_benchmark_vertical_browsertest.cc",
+      "task_model_reply_test_support.cc",
+      "task_model_reply_test_support.h",
+      "task_pdf_handoff_test_support.cc",
+      "task_pdf_handoff_test_support.h",
+      "workspace_vertical_test_support.cc",
+      "workspace_vertical_test_support.h",
+    ]
+    data = [ "//taffy/contracts/core-api/golden/full-status-v1.hex" ]
+    deps += [
+      ":task_pdf_handoff_jni_headers",
+      "//chrome/browser:browser_process",
+      "//chrome/browser/download",
+      "//chrome/common",
+      "//chrome/test:test_support_ui_android",
+      "//components/download/public/common:public",
+      "//components/prefs",
+      "//services/network:test_support",
+      "//sql",
+      "//taffy/browser/android:restore_profile_lifecycle",
+      "//taffy/components/storage/browser:storage",
+      "//third_party/zlib/google:zip",
+      "//ui/android",
+    ]
+  } else {
+    deps += [ "//chrome/test:test_support_ui" ]
+  }
+}

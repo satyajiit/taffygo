@@ -1,0 +1,169 @@
+// Copyright (c) 2026 Matterward Labs Private Limited.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// Generated from schema/contract.json. Do not edit.
+// Contract browsing 1.1.
+
+module taffy.browsing.mojom;
+
+const uint64 kMaxTabs = 256;
+const uint64 kMaxDownloads = 256;
+const uint64 kMaxIdentifierBytes = 256;
+const uint64 kMaxHostBytes = 253;
+const uint64 kMaxTitleBytes = 1024;
+const uint64 kMaxFileNameBytes = 512;
+
+enum TabOwner {
+  kUnknown = 0,
+  kUser = 1,
+  kAssistant = 2,
+};
+
+enum TabPrivacy {
+  kNormal = 0,
+  kPrivate = 1,
+};
+
+enum NavigationFailure {
+  kNone = 0,
+  kDnsFailure = 1,
+  kOffline = 2,
+  kConnectionFailure = 3,
+  kTimeout = 4,
+  kTlsFailure = 5,
+  kHttpErrorStatus = 6,
+  kBlockedByClient = 7,
+  kBlockedBySafeBrowsing = 8,
+  kAborted = 9,
+  kUnknownFailure = 10,
+};
+
+enum InterstitialKind {
+  kNone = 0,
+  kCertificateError = 1,
+  kSafeBrowsing = 2,
+  kBlockedByPolicy = 3,
+  kOther = 4,
+};
+
+enum DownloadState {
+  kCreated = 0,
+  kInProgress = 1,
+  kPaused = 2,
+  kInterrupted = 3,
+  kComplete = 4,
+  kCancelled = 5,
+};
+
+enum DownloadFailure {
+  kNone = 0,
+  kNetwork = 1,
+  kServer = 2,
+  kFileSystem = 3,
+  kInsufficientSpace = 4,
+  kPermissionDenied = 5,
+  kBlockedBySecurityCheck = 6,
+  kCancelledByUser = 7,
+  kBrowserShutdown = 8,
+  kUnknown = 9,
+};
+
+enum DownloadDestination {
+  kUndecided = 0,
+  kDefaultDirectory = 1,
+  kUserChosenLocation = 2,
+  kApplicationPrivateDirectory = 3,
+};
+
+enum DownloadCommand {
+  kPause = 0,
+  kResume = 1,
+  kCancel = 2,
+  kRetry = 3,
+  kOpenWhenComplete = 4,
+  kOpenNow = 5,
+};
+
+enum BrowsingStatus {
+  kAccepted = 0,
+  kInvalidRequest = 1,
+  kUnknownTab = 2,
+  kUnknownDownload = 3,
+  kIllegalInState = 4,
+  kRefusedByPolicy = 5,
+  kNoHistory = 6,
+  kUnavailable = 7,
+};
+
+struct TabView {
+  string tab_id@0;
+  string title@1;
+  string host@2;
+  bool has_been_nowhere@3;
+  TabOwner owner@4;
+  TabPrivacy privacy@5;
+  bool selected@6;
+};
+
+struct NavigationView {
+  string host@0;
+  string title@1;
+  bool can_go_back@2;
+  bool can_go_forward@3;
+  bool is_loading@4;
+  NavigationFailure failure@5;
+  InterstitialKind interstitial@6;
+  uint32 http_status_code@7;
+  bool filtering_active@8;
+  uint32 blocked_request_count@9;
+};
+
+struct DownloadView {
+  string download_id@0;
+  string file_name@1;
+  string host@2;
+  uint64 received_bytes@3;
+  uint64 total_bytes@4;
+  bool total_known@5;
+  DownloadState state@6;
+  DownloadFailure failure@7;
+  DownloadDestination destination@8;
+  bool resumable@9;
+  bool requires_danger_confirmation@10;
+};
+
+struct BrowsingStateView {
+  array<TabView> tabs@0;
+  NavigationView navigation@1;
+  array<DownloadView> downloads@2;
+};
+
+interface TaffyBrowsingObserver {
+  OnBrowsingState@0(BrowsingStateView state@0);
+};
+
+interface TaffyBrowsingSurface {
+  Observe@0(pending_remote<TaffyBrowsingObserver> observer@0);
+  OpenTab@1(
+      string host@0,
+      TabPrivacy privacy@1
+  ) => (BrowsingStatus status@0, string tab_id@1);
+  SelectTab@2(string tab_id@0) => (BrowsingStatus status@0);
+  CloseTab@3(string tab_id@0) => (BrowsingStatus status@0);
+  NavigateTo@4(string host@0) => (BrowsingStatus status@0);
+  GoBack@5() => (BrowsingStatus status@0);
+  GoForward@6() => (BrowsingStatus status@0);
+  Reload@7() => (BrowsingStatus status@0);
+  RunDownloadCommand@8(
+      string download_id@0,
+      DownloadCommand command@1
+  ) => (BrowsingStatus status@0);
+  SetFilteringEnabled@9(bool enabled@0) => (BrowsingStatus status@0);
+  SetSiteFilteringException@10(
+      string host@0,
+      bool allow@1
+  ) => (BrowsingStatus status@0);
+};

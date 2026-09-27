@@ -1,0 +1,9 @@
+include_rules = [
+  "+base",
+  "+content/public/browser",
+  "+content/public/test",
+  "+crypto",
+  "+taffy/common/public",
+  "+taffy/contracts/core-service",
+  "+url",
+]

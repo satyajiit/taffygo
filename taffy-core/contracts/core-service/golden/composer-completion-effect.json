@@ -1,0 +1,29 @@
+{
+  "operation": {
+    "operation_id": "composer-1",
+    "service_generation": 4,
+    "task_revision": 0,
+    "deadline_monotonic_ms": 120000,
+    "idempotency_key": "composer-key-1"
+  },
+  "effect_id": "composer-completion-composer-request-1",
+  "kind": 12,
+  "retry_class": 0,
+  "storage_commit": null,
+  "page_observation": null,
+  "model_request": null,
+  "network_request": null,
+  "browser_action": null,
+  "tool_job": null,
+  "secure_store": null,
+  "auth_surface": null,
+  "permission_request": null,
+  "asset_delivery": null,
+  "catalog_fetch": null,
+  "provider_listing_fetch": null,
+  "composer_completion": {
+    "request_id": "composer-request-1",
+    "text": "is cheaper once the checked bag is counted."
+  },
+  "custom_endpoint_probe": null
+}

@@ -1,0 +1,41 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The frozen registry of everything a sandboxed worker may ever be asked to do.
+#
+# There is no loader target here and there never will be one. The rows are
+# generated from `source/entrypoints.json` into a C++ table and a Rust table,
+# both compiled in, and the source file is a build input rather than a run-time
+# input: nothing in the product opens it. Decision
+# 0064-a-worker-entrypoint-is-frozen-and-loses-to-a-native-path.md records why.
+#
+# Data plus one small decision. Its only dependency is //base, for `base::span`
+# over each row's ports: the pointer-and-count form it replaced is two facts a
+# caller has to keep in step, and Chromium's unsafe-buffer diagnostic refuses it
+# for exactly that reason. Nothing else - no //mojo, no contract, no reader.
+#
+# The Rust projection beside it still depends on nothing at all, which is where
+# the "cannot be handed a second registry" property actually lives: a crate with
+# no deserializer cannot be given a table, and this target has none either.
+source_set("entrypoints") {
+  sources = [
+    "generated/cpp/tool_entrypoints.h",
+    "tool_entrypoint_registry.cc",
+    "tool_entrypoint_registry.h",
+  ]
+
+  deps = []
+
+  # `base::span` appears in the generated struct, so a consumer of this header
+  # gets it transitively rather than having to name //base itself.
+  public_deps = [ "//base" ]
+}
+
+# There is deliberately no group here naming both projections. The Rust view is
+# reached by the sandboxed core and the C++ view by the browser, and a label
+# that offered both would be a label the browser could take - which would link
+# first-party Rust into the browser process, the one thing the process split
+# exists to prevent.

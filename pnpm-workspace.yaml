@@ -1,0 +1,16 @@
+# JS workspace (decision 0012). Node tooling is host/service only: nothing
+# here ships inside the Android package.
+packages:
+  - 'website'
+allowBuilds:
+  esbuild: false
+  unrs-resolver: false
+
+# eslint-config-next loads Next's compiled Babel parser at runtime but does not
+# declare the package it requires.  Keep the workspace's isolated linker
+# honest by repairing that package boundary explicitly rather than relying on
+# an ambient hoist from another workspace project.
+packageExtensions:
+  eslint-config-next@16.3.1:
+    dependencies:
+      next: 16.3.1

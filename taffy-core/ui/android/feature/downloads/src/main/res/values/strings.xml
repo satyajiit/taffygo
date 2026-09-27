@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<resources>
+    <string name="taffy_downloads_title">Downloads</string>
+    <string name="taffy_downloads_tab_yours">Yours</string>
+    <string name="taffy_downloads_tab_taffys">Taffy\'s</string>
+    <string name="taffy_downloads_tabs_description">Which downloads to show</string>
+
+    <string name="taffy_downloads_search">Search file names and sites</string>
+    <string name="taffy_downloads_search_clear">Clear download search</string>
+    <string name="taffy_downloads_filter_label">Show</string>
+    <string name="taffy_downloads_filter_all">All</string>
+    <string name="taffy_downloads_filter_active">Active</string>
+    <string name="taffy_downloads_filter_complete">Saved</string>
+    <string name="taffy_downloads_filter_failed">Issues</string>
+    <string name="taffy_downloads_sort_label">Sort by</string>
+    <string name="taffy_downloads_sort_newest">Newest</string>
+    <string name="taffy_downloads_sort_name">Name</string>
+    <string name="taffy_downloads_sort_largest">Largest</string>
+    <string name="taffy_downloads_sort_source">Site</string>
+    <string name="taffy_downloads_group_label">Group by</string>
+    <string name="taffy_downloads_group_none">None</string>
+    <string name="taffy_downloads_group_status">Status</string>
+    <string name="taffy_downloads_group_type">File type</string>
+    <string name="taffy_downloads_group_source">Site</string>
+
+    <string name="taffy_downloads_status_loading">Loading this profile\'s downloads</string>
+    <string name="taffy_downloads_status_unavailable">This profile\'s full download list is unavailable</string>
+    <plurals name="taffy_downloads_status_limited">
+        <item quantity="one">Showing the newest %1$d download. Older downloads may exist.</item>
+        <item quantity="other">Showing the newest %1$d downloads. Older downloads may exist.</item>
+    </plurals>
+    <plurals name="taffy_downloads_status_count">
+        <item quantity="one">Showing %1$d of %2$d download</item>
+        <item quantity="other">Showing %1$d of %2$d downloads</item>
+    </plurals>
+    <string name="taffy_downloads_loading_title">Loading downloads</string>
+    <string name="taffy_downloads_loading_body">TaffyGo is reading this profile\'s download list.</string>
+    <string name="taffy_downloads_unavailable_title">Downloads unavailable</string>
+    <string name="taffy_downloads_unavailable_body">TaffyGo could not read this profile\'s download list. Your files and active downloads are unchanged.</string>
+    <string name="taffy_downloads_empty_title">No downloads</string>
+    <string name="taffy_downloads_empty_body">Files you download are saved to your device and listed here.</string>
+    <string name="taffy_downloads_no_matches_title">No matching downloads</string>
+    <string name="taffy_downloads_no_matches_body">Change the search, filter, or grouping to see other files.</string>
+    <string name="taffy_downloads_action_unavailable">That action is no longer available for this download.</string>
+    <string name="taffy_downloads_dismiss">Dismiss</string>
+
+    <string name="taffy_downloads_pause">Pause</string>
+    <string name="taffy_downloads_resume">Resume</string>
+    <string name="taffy_downloads_cancel">Cancel download</string>
+    <string name="taffy_downloads_open">Open</string>
+    <string name="taffy_downloads_share">Share</string>
+    <string name="taffy_downloads_remove">Remove</string>
+    <string name="taffy_downloads_action_description">%1$s %2$s</string>
+    <string name="taffy_downloads_keep">Keep</string>
+    <string name="taffy_downloads_cancel_confirm_title">Cancel download?</string>
+    <string name="taffy_downloads_cancel_confirm_body">Stop downloading %1$s? You can resume only if the site and your browser still allow it.</string>
+    <string name="taffy_downloads_remove_confirm_title">Remove download?</string>
+    <string name="taffy_downloads_remove_confirm_body">Remove %1$s and its downloaded file from this profile? This cannot be undone here.</string>
+
+    <string name="taffy_downloads_progress">%1$d%%</string>
+    <string name="taffy_downloads_progress_unknown">Size unknown</string>
+    <string name="taffy_downloads_supporting">%1$s · %2$s</string>
+    <string name="taffy_downloads_description">%1$s, from %2$s, %3$s, %4$s</string>
+    <string name="taffy_downloads_source_unknown">Unknown site</string>
+    <string name="taffy_downloads_type_documents">Documents</string>
+    <string name="taffy_downloads_type_images">Images</string>
+    <string name="taffy_downloads_type_audio">Audio</string>
+    <string name="taffy_downloads_type_video">Video</string>
+    <string name="taffy_downloads_type_archives">Archives</string>
+    <string name="taffy_downloads_type_other">Other files</string>
+
+    <string name="taffy_parts_empty_title">No separate parts</string>
+    <string name="taffy_parts_empty_body">This version of TaffyGo has everything it needs built in.</string>
+    <string name="taffy_parts_unsupported_title">Nothing for this device</string>
+    <string name="taffy_parts_unsupported_body">No parts are published for this kind of device, so Taffy will not fetch any.</string>
+    <string name="taffy_parts_purpose_python_library">Python library</string>
+    <string name="taffy_parts_purpose_python_packages">Extra Python packages</string>
+    <string name="taffy_parts_purpose_model">On-device model</string>
+    <string name="taffy_parts_purpose_model_tokenizer">On-device model text reader</string>
+    <string name="taffy_parts_purpose_block_list">Ad and tracker list</string>
+    <string name="taffy_parts_purpose_country_flags">Country flags</string>
+    <string name="taffy_parts_purpose_start_scenes">Start page artwork</string>
+    <string name="taffy_parts_state_ready">Ready</string>
+    <string name="taffy_parts_state_checking">Checking</string>
+    <string name="taffy_parts_state_downloading">Downloading</string>
+    <string name="taffy_parts_state_missing">Waiting</string>
+    <string name="taffy_parts_state_not_needed">Not needed yet</string>
+    <string name="taffy_parts_hold_not_available">Not available for this device</string>
+    <string name="taffy_parts_hold_not_published">Not published yet</string>
+    <string name="taffy_parts_hold_attempts_spent">Could not finish</string>
+    <string name="taffy_parts_hold_wrong_contents">What arrived was not right</string>
+    <string name="taffy_parts_hold_connection">Waiting for a connection</string>
+    <string name="taffy_parts_hold_turned_off">Turned off</string>
+    <string name="taffy_parts_hold_product_defect">Something is wrong with this part of Taffy</string>
+    <string name="taffy_parts_supporting">%1$s · %2$s</string>
+    <string name="taffy_parts_description">%1$s, %2$s, %3$s</string>
+    <string name="taffy_parts_remove">Delete</string>
+</resources>

@@ -1,0 +1,310 @@
+TaffyGo website images
+======================
+
+Recorded: 2026-09-27
+Owner: Matterward Labs Private Limited
+
+Every image this website serves that is not a logo file from brand/ or the
+official Google Play badge is listed here: the real phone screens, the
+paintings of Taffy and the link-preview card. Each entry names the file, the
+file it was made from, its pixel size, its byte count and its sha256.
+tests/assets.test.ts holds every file under public/screens/ and public/art/,
+and the card, to this record, so a file that changes without a new entry
+fails the website lane.
+
+website/scripts/build_media.py makes all of them from two directories kept
+outside the repository, and can make them again:
+
+  python3 scripts/build_media.py --screens <capture dir> --art <art dir>
+
+Every painting shows Taffy, so each path below belongs in the reserved-media
+table of TRADEMARKS.md beside the character master.
+
+Approved character reference
+----------------------------
+
+path=brand/character/taffy-character-master.webp
+sha256=b9a13f14fdd94d77657180dd0df35d6b6845846a37295152c430d568bf6ce602
+
+Phone screens
+-------------
+
+Method: captures of TaffyGo on an Android 16 phone (1268x2756 px, 520 dpi),
+taken with tools/screens/capture on 2026-09-26, app version 152.0.7977.42.
+Three were taken again on 2026-09-27 from a build of the same version: the
+start page (01, 11), whose suggestion rows now carry their own labels, and
+Backup (09), which no longer offers a restore. The status bar (156 px) and the navigation bar (52 px) are cut off, so each
+screen starts and ends at the app's own edges. The pages shown are public:
+allrecipes.com, amazon.in, flipkart.com and example.com. Every capture was
+checked for personal data before use; none shows an account, email address,
+phone number, saved password, browsing history, location or document.
+
+Two captures are not the screen's resting state. The start page (01, 11)
+has a request typed into its box, because the idle start page lists the
+phone's most-visited sites. Nothing else was staged.
+
+Derivation: the lossless cropped PNG, resized with Lanczos to 360 and 720 px
+wide, saved as WebP at quality 82, method 6, with no metadata.
+
+path=website/public/screens/01-start-page-360.webp
+source=capture cropped/01-start-page.png
+source_sha256=7dcacdb11464d233ff08ec1c5137535494a4b09ab12747f714a25d03a88b8672
+dimensions=360x723
+bytes=12126
+sha256=d33b3803f45c33533a50dee28aa773ecb57b2d9ba968d311254bbe9e58d4b4c7
+
+path=website/public/screens/01-start-page-720.webp
+source=capture cropped/01-start-page.png
+source_sha256=7dcacdb11464d233ff08ec1c5137535494a4b09ab12747f714a25d03a88b8672
+dimensions=720x1447
+bytes=28750
+sha256=41a1d724dbab8f3a12cc5dee011f107077fd513869153efc2cd0289e21527407
+
+path=website/public/screens/02-taffy-on-a-page-360.webp
+source=capture cropped/02-taffy-on-a-page.png
+source_sha256=6dfb932868ee7582e5fb4b0ed792478fedbf488b46a7708a5d0672227cbd6f45
+dimensions=360x723
+bytes=26944
+sha256=2711c4f8c90e31345cdd917cac5c16804f9f04de41d5b66c42dc07b7994f832c
+
+path=website/public/screens/02-taffy-on-a-page-720.webp
+source=capture cropped/02-taffy-on-a-page.png
+source_sha256=6dfb932868ee7582e5fb4b0ed792478fedbf488b46a7708a5d0672227cbd6f45
+dimensions=720x1447
+bytes=63064
+sha256=074a41c87394ecc4761d660043faa55a829c26ff563608a18e62d96625ebe26c
+
+path=website/public/screens/03-ad-blocking-360.webp
+source=capture cropped/03-ad-blocking.png
+source_sha256=22116f79388b2829124e16c17ab893058cd3c751c3114d62308dc9a63bcabbda
+dimensions=360x723
+bytes=16770
+sha256=9f88bcfd1aafdf8c7103e622ec9f1cda0ef0ad3c95424eea10a154e7ec359178
+
+path=website/public/screens/03-ad-blocking-720.webp
+source=capture cropped/03-ad-blocking.png
+source_sha256=22116f79388b2829124e16c17ab893058cd3c751c3114d62308dc9a63bcabbda
+dimensions=720x1447
+bytes=39854
+sha256=8276b7ffe3c77a67a20826ac3ae23330ab247c5b1a3f7007090267ac6446e331
+
+path=website/public/screens/04-errand-running-360.webp
+source=capture cropped/04-errand-running.png
+source_sha256=ea395210fd8e0ed5f0933a0447755131e72fbfcd3475f935559628be81af4292
+dimensions=360x723
+bytes=22726
+sha256=b07ef03f55dab4524e88969ba7eb607e3ee5b429ab50b074d6048ef4c278af13
+
+path=website/public/screens/04-errand-running-720.webp
+source=capture cropped/04-errand-running.png
+source_sha256=ea395210fd8e0ed5f0933a0447755131e72fbfcd3475f935559628be81af4292
+dimensions=720x1447
+bytes=52996
+sha256=69b18e9d3e21902aca98ffdf78dce14ec47b89ccf1557538abba19c334aab400
+
+path=website/public/screens/05-asks-before-acting-360.webp
+source=capture cropped/05-asks-before-acting.png
+source_sha256=d46878243e671a855ee27115efb72861cb986ae0adbe4e4563f9053d1e3f95a5
+dimensions=360x723
+bytes=14414
+sha256=9389c18570cbd5accf8d247e3632126afc7f595c5255ed7ae49be4113c215110
+
+path=website/public/screens/05-asks-before-acting-720.webp
+source=capture cropped/05-asks-before-acting.png
+source_sha256=d46878243e671a855ee27115efb72861cb986ae0adbe4e4563f9053d1e3f95a5
+dimensions=720x1447
+bytes=32772
+sha256=d8e405df94f84880ab69c8ac956627116ef1ba9bb0809c58a62606ad08555cc4
+
+path=website/public/screens/06-results-360.webp
+source=capture cropped/06-results.png
+source_sha256=183c3939e4b0842e6cc2664fd4c6703a8311c64b48e0878a2a9966970c8ace8c
+dimensions=360x723
+bytes=37128
+sha256=696331cd4a4d6e086f795c293c1ef0dacb4685526e3b94616ba61c21b1d3272d
+
+path=website/public/screens/06-results-720.webp
+source=capture cropped/06-results.png
+source_sha256=183c3939e4b0842e6cc2664fd4c6703a8311c64b48e0878a2a9966970c8ace8c
+dimensions=720x1447
+bytes=86550
+sha256=0c973d82daa376ac509663b78af5fd065a19a87a65a80f142b5b2991d9f9ba95
+
+path=website/public/screens/07-your-provider-your-key-360.webp
+source=capture cropped/07-your-provider-your-key.png
+source_sha256=37bb4df12e834b67f90e584ada81bc16d3d5584ee9f3814420c7fb9be6b52a2b
+dimensions=360x723
+bytes=13906
+sha256=2304a8e05311103f3271aaac27f428f8739076ff08a688246a344c0ae50ce130
+
+path=website/public/screens/07-your-provider-your-key-720.webp
+source=capture cropped/07-your-provider-your-key.png
+source_sha256=37bb4df12e834b67f90e584ada81bc16d3d5584ee9f3814420c7fb9be6b52a2b
+dimensions=720x1447
+bytes=33180
+sha256=5e2afb720c0c122b387670008bc30eaa29117fe7bf0dde450b498e7c43cc42ee
+
+path=website/public/screens/08-privacy-360.webp
+source=capture cropped/08-privacy.png
+source_sha256=092b3469a37e4da3780495ec972ec8619cf93b088ffeb44be6c8bcab82df5744
+dimensions=360x723
+bytes=22278
+sha256=e50db69d00c3059b0a042961d38d90ccfcf197df856e162d62683b9f450cc6e1
+
+path=website/public/screens/08-privacy-720.webp
+source=capture cropped/08-privacy.png
+source_sha256=092b3469a37e4da3780495ec972ec8619cf93b088ffeb44be6c8bcab82df5744
+dimensions=720x1447
+bytes=52654
+sha256=ad68f847a87c3ef7ae7afe70bb2f17bcb33e361e714f67edd47f06439b1e2a0d
+
+path=website/public/screens/09-backup-360.webp
+source=capture cropped/09-backup.png
+source_sha256=cf0cec10ab7ffe4397eb078afe2b44b3845be0ad1b3ce72a175cc821abfffe40
+dimensions=360x723
+bytes=25358
+sha256=3379c73a5ac406dc5e213a628efae0716676db829fdf84c84cb0d7c32eeb37e3
+
+path=website/public/screens/09-backup-720.webp
+source=capture cropped/09-backup.png
+source_sha256=cf0cec10ab7ffe4397eb078afe2b44b3845be0ad1b3ce72a175cc821abfffe40
+dimensions=720x1447
+bytes=60058
+sha256=aa7fd8e752f84e67aa43ee4092038892c2792f17752494a4e1460c7dae460b07
+
+path=website/public/screens/10-tabs-360.webp
+source=capture cropped/10-tabs.png
+source_sha256=1d9b6bc52c1a242819ca9d8a9f070ee73c9ff6eac0010ce976f23ed686bd80cd
+dimensions=360x723
+bytes=23728
+sha256=056f13faa75556ea1d57f43d28df03d4e92cfe03eb360222388d53abb62f4cb2
+
+path=website/public/screens/10-tabs-720.webp
+source=capture cropped/10-tabs.png
+source_sha256=1d9b6bc52c1a242819ca9d8a9f070ee73c9ff6eac0010ce976f23ed686bd80cd
+dimensions=720x1447
+bytes=53130
+sha256=3373d880d0c8d43a1246b15a365539222f4ebb0ede8f1fbf68b1708195ae0126
+
+path=website/public/screens/11-start-page-dark-360.webp
+source=capture cropped/11-start-page-dark.png
+source_sha256=d04026682256d508faa017b3e6ec883d8aca9524235292c7275084cc32205b19
+dimensions=360x723
+bytes=12094
+sha256=b3e588d6cdb634396251bd3770a660c182a87c06955b41ebc079addea77c6eeb
+
+path=website/public/screens/11-start-page-dark-720.webp
+source=capture cropped/11-start-page-dark.png
+source_sha256=d04026682256d508faa017b3e6ec883d8aca9524235292c7275084cc32205b19
+dimensions=720x1447
+bytes=27968
+sha256=a6ee46a4b0bffe5557e3027954d48a8e73ef99b70aab17e0030d308a60f4daa9
+
+path=website/public/screens/12-taffy-dark-360.webp
+source=capture cropped/12-taffy-dark.png
+source_sha256=e08b61eda0dd5c64fbf7f7d6c98b93bbb02f3cc5b932ff33743a2afa2b40e4f4
+dimensions=360x723
+bytes=47246
+sha256=34e97696e358285a1e292d34ec5d3063406079f21fe382c5f64d59b6f143624f
+
+path=website/public/screens/12-taffy-dark-720.webp
+source=capture cropped/12-taffy-dark.png
+source_sha256=e08b61eda0dd5c64fbf7f7d6c98b93bbb02f3cc5b932ff33743a2afa2b40e4f4
+dimensions=720x1447
+bytes=108642
+sha256=4c7bd2f25869a4ff85726b96f96b8278484657eb8b05be648bc8a23ea48398ee
+
+path=website/public/screens/x-ask-about-this-page-360.webp
+source=capture cropped/x-ask-about-this-page.png
+source_sha256=859e37e2b73da9fb79252f53334aa7b0a3ea88e5fb5c730613cab79801d1a0fc
+dimensions=360x723
+bytes=18012
+sha256=a936555438e3b41088f3a3ac855ebfb2fbf93a46ee51b4604c826b3fbd8c6b2a
+
+path=website/public/screens/x-ask-about-this-page-720.webp
+source=capture cropped/x-ask-about-this-page.png
+source_sha256=859e37e2b73da9fb79252f53334aa7b0a3ea88e5fb5c730613cab79801d1a0fc
+dimensions=720x1447
+bytes=39838
+sha256=bd0ff66d7e28330cd9273795068cea4e59509b719bfcbe9d3ec1be180fcb29cb
+
+Paintings
+---------
+
+Method: painted in gouache style by an image-generation model, given the
+approved character master (above) and one of the app's own task-scene
+paintings as references. Each painting was chosen from three or four
+candidates after checking Taffy against the master (face, hair streak, ears,
+outfit and wings), five fingers on every visible hand, and no lettering or
+marks anywhere. No painted pixel carries text. The prompts, every candidate
+and the reasons for each choice are kept with the source files.
+
+Derivation: the reviewed sRGB PNG, resized with Lanczos to two widths, saved
+as WebP at quality 82, method 6, with no metadata.
+
+website-hero: a person at a desk reads their phone while Taffy stands beside
+their arm, ready. section-asks-first: Taffy holds up a blank card to a person
+and waits for their answer. section-on-your-phone: a hand holds a phone whose
+screen is a small room, where Taffy puts keepsakes on a shelf.
+
+path=website/public/art/website-hero-800.webp
+source=painting website-hero.png
+source_sha256=e722ec915d5e63c01adaa4fba58ff8f74ac8fee91e36a14c3fd6aec30d370684
+dimensions=800x500
+bytes=66084
+sha256=0d60afde81d5bfa579d85ad954669b3fe5d695ab5813684609a9593109e990ad
+
+path=website/public/art/website-hero-1600.webp
+source=painting website-hero.png
+source_sha256=e722ec915d5e63c01adaa4fba58ff8f74ac8fee91e36a14c3fd6aec30d370684
+dimensions=1600x1000
+bytes=191012
+sha256=847ea3331dbeb5ceb1da0fec8f96d18c8ad46f831a636631add6415401d05105
+
+path=website/public/art/section-asks-first-720.webp
+source=painting section-asks-first.png
+source_sha256=236590c06c13e55284b2666d3b22d2123d450bd4a1e9795715c16fb14dd902d0
+dimensions=720x540
+bytes=85678
+sha256=316b656fb00998d9ece7df4899e736a87a6f42f4c2f4973d3474bcffbd668185
+
+path=website/public/art/section-asks-first-1440.webp
+source=painting section-asks-first.png
+source_sha256=236590c06c13e55284b2666d3b22d2123d450bd4a1e9795715c16fb14dd902d0
+dimensions=1440x1080
+bytes=227874
+sha256=6ef409c8ad825c9e77d506950c508f8906de51d341804792a6cf64df1211b8b2
+
+path=website/public/art/section-on-your-phone-720.webp
+source=painting section-on-your-phone.png
+source_sha256=8c54e3c0dd5820dc450cd0c239eca4fbd3c4533bc80eaeff24f581b14e00f4cb
+dimensions=720x540
+bytes=51666
+sha256=5313ab1989e54242c98936fd466709d84b9408eae889d3497dee69868d8d972c
+
+path=website/public/art/section-on-your-phone-1440.webp
+source=painting section-on-your-phone.png
+source_sha256=8c54e3c0dd5820dc450cd0c239eca4fbd3c4533bc80eaeff24f581b14e00f4cb
+dimensions=1440x1080
+bytes=147026
+sha256=781cffabb7c5362f493b0df0abb4b86b8d9c43b24e7ac78d901cae5e3491c544
+
+Link-preview card
+-----------------
+
+Method: a painting made the same way as those above (Taffy sits on the edge
+of a desk beside a phone in a wooden stand), with the committed lockup
+brand/png/taffygo-lockup-color-on-light.png trimmed to its opaque edges,
+scaled and composited as pixels. No generated logo layer is involved: the
+lockup is the committed file. Saved as a progressive JPEG at quality 86 with
+an sRGB profile, and served byte for byte under a name carrying its hash.
+
+lockup_path=brand/png/taffygo-lockup-color-on-light.png
+lockup_sha256=e515cfa0cb7e35c3ffcabf4f57cdcbace5f306ce118828a68df2e266479a8ca5
+
+path=website/public/og-image-2655c535d406.jpg
+source=og-image.jpg
+source_sha256=2655c535d40666565546d7bac706acde351b08eff4da4d771c1e01623d8d3e3d
+dimensions=1200x630
+bytes=170170
+sha256=2655c535d40666565546d7bac706acde351b08eff4da4d771c1e01623d8d3e3d

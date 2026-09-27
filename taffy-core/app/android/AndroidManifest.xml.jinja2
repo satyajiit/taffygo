@@ -1,0 +1,122 @@
+{% extends "chrome/android/java/AndroidManifest.xml" %}
+{#
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+TaffyGo's product-manifest overlay. The pinned Chromium base supplies the
+browser application and its ordinary platform declarations; these blocks add
+only TaffyGo-owned policy and components.
+
+The base emits android:allowBackup="false" whenever no backup_key is supplied.
+//taffy/app/android/product_targets.gni deliberately supplies none. The two
+rules below are still required because Android 12+ and some OEMs treat direct
+device transfer separately from that attribute.
+#}
+
+{% block extra_uses_permissions %}
+{{ super() }}
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+<!--
+  The queries below name the three things this browser has to be able to see:
+  an app that handles a web link, the viewer the PDF task hand-off opens
+  (TaffyTaskPdfHandoff.kt, the only PackageManager query this product's own
+  code makes), and the Play Store. The Play Store entry outlived both reasons
+  decision 0153 gave for it — the plan surfaces are deleted and Play Billing
+  is gone — and it stays for a reason that record does not state.
+
+  Two readings of why it stays are wrong, and both are easy to reach. It is
+  not clause 4's Play Store listing for an `intent://` naming an uninstalled
+  package: that is upstream's ExternalNavigationHandler, and it never runs
+  here, because TaffyExternalNavigationDelegate.shouldDisableAllExternalIntents
+  returns true and TaffyExternalNavigationHandler.shouldOverrideUrlLoading
+  never calls its superclass. It is not the `market://` hand-off either
+  (TaffyExternalAppHandoff, TaffyExternalAppHandoffTest): that goes out through
+  Intent.createChooser and startActivity, which package visibility does not
+  filter.
+
+  What does need it is upstream code this product compiles and never wrote:
+  PasswordManagerUtilBridge.isGooglePlayServicesUpdatable reads
+  PackageUtils.getPackageInfo("com.android.vending"), which visibility
+  filtering does answer with null. Upstream needs no entry of its own because
+  it declares QUERY_ALL_PACKAGES; this product declines that permission, so
+  every package upstream expects to see has to be named here or stop existing
+  as far as that code can tell. Searching taffy-core/ alone says this entry
+  has no consumer, and that census is narrower than the artifact.
+-->
+<queries>
+    <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="content" android:mimeType="application/pdf" />
+    </intent>
+    <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="https" />
+    </intent>
+    <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="http" />
+    </intent>
+    <package android:name="com.android.vending" />
+</queries>
+{% endblock %}
+
+{#
+TaffyGo does not enumerate what a person has installed (decision 0153).
+QUERY_ALL_PACKAGES is upstream's, declared so Chrome can decide whether an app
+installed on the device should handle a web navigation; on API 30 and above it
+switches package-visibility filtering off for the whole application, which is
+an inventory of the device this product has no use for. Upstream patch 0051
+wraps that declaration in the block overridden here, because the manifest
+merger's tools:node="remove" reaches only elements arriving from another
+manifest and is ignored for one this document declares. Overriding it with
+nothing narrows external hand-off rather than ending it: a navigation whose
+scheme no query above names stays in the browser, follows the page's
+browser_fallback_url, or — for an intent:// URL naming a package — offers that
+package's Play Store listing.
+#}
+{% block query_all_packages_permission %}{% endblock %}
+
+{% block extra_application_attributes %}
+{{ super() }}
+android:dataExtractionRules="@xml/taffy_data_extraction_rules"
+android:fullBackupContent="@xml/taffy_full_backup_content"
+{% endblock %}
+
+{% block extra_application_definitions %}
+{{ super() }}
+<service
+    android:name="com.taffygo.browser.ui.app.TaskContinuationService"
+    android:exported="false"
+    android:foregroundServiceType="specialUse">
+    <property
+        android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+        android:value="user_initiated_browser_research_with_visible_pause_stop_resume" />
+</service>
+<receiver
+    android:name="org.chromium.taffy.shell.TaffyDownloadActionReceiver"
+    android:exported="false" />
+<!--
+  Nothing about Cast is removed here, and that is a decision rather than an
+  omission. A previous revision of this template removed
+  MediaIntentReceiver and the policy_cast_dynamite query, on the rationale that
+  they rode in on the datatransport carrier that the Play Billing library
+  vendored here depended on, and that TaffyGo has no Cast surface. That
+  library has since been removed from the product and both components are
+  still in the merged manifest, which settles the carrier half by measurement
+  rather than by argument. Neither half survives contact with a built artifact: an APK built
+  before that library was vendored already carried both, from chrome_java's own
+  Cast dependency, and the same merged manifest registers CastOptionsProvider
+  and ChromeMediaNotificationControllerServices$CastListenerService, with
+  nothing in taffy-core/ or chromium/ disabling media_router. Upstream removes
+  ReconnectionService by name ("Disabled via CastOptionsProvider") and keeps
+  MediaIntentReceiver on purpose, recording it in its own golden manifest
+  expectations. Deleting shipping components from the product on a false
+  rationale is worse than carrying them, so they stay. What TaffyGo's
+  media-router posture should be is an open question for its owner and wants
+  its own evidence and its own decision record; it is not a billing change's to
+  settle.
+-->
+{% endblock %}

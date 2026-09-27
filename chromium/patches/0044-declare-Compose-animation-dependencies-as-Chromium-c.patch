@@ -1,0 +1,62 @@
+From 6a8846426c4622a114162bcc358a68866b169735 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Thu, 3 Sep 2026 23:50:31 +0530
+Subject: declare Compose animation dependencies as Chromium-consumable
+
+The retained Compose sheets and transitions directly reference animation-core and animation types. Declare both pinned artifacts at their shared AndroidX generator seam so Chromium's bytecode validator can accept the two direct dependencies. The patch retires when an AndroidX roll regenerates the public groups from the template.
+
+Specified by chromium/patches/0044-declare-compose-animation-dependencies.md.
+
+Taffy-Patch: 0044
+
+diff --git a/third_party/androidx/BUILD.gn b/third_party/androidx/BUILD.gn
+index 8d12b37e4c3f6..4a882d3106a44 100644
+--- a/third_party/androidx/BUILD.gn
++++ b/third_party/androidx/BUILD.gn
+@@ -2138,13 +2138,10 @@ if (!limit_android_deps) {
+   }
+ 
+   # This is generated, do not edit. Update BuildConfigGenerator.groovy instead.
++  # Downstream (TaffyGo): animation is declared in build.gradle.template, so
++  # the next generator run drops this visibility constraint itself; this edit
++  # is that regeneration applied by hand.
+   androidx_java_group("androidx_compose_animation_animation_java") {
+-    # To remove visibility constraint, add this dependency to
+-    # //third_party/androidx/build.gradle.template
+-    visibility = [
+-      ":*",
+-      "//third_party/android_deps:*",
+-    ]
+     deps = [ ":androidx_compose_animation_animation_android_java" ]
+   }
+ 
+@@ -2177,13 +2174,10 @@ if (!limit_android_deps) {
+   }
+ 
+   # This is generated, do not edit. Update BuildConfigGenerator.groovy instead.
++  # Downstream (TaffyGo): animation-core is declared in
++  # build.gradle.template, so the next generator run drops this visibility
++  # constraint itself; this edit is that regeneration applied by hand.
+   androidx_java_group("androidx_compose_animation_animation_core_java") {
+-    # To remove visibility constraint, add this dependency to
+-    # //third_party/androidx/build.gradle.template
+-    visibility = [
+-      ":*",
+-      "//third_party/android_deps:*",
+-    ]
+     deps = [ ":androidx_compose_animation_animation_core_android_java" ]
+   }
+ 
+diff --git a/third_party/androidx/build.gradle.template b/third_party/androidx/build.gradle.template
+index af6ae97d126a7..fbf504b37c1ec 100644
+--- a/third_party/androidx/build.gradle.template
++++ b/third_party/androidx/build.gradle.template
+@@ -30,6 +30,8 @@ dependencies {
+ 
+     compileLatest 'androidx.compose.runtime:runtime:+'
+     compileLatest 'androidx.compose.runtime:runtime-android:+'
++    compileLatest 'androidx.compose.animation:animation:+'
++    compileLatest 'androidx.compose.animation:animation-core:+'
+     compileLatest 'androidx.compose.material3:material3:+'
+     compileLatest 'androidx.compose.foundation:foundation:+'
+     compileLatest 'androidx.compose.foundation:foundation-layout:+'

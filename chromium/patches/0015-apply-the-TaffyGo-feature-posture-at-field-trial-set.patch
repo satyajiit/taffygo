@@ -1,0 +1,53 @@
+From b8119d257325acc5306668646003d8a621d56b89 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Tue, 18 Aug 2026 02:25:47 +0530
+Subject: apply the TaffyGo feature posture at field-trial setup
+
+One call at the top of RegisterFeatureOverrides installs the downstream
+feature-override list before the feature list freezes; registration is
+first-wins, so the posture beats later registrations and is itself beaten
+by nothing but the command line. The list lives in
+//taffy/browser and names each silenced upstream symbol with the
+reason decision 0019 records for it.
+
+Taffy-Patch: 0015
+
+diff --git a/chrome/browser/BUILD.gn b/chrome/browser/BUILD.gn
+index 01eeda29e78ad..0947bbe0bef5d 100644
+--- a/chrome/browser/BUILD.gn
++++ b/chrome/browser/BUILD.gn
+@@ -2874,6 +2874,10 @@ source_set("browser") {
+     "//components/sync_preferences:features",
+     "//components/sync_sessions",
+     "//components/tab_groups",
++
++    # Taffy: the feature-override list RegisterFeatureOverrides installs.
++    # chromium/patches/0015-apply-feature-posture-at-field-trial-setup.md
++    "//taffy/browser:feature_posture",
+     "//components/touch_to_search/core/browser",
+     "//components/tracing:background_tracing_utils",
+     "//components/tracing:tracing_config",
+diff --git a/chrome/browser/chrome_browser_field_trials.cc b/chrome/browser/chrome_browser_field_trials.cc
+index edf55b0274167..8c0122ec85990 100644
+--- a/chrome/browser/chrome_browser_field_trials.cc
++++ b/chrome/browser/chrome_browser_field_trials.cc
+@@ -26,6 +26,7 @@
+ #include "components/metrics/metrics_pref_names.h"
+ #include "components/metrics/persistent_histograms.h"
+ #include "components/site_isolation/features.h"
++#include "taffy/browser/feature_posture.h"
+ #include "components/variations/feature_overrides.h"
+ #include "components/version_info/version_info.h"
+ #include "third_party/blink/public/common/features.h"
+@@ -112,6 +113,11 @@ void ChromeBrowserFieldTrials::RegisterSyntheticTrials() {
+ 
+ void ChromeBrowserFieldTrials::RegisterFeatureOverrides(
+     base::FeatureList* feature_list) {
++  // Taffy: the runtime half of the Google service posture (decision 0019).
++  // Registered before upstream's own overrides because registration is
++  // first-wins. chromium/patches/0015-apply-feature-posture-at-field-trial-setup.md
++  taffy::ApplyFeaturePosture(feature_list);
++
+   variations::FeatureOverrides feature_overrides(*feature_list);
+ 
+ #if BUILDFLAG(IS_LINUX)

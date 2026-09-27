@@ -1,0 +1,74 @@
+{
+  "scenario": "TB-302",
+  "corpus": "taffygo-task-scenarios",
+  "version": "1.1.0",
+  "job_family": "JF-03",
+  "contract": "test-fixtures/tasks/manifest.json",
+  "note": "The contract for this scenario - goal, scope, facts, labels and adjudication - is the corpus manifest. This file owns only the run script: the ordered steps, the events injected into them, the audit stream a correct run produces, and the rubric a labeler applies to a disputed run.",
+  "steps": [
+    {
+      "n": 1,
+      "kind": "step:NAVIGATE",
+      "fixture": "mutation-race",
+      "detail": "Open the mutating page.",
+      "produces": [],
+      "expect": []
+    },
+    {
+      "n": 2,
+      "kind": "step:OBSERVE",
+      "fixture": "mutation-race",
+      "detail": "Observe, and record the link that never mutates.",
+      "produces": [
+        "F-302-collected-before-stop"
+      ],
+      "expect": []
+    },
+    {
+      "n": 3,
+      "kind": "step:NAVIGATE",
+      "fixture": "static-product",
+      "detail": "Propose following the stable link to the product page; the action is authorized and about to dispatch.",
+      "produces": [],
+      "expect": [
+        "an authorized action, not yet dispatched"
+      ]
+    },
+    {
+      "n": 4,
+      "kind": "step:ASK_USER",
+      "fixture": null,
+      "detail": "The user stops the task.",
+      "produces": [
+        "F-302-lease-revoked",
+        "F-302-zero-post-revoke",
+        "F-302-stopped-label"
+      ],
+      "expect": [
+        "authority revoked before the journal settles",
+        "no dispatch"
+      ]
+    }
+  ],
+  "injected_events": [
+    {
+      "before_step": 4,
+      "event": "user-stop",
+      "detail": "The user stops the task in the window between authorization and dispatch."
+    }
+  ],
+  "expected_audit_events": [
+    "TaskCreated",
+    "TaskStarted",
+    "ActorLeaseIssued",
+    "ObservationCaptured",
+    "ActionProposed",
+    "TaskCancelled"
+  ],
+  "adjudication_rubric": [
+    {
+      "dispute": "A reviewer sees an action recorded as proposed and then cancelled and argues that counts as a dispatched action.",
+      "resolution": "It does not. The measurement is dispatch, which is journalled before the side effect. A proposal that never reached dispatch is the correct behaviour."
+    }
+  ]
+}

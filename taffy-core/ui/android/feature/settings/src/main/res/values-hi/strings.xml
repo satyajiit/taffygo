@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<!-- Machine-translated (hi), pending native review. -->
+<resources>
+    <!-- Screen SCR-401 -->
+    <string name="taffy_settings_title">सेटिंग्स</string>
+    <string name="taffy_settings_search">सेटिंग्स खोजें</string>
+    <string name="taffy_settings_search_close">खोज बंद करें</string>
+    <string name="taffy_settings_no_matches_title">कुछ भी मेल नहीं खाया</string>
+    <string name="taffy_settings_no_matches_body">यहाँ कोई भी सेटिंग इस खोज से मेल नहीं खाती।</string>
+    <string name="taffy_settings_section_description">%1$s। %2$s</string>
+    <string name="taffy_settings_ai_title">AI और प्रदाता</string>
+    <string name="taffy_settings_ai_summary">मॉडल की पहुँच और प्रदाता कुंजियाँ</string>
+    <string name="taffy_settings_blocking_title">विज्ञापन और ट्रैकर</string>
+    <string name="taffy_settings_blocking_summary">आप जिन साइटों को अनुमति देते हैं उन्हें छोड़कर हर साइट पर चालू</string>
+    <plurals name="taffy_settings_blocking_summary_week">
+        <item quantity="one">इस सप्ताह %1$d ब्लॉक किया गया</item>
+        <item quantity="other">इस सप्ताह %1$d ब्लॉक किए गए</item>
+    </plurals>
+    <string name="taffy_settings_notifications_title">सूचनाएँ</string>
+    <string name="taffy_settings_notifications_summary">कार्य की प्रगति और डाउनलोड</string>
+    <string name="taffy_settings_appearance_title">रूप-रंग</string>
+    <string name="taffy_settings_appearance_summary">थीम, भाषा और टेक्स्ट का आकार</string>
+    <string name="taffy_settings_pane_empty_title">एक अनुभाग चुनें</string>
+    <string name="taffy_settings_pane_empty_body">सूची से कुछ चुनें। वह यहाँ खुलेगा।</string>
+    <string name="taffy_settings_you_opens">%1$s। You खोलता है।</string>
+    <string name="taffy_settings_you_search">You प्रोफ़ाइल नाम तस्वीर password पासवर्ड</string>
+    <string name="taffy_settings_memory_search">Memory याद नोट remember note</string>
+    <string name="taffy_settings_saved_sign_ins_search">password passwords passkey पासवर्ड</string>
+    <string name="taffy_settings_saved_details_search">saved details नाम पता ईमेल name address email</string>
+    <string name="taffy_settings_skills_search">skill skills abilities कौशल</string>
+    <string name="taffy_settings_taffy_search">Taffy Personality skills</string>
+    <string name="taffy_settings_library_search">Library keep this रखें</string>
+    <string name="taffy_settings_time_on_sites_search">time on sites समय इस सप्ताह</string>
+    <string name="taffy_settings_what_happened_search">What happened Taffy did क्या हुआ</string>
+    <string name="taffy_settings_blocking_search">ads trackers blocking विज्ञापन ट्रैकर</string>
+    <string name="taffy_settings_ai_search">AI providers your keys key</string>
+    <string name="taffy_settings_personality_search">Personality how Taffy talks</string>
+    <string name="taffy_settings_backup_search">backup restore बैकअप रिस्टोर रिकवरी कुंजी एन्क्रिप्ट की गई फ़ाइल</string>
+
+    <!-- Screen SCR-206 -->
+    <string name="taffy_filtering_title">विज्ञापन और ट्रैकर</string>
+    <string name="taffy_filtering_hero_eyebrow">इसी ब्राउज़र में बना हुआ</string>
+    <string name="taffy_filtering_hero_on">विज्ञापन और ट्रैकर चालू हैं</string>
+    <string name="taffy_filtering_hero_off">विज्ञापन और ट्रैकर बंद हैं</string>
+    <string name="taffy_filtering_hero_body">पेज आमतौर पर तेज़ी से खुलते हैं। साइटों के पास आपको फ़ॉलो करने के लिए कम होता है।</string>
+    <string name="taffy_filtering_master_toggle">विज्ञापन और ट्रैकर ब्लॉक करें</string>
+    <string name="taffy_filtering_master_summary">आप जिन साइटों को अनुमति देते हैं उन्हें छोड़कर हर साइट पर लागू।</string>
+    <string name="taffy_filtering_master_summary_off">हर साइट पर बंद।</string>
+    <string name="taffy_filtering_counts_eyebrow">गिनती</string>
+    <string name="taffy_filtering_week_heading">इस सप्ताह</string>
+    <string name="taffy_filtering_sites_heading">कम से कम इतनी साइटें</string>
+    <string name="taffy_filtering_week_unknown">गिना नहीं गया</string>
+    <string name="taffy_filtering_week_unavailable">इस सप्ताह अभी गिना नहीं जाता। अब तक ब्लॉक किए गए अनुरोध अभी भी दिखाए जाते हैं।</string>
+    <plurals name="taffy_filtering_lifetime_caption">
+        <item quantity="one">कुल %1$d ब्लॉक किया गया</item>
+        <item quantity="other">कुल %1$d ब्लॉक किए गए</item>
+    </plurals>
+    <string name="taffy_filtering_why_eyebrow">क्यों</string>
+    <string name="taffy_filtering_why_heading">यह क्यों चालू है</string>
+    <string name="taffy_filtering_why_body">पेज आमतौर पर तेज़ी से खुलते हैं। साइटों के पास आपको फ़ॉलो करने के लिए कम होता है।</string>
+    <string name="taffy_filtering_exceptions_eyebrow">अनुमति</string>
+    <string name="taffy_filtering_exceptions">साइटें जिन्हें आपने अनुमति दी</string>
+    <string name="taffy_filtering_no_exceptions">कोई अपवाद नहीं। हर साइट पर विज्ञापन और ट्रैकर चालू हैं।</string>
+    <string name="taffy_filtering_no_exceptions_off">कोई अपवाद नहीं। हर साइट पर विज्ञापन और ट्रैकर बंद हैं।</string>
+    <string name="taffy_filtering_exceptions_off">हर साइट के लिए ब्लॉकिंग बंद है, इसलिए इन्हें बदला नहीं जा सकता। इनमें से किसी को फिर से ब्लॉक करने के लिए ब्लॉकिंग चालू करें।</string>
+    <string name="taffy_filtering_no_exceptions_how">किसी साइट को यहाँ पेज के मेन्यू में विज्ञापन और ट्रैकर से जोड़ा जाता है।</string>
+    <plurals name="taffy_filtering_exceptions_count">
+        <item quantity="one">%1$d साइट अनुमत</item>
+        <item quantity="other">%1$d साइटें अनुमत</item>
+    </plurals>
+    <string name="taffy_filtering_remove_failed">%1$s को फिर से ब्लॉक नहीं किया जा सका। यह अब भी अनुमत है।</string>
+    <string name="taffy_filtering_removing">%1$s को फिर से ब्लॉक किया जा रहा है…</string>
+    <string name="taffy_filtering_remove">फिर ब्लॉक करें</string>
+    <string name="taffy_filtering_remove_exception">%1$s के लिए विज्ञापन और ट्रैकर फिर चालू करें</string>
+    <string name="taffy_filtering_remove_exception_off">%1$s पर विज्ञापन और ट्रैकर अनुमत हैं। हर साइट के लिए ब्लॉकिंग बंद है, इसलिए इसे बदला नहीं जा सकता।</string>
+
+    <!-- Screen SCR-406 -->
+    <string name="taffy_notifications_title">सूचनाएँ</string>
+    <string name="taffy_notifications_topics_heading">विषय</string>
+    <string name="taffy_notifications_task_progress">कार्य की प्रगति</string>
+    <string name="taffy_notifications_task_progress_summary">रोकें और बंद करें के साथ एक चलती सूचना।</string>
+    <string name="taffy_notifications_downloads">डाउनलोड</string>
+    <string name="taffy_notifications_downloads_summary">प्रगति और पूरा होना।</string>
+    <string name="taffy_notifications_permission_first_request">किसी विषय को चालू करें, ताकि Android पूछ सके कि TaffyGo सूचनाएँ दिखा सकता है या नहीं।</string>
+    <string name="taffy_notifications_permission_requesting">Android में सूचना की अनुमति चुने जाने का इंतज़ार है…</string>
+    <string name="taffy_notifications_permission_rationale">Android ने सूचनाओं की अनुमति नहीं दी। अगर आप फिर से पूछना चाहते हैं, तो किसी विषय को दोबारा चालू करें।</string>
+    <string name="taffy_notifications_permission_blocked">Android ने TaffyGo की सूचनाएँ रोक रखी हैं। आप इसे सिस्टम सेटिंग में बदल सकते हैं।</string>
+    <string name="taffy_notifications_permission_unavailable">Android सूचना की अनुमति नहीं खोल सका। सूचना के विषय बंद रहेंगे।</string>
+    <string name="taffy_notifications_open_settings">सिस्टम सेटिंग खोलें</string>
+    <string name="taffy_notifications_absent">निगरानी अलर्ट अभी यहाँ नहीं हैं। उन्हें बंद दिखाने के बजाय छोड़ दिया गया है।</string>
+
+    <!-- Screen SCR-407 -->
+    <string name="taffy_appearance_title">रूप-रंग</string>
+    <string name="taffy_appearance_tab_theme">थीम</string>
+    <string name="taffy_appearance_tab_language">भाषा</string>
+    <string name="taffy_appearance_theme">थीम</string>
+    <string name="taffy_appearance_theme_system">सिस्टम</string>
+    <string name="taffy_appearance_theme_light">लाइट</string>
+    <string name="taffy_appearance_theme_dark">डार्क</string>
+    <string name="taffy_appearance_dark_sites_title">साइटें डार्क</string>
+    <string name="taffy_appearance_dark_sites_body">जिस साइट का डार्क रूप नहीं है, उसे डार्क दिखाएँ।</string>
+    <string name="taffy_appearance_language">भाषा</string>
+    <string name="taffy_appearance_language_system">सिस्टम के अनुसार</string>
+    <string name="taffy_appearance_language_system_note">आपका फ़ोन जिस भाषा में है। अगर TaffyGo के पास उस भाषा के शब्द नहीं हैं तो English।</string>
+    <!-- Language rows name themselves (handoff screen 12b): English in English. -->
+    <string name="taffy_appearance_language_english">English</string>
+    <string name="taffy_appearance_language_english_note">TaffyGo के अपने शब्द English में</string>
+    <string name="taffy_appearance_language_hindi">हिन्दी</string>
+    <string name="taffy_appearance_language_hindi_note">TaffyGo के अपने शब्द हिन्दी में</string>
+    <string name="taffy_appearance_language_footnote">यह चुनाव TaffyGo के अपने शब्दों का है। यह वेब पेजों का अनुवाद नहीं करता।</string>
+    <string name="taffy_appearance_country_change">देश चुनें</string>
+    <string name="taffy_appearance_country_note">खोज, कीमतें और इकाइयाँ इसके अनुसार होंगी।</string>
+    <string name="taffy_appearance_country_picker_title">देश या क्षेत्र</string>
+    <string name="taffy_appearance_country_picker_body">English और हिन्दी हर देश में उपलब्ध रहते हैं। यह चुनाव खोज, कीमतों और इकाइयों के लिए है।</string>
+    <string name="taffy_appearance_country_picker_search">देश या कोड खोजें</string>
+    <string name="taffy_appearance_pair">%1$s, %2$s</string>
+    <string name="taffy_appearance_text_size">टेक्स्ट का आकार</string>
+    <string name="taffy_appearance_text_size_note">टेक्स्ट आपकी डिवाइस सेटिंग का पालन करता है, अपने आकार के दोगुने तक। इसे अपनी डिवाइस सेटिंग्स में बदलें।</string>
+    <string name="taffy_appearance_pseudo_title">जाँचें कि टेक्स्ट समाता है</string>
+    <string name="taffy_appearance_pseudo_body">हर पंक्ति को लंबा करें, ताकि दिखे कि दूसरी भाषा में क्या बाहर निकलेगा।</string>
+
+    <!-- Screen SCR-402 -->
+    <string name="taffy_general_title">सामान्य</string>
+    <string name="taffy_general_search_engine">खोज इंजन</string>
+    <string name="taffy_general_search_engine_unavailable">खोज इंजन चुनना इस फ़ोन पर अभी उपलब्ध नहीं है। पता बार अब भी वही खोलता है जो आप लिखते हैं।</string>
+    <string name="taffy_general_downloads">डाउनलोड स्थान</string>
+    <string name="taffy_general_downloads_unavailable">TaffyGo इस फ़ोन का डिफ़ॉल्ट डाउनलोड फ़ोल्डर इस्तेमाल करता है। कोई और चुनना अभी उपलब्ध नहीं है।</string>
+    <string name="taffy_general_downloads_loading">उपलब्ध स्थानों की जाँच हो रही है…</string>
+    <string name="taffy_general_downloads_choose">डाउनलोड स्थान चुनें</string>
+    <string name="taffy_general_downloads_device">इस डिवाइस पर</string>
+    <string name="taffy_general_downloads_removable">हटाने योग्य स्टोरेज</string>
+    <string name="taffy_general_downloads_selected">%1$s, चुना गया</string>
+    <string name="taffy_general_downloads_selection_failed">वह डाउनलोड स्थान अब उपलब्ध नहीं है। कोई दूसरा चुनें।</string>
+    <string name="taffy_general_downloads_write_failed">TaffyGo उस डाउनलोड स्थान को सहेज नहीं सका। फिर कोशिश करें।</string>
+    <string name="taffy_general_downloads_readback_failed">TaffyGo यह पक्का नहीं कर सका कि कौन सा डाउनलोड स्थान चुना गया है। डाउनलोड करने से पहले फिर जाँचें।</string>
+    <string name="taffy_general_text_size">टेक्स्ट का आकार</string>
+    <string name="taffy_general_text_size_note">टेक्स्ट आपकी डिवाइस सेटिंग का पालन करता है। रूप-रंग में नोट है, और यह जाँचने का तरीका कि शब्द अभी भी समाते हैं।</string>
+
+    <!-- Screen SCR-403 -->
+    <string name="taffy_privacy_title">गोपनीयता</string>
+    <string name="taffy_privacy_hero_body">क्या रखा जाता है, कोई अनुरोध कहाँ जाता है, और कितनी देर रहता है।</string>
+    <string name="taffy_privacy_stored_heading">इस फ़ोन पर क्या रखा जाता है</string>
+    <string name="taffy_privacy_stored_body">आपके खोले पेजों का इतिहास, साइटों द्वारा सेट कुकीज़, आपके डाउनलोड किए फ़ाइल, Memory जिसे आप देख सकते हैं, और वर्कस्पेस। निजी टैब बंद होने पर भूल जाते हैं।</string>
+    <string name="taffy_privacy_inventory_heading">मौजूदा कुल संख्या</string>
+    <string name="taffy_privacy_inventory_workspaces">सहेजे गए वर्कस्पेस</string>
+    <string name="taffy_privacy_inventory_library">Library के आइटम</string>
+    <string name="taffy_privacy_inventory_memory">Memory के आइटम</string>
+    <string name="taffy_privacy_inventory_providers">सहेजे गए प्रदाता कनेक्शन</string>
+    <string name="taffy_privacy_inventory_downloads">दिखाए गए हाल के डाउनलोड</string>
+    <string name="taffy_privacy_inventory_sites">बदली हुई सेटिंग वाली साइटें</string>
+    <string name="taffy_privacy_inventory_loading">जाँच हो रही है…</string>
+    <string name="taffy_privacy_inventory_unavailable">उपलब्ध नहीं</string>
+    <string name="taffy_privacy_inventory_exact">%1$d</string>
+    <string name="taffy_privacy_inventory_at_least">%1$d+</string>
+    <string name="taffy_privacy_inventory_row">%1$s: %2$s</string>
+    <string name="taffy_privacy_route_heading">अनुरोध कहाँ जाते हैं</string>
+    <string name="taffy_privacy_route_none">कहीं नहीं। कोई प्रदाता सेट नहीं है, इसलिए इस डिवाइस से कुछ नहीं जाता।</string>
+    <string name="taffy_privacy_route_direct">सीधे आपके प्रदाता को।</string>
+    <string name="taffy_privacy_route_no_model">इस फ़ोन पर रहता है। यह कार्य किसी AI प्रदाता को कुछ नहीं भेजता।</string>
+    <string name="taffy_privacy_retention_heading">यह कितनी देर रहता है</string>
+    <string name="taffy_privacy_retention_body">इतिहास और कुकीज़ तब तक रहती हैं जब तक आप उन्हें साफ़ नहीं करते। वर्कस्पेस तब तक रहते हैं जब तक आप उन्हें हटाते नहीं। Taffy निजी टैब बंद होने पर भूल जाता है।</string>
+    <string name="taffy_privacy_site_settings">साइट सेटिंग्स</string>
+    <string name="taffy_privacy_site_settings_summary">जिन साइटों को आपने बदला, और वे क्या इस्तेमाल कर सकती हैं</string>
+    <string name="taffy_privacy_clear">ब्राउज़िंग डेटा साफ़ करें</string>
+    <string name="taffy_privacy_clear_summary">इतिहास, कुकीज़, और कैश फ़ाइलें</string>
+    <string name="taffy_privacy_what_happened">क्या हुआ</string>
+    <string name="taffy_privacy_what_happened_summary">टास्क के नतीजे और रोकने के कुल आँकड़े, बिना पेज की सामग्री</string>
+    <string name="taffy_privacy_manage_heading">इस ब्राउज़र पर</string>
+    <string name="taffy_privacy_copy_heading">आपका डेटा</string>
+    <string name="taffy_privacy_export">सब कुछ निर्यात करें</string>
+    <string name="taffy_privacy_delete">सब कुछ हटाएँ</string>
+    <string name="taffy_privacy_workspaces_stay">ब्राउज़िंग डेटा साफ़ करने से वर्कस्पेस, Library, Memory, या सहेजे साइन-इन नहीं हटते।</string>
+    <string name="taffy_privacy_export_scope">निर्यात में सहेजा गया Taffy काम, दिखाई देने वाले Saved sign-ins और Saved details रिकॉर्ड, इतिहास, बुकमार्क, हाल के डाउनलोड रिकॉर्ड, साइट और ब्लॉकिंग सेटिंग, Time on sites और ऐप की पसंद शामिल हैं। इसमें पासवर्ड, आपकी कुंजियाँ, कुकी, कैश किए पेज, खुले टैब या किसी खुले टास्क को काम करते रहने देने वाली चीज़ शामिल नहीं होती।</string>
+    <string name="taffy_privacy_external_copies">इस ब्राउज़र का डेटा हटाने से डाउनलोड या निर्यात की गई फ़ाइलें, दूसरे ऐप, ड्राइव, संदेश या किसी प्राप्तकर्ता के पास मौजूद प्रतियाँ, या वेबसाइट और AI प्रदाता के पास मौजूद डेटा नहीं हटता।</string>
+    <string name="taffy_privacy_export_choosing">चुनें कि Android निर्यात कहाँ बनाए।</string>
+    <string name="taffy_privacy_export_writing">जाँचा गया निर्यात लिखा जा रहा है…</string>
+    <string name="taffy_privacy_export_succeeded">निर्यात पूरा हुआ। चुनी गई प्रति अब TaffyGo के बाहर है और इस ब्राउज़र का डेटा हटाने पर नहीं हटेगी।</string>
+    <string name="taffy_privacy_export_failed">कोई पूरा निर्यात नहीं बना। गंतव्य जाँचें और फिर कोशिश करें।</string>
+    <string name="taffy_privacy_export_cancelled">निर्यात रद्द हुआ। किसी गंतव्य पर नहीं लिखा गया।</string>
+    <string name="taffy_privacy_delete_confirm_title">इस फ़ोन का सारा डेटा हटाएँ?</string>
+    <string name="taffy_privacy_delete_confirm_body">TaffyGo पहले खुले टास्क रोकेगा और Saved sign-ins तथा आपकी कुंजियों की पहुँच बंद करेगा। फिर Android ऐप बंद करके उसका सारा सहेजा डेटा मिटाएगा, जिसमें ब्राउज़िंग डेटा, वर्कस्पेस, Library, Memory, सेटिंग और कैश फ़ाइलें शामिल हैं। इसे वापस नहीं लाया जा सकता।</string>
+    <string name="taffy_privacy_delete_external_limit">डाउनलोड की गई फ़ाइलें और पुराने निर्यात अपने गंतव्य के हैं। इससे दूसरे ऐप, ड्राइव, प्राप्तकर्ता, वेबसाइट, AI प्रदाता या ऑनलाइन खाते की प्रतियाँ नहीं हटतीं।</string>
+    <string name="taffy_privacy_delete_confirm">हटाएँ और TaffyGo बंद करें</string>
+    <string name="taffy_privacy_delete_keep">मेरा डेटा रखें</string>
+    <string name="taffy_privacy_delete_starting">Android द्वारा ऐप डेटा मिटाने से पहले चल रही पहुँच बंद हो रही है…</string>
+    <string name="taffy_privacy_delete_started">Android ने मिटाने का अनुरोध स्वीकार किया। TaffyGo बंद होगा। अगली बार खोलने पर स्वागत स्क्रीन इस फ़ोन का ऐप डेटा मिटने की जाँच है।</string>
+    <string name="taffy_privacy_delete_failed">Android ने मिटाने का अनुरोध स्वीकार नहीं किया। TaffyGo ने पहले अपनी चल रही प्रोफ़ाइल बंद कर दी। ऐप फिर शुरू करके दोबारा कोशिश करें।</string>
+
+    <!-- Screen SCR-205 -->
+    <string name="taffy_site_settings_title">साइट सेटिंग्स</string>
+    <string name="taffy_site_settings_loading">साइट सेटिंग्स लोड हो रही हैं</string>
+    <string name="taffy_site_settings_empty_title">अभी कोई साइट सेटिंग नहीं</string>
+    <string name="taffy_site_settings_empty_body">जिन साइटों को आपने बदला वे यहाँ दिखेंगी।</string>
+    <string name="taffy_site_settings_unavailable_title">साइट सेटिंग्स अभी उपलब्ध नहीं हैं</string>
+    <string name="taffy_site_settings_unavailable_body">यह फ़ोन अभी साइट अनुमतियाँ सूचीबद्ध या बदल नहीं सकता।</string>
+    <string name="taffy_site_settings_defaults">डिफ़ॉल्ट</string>
+    <string name="taffy_site_settings_defaults_unavailable">कोई समर्थित वैश्विक डिफ़ॉल्ट पढ़ा नहीं जा सका। हर साइट के बदलाव नीचे फिर भी दिखाए गए हैं।</string>
+    <string name="taffy_site_settings_exceptions">आपकी बदली हुई साइटें</string>
+    <string name="taffy_site_settings_update_failed">वह डिफ़ॉल्ट नहीं बदला। यहाँ अब भी Chromium का मौजूदा मान दिख रहा है।</string>
+    <string name="taffy_site_settings_reset_title">इस साइट को रीसेट करें?</string>
+    <string name="taffy_site_settings_reset_body">%1$s के लिए सहेजी गई हर अनुमति पसंद हटाएँ। साइट आपके डिफ़ॉल्ट इस्तेमाल करेगी और दोबारा पूछ सकेगी।</string>
+    <string name="taffy_site_settings_reset_confirm">अनुमतियाँ रीसेट करें</string>
+    <string name="taffy_site_settings_reset_cancel">बदलाव रखें</string>
+    <string name="taffy_site_settings_resetting">%1$s की अनुमतियाँ रीसेट हो रही हैं…</string>
+    <string name="taffy_site_settings_reset_failed">%1$s की कुछ सेटिंग रीसेट नहीं हो सकीं। मौजूदा बदलाव अब भी नीचे दिख रहे हैं।</string>
+    <string name="taffy_site_settings_managed">नीति द्वारा नियंत्रित</string>
+    <string name="taffy_site_settings_blocked">डिफ़ॉल्ट रूप से ब्लॉक</string>
+    <string name="taffy_site_settings_allowed">डिफ़ॉल्ट रूप से अनुमति</string>
+    <string name="taffy_site_settings_location">स्थान</string>
+    <string name="taffy_site_settings_location_ask">साइटें आपका स्थान माँग सकती हैं</string>
+    <string name="taffy_site_settings_camera">कैमरा</string>
+    <string name="taffy_site_settings_camera_ask">साइटें कैमरा इस्तेमाल करने की अनुमति माँग सकती हैं</string>
+    <string name="taffy_site_settings_microphone">माइक्रोफ़ोन</string>
+    <string name="taffy_site_settings_microphone_ask">साइटें माइक्रोफ़ोन इस्तेमाल करने की अनुमति माँग सकती हैं</string>
+    <string name="taffy_site_settings_notifications">सूचनाएँ</string>
+    <string name="taffy_site_settings_notifications_ask">साइटें सूचनाएँ भेजने की अनुमति माँग सकती हैं</string>
+    <string name="taffy_site_settings_javascript">JavaScript</string>
+    <string name="taffy_site_settings_pop_ups">पॉप-अप और रीडायरेक्ट</string>
+    <string name="taffy_site_settings_automatic_downloads">अपने-आप डाउनलोड</string>
+    <string name="taffy_site_settings_downloads_ask">साइटें एक से अधिक फ़ाइल डाउनलोड करने की अनुमति माँग सकती हैं</string>
+    <string name="taffy_site_settings_clipboard">कॉपी किया पाठ</string>
+    <string name="taffy_site_settings_clipboard_ask">साइटों को आपका कॉपी किया पाठ पढ़ने से पहले पूछना होगा। इस सेटिंग से Taffy को पहुँच नहीं मिलती।</string>
+    <string name="taffy_site_settings_sensors">मोशन सेंसर</string>
+    <string name="taffy_site_settings_sensors_ask">साइटें मोशन सेंसर इस्तेमाल करने की अनुमति माँग सकती हैं</string>
+    <string name="taffy_site_settings_sound">आवाज़</string>
+    <plurals name="taffy_site_settings_changed_permissions">
+        <item quantity="one">%1$d अनुमति बदली गई</item>
+        <item quantity="other">%1$d अनुमतियाँ बदली गईं</item>
+    </plurals>
+
+    <!-- Screen SCR-207 -->
+    <string name="taffy_clear_title">ब्राउज़िंग डेटा साफ़ करें</string>
+    <string name="taffy_clear_range_heading">कितना पीछे तक</string>
+    <string name="taffy_clear_range_hour">पिछला घंटा</string>
+    <string name="taffy_clear_range_day">पिछले 24 घंटे</string>
+    <string name="taffy_clear_range_week">पिछले 7 दिन</string>
+    <string name="taffy_clear_range_all">सभी समय</string>
+    <string name="taffy_clear_classes_heading">क्या साफ़ करें</string>
+    <string name="taffy_clear_class_history">इतिहास</string>
+    <string name="taffy_clear_class_cookies">कुकीज़</string>
+    <string name="taffy_clear_class_cache">कैश फ़ाइलें</string>
+    <string name="taffy_clear_class_time">साइटों पर समय</string>
+    <string name="taffy_clear_workspaces_stay">वर्कस्पेस रहते हैं। Library, Memory, और सहेजे साइन-इन रहते हैं।</string>
+    <string name="taffy_clear_unavailable">साफ़ करना इस फ़ोन पर अभी उपलब्ध नहीं है।</string>
+    <string name="taffy_clear_failed">कुछ डेटा साफ़ हुआ हो सकता है, लेकिन पूरा नहीं। फिर कोशिश करें।</string>
+    <string name="taffy_clear_confirm">साफ़ करें</string>
+    <string name="taffy_clear_confirm_title">यह डेटा साफ़ करें?</string>
+    <string name="taffy_clear_confirm_body">यह वापस नहीं किया जा सकता। वर्कस्पेस, Library, Memory, और सहेजे साइन-इन साफ़ नहीं होते।</string>
+    <string name="taffy_clear_keep">रखें</string>
+    <string name="taffy_clear_class_on">चालू</string>
+    <string name="taffy_clear_class_off">बंद</string>
+
+    <!-- Screen SCR-408 -->
+    <string name="taffy_about_title">के बारे में</string>
+    <string name="taffy_about_facts_heading">यह ब्राउज़र</string>
+    <string name="taffy_about_more_heading">अधिक</string>
+    <string name="taffy_about_version">संस्करण</string>
+    <string name="taffy_about_version_unknown">संस्करण इस फ़ोन पर अभी सूचीबद्ध नहीं है।</string>
+    <string name="taffy_about_chromium_version">Chromium संस्करण</string>
+    <string name="taffy_about_help">मदद और प्रतिक्रिया</string>
+    <string name="taffy_about_help_summary">यहाँ क्या काम करता है, और हम तक कैसे पहुँचें</string>
+    <string name="taffy_about_licences">लाइसेंस</string>
+    <string name="taffy_about_licences_summary">यह ऐप जिस सॉफ़्टवेयर से बना है, और उसकी शर्तें</string>
+    <string name="taffy_about_source">सोर्स कोड</string>
+
+    <!-- Screen SCR-409 -->
+    <string name="taffy_help_title">मदद और प्रतिक्रिया</string>
+    <string name="taffy_help_reach_heading">हम तक कैसे पहुँचें</string>
+    <string name="taffy_help_feedback_body">TaffyGo बनाने वालों को बताएँ कि क्या ठीक चलता है और क्या नहीं। यहाँ से कुछ नहीं भेजा जाता। आपका ईमेल ऐप एक ड्राफ़्ट खोलता है, या GitHub एक नए टैब में खुलता है, और भेजना है या नहीं, यह आप तय करते हैं।</string>
+    <string name="taffy_help_feedback_email">ईमेल से प्रतिक्रिया भेजें</string>
+    <string name="taffy_help_feedback_issue">GitHub पर इश्यू खोलें</string>
+    <string name="taffy_help_feedback_issue_public">GitHub पर इश्यू सार्वजनिक होते हैं। वहाँ आप जो लिखेंगे, उसे कोई भी पढ़ सकता है।</string>
+    <string name="taffy_help_feedback_no_email_app">इस फ़ोन पर किसी ईमेल ऐप ने ड्राफ़्ट नहीं खोला। आप किसी भी ईमेल खाते से %1$s पर लिख सकते हैं।</string>
+    <string name="taffy_help_feedback_email_subject">TaffyGo पर प्रतिक्रिया</string>
+    <string name="taffy_help_feedback_email_body">आपकी प्रतिक्रिया:\n\n\n\n---\nTaffyGo संस्करण: %1$s</string>
+    <string name="taffy_help_feedback_version_unknown">पता नहीं</string>
+    <string name="taffy_help_limits_heading">यह क्या है</string>
+    <string name="taffy_help_limits_body">Taffy अकेला सहायक है। Taffy पासवर्ड, कार्ड नंबर, या सहेजे विवरण किसी AI प्रदाता को नहीं भेजता। विज्ञापन और ट्रैकर डिफ़ॉल्ट रूप से ब्लॉक होते हैं, जिन साइटों को आप अनुमति देते हैं उन्हें छोड़कर।</string>
+    <string name="taffy_help_limit_assistant">Taffy</string>
+    <string name="taffy_help_limit_assistant_detail">अकेला सहायक</string>
+    <string name="taffy_help_limit_blocking">विज्ञापन और ट्रैकर</string>
+    <string name="taffy_help_limit_blocking_detail">डिफ़ॉल्ट रूप से ब्लॉक, जिन साइटों को आप अनुमति देते हैं उन्हें छोड़कर</string>
+    <string name="taffy_help_limit_secrets">सहेजे विवरण</string>
+    <string name="taffy_help_limit_secrets_detail">Taffy पासवर्ड, कार्ड नंबर, या सहेजे विवरण किसी AI प्रदाता को नहीं भेजता</string>
+
+    <!-- Explicit acceptance of a recorded flow. -->
+    <string name="taffy_skill_review_open">देखें</string>
+    <string name="taffy_skill_review_title">सहेजने के लिए तरीका देखें</string>
+    <string name="taffy_skill_review_missing">इस सेव किए गए फ़्लो को जाँचने के लिए उसके सभी चरण लोड करें। लोड करने से फ़्लो चालू नहीं होगा।</string>
+    <string name="taffy_skill_review_save">यह तरीका सहेजें</string>
+    <string name="taffy_skill_review_saving">सहेज रहे हैं…</string>
+    <string name="taffy_skill_review_failed">तरीका सहेजा नहीं जा सका। मौजूदा चरण देखकर फिर कोशिश करें।</string>
+    <string name="taffy_skill_review_load">सभी चरण लोड करें</string>
+    <string name="taffy_skill_review_loading">सभी चरण लोड हो रहे हैं…</string>
+    <string name="taffy_skill_review_load_failed">सभी चरण लोड नहीं हो सके। उन्हें फिर से लोड करें।</string>
+</resources>

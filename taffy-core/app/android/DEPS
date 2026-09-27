@@ -1,0 +1,20 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# Portable UI and platform glue may depend downward on Chromium component APIs.
+# Only shell/ is embedder assembly and may depend on selected //chrome areas.
+include_rules = [
+  "+base/android",
+  "+components/embedder_support/android",
+  "+content/public/android",
+  "+taffy/app/android",
+  "+ui/android",
+
+  "-chrome",
+  "-content/public/renderer",
+  "-taffy/renderer",
+  "-third_party/blink",
+]

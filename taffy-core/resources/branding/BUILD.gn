@@ -1,0 +1,212 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# TaffyGo's identity inside the Chromium build: the name, the launcher icon,
+# and the report of which upstream revision this binary actually is.
+#
+# A Chromium derivative inherits the BSD licence and the third-party
+# obligations, and inherits none of the Google-owned branding
+# (chromium/README.md, decision 0001). Everything that replaces that branding
+# is here, in one directory, so that a reviewer can see the whole replacement
+# without reading the product target.
+#
+# Two rules a reviewer should check first:
+#
+#   * No committed artwork. Every icon is derived from the committed mark in
+#     brand/ by an action below. A PNG that appeared in this directory would be
+#     an unreviewable blob and a second source of truth for the mark.
+#   * No hand-written pin. The provenance translation unit is generated from
+#     chromium/REVISION, chromium/SECURITY_PATCH_LEVEL and chromium/patches/,
+#     counted the way ./tools/check fast counts them.
+
+import("//taffy/resources/branding/taffy_branding.gni")
+
+if (is_android) {
+  import("//build/config/android/rules.gni")
+}
+
+# ---------------------------------------------------------------------------
+# Upstream provenance (PAR-SEC-002)
+# ---------------------------------------------------------------------------
+
+# The generator reads three files that live in this repository but outside the
+# Chromium checkout, so GN cannot name them in `inputs`: the overlay is mounted
+# at //taffy and a label above it normalizes to a path the checkout
+# does not have. The script therefore resolves the repository root through the
+# mount and writes a depfile with absolute paths, which is what makes Ninja
+# rebuild this when the pin moves or a patch lands.
+#
+# VERIFY AT SP-01: that a depfile naming paths outside the source root is
+# honoured by Siso as well as by Ninja. Upstream file to read:
+# build/toolchain/gcc_toolchain.gni for how depfiles are declared, and the
+# Siso configuration under build/config/siso/. If absolute out-of-tree depfile
+# entries are rejected, the fallback is for ./tools/chromium/sync to write the
+# three values into a generated file inside the mount at sync time, and that
+# trade belongs in the SP-01 report.
+_provenance_cc = "$target_gen_dir/taffy_upstream_provenance.cc"
+_provenance_json = "$target_gen_dir/taffy_upstream_provenance.json"
+_provenance_depfile = "$target_gen_dir/taffy_upstream_provenance.d"
+
+action("upstream_provenance_source") {
+  script = "tools/write_upstream_provenance.py"
+
+  inputs = [
+    "tools/repo_root.py",
+    "taffy_upstream_provenance.h",
+  ]
+  outputs = [
+    _provenance_cc,
+    _provenance_json,
+  ]
+  depfile = _provenance_depfile
+
+  args = [
+    "--output-cc",
+    rebase_path(_provenance_cc, root_build_dir),
+    "--output-json",
+    rebase_path(_provenance_json, root_build_dir),
+    "--depfile",
+    rebase_path(_provenance_depfile, root_build_dir),
+  ]
+}
+
+# The in-process half of PAR-SEC-002. The header is committed because it is an
+# API and APIs are reviewed; the translation unit is generated because it is
+# data and data has one owner.
+#
+# The JSON sidecar is produced by the same action but is deliberately not a
+# source here: it is an input to the release artifact manifest, not to a
+# compiler.
+source_set("upstream_provenance") {
+  sources = [
+    _provenance_cc,
+    "taffy_upstream_provenance.h",
+  ]
+
+  deps = [ ":upstream_provenance_source" ]
+
+  # Depends on nothing else at all, by design: not //base, not //content. It
+  # is a struct of compile-time constants, and the empty list below is how
+  # that stays true.
+  public_deps = []
+}
+
+# The JSON sidecar on its own, for the release artifact manifest (WP-M1-07).
+# Declared as a separate group so that a release lane can build the report
+# without linking the product.
+group("upstream_provenance_report") {
+  public_deps = [ ":upstream_provenance_source" ]
+}
+
+# ---------------------------------------------------------------------------
+# Launcher icons and Android resources
+# ---------------------------------------------------------------------------
+
+if (is_android) {
+  # The manifest is the single source of the density set. GN reads it so that
+  # adding a density is a one-file change; generate_icons.py reads the same
+  # file, so the build graph and the generator cannot disagree.
+  #
+  # VERIFY AT SP-01: the "json" input conversion of read_file() at the pinned
+  # GN. Upstream file to read: tools/gn/docs/reference.md, the read_file
+  # section. If the conversion is unavailable, the fallback is for
+  # generate_icons.py to emit a committed .gni listing the same outputs, and
+  # for a presubmit to keep the two in step.
+  _icon_manifest = read_file("icons/manifest.json", "json")
+
+  # The manifest partitions its assets by role: `launcher` assets carry
+  # TaffyGo's own resource names and feed :branding_resources; `override`
+  # assets shadow upstream resource names and feed :image_override_resources. One
+  # manifest and one action, so the two sets cannot be generated from
+  # different masters.
+  _icon_outputs = []
+  _launcher_outputs = []
+  _override_outputs = []
+  foreach(_asset, _icon_manifest.assets) {
+    _icon_outputs += [ "$target_gen_dir/${_asset.output}" ]
+    if (_asset.role == "launcher") {
+      _launcher_outputs += [ "$target_gen_dir/${_asset.output}" ]
+    } else {
+      _override_outputs += [ "$target_gen_dir/${_asset.output}" ]
+    }
+  }
+
+  action("launcher_icons") {
+    script = "tools/generate_icons.py"
+
+    inputs = [
+      "icons/manifest.json",
+      "tools/png_io.py",
+      "tools/repo_root.py",
+    ]
+    outputs = _icon_outputs
+    depfile = "$target_gen_dir/launcher_icons.d"
+
+    args = [
+      "--generate",
+      "--out-dir",
+      rebase_path(target_gen_dir, root_build_dir),
+      "--depfile",
+      rebase_path(depfile, root_build_dir),
+    ]
+  }
+
+  # The name and the icon, as Android resources.
+  #
+  # `resource_overlay` is what makes this replace the upstream value of
+  # `app_name` rather than collide with it. It is the whole branding
+  # substitution mechanism, and it is the reason this fork needs no patch to
+  # rename the product.
+  #
+  # VERIFY AT SP-01: that `android_resources` still takes `resource_overlay`
+  # at the pinned milestone, and that it accepts generated files under a
+  # `res/` directory in $target_gen_dir. Upstream file to read:
+  # build/config/android/rules.gni, the android_resources template. If
+  # `resource_overlay` is gone, chromium/patches/0002-*.md is the specified
+  # replacement and that is the point at which it stops being optional.
+  android_resources("branding_resources") {
+    sources = [ "$taffy_branding_values_dir/values/taffy_branding_strings.xml" ]
+    sources += _launcher_outputs
+
+    deps = [ ":launcher_icons" ]
+
+    custom_package = "org.chromium.taffy.branding"
+    resource_overlay = true
+  }
+
+  # Chromium artwork, replaced by name (decision 0019's branding obligation;
+  # the mechanism and its reversal of the earlier no-shadowing stance are
+  # recorded in chromium/patches/0002-downstream-branding-hooks.md).
+  #
+  # Resource-overlay precedence substitutes by resource *name*, which is
+  # upstream's own mechanism for exactly this — its chrome_public_apk_resources
+  # target does the same over chrome_app_java_resources. The generated
+  # bitmaps shadow the launcher-icon family, the FRE product logos and the
+  # menu logo; the committed XMLs shadow the adaptive-icon layers, the
+  # notification glyph and the install-promo art (structure, not artwork —
+  # every raster byte still comes from the generator); the strings file
+  # shadows the widget titles.
+  #
+  # The known risk of shadowing — an upstream rename silently un-brands the
+  # product — is answered by tools/check_shadowed_names.py, which
+  # ./tools/chromium/build runs against the checkout so a rename fails the
+  # build loudly instead.
+  android_resources("image_override_resources") {
+    sources = [
+      "java/res_images/drawable/chrome_logo_on_circular_background.xml",
+      "java/res_images/drawable/ic_chrome.xml",
+      "java/res_images/drawable/themed_app_icon.xml",
+      "java/res_images/mipmap-nodpi/layered_app_icon_foreground.xml",
+      "java/res_images/raw/signin_spin.json",
+    ]
+    sources += _override_outputs
+
+    deps = [ ":launcher_icons" ]
+
+    custom_package = "org.chromium.taffy.branding.images"
+    resource_overlay = true
+  }
+}

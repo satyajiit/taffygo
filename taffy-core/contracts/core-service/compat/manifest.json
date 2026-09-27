@@ -1,0 +1,461 @@
+{
+  "description": "Compatibility fixtures for the Core Service boundary and for the persisted transaction batch it writes to a device. Each fixture is one deliberate deviation from a message that would otherwise be accepted, and states the verdict a conforming decoder must reach. The kind of each fixture says which artifact reaches that verdict, so no row claims more than was run. Run them with: python3 taffy-core/contracts/core-service/codegen/generate.py --verify",
+  "verdicts": {
+    "ACCEPT": "The message is valid at this version and is accepted.",
+    "REJECT_CLOSED_ENUM": "A closed enumeration carries a value outside the members this version defines. The message is unsupported and fails closed; the value is never coerced to a known member.",
+    "REJECT_MALFORMED": "The message breaks a shape rule: a missing or extra field, a body that does not match its tag, a presence combination the contract forbids, a truncated or over-long frame, or bytes that are not what they claim to be.",
+    "REJECT_OVERSIZED": "The message is otherwise valid and is refused only because it exceeds a bound the contract declares.",
+    "REJECT_VERSION": "The declared contract version is one this build does not speak, so the required meaning may have changed. The message is refused on the version alone."
+  },
+  "kinds": {
+    "payload": "Committed bytes. Decoded by the generated Rust decoder and by the generator's reference reader; both must reach the verdict and the named decoder error.",
+    "enum": "A committed document whose closed enumeration carries a value outside the contract. The generated Rust `from_wire` must answer that the value is unsupported.",
+    "bound": "A committed document measured against the generated limit constant the product compiles in. The generated Rust constant must answer that the measurement is over.",
+    "version": "A committed document at a declared contract version, answered against the version this build speaks.",
+    "record": "A committed document answered by this contract's own shape rules - tagged-union exactness, conditional presence, enum pairing, field completeness - in the generator. No shipped decoder runs; the records cross this seam as Mojo, and no Mojo decoder can be driven from a stdlib-only Python generator.",
+    "declaration": "A committed schema fragment the schema validator must refuse. This is how a rule about what the contract may declare is executed rather than asserted.",
+    "unexecuted": "A rule this contract does not express and nothing here can run. It carries a written reason and is never counted as covered."
+  },
+  "fixtures": [
+    {
+      "case": "transaction-current-batch",
+      "kind": "payload",
+      "verdict": "ACCEPT",
+      "codec": "transaction_batch",
+      "decoder_error": null,
+      "file": "transaction-current-batch.hex",
+      "rule": "A transaction written by this build is read by this build. Every other payload here differs from it by one deliberate thing.",
+      "deviation": "None. One closed effect intent and nothing else.",
+      "note": "This is the row that would fail first if the persisted layout moved under a device that already holds journals, which is the failure the whole ledger exists to prevent."
+    },
+    {
+      "case": "transaction-unknown-effect-intent-tag",
+      "kind": "payload",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "codec": "transaction_batch",
+      "decoder_error": "InvalidEnum",
+      "file": "transaction-unknown-effect-intent-tag.hex",
+      "rule": "A tagged union's variant tag is closed. A tag outside the set this version defines is unsupported and fails closed.",
+      "deviation": "The effect intent's variant tag is a value no variant of PersistedEffectIntent holds.",
+      "note": "The effect intents are what the reducer replays into the world after a restart. Guessing a neighbouring variant here would replay an effect nobody recorded."
+    },
+    {
+      "case": "transaction-unsupported-schema-version",
+      "kind": "payload",
+      "verdict": "REJECT_VERSION",
+      "codec": "transaction_batch",
+      "decoder_error": "UnsupportedVersion",
+      "file": "transaction-unsupported-schema-version.hex",
+      "rule": "The batch carries the layout version it was written with, and a version this build does not speak is refused.",
+      "deviation": "The schema version word is the version before this one; every other byte is a valid batch at that layout.",
+      "note": "This is the exact shape of the hazard the wire ledger guards: a journal written by yesterday's layout, read by today's build. The refusal has to come from the version word, because positionally the two layouts look alike until the first field that moved."
+    },
+    {
+      "case": "transaction-trailing-bytes",
+      "kind": "payload",
+      "verdict": "REJECT_MALFORMED",
+      "codec": "transaction_batch",
+      "decoder_error": "TrailingBytes",
+      "file": "transaction-trailing-bytes.hex",
+      "rule": "A batch is exactly as long as its content.",
+      "deviation": "One zero byte after an otherwise valid batch.",
+      "note": "A journal file is appended to. A decoder that ignored a tail would read one record and silently drop whatever followed it."
+    },
+    {
+      "case": "transaction-truncated",
+      "kind": "payload",
+      "verdict": "REJECT_MALFORMED",
+      "codec": "transaction_batch",
+      "decoder_error": "Truncated",
+      "file": "transaction-truncated.hex",
+      "rule": "A batch that ends inside a field is refused whole.",
+      "deviation": "The last byte of a valid batch is missing, which is what power loss during a write produces.",
+      "note": "This is the ordinary failure on a phone, not an exotic one. Recovering the records that did arrive would restore a task to a state its own journal never reached."
+    },
+    {
+      "case": "transaction-foreign-magic",
+      "kind": "payload",
+      "verdict": "REJECT_MALFORMED",
+      "codec": "transaction_batch",
+      "decoder_error": "InvalidMagic",
+      "file": "transaction-foreign-magic.hex",
+      "rule": "A batch names the codec that wrote it.",
+      "deviation": "The eight magic bytes are the Core API state codec's; the rest is a valid batch.",
+      "note": "Both codecs live in one process and both are positional. Reading one as the other is not a parse error until several fields in, which is exactly why the check is at byte zero."
+    },
+    {
+      "case": "transaction-too-many-journal-entries",
+      "kind": "payload",
+      "verdict": "REJECT_OVERSIZED",
+      "codec": "transaction_batch",
+      "decoder_error": "CollectionLimit",
+      "file": "transaction-too-many-journal-entries.hex",
+      "rule": "Every collection is bounded and the bound is read from the length prefix, before an element is decoded.",
+      "deviation": "The journal entry count claims more entries than the codec's collection bound allows; the entries are not present.",
+      "note": "A journal on disk is attacker-adjacent in the way that matters: whatever wrote it last may have been interrupted, and a four-byte count read on trust is an allocation the device cannot refuse."
+    },
+    {
+      "case": "transaction-invalid-optional-flag",
+      "kind": "payload",
+      "verdict": "REJECT_MALFORMED",
+      "codec": "transaction_batch",
+      "decoder_error": "InvalidBoolean",
+      "file": "transaction-invalid-optional-flag.hex",
+      "rule": "The presence byte before an optional field is exactly zero or one.",
+      "deviation": "The presence byte for the task seed is two.",
+      "note": "Reading any non-zero byte as present would send the decoder into the seed record on a payload that has none, and everything after that offset would be misread as well."
+    },
+    {
+      "case": "transaction-oversized-goal",
+      "kind": "payload",
+      "verdict": "REJECT_OVERSIZED",
+      "codec": "transaction_batch",
+      "decoder_error": "StringLimit",
+      "file": "transaction-oversized-goal.hex",
+      "rule": "Every string is bounded and the bound is checked from the length prefix.",
+      "deviation": "The task goal declares a length past the codec's string bound; the bytes it claims are not there.",
+      "note": "The goal is user text that was persisted once and is re-read on every restore. Its length prefix is the one field a corrupted journal can use to ask for an unbounded allocation."
+    },
+    {
+      "case": "transaction-invalid-utf8-goal",
+      "kind": "payload",
+      "verdict": "REJECT_MALFORMED",
+      "codec": "transaction_batch",
+      "decoder_error": "InvalidUtf8",
+      "file": "transaction-invalid-utf8-goal.hex",
+      "rule": "A persisted string is UTF-8. Bytes that are not are refused rather than replaced.",
+      "deviation": "The goal's bytes are 0xFF repeated, at the length the batch declares.",
+      "note": "Replacing them would restore a task whose stated goal is not the goal the person set, and the restore would look clean."
+    },
+    {
+      "case": "transaction-oversized-payload",
+      "kind": "bound",
+      "verdict": "REJECT_OVERSIZED",
+      "limit": "MAX_EFFECT_BYTES",
+      "path": "payload_bytes",
+      "file": "transaction-oversized-payload.json",
+      "rule": "A batch longer than the declared bound is refused on its length alone, before it is parsed.",
+      "deviation": "A measured batch length one byte past MAX_EFFECT_BYTES.",
+      "note": "This row measures a length rather than carrying a megabyte of hexadecimal. What it executes is the bound the product compiles in; that the decoder refuses at that length is the generated decoder's first statement, before the magic is even read."
+    },
+    {
+      "case": "unknown-effect-enum",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "EffectEnvelope",
+      "enum": "EffectKind",
+      "path": "kind",
+      "file": "unknown-effect-enum.json",
+      "rule": "Every enumeration is closed. An effect kind outside the set this version defines is unsupported and fails closed.",
+      "deviation": "The effect kind carries a value no member of EffectKind holds, and no body.",
+      "note": "An effect kind is a request for bounded work from a browser broker. Rounding an unknown one to a known kind would dispatch work the sender never asked for, through a broker that would have every reason to believe it was asked."
+    },
+    {
+      "case": "unsupported-major",
+      "kind": "version",
+      "verdict": "REJECT_VERSION",
+      "type": "EffectEnvelope",
+      "file": "unsupported-major.json",
+      "rule": "A different major version changes required meaning. The message is refused on the version alone, without inspecting the body.",
+      "deviation": "An effect declared at major version 1, carrying a budget record that major version had.",
+      "note": "The fields this build knows are deliberately valid, so the version is the only reason to refuse. A major step is where a field's meaning may have changed rather than its presence, and a body that still validates is precisely what makes that dangerous."
+    },
+    {
+      "case": "next-minor-effect-field",
+      "kind": "version",
+      "verdict": "ACCEPT",
+      "declares_next_minor": true,
+      "type": "EffectEnvelope",
+      "file": "next-minor-effect-field.json",
+      "rule": "A higher minor version of the same major is additive. A reader accepts the message and ignores the fields it does not define.",
+      "deviation": "An effect declared at the next minor version of this major, carrying one field this build does not define.",
+      "note": "Accepting is not the same as understanding. The effect is executed on the fields this build knows; the one it does not know is ignored, which is only safe because a minor step may not change what an existing field means."
+    },
+    {
+      "case": "unknown-account-token-validation-status",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "AccountTokenValidationResult",
+      "enum": "AccountTokenValidationStatus",
+      "path": "status",
+      "file": "unknown-account-token-validation-status.json",
+      "rule": "Every enumeration is closed, including the outcome of validating an account token.",
+      "deviation": "The validation result carries a status no member of AccountTokenValidationStatus holds.",
+      "note": "The five known members are one success and four distinct failures. A reader that guessed would be choosing, on a token response, between rotating a credential and refusing to; VALIDATED is the neighbour it must never round to."
+    },
+    {
+      "case": "unknown-provider-wire-api",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "SaveCustomProviderCommand",
+      "enum": "ProviderWireApi",
+      "path": "wire_api",
+      "file": "unknown-provider-wire-api.json",
+      "rule": "Every enumeration is closed, including the request family a person's own endpoint speaks.",
+      "deviation": "A custom provider names a wire family no member of ProviderWireApi holds.",
+      "note": "The wire family decides how a request body is built and how a response is read. Rounding an unknown one to a neighbour would send a person's own key to their own endpoint in a shape neither agreed to speak, and the credential is the first thing that shape carries."
+    },
+    {
+      "case": "wrong-task-seed-length",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "CoreServiceCommand",
+      "file": "wrong-task-seed-length.json",
+      "rule": "A fixed-width field is exactly that width. A bytes32 that is not thirty-two bytes is invalid.",
+      "deviation": "A start-task command whose task identifier seed is thirty-one bytes.",
+      "note": "Padding it to thirty-two is the repair a lenient decoder would make, and it would silently change the derived identifier, which is the one thing a seed exists to determine."
+    },
+    {
+      "case": "granted-policy-result-without-grant",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "PolicyEvaluationResult",
+      "file": "granted-policy-result-without-grant.json",
+      "rule": "The contract binds the minted grant's presence to the status that mints it.",
+      "deviation": "A policy evaluation reports GRANTED and carries no minted grant.",
+      "note": "policy-engine is the only component that may grant authority, and this is what a grant looks like on the wire. A GRANTED result with nothing in it is either a message that lost its grant or one that never had it; either way the browser must not treat the word alone as authority."
+    },
+    {
+      "case": "effect-kind-body-mismatch",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "EffectEnvelope",
+      "file": "effect-kind-body-mismatch.json",
+      "rule": "A tagged effect carries exactly one body, and it is the body its kind names.",
+      "deviation": "The kind says STORAGE_COMMIT and the body present is the page observation.",
+      "note": "Reading the body that is there rather than the one the tag names is how a storage commit becomes a page read. The two go to different brokers with different authority."
+    },
+    {
+      "case": "tool-job-runtime-operation-mismatch",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "ToolJobEffect",
+      "file": "tool-job-runtime-operation-mismatch.json",
+      "rule": "A runtime executes only the operations the contract pairs with it, and the pairing covers both enumerations exactly.",
+      "deviation": "A job names the Python runtime and the signed-WASM operation.",
+      "note": "Each runtime has its own service and its own dependency closure. A pairing that was merely conventional would let a job cross from one sandbox into another by naming an operation, which is the shortest path between two isolation boundaries this contract has."
+    },
+    {
+      "case": "provider-callback-denied-with-code",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "ProviderAuthCallbackCommand",
+      "file": "provider-callback-denied-with-code.json",
+      "rule": "The contract binds the authorization code handle's presence to the one outcome that produces a code.",
+      "deviation": "A provider redirect reports DENIED and still carries an authorization code handle.",
+      "note": "A denied redirect holding a code is either a message that kept a handle it should have dropped or one assembled by something that never ran the flow. Exchanging it would spend a handle against a sign-in the person refused. The account callback beside it carries the same rule, and until this version carried it only as a sentence in its own description."
+    },
+    {
+      "case": "account-callback-denied-with-code",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "AuthCallbackCommand",
+      "file": "account-callback-denied-with-code.json",
+      "rule": "The same binding on the account redirect this contract has carried since the account plane landed.",
+      "deviation": "An account redirect reports DENIED and still carries an authorization code handle.",
+      "note": "The rule was written into the field's own description and never declared, so the validator did not hold it and this document was accepted. It is declared and executed from version 2.24, in the change that added the provider callback next to it; the two rules are one rule and there was no defensible reading under which only the new one is checked."
+    },
+    {
+      "case": "provider-command-body-mismatch",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "CoreServiceCommand",
+      "file": "provider-command-body-mismatch.json",
+      "rule": "A tagged command carries exactly one body, and it is the body its kind names.",
+      "deviation": "The kind says SAVE_PROVIDER_CREDENTIAL and the body present forgets a credential instead.",
+      "note": "These two commands are opposites over one provider, and both are a single short record keyed by provider_id alone, so neither shape refuses the other on its fields. Reading the body that is present rather than the one the tag names would clear the credential a person was in the middle of saving."
+    },
+    {
+      "case": "provider-state-body-mismatch",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "CoreServiceCommand",
+      "file": "provider-state-body-mismatch.json",
+      "rule": "A tagged command carries exactly one body, and it is the body its kind names.",
+      "deviation": "The kind says SET_PROVIDER_CREDENTIAL_STATE and the body present forgets a credential instead.",
+      "note": "The state report and the forget are the two registry writes that can race inside one provider's critical section, and both are short records keyed by provider_id alone, so neither shape refuses the other on its fields. Reading the body that is present rather than the one the tag names would delete a credential the browser was reporting on."
+    },
+    {
+      "case": "probe-command-body-mismatch",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "CoreServiceCommand",
+      "file": "probe-command-body-mismatch.json",
+      "rule": "A tagged command carries exactly one body, and it is the body its kind names.",
+      "deviation": "The kind says PROBE_PROVIDER_CREDENTIAL and the body present forgets a credential instead.",
+      "note": "Both shapes are keyed by provider_id, so nothing on the fields refuses the swap. Reading the body that is present rather than the one the tag names would delete a stored credential the person only asked to test."
+    },
+    {
+      "case": "unknown-provider-credential-state",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "SetProviderCredentialStateCommand",
+      "enum": "ProviderCredentialState",
+      "path": "state",
+      "file": "unknown-provider-credential-state.json",
+      "rule": "Every enumeration is closed, including the registry state the browser reports for a stored credential.",
+      "deviation": "A state report names a state no member of ProviderCredentialState holds.",
+      "note": "The state decides whether route selection may spend the credential. Rounding an unknown state to a neighbour would either spend a credential the browser just said needs renewing, or park a usable one behind a sign-in prompt nobody needed."
+    },
+    {
+      "case": "catalog-fetch-body-mismatch",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "EffectEnvelope",
+      "file": "catalog-fetch-body-mismatch.json",
+      "rule": "A tagged effect carries exactly one body, and it is the body its kind names.",
+      "deviation": "The kind says FETCH_CATALOG and the body present is an asset delivery.",
+      "note": "The two fetches have opposite postures: an asset transfer streams to disk against a pinned digest, and a catalog fetch answers bounded bytes for the fail-closed decoder. Reading the body that is there rather than the one the tag names would hand one broker's work to the other with the wrong guarantees around it."
+    },
+    {
+      "case": "unknown-catalog-fetch-disposition",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "CatalogFetchEffectResult",
+      "enum": "CatalogFetchDisposition",
+      "path": "disposition",
+      "file": "unknown-catalog-fetch-disposition.json",
+      "rule": "Every enumeration is closed, including what the transport says a catalog fetch did.",
+      "deviation": "The disposition carries a value no member of CatalogFetchDisposition holds.",
+      "note": "The disposition decides whether the body is read at all. Rounding an unknown one toward SUCCESS would hand the decoder bytes the transport refused to vouch for; rounding it toward NOT_MODIFIED would stamp the refresh clock for a fetch that answered nothing."
+    },
+    {
+      "case": "profile-path-field",
+      "kind": "declaration",
+      "verdict": "REJECT_MALFORMED",
+      "file": "profile-path-field.json",
+      "rule": "This contract may not declare a field whose name carries an authority-bearing substring; profile_path is on that list.",
+      "deviation": "An effect record that would hand the sandboxed core the profile directory to read.",
+      "note": "The service receives no ambient filesystem or profile-directory authority. A path field is how that sentence stops being true, and it would arrive looking like an ordinary string."
+    },
+    {
+      "case": "stale-generation",
+      "kind": "unexecuted",
+      "verdict": "REJECT_MALFORMED",
+      "reason": "Generation freshness is a comparison against state the message does not carry: the generation the service currently holds. No decoder reaches this verdict from the bytes alone.",
+      "rule": "A message whose service generation is not the generation in force is refused rather than applied.",
+      "deviation": "A command carrying a generation the service has already moved past.",
+      "note": "The generation is on the wire so the receiver can make this comparison; the comparison itself belongs to the receiver. This row records the requirement and executes nothing."
+    },
+    {
+      "case": "observation-grant-binding-mismatch",
+      "kind": "unexecuted",
+      "verdict": "REJECT_MALFORMED",
+      "reason": "The binding between an observation effect and the grant that authorized it is checked against the ledger of grants the browser holds, which is not in the message.",
+      "rule": "An observation effect must be bound to the grant that authorized it, and to no other.",
+      "deviation": "An observation effect naming a grant that authorized a different subject.",
+      "note": "This is the check that keeps a minted capability from being spent on something it was not minted for, and it is the browser-process ledger's, not the decoder's. Executing it here would need a fixture carrying the ledger too."
+    },
+    {
+      "case": "direct-intent-id-in-task-slot",
+      "kind": "unexecuted",
+      "verdict": "REJECT_MALFORMED",
+      "reason": "Telling a direct intent identifier from a task identifier needs the allocator that issued them, which the message does not carry.",
+      "rule": "A direct user intent's identifier may not be presented where a task identifier is expected.",
+      "deviation": "A direct intent identifier in the task slot of an effect.",
+      "note": "The two identifier spaces are deliberately separate so a direct action can never be attributed to a task. The contract types them both as strings, so nothing in the schema can tell them apart."
+    },
+    {
+      "case": "task-id-in-direct-subject-slot",
+      "kind": "unexecuted",
+      "verdict": "REJECT_MALFORMED",
+      "reason": "The same missing distinction, in the other direction.",
+      "rule": "A task identifier may not be presented as the subject of a direct user action.",
+      "deviation": "A task identifier in the direct subject slot.",
+      "note": "This direction is the more expensive one: it would attribute to a person an action the assistant proposed."
+    },
+    {
+      "case": "direct-observation-with-approval",
+      "kind": "unexecuted",
+      "verdict": "REJECT_MALFORMED",
+      "reason": "Whether a direct observation carries an approval is a rule about which requests may accompany which principal, and the contract does not declare it where the generator can read it.",
+      "rule": "A direct observation is the user's own read; it carries no approval, because there is nobody to approve it to.",
+      "deviation": "A direct observation request accompanied by an approval fact.",
+      "note": "An approval on a direct read would make a user's own action look like an authorized assistant action in the audit record, which is the one place the difference matters most."
+    },
+    {
+      "case": "direct-observation-budget-widening",
+      "kind": "unexecuted",
+      "verdict": "REJECT_MALFORMED",
+      "reason": "Comparing a requested budget against the direct-observation ceiling needs both numbers, and the request carries only one.",
+      "rule": "A direct observation may not request bounds wider than the direct-observation ceiling the build compiles in.",
+      "deviation": "A direct observation request naming bounds above that ceiling.",
+      "note": "The ceiling exists so a direct read cannot be used to pull a whole page through a path that skips policy. The comparison belongs to policy-engine."
+    },
+    {
+      "case": "fetch-entitlement-body-mismatch",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "EffectEnvelope",
+      "file": "fetch-entitlement-body-mismatch.json",
+      "rule": "A tagged network request carries exactly one body, and it is the body its operation kind names.",
+      "deviation": "The operation kind says FETCH_ENTITLEMENT and the body present asks to refresh a session instead.",
+      "note": "The two operations share the account route and nothing else: one reads counts, the other rotates a credential. Reading the body that is present rather than the one the tag names would spend a session rotation on a fetch the core planned as a read, and the receipt it produced would be delivered against an operation that never asked for one."
+    },
+    {
+      "case": "unknown-backup-restore-physical-intent",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "BackupRestoreRecoveryIntentFact",
+      "enum": "BackupRestorePhysicalIntent",
+      "path": "intent",
+      "file": "unknown-backup-restore-physical-intent.json",
+      "rule": "Every persisted physical intent is a closed value and an unknown action fails closed.",
+      "deviation": "The recovery fact names a physical action no member of BackupRestorePhysicalIntent holds.",
+      "note": "Guessing a neighbouring intent would turn an observational crash record into permission to publish, delete, or repeat physical work."
+    },
+    {
+      "case": "backup-restore-recovery-fact-body-mismatch",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "BackupRestoreRecoveryRecord",
+      "file": "backup-restore-recovery-fact-body-mismatch.json",
+      "rule": "A recovery fact carries exactly the body selected by its closed fact kind.",
+      "deviation": "The tag says INTENT_RECORDED while only an outcome body is present.",
+      "note": "Reading the body that happens to be present would let a fabricated observation settle physical work for which no durable intent exists."
+    },
+    {
+      "case": "wrong-backup-restore-candidate-digest-length",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "BackupRestoreCandidateWitness",
+      "file": "wrong-backup-restore-candidate-digest-length.json",
+      "rule": "The candidate projection witness digest is exactly thirty-two bytes.",
+      "deviation": "The candidate digest carries thirty-one bytes.",
+      "note": "Padding or truncating the witness would change the identity used to reconcile the quarantined candidate."
+    },
+    {
+      "case": "backup-restore-recovery-history-over-limit",
+      "kind": "bound",
+      "verdict": "REJECT_OVERSIZED",
+      "limit": "MAX_BACKUP_RESTORE_RECOVERY_RECORDS",
+      "path": "recovery_records",
+      "file": "backup-restore-recovery-history-over-limit.json",
+      "rule": "Content-free physical recovery facts have a dedicated bound separate from payload record limits.",
+      "deviation": "The measured history count is one above MAX_BACKUP_RESTORE_RECOVERY_RECORDS.",
+      "note": "Exhausting the bounded journal preserves quarantine; it must not become an allocation request or permission to discard old facts."
+    },
+    {
+      "case": "unknown-backup-restore-recovery-resolution-choice",
+      "kind": "enum",
+      "verdict": "REJECT_CLOSED_ENUM",
+      "type": "BackupRestoreRecoveryResolutionRequest",
+      "enum": "BackupRestoreResolutionChoice",
+      "path": "choice",
+      "file": "unknown-backup-restore-recovery-resolution-choice.json",
+      "rule": "A recovered candidate resolution is an explicit closed accept-or-discard choice.",
+      "deviation": "The resolution request carries a choice no member defines.",
+      "note": "Guessing could turn deletion into publication or publication into deletion."
+    },
+    {
+      "case": "succeeded-backup-recovery-resolution-without-authorization",
+      "kind": "record",
+      "verdict": "REJECT_MALFORMED",
+      "type": "BackupRestoreRecoveryResolutionAuthorizationResult",
+      "file": "succeeded-backup-recovery-resolution-without-authorization.json",
+      "rule": "A successful recovery resolution result carries exactly one consumptive authorization.",
+      "deviation": "The result says SUCCEEDED but omits authorization.",
+      "note": "The success word alone is never permission to mutate a hidden profile."
+    }
+  ]
+}

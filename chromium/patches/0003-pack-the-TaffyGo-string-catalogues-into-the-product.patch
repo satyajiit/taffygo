@@ -1,0 +1,72 @@
+From 2a4b7318b3d34e267cca53c33edab590252795ab Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Mon, 17 Aug 2026 20:29:40 +0530
+Subject: pack the TaffyGo string catalogues into the product
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Two registries, both additive. tools/gritsettings/resource_ids.spec
+allocates the id ranges for both TaffyGo catalogues (taffy_strings.grd and
+taffy_android_strings.grd) — starts above every upstream range, so a rebase
+that grows an upstream catalogue cannot collide, and no first_id is copied
+back into the overlay. chrome/chrome_repack_locales.gni lists the
+taffy_strings_ pattern and its dep in the shared source_patterns every
+product's locale repack inherits, which is what makes the generated pak a
+loaded pak: the overlay's grit_strings target emits one per locale (and per
+gender where the platform enables them), every non-English pak carrying the
+English strings until OD-060 sets the launch languages.
+
+Rebase risk: low, one sharp edge. Both edits are single entries in lists;
+the id range is the edge, because upstream may reassign ranges wholesale and
+a stale start produces overlapping ids rather than a loud failure. Grit
+refuses overlapping ranges when it can see both catalogues, which the
+product build always can.
+
+Needed by: WP-M1-01 and PAR-L10N-001; patch 0004 reads these strings.
+Retirement: permanent while TaffyGo ships strings of its own.
+
+Taffy-Patch: 0003
+
+diff --git a/chrome/chrome_repack_locales.gni b/chrome/chrome_repack_locales.gni
+index 19be5865dc73b..52f2a2f840d25 100644
+--- a/chrome/chrome_repack_locales.gni
++++ b/chrome/chrome_repack_locales.gni
+@@ -33,6 +33,7 @@ template("chrome_repack_locales") {
+       "${root_gen_dir}/components/strings/components_strings_",
+       "${root_gen_dir}/components/strings/components_variant_strings_",
+       "${root_gen_dir}/components/strings/privacy_sandbox_strings_",
++      "${root_gen_dir}/taffy/resources/catalog/taffy_strings_",
+       "${root_gen_dir}/third_party/blink/public/strings/blink_strings_",
+       "${root_gen_dir}/third_party/blink/public/strings/permission_element_strings_",
+       "${root_gen_dir}/device/bluetooth/strings/bluetooth_strings_",
+@@ -59,6 +60,7 @@ template("chrome_repack_locales") {
+       "//components/strings:components_strings",
+       "//components/strings:components_variant_strings",
+       "//components/strings:privacy_sandbox_strings",
++      "//taffy/resources/catalog:taffy_strings",
+       "//device/bluetooth/strings",
+       "//device/fido/strings",
+       "//services/strings",
+diff --git a/tools/gritsettings/resource_ids.spec b/tools/gritsettings/resource_ids.spec
+index 24ed276c40a30..923d03df2a09e 100644
+--- a/tools/gritsettings/resource_ids.spec
++++ b/tools/gritsettings/resource_ids.spec
+@@ -1415,6 +1415,17 @@
+     "META": {"sizes": {"includes": [50]}},
+     "includes": [7505],
+   },
++
++  # TaffyGo (downstream): allocated above every upstream range so a milestone
++  # rebase that grows an upstream catalogue cannot collide with these. See
++  # chromium/patches/0003-pack-taffy-string-resources.md in the TaffyGo
++  # repository; grit itself refuses overlapping ranges if this drifts.
++  "taffy/resources/catalog/taffy_android_strings.grd": {
++    "messages": [13000],
++  },
++  "taffy/resources/catalog/taffy_strings.grd": {
++    "messages": [13100],
++  },
+   # END components/ section.
+ 
+   # START ios/ section.

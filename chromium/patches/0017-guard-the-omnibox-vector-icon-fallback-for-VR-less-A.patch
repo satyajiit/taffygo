@@ -1,0 +1,95 @@
+From 3ae919ce8e39e20bf86f19d4b347dc10b5e45dfa Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Tue, 18 Aug 2026 03:02:07 +0530
+Subject: guard the omnibox vector-icon fallback for VR-less Android
+
+AutocompleteMatch::GetVectorIcon is declared only under
+(!IS_ANDROID || ENABLE_VR) && !IS_IOS, but GetMatchIcon's fallback calls it
+unguarded, so an Android build with the XR runtimes disabled does not
+compile. Mirror the declaration's guard at the call site and return the
+empty image on the excluded configuration, the same value the favicon path
+produces while a fetch is outstanding.
+
+Taffy-Patch: 0017
+
+diff --git a/chrome/browser/ui/omnibox/omnibox_edit_model.cc b/chrome/browser/ui/omnibox/omnibox_edit_model.cc
+index ed78b9d69257b..36716818b9dc2 100644
+--- a/chrome/browser/ui/omnibox/omnibox_edit_model.cc
++++ b/chrome/browser/ui/omnibox/omnibox_edit_model.cc
+@@ -30,6 +30,7 @@
+ #include "base/trace_event/typed_macros.h"
+ #include "build/branding_buildflags.h"
+ #include "build/build_config.h"
++#include "components/omnibox/browser/buildflags.h"
+ #include "chrome/app/vector_icons/vector_icons.h"
+ #include "chrome/browser/contextual_search/contextual_search_service_factory.h"
+ #include "chrome/browser/contextual_search/contextual_search_web_contents_helper.h"
+@@ -1939,11 +1940,18 @@ gfx::Image OmniboxEditModel::GetMatchIcon(const AutocompleteMatch& match,
+     }
+   }
+ 
++  // Taffy: the declaration of GetVectorIcon carries this same guard; the
++  // call did not, so an Android build without ENABLE_VR failed to compile.
++  // chromium/patches/0017-guard-omnibox-vector-icon-fallback-for-vr-less-android.md
++#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR)
+   bool is_starred_match = IsStarredMatch(match);
+   const auto& vector_icon_type = match.GetVectorIcon(is_starred_match, turl);
+ 
+   return controller_->client()->GetSizedIcon(vector_icon_type,
+                                              vector_icon_color);
++#else
++  return gfx::Image();
++#endif
+ }
+ 
+ gfx::Image OmniboxEditModel::GetMatchIconIfExtension(
+diff --git a/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc b/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
+index d3e1502aec422..f9eb007b9a792 100644
+--- a/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
++++ b/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
+@@ -60,6 +60,7 @@
+ #include "components/omnibox/browser/omnibox_popup_selection.h"
+ #include "components/omnibox/browser/omnibox_prefs.h"
+ #include "components/omnibox/browser/searchbox_utils.h"
++#include "components/omnibox/browser/buildflags.h"
+ #include "components/omnibox/browser/vector_icons.h"
+ #include "extensions/buildflags/buildflags.h"
+ #if BUILDFLAG(ENABLE_EXTENSIONS)
+@@ -884,6 +885,9 @@ SearchboxHandler::CreateAutocompleteMatch(
+   mojom_match->destination_url = match.destination_url;
+   mojom_match->suggestion_group_id =
+       match.suggestion_group_id.value_or(omnibox::GROUP_INVALID);
++  // Taffy: AutocompleteMatch::GetVectorIcon exists only under this guard;
++  // see chromium/patches/0017-guard-omnibox-vector-icon-fallback-for-vr-less-android.md
++#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR)
+   const bool is_bookmarked =
+       bookmark_model->IsBookmarked(match.destination_url);
+   // For starter pack suggestions, use template url to generate proper vector
+@@ -894,6 +898,7 @@ SearchboxHandler::CreateAutocompleteMatch(
+           : turl_service->GetTemplateURLForKeyword(match.associated_keyword);
+   mojom_match->icon_path = AutocompleteIconToResourceName(
+       match.GetVectorIcon(is_bookmarked, associated_keyword_turl));
++#endif
+   // For enterprise search aggregator people suggestions, use branded icon if
+   // branded build.
+   if (match.enterprise_search_aggregator_type ==
+@@ -964,11 +969,19 @@ SearchboxHandler::CreateAutocompleteMatch(
+   if (!match.from_keyword) {
+     for (const auto& action : match.actions) {
+       std::string icon_path;
++      // Taffy: OmniboxAction::GetVectorIcon exists only with pedal vector
++      // icons, absent on VR-less Android (patch 0017, same guard as above).
++#if defined(SUPPORT_PEDALS_VECTOR_ICONS)
+       if (action->GetIconImage().IsEmpty()) {
+         icon_path = AutocompleteIconToResourceName(action->GetVectorIcon());
+       } else {
+         icon_path = webui::GetBitmapDataUrl(action->GetIconImage().AsBitmap());
+       }
++#else
++      if (!action->GetIconImage().IsEmpty()) {
++        icon_path = webui::GetBitmapDataUrl(action->GetIconImage().AsBitmap());
++      }
++#endif
+       const OmniboxAction::LabelStrings& label_strings =
+           action->GetLabelStrings();
+       mojom_match->actions.emplace_back(searchbox::mojom::Action::New(

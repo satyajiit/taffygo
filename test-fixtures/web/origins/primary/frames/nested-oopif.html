@@ -1,0 +1,20 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="iframe-nested-oopif">
+<title>Nested cross-origin frames</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+
+<header class="fixture">
+  <h1>Nested cross-origin frames</h1>
+  <p class="who">primary &rarr; partner &rarr; embed. Three origins, three frame
+  scopes, one frame tree that only the browser process can assemble.</p>
+</header>
+
+<p id="depth-note">This document is depth 0. The partner frame is depth 1 and
+embeds an embed-origin frame at depth 2.</p>
+
+<iframe id="oopif-depth-1" title="Partner frame containing a nested frame" height="420"
+        data-taffy-origin="partner" data-taffy-path="/frames/partner-nest.html"></iframe>

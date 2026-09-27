@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" data-fixture-session="none">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="taffy-fixture-origin" content="primary">
+<meta name="taffy-fixture-id" content="auth-account">
+<title>Fixture account</title>
+<link rel="stylesheet" href="/_fixture/fixture.css">
+<script src="/_fixture/origin-links.js" defer></script>
+</head>
+<body>
+
+<header class="fixture">
+  <h1>Fixture account</h1>
+  <p class="who">Session state comes from an HttpOnly fixture cookie. The document
+  never sees the cookie value; the server swaps one attribute when it is valid.</p>
+</header>
+
+<section id="signed-out">
+  <h2>Not signed in</h2>
+  <p>Order history is unavailable without a session.</p>
+  <p><a href="/auth/login.html">Go to the sign-in page</a></p>
+</section>
+
+<section id="signed-in" hidden>
+  <h2>Signed in as fixture-user@primary.taffy.test</h2>
+  <table id="orders">
+    <thead><tr><th scope="col">Order</th><th scope="col">Item</th><th scope="col">Total</th></tr></thead>
+    <tbody>
+      <tr><td>ORD-100013</td><td>Lumen Arc desk lamp</td><td>$129.00</td></tr>
+      <tr><td>ORD-100026</td><td>Lumen Flat desk lamp</td><td>$89.00</td></tr>
+    </tbody>
+  </table>
+  <p><a href="/auth/logout">Sign out</a></p>
+</section>
+
+<p class="note" id="session-note">The only server-side edit to this file is the
+value of <code>data-fixture-session</code> on the root element.</p>
+
+<script>
+  (function () {
+    "use strict";
+    if (document.documentElement.getAttribute("data-fixture-session") === "active") {
+      document.getElementById("signed-out").hidden = true;
+      document.getElementById("signed-in").hidden = false;
+    }
+  })();
+</script>
+</body>
+</html>

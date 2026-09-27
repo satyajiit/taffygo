@@ -1,0 +1,111 @@
+{
+  "schema_version": "0.8",
+  "action_id": "act_21",
+  "task_id": "task_07",
+  "principal": {
+    "kind": "ASSISTANT"
+  },
+  "action_type": "SUBMIT_FORM",
+  "target_handle": {
+    "tab_id": "tab_04",
+    "frame_id": "frame_main",
+    "page_epoch": "epoch_d4",
+    "graph_revision": 14,
+    "node_id": "n_place_order_button",
+    "expected_origin": {
+      "kind": "TUPLE",
+      "serialization": "https://shop.example.test"
+    }
+  },
+  "input": {
+    "kind": "NONE",
+    "sensitivity": "NOT_SENSITIVE"
+  },
+  "preconditions": [
+    {
+      "kind": "EXACT_PAGE_EPOCH",
+      "page_epoch": "epoch_d4"
+    },
+    {
+      "kind": "ACCEPTABLE_GRAPH_REVISION",
+      "min_graph_revision": 14
+    },
+    {
+      "kind": "DOCUMENT_ACTIVE"
+    },
+    {
+      "kind": "EXACT_ORIGIN",
+      "origin": {
+        "kind": "TUPLE",
+        "serialization": "https://shop.example.test"
+      }
+    },
+    {
+      "kind": "NODE_EXISTS"
+    },
+    {
+      "kind": "NODE_ROLE_UNCHANGED",
+      "expected_role": "BUTTON"
+    },
+    {
+      "kind": "NODE_ACTION_AVAILABLE",
+      "expected_action_type": "SUBMIT_FORM"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "VISIBLE"
+    },
+    {
+      "kind": "NODE_STATE_ASSERTED",
+      "node_state": "ENABLED"
+    },
+    {
+      "kind": "NODE_STATE_ABSENT",
+      "node_state": "OBSCURED"
+    },
+    {
+      "kind": "NOT_SENSITIVE_FIELD",
+      "max_sensitivity": "NOT_SENSITIVE"
+    },
+    {
+      "kind": "NO_USER_INTERACTION_SINCE_LEASE"
+    },
+    {
+      "kind": "NO_UNDECLARED_EGRESS"
+    },
+    {
+      "kind": "PREPARED_EFFECT_UNCHANGED",
+      "prepared_effect": {
+        "prepared_action_id": "act_20",
+        "prepared_effect_digest": {
+          "algorithm": "SHA_256",
+          "value": "6b1d0c4af8392e57d0a4b31e9c72f8560d3ea914c7b25f80e1a63d4c9f072b8a"
+        },
+        "prepared_at_monotonic_ms": 30200,
+        "gesture_at_monotonic_ms": 34800
+      }
+    },
+    {
+      "kind": "BUDGET_REMAINING"
+    }
+  ],
+  "expected_postconditions": [
+    {
+      "kind": "COMMITTED_NAVIGATION",
+      "allowed_origins": [
+        {
+          "kind": "TUPLE",
+          "serialization": "https://shop.example.test"
+        }
+      ],
+      "timeout_ms": 10000
+    }
+  ],
+  "idempotency_policy": "NON_IDEMPOTENT",
+  "deadline_monotonic_ms": 46000,
+  "user_visible_reason": "Press Place order on this checkout form.",
+  "proposal_digest": {
+    "algorithm": "SHA_256",
+    "value": "3f7a92c05e1b6d84a2f30c95b7e14d6a08c3f512de9b7a460c85d1e3a92b7e04"
+  }
+}

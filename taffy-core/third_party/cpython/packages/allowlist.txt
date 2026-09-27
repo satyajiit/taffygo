@@ -1,0 +1,23 @@
+# The pure-Python packages a bundled entrypoint may import beside the standard
+# library, and nothing else.
+#
+# Columns, tab-separated:  name <TAB> version <TAB> sha256 <TAB> reason
+#
+# Four rules, all of which build_packages.py enforces:
+#
+#   1. **Pure Python only.** A wheel with a compiled extension is a second ABI
+#      to build for six platforms and a second thing a sandbox has to load. If
+#      a package needs one, it is not an allowlist entry — it is a component.
+#   2. **A pinned version and a digest.** The artifact is fetched by whoever
+#      builds it and verified against this file, so "the latest" is never what
+#      ships and a compromised index is a build failure rather than a release.
+#   3. **A stated reason, naming the entrypoint that needs it.** A package
+#      nothing imports is a package nobody has to audit and nobody removed.
+#   4. **No transitive resolution.** Every package a build produces is a row
+#      here, its dependencies included, because a dependency nobody wrote down
+#      is a dependency nobody reviewed.
+#
+# The file is empty on purpose. No bundled entrypoint exists yet, so no package
+# has an argued reason, and an allowlist seeded with plausible entries is an
+# allowlist that was never reviewed. The first row arrives with the first
+# entrypoint that needs it.

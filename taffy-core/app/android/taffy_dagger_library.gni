@@ -1,0 +1,127 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# An Android library whose Kotlin sources are processed by regular Dagger.
+# Chromium's Turbine path sees Java only, so this explicit kapt action is the
+# required bridge for Kotlin @Inject constructors, modules, and components.
+
+import("//build/config/android/rules.gni")
+
+taffy_dagger_processor_jars = [
+  "//taffy/third_party/dagger/lib/checker-compat-qual-2.5.3.jar",
+  "//taffy/third_party/dagger/lib/dagger-2.60.1.jar",
+  "//taffy/third_party/dagger/lib/dagger-compiler-2.60.1.jar",
+  "//taffy/third_party/dagger/lib/dagger-spi-2.60.1.jar",
+  "//taffy/third_party/dagger/lib/failureaccess-1.0.1.jar",
+  "//taffy/third_party/dagger/lib/google-java-format-1.33.0.jar",
+  "//taffy/third_party/dagger/lib/guava-33.6.0-jre.jar",
+  "//taffy/third_party/dagger/lib/incap-0.2.jar",
+  "//taffy/third_party/dagger/lib/jakarta.inject-api-2.0.1.jar",
+  "//taffy/third_party/dagger/lib/javapoet-1.13.0.jar",
+  "//taffy/third_party/dagger/lib/javax.inject-1.jar",
+  "//taffy/third_party/dagger/lib/jsr305-3.0.2.jar",
+  "//taffy/third_party/dagger/lib/kotlin-metadata-jvm-2.3.21.jar",
+  "//taffy/third_party/dagger/lib/kotlin-stdlib-2.4.10.jar",
+  "//taffy/third_party/dagger/lib/kotlinpoet-1.11.0.jar",
+  "//taffy/third_party/dagger/lib/symbol-processing-api-2.3.11.jar",
+]
+
+taffy_dagger_processors = [ "dagger.internal.codegen.ComponentProcessor" ]
+taffy_dagger_runtime_deps =
+    [ "//taffy/third_party/dagger:taffy_dagger_runtime_java" ]
+
+template("taffy_dagger_library") {
+  _kapt_target = "${target_name}__kapt"
+  _classpath_target = "${target_name}__kapt_classpath"
+  _deps = invoker.deps + taffy_dagger_runtime_deps
+
+  android_library(_classpath_target) {
+    sources = [ "//taffy/third_party/dagger/java/org/chromium/taffy/dagger/KaptClasspathAnchor.java" ]
+    deps = _deps
+    if (defined(invoker.compile_srcjar_deps)) {
+      srcjar_deps = invoker.compile_srcjar_deps
+    }
+    if (defined(invoker.testonly)) {
+      testonly = invoker.testonly
+    }
+  }
+
+  action(_kapt_target) {
+    script = "//taffy/app/android/tools/kapt.py"
+    deps = [
+      ":$_classpath_target",
+      ":${_classpath_target}__build_config_crbug_908819",
+    ]
+
+    _build_config = get_label_info(":$_classpath_target", "target_gen_dir") +
+                    "/$_classpath_target.javac.build_config.json"
+    _kapt_plugin =
+        "//third_party/kotlinc/current/lib/kotlin-annotation-processing.jar"
+    inputs = invoker.sources + taffy_dagger_processor_jars +
+             [
+               _build_config,
+               _kapt_plugin,
+             ]
+    outputs = [ "$target_gen_dir/$_kapt_target.srcjar" ]
+    args = [
+      "--kotlinc",
+      rebase_path("//third_party/kotlinc/current/bin/kotlinc", root_build_dir),
+      "--kapt-plugin-jar",
+      rebase_path(_kapt_plugin, root_build_dir),
+      "--java-home",
+      rebase_path("//third_party/jdk/current", root_build_dir),
+      "--build-config",
+      rebase_path(_build_config, root_build_dir),
+      "--work-dir",
+      rebase_path("$target_gen_dir/$_kapt_target.work", root_build_dir),
+      "--srcjar",
+      rebase_path("$target_gen_dir/$_kapt_target.srcjar", root_build_dir),
+    ]
+    foreach(jar, taffy_dagger_processor_jars) {
+      args += [
+        "--processor-jar",
+        rebase_path(jar, root_build_dir),
+      ]
+    }
+    foreach(processor, taffy_dagger_processors) {
+      args += [
+        "--processor",
+        processor,
+      ]
+    }
+    foreach(source, invoker.sources) {
+      args += [
+        "--source",
+        rebase_path(source, root_build_dir),
+      ]
+    }
+    if (defined(invoker.testonly)) {
+      testonly = invoker.testonly
+    }
+  }
+
+  android_library(target_name) {
+    forward_variables_from(invoker,
+                           [
+                             "sources",
+                             "enable_bytecode_checks",
+                             "enable_compose",
+                             "resources_package",
+                             "testonly",
+                             "visibility",
+                             "jar_excluded_patterns",
+                           ])
+    deps = _deps
+    srcjar_deps = [ ":$_kapt_target" ]
+    if (defined(invoker.compile_srcjar_deps)) {
+      srcjar_deps += invoker.compile_srcjar_deps
+    }
+    chromium_code = false
+    if (defined(invoker.chromium_code)) {
+      chromium_code = invoker.chromium_code
+    }
+  }
+}

@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# ./tools/chromium/import-patches — apply chromium/patches/ onto an
+# already-synced checkout, without a full gclient sync.
+#
+# Two jobs, and only one of them writes to the checkout. The import rewrites
+# taffy/patched and is destructive by design. The rebase rehearsal (--onto)
+# measures the queue against another milestone and touches nothing: it is given
+# its own git worktree, so the checkout is not reachable from it.
+#
+# Use after pulling a change to the queue. Authority:
+# docs/development/chromium-fork-and-build.md section 1.1.
+
+set -euo pipefail
+# shellcheck disable=SC1091
+. "$(dirname "${BASH_SOURCE[0]}")/lib/chromium.sh"
+
+FORCE=0
+REHEARSAL=0
+ONTO=''
+
+usage() {
+  cat <<'USAGE'
+Usage: ./tools/chromium/import-patches [--onto <commit>] [--force]
+
+Recreates taffy/patched at chromium/REVISION and applies the whole queue in
+order: chromium/patches/*.patch, then chromium/patches/security/*.patch.
+
+Every patch is reported as one of three verdicts, because they are three
+different facts about the queue:
+
+  clean        applied as written
+  auto-merged  the strict apply failed and a three-way merge did not; the
+               patch still lands, but its context has moved
+  failed       neither applied
+
+Options:
+  --onto SHA  rebase rehearsal: replay the queue onto another revision, on the
+              throwaway branch taffy/rehearsal, in a git worktree of its own.
+              It reports every patch that fails instead of stopping at the
+              first, and it cannot write to the checkout — no command it runs
+              is given the checkout's directory. Needs no --force and rejects
+              it, whatever state the checkout is in.
+  --force     discard uncommitted changes in the checkout before rewriting
+              taffy/patched. Destructive, and only for that rewrite.
+  -h, --help  show this help
+
+The import rewrites the branch. Anything committed on taffy/patched that is
+not in the queue is lost — export first if you have local work. To measure the
+queue without touching anything, rehearse it against the pin instead.
+USAGE
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --onto)
+      # `${2:-}` used to accept a missing value silently: `--onto` last on the
+      # line shifted past the end and set -e exited 1 with no message, and an
+      # empty value fell through to a destructive rewrite of taffy/patched.
+      [ $# -ge 2 ] || die "--onto needs a revision" \
+        "For example: ./tools/chromium/import-patches --onto <beta-tag>"
+      case "$2" in
+        -*) die "--onto needs a revision, not the option $2" \
+              "It reads the next word as the revision to rehearse against." ;;
+      esac
+      ONTO=$2; REHEARSAL=1; shift ;;
+    --onto=*) ONTO=${1#*=}; REHEARSAL=1 ;;
+    --force) FORCE=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage >&2; die "unknown option: $1" ;;
+  esac
+  shift
+done
+
+if [ "$REHEARSAL" = 1 ] && [ -z "$ONTO" ]; then
+  die "--onto was given an empty revision" \
+    "An empty --onto is not a rehearsal against nothing: it used to fall" \
+    "through to a rewrite of $TAFFY_PATCH_BRANCH. Name the revision."
+fi
+
+# The second guard on the destructive flag, independent of the isolation below.
+# --force exists to discard work in the checkout, and the rehearsal has no
+# business in the checkout at all.
+if [ "$REHEARSAL" = 1 ] && [ "$FORCE" = 1 ]; then
+  die "--force cannot be combined with --onto" \
+    "--force discards uncommitted changes in the checkout. The rehearsal never" \
+    "reads or writes the checkout — it replays the queue in a worktree of its" \
+    "own — so there is nothing for the flag to do but damage. Drop it."
+fi
+
+SRC=$(chromium_require_checkout)
+COMMIT=$(chromium_require_pin)
+
+# --- rebase rehearsal -------------------------------------------------------
+
+if [ "$REHEARSAL" = 1 ]; then
+  COMMIT=$(git -C "$SRC" rev-parse --verify --quiet "$ONTO^{commit}") || die \
+    "unknown revision: $ONTO" \
+    "Fetch it first, for example: git -C $SRC fetch origin <beta-tag>"
+
+  HEAD_REF_BEFORE=$(git -C "$SRC" symbolic-ref --quiet HEAD 2>/dev/null) || HEAD_REF_BEFORE=''
+  HEAD_BEFORE=$(git -C "$SRC" rev-parse HEAD)
+  # shellcheck disable=SC2317,SC2329  # reached through the EXIT trap on the next line
+  restore_checkout_head() { chromium_restore_head "$SRC" "$HEAD_REF_BEFORE" "$HEAD_BEFORE"; }
+  trap restore_checkout_head EXIT
+
+  step "rebase rehearsal: replaying the queue onto ${COMMIT:0:12}"
+  note "The checkout at $SRC is not touched, whatever state it is in."
+
+  WORKTREE=$(chromium_rehearsal_worktree "$SRC" "$COMMIT")
+  STATUS=0
+  chromium_apply_patches "$WORKTREE" "$COMMIT" "$TAFFY_REHEARSAL_BRANCH" continue || STATUS=$?
+
+  info ""
+  if [ "$STATUS" -eq 0 ]; then
+    ok "the whole queue applies to ${COMMIT:0:12}"
+  else
+    bad "$TAFFY_PATCH_FAILED of $TAFFY_PATCH_TOTAL patch(es) do not apply to ${COMMIT:0:12}"
+    note "Every failure is above, with its owner and the conflict git reported."
+  fi
+  info "Rehearsal only — $TAFFY_PATCH_BRANCH and the checkout are unchanged."
+  info "The replay is on $TAFFY_REHEARSAL_BRANCH in $WORKTREE — resolve there."
+  info "Discard it with: git -C $SRC worktree remove --force $WORKTREE"
+  exit "$STATUS"
+fi
+
+# --- import onto the queue branch -------------------------------------------
+
+AHEAD=$(git -C "$SRC" rev-list --count "$COMMIT..$TAFFY_PATCH_BRANCH" 2>/dev/null || printf '0')
+if [ "$AHEAD" -gt 0 ]; then
+  warn "$TAFFY_PATCH_BRANCH has $AHEAD commit(s) that this rewrite will drop"
+  note "They survive only if chromium/patches/ already contains them."
+fi
+
+DIRTY=$(git -C "$SRC" status --porcelain --untracked-files=no)
+if [ -n "$DIRTY" ]; then
+  if [ "$FORCE" = 0 ]; then
+    bad "the checkout at $SRC has uncommitted changes"
+    printf '%s\n' "$DIRTY" | chromium_note_block
+    die "refusing to rewrite $TAFFY_PATCH_BRANCH over uncommitted work" \
+      "Commit them and run ./tools/chromium/export-patches, or set them aside" \
+      "with: git -C $SRC stash push" \
+      "--force discards them permanently and nothing here can bring them back." \
+      "To measure the queue without touching the checkout, rehearse it:" \
+      "./tools/chromium/import-patches --onto ${COMMIT:0:12}"
+  fi
+  step "discarding uncommitted changes (--force)"
+  printf '%s\n' "$DIRTY" | chromium_note_block
+  git -C "$SRC" reset --hard --quiet
+fi
+
+chromium_apply_patches "$SRC" "$COMMIT" "$TAFFY_PATCH_BRANCH"
+
+info ""
+ok "queue applied to ${COMMIT:0:12} on $TAFFY_PATCH_BRANCH"
+chromium_mount_taffy_core "$SRC"
+info "Rebuild: ./tools/chromium/build --profile dev-x64"

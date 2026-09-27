@@ -1,0 +1,93 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The sandboxed media tool worker. One process, one job, one terminal result.
+#
+# This target is the whole of the runtime: Chromium owns the process, the
+# sandbox, the sequence and the descriptors, and everything here is a bounded
+# parse of bytes the browser opened. Nothing in it can be reached from the
+# browser except through //taffy/utility, which is the only target allowed to
+# name it.
+
+import("//media/media_options.gni")
+
+# The probe is a demuxer pass, and the demuxer is FFmpeg's. A build without it
+# has no media runtime, and saying so at GN load is better than a target that
+# exists, links, and refuses every job it is given.
+assert(
+    media_use_ffmpeg,
+    "//taffy/services/tool-runtime/media needs media_use_ffmpeg; a profile " +
+        "without it has no media runtime and must not register one.")
+
+source_set("media") {
+  sources = [
+    "media_audio_transform.cc",
+    "media_frame_transform.cc",
+    "media_probe.cc",
+    "media_probe.h",
+    "media_tool_service.cc",
+    "media_tool_service.h",
+    "media_transform.cc",
+    "media_transform.h",
+    "media_transform_internal.h",
+    "media_zip_writer.cc",
+    "media_zip_writer.h",
+  ]
+
+  public_deps = [ "//taffy/contracts/tool-runtime:tool_runtime_mojom" ]
+
+  deps = [
+    "//base",
+    "//crypto",
+    "//media",
+    "//media:media_buildflags",
+    "//mojo/public/cpp/bindings",
+    "//ui/gfx/codec",
+    "//ui/gfx/geometry",
+  ]
+
+  visibility = [
+    ":*",
+    "//taffy/utility:*",
+  ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+  data = [ "//media/test/data/bear.webm" ]
+  sources = [
+    "media_probe_unittest.cc",
+    "media_tool_service_unittest.cc",
+  ]
+
+  deps = [
+    ":media",
+    ":test_support",
+    "//base",
+    "//base/test:test_support",
+    "//media:test_support",
+    "//mojo/public/cpp/bindings",
+    "//testing/gtest",
+  ]
+
+  visibility = [ "//taffy/*" ]
+}
+
+# One synthetic container per test, built in memory rather than checked in.
+# A committed media file would be a binary under a source tree whose provenance
+# sweep would then have to explain it, and a generated one states its own
+# contents in the code that asserts about them.
+source_set("test_support") {
+  testonly = true
+  sources = [
+    "test/synthetic_media.cc",
+    "test/synthetic_media.h",
+  ]
+
+  deps = [ "//base" ]
+
+  visibility = [ "//taffy/*" ]
+}

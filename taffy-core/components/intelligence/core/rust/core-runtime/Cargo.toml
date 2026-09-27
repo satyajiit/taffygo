@@ -1,0 +1,29 @@
+[package]
+name = "core-runtime"
+description = "Deterministic composition, async effect contracts, and recovery for the Taffy core service."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+asset-plane = { workspace = true }
+audit-engine = { workspace = true }
+bip-types = { workspace = true }
+core-api-types = { workspace = true }
+core-service-types = { workspace = true }
+file-engine = { workspace = true }
+loop-kernel = { workspace = true }
+model-router = { workspace = true }
+policy-engine = { workspace = true }
+procedure-engine = { workspace = true }
+taffy-storage = { workspace = true }
+task-engine = { workspace = true }
+tool-entrypoints = { workspace = true }
+
+[dev-dependencies]
+kernel-test-support = { workspace = true }
+proptest = { workspace = true }

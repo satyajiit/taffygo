@@ -1,0 +1,17 @@
+Taffy original scene masters
+============================
+
+Owner: Matterward Labs Private Limited / TaffyGo
+Licence: Reserved media, not licensed with the code; see TRADEMARKS.md.
+Created: 2026-09-09, Codex built-in image_gen from original prompts.
+
+Unaltered 1448 by 1086 generated PNG masters. The matching shipping assets,
+encoder and design intent are recorded in taffy-task-scenes.txt beside this
+record. The exact generation prompts are kept in the maintainer's working
+tree and are not published. Neither master uses an input image or copies an
+Aster asset.
+
+sha256_taffy_scene_browsing_png=d94833dc9035a716edff282a31034c4cc736b4d5bdf9c079608e35280dbe4928
+bytes_taffy_scene_browsing_png=2506205
+sha256_taffy_scene_saved_flow_png=01fe67729ad064b4ed88739fed0560f6a33672bf40947cfd653c32b4a4377d6e
+bytes_taffy_scene_saved_flow_png=2717985

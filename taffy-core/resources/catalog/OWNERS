@@ -1,0 +1,13 @@
+# Every word a person reads in TaffyGo's own surfaces is decided here. A
+# change to a message is a change to product copy, so it needs the review the
+# voice and naming guide describes (docs/voice-and-naming.md) as well as the
+# usual engineering review — a refusal that reads as an apology, or a string
+# that claims to be security UI when it is not, is a defect this file's owner
+# is supposed to catch.
+#
+# The product and assistant naming decisions are [Open (OD-001)] and
+# [Open (OD-002)], and the launch language set is [Open (OD-060)]. Until those
+# land and the M0 owner roles are filled, this file is deliberately unowned
+# rather than falsely attributed: review falls through to
+# //taffy/OWNERS and then to //components/OWNERS.
+*

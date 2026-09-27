@@ -1,0 +1,44 @@
+# Copyright (c) 2026 Matterward Labs Private Limited.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# The reader over a person's own History and Bookmarks that an attached-store
+# read is answered from (decision 0133). Its interface and the entry it
+# answers live in //taffy/browser; only the two answers live here, because one
+# of them needs Chrome's profile composition and browser_shared must stay
+# link-closed for content_shell binaries.
+
+# The product-only adapter from Chromium's history service and bookmark model
+# into the entries an attached-store read answers (decision 0133). It lives
+# beside the Saved Data adapter for the same reason: the Chrome factory
+# targets need Chrome's profile composition, and browser_shared must stay
+# link-closed for content_shell binaries.
+source_set("profile_adapter") {
+  sources = [ "profile_store_reader_chrome.cc" ]
+  deps = [
+    "//base",
+    "//chrome/browser/bookmarks",
+    "//chrome/browser/history",
+    "//chrome/browser/profiles",
+    "//components/bookmarks/browser",
+    "//components/history/core/browser",
+    "//components/keyed_service/core",
+    "//taffy/browser:core_service_client",
+    "//url",
+  ]
+}
+
+# The standalone-test answer for the store reader: no Chrome profile
+# composition means no History or Bookmarks, so every such read answers
+# unavailable, and the row and result rules are covered through entries the
+# tests hand in themselves.
+source_set("unavailable_test_adapter") {
+  testonly = true
+  sources = [ "profile_store_reader_unavailable.cc" ]
+  deps = [
+    "//base",
+    "//taffy/browser:core_service_client",
+  ]
+}

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Matterward Labs Private Limited.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
+<resources>
+    <string name="taffy_settings_profiles_title">Profiles</string>
+    <string name="taffy_settings_profiles_summary">Where your tabs, history, and Taffy data are kept</string>
+    <string name="taffy_profiles_title">Profiles</string>
+    <string name="taffy_profiles_explanation">This profile keeps your tabs, history, site data, settings, saved sign-ins, Taffy tasks, and workspaces on this device.</string>
+    <string name="taffy_profiles_loading">Loading profiles</string>
+    <string name="taffy_profiles_unavailable_title">Profiles are unavailable</string>
+    <string name="taffy_profiles_unavailable_body">TaffyGo could not read this device\'s browser profiles. Your current profile is unchanged.</string>
+    <string name="taffy_profiles_try_again">Try again</string>
+    <string name="taffy_profiles_active">Current profile</string>
+    <string name="taffy_profiles_row_active">%1$s, current profile</string>
+    <string name="taffy_profiles_unused">Not in use</string>
+    <string name="taffy_profiles_row_unused">%1$s, not in use</string>
+    <plurals name="taffy_profiles_active_workspaces">
+        <item quantity="one">Current profile · %1$d workspace</item>
+        <item quantity="other">Current profile · %1$d workspaces</item>
+    </plurals>
+    <plurals name="taffy_profiles_row_active_workspaces">
+        <item quantity="one">%1$s, current profile, %2$d workspace</item>
+        <item quantity="other">%1$s, current profile, %2$d workspaces</item>
+    </plurals>
+    <string name="taffy_profiles_delete_description">Delete %1$s</string>
+    <string name="taffy_profiles_delete_title">Delete %1$s?</string>
+    <string name="taffy_profiles_delete_body">This permanently removes that profile\'s tabs, history, site data, settings, saved sign-ins, Taffy tasks, and every workspace Taffy made in it from this device. Exported files you saved are not affected. This cannot be undone.</string>
+    <string name="taffy_profiles_delete">Delete profile</string>
+    <string name="taffy_profiles_keep">Keep profile</string>
+    <string name="taffy_profiles_deleting">Deleting the profile…</string>
+    <string name="taffy_profiles_dismiss_error">Dismiss</string>
+    <string name="taffy_profiles_error_name">Enter a name with 1 to 40 visible characters.</string>
+    <string name="taffy_profiles_error_limit">This device already has the maximum of eight profiles.</string>
+    <string name="taffy_profiles_error_duplicate">A profile already uses that name.</string>
+    <string name="taffy_profiles_error_missing">That profile no longer exists.</string>
+    <string name="taffy_profiles_error_active">Switch away from a profile before deleting it.</string>
+    <string name="taffy_profiles_error_last">The last profile cannot be deleted.</string>
+    <string name="taffy_profiles_error_in_use">Close every window using this profile, including private windows, then try again.</string>
+    <string name="taffy_profiles_error_busy">Another profile change is still finishing.</string>
+    <string name="taffy_profiles_error_private">Profiles cannot be changed from private browsing.</string>
+    <string name="taffy_profiles_error_failed">TaffyGo could not change profiles. Your current profile is unchanged.</string>
+    <string name="taffy_settings_backup_title">Backup</string>
+    <string name="taffy_settings_backup_summary">Choose content for an encrypted file, or check an existing backup</string>
+</resources>

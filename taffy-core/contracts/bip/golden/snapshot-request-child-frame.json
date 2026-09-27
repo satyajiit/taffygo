@@ -1,0 +1,40 @@
+{
+  "schema_version": "0.7",
+  "request_id": "req_014",
+  "profile_id": "prof_default",
+  "tab_id": "tab_04",
+  "root_frame_id": "frame_main",
+  "observed_frame_id": "frame_child_2",
+  "expected_page_epoch": "epoch_c7",
+  "scope": "DOCUMENT",
+  "adapters": [
+    {
+      "adapter": "DOM",
+      "requirement": "REQUIRED"
+    },
+    {
+      "adapter": "ACCESSIBILITY",
+      "requirement": "REQUIRED"
+    }
+  ],
+  "requested_fields": [
+    "ROLE",
+    "NAME",
+    "STATES",
+    "SENSITIVITY"
+  ],
+  "include_child_frames": false,
+  "allowed_origins": [
+    {
+      "kind": "TUPLE",
+      "serialization": "https://payments.partner.test"
+    }
+  ],
+  "max_nodes": 400,
+  "max_text_bytes": 32768,
+  "max_total_bytes": 65536,
+  "max_depth": 12,
+  "deadline_ms": 1200,
+  "sensitivity_policy_id": "policy_research_read",
+  "task_purpose": "RESEARCH_READ"
+}

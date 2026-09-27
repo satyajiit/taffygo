@@ -1,0 +1,145 @@
+From ca14f29abac3d9eff782105d65823e37cdfa8ad7 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Tue, 1 Sep 2026 06:04:56 +0530
+Subject: persist only returned open-document URI grants
+
+Keep transient HTML file-input results process-scoped, and persist only the read/write modes actually returned for original ACTION_OPEN_DOCUMENT results.
+
+Specified by chromium/patches/0039-persist-only-open-document-grants.md.
+
+Taffy-Patch: 0039
+
+diff --git a/ui/android/java/src/org/chromium/ui/base/SelectFileDialog.java b/ui/android/java/src/org/chromium/ui/base/SelectFileDialog.java
+index 46713bd30ba2b..def4f03d36d7f 100644
+--- a/ui/android/java/src/org/chromium/ui/base/SelectFileDialog.java
++++ b/ui/android/java/src/org/chromium/ui/base/SelectFileDialog.java
+@@ -1050,17 +1050,26 @@ public class SelectFileDialog implements WindowAndroid.IntentCallback, PhotoPick
+                 onFileNotSelected();
+                 return;
+             }
+-            if (UiAndroidFeatureMap.isEnabled(UiAndroidFeatures.SELECT_FILE_OPEN_DOCUMENT)) {
++            if (Intent.ACTION_OPEN_DOCUMENT.equals(mIntentAction)) {
+                 ContentResolver cr = ContextUtils.getApplicationContext().getContentResolver();
+-                try {
+-                    cr.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+-                } catch (SecurityException e) {
+-                    Log.w(TAG, "No persisted read permission for " + uri);
++                int returnedModes =
++                        results.getFlags()
++                                & (Intent.FLAG_GRANT_READ_URI_PERMISSION
++                                        | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
++                if ((returnedModes & Intent.FLAG_GRANT_READ_URI_PERMISSION) != 0) {
++                    try {
++                        cr.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
++                    } catch (SecurityException e) {
++                        Log.w(TAG, "No persisted read permission for " + uri);
++                    }
+                 }
+-                try {
+-                    cr.takePersistableUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+-                } catch (SecurityException e) {
+-                    Log.w(TAG, "No persisted write permission for " + uri);
++                if ((returnedModes & Intent.FLAG_GRANT_WRITE_URI_PERMISSION) != 0) {
++                    try {
++                        cr.takePersistableUriPermission(
++                                uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
++                    } catch (SecurityException e) {
++                        Log.w(TAG, "No persisted write permission for " + uri);
++                    }
+                 }
+             }
+             GetDisplayNameTask task =
+diff --git a/ui/android/junit/src/org/chromium/ui/base/SelectFileDialogTest.java b/ui/android/junit/src/org/chromium/ui/base/SelectFileDialogTest.java
+index 3861d0ac01817..8b770408ec014 100644
+--- a/ui/android/junit/src/org/chromium/ui/base/SelectFileDialogTest.java
++++ b/ui/android/junit/src/org/chromium/ui/base/SelectFileDialogTest.java
+@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
+ import android.Manifest;
+ import android.app.Activity;
+ import android.content.ContentResolver;
++import android.content.Context;
+ import android.content.Intent;
+ import android.content.pm.PackageManager;
+ import android.database.Cursor;
+@@ -70,6 +71,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
+ @RunWith(BaseRobolectricTestRunner.class)
+ @Config(manifest = Config.NONE)
+ @DisableFeatures({
++    UiAndroidFeatures.CHECK_INTENT_CALLER_PERMISSION,
+     UiAndroidFeatures.DEPRECATED_EXTERNAL_PICKER_FUNCTION,
+     UiAndroidFeatures.SELECT_FILE_OPEN_DOCUMENT
+ })
+@@ -348,6 +350,73 @@ public class SelectFileDialogTest {
+         verifyFileSystemAccessIntent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+     }
+ 
++    @Test
++    @EnableFeatures({UiAndroidFeatures.SELECT_FILE_OPEN_DOCUMENT})
++    public void testGetContentResultDoesNotPersistPermission() throws Exception {
++        ContentResolver contentResolver = installMockContentResolver();
++        TestSelectFileDialog selectFileDialog = prepareResultTest(Intent.ACTION_GET_CONTENT);
++        Uri selectedUri = Uri.parse("content://provider/transient");
++        Intent result =
++                new Intent()
++                        .setData(selectedUri)
++                        .addFlags(
++                                Intent.FLAG_GRANT_READ_URI_PERMISSION
++                                        | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
++
++        selectFileDialog.onIntentCompleted(Activity.RESULT_OK, result);
++
++        Mockito.verify(contentResolver, Mockito.never())
++                .takePersistableUriPermission(any(), anyInt());
++        runAllAsyncTasks();
++    }
++
++    @Test
++    @EnableFeatures({UiAndroidFeatures.SELECT_FILE_OPEN_DOCUMENT})
++    public void testOpenDocumentPersistsOnlyReturnedModes() throws Exception {
++        ContentResolver contentResolver = installMockContentResolver();
++        TestSelectFileDialog selectFileDialog = prepareResultTest(Intent.ACTION_OPEN_DOCUMENT);
++        Uri selectedUri = Uri.parse("content://provider/persistable");
++        Intent result =
++                new Intent()
++                        .setData(selectedUri)
++                        .addFlags(
++                                Intent.FLAG_GRANT_READ_URI_PERMISSION
++                                        | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
++
++        selectFileDialog.onIntentCompleted(Activity.RESULT_OK, result);
++
++        Mockito.verify(contentResolver)
++                .takePersistableUriPermission(selectedUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
++        Mockito.verify(contentResolver, Mockito.never())
++                .takePersistableUriPermission(selectedUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
++        runAllAsyncTasks();
++    }
++
++    private ContentResolver installMockContentResolver() {
++        Context context = Mockito.spy(ContextUtils.getApplicationContext());
++        ContentResolver contentResolver = Mockito.mock(ContentResolver.class);
++        when(context.getContentResolver()).thenReturn(contentResolver);
++        ContextUtils.initApplicationContextForTests(context);
++        return contentResolver;
++    }
++
++    private TestSelectFileDialog prepareResultTest(String intentAction) {
++        TestSelectFileDialog selectFileDialog = new TestSelectFileDialog(0);
++        WindowAndroid windowAndroid = Mockito.mock(WindowAndroid.class);
++        when(windowAndroid.showIntent(
++                        (Intent) any(), (WindowAndroid.IntentCallback) any(), anyInt()))
++                .thenReturn(true);
++        selectFileDialog.selectFile(
++                intentAction,
++                new String[] {"application/pdf"},
++                /* capture= */ false,
++                /* multiple= */ false,
++                /* defaultDirectory= */ null,
++                /* suggestedName= */ null,
++                windowAndroid);
++        return selectFileDialog;
++    }
++
+     @Test
+     public void testMimeTypesWithExternalPickerNoAcceptList() throws Exception {
+         TestSelectFileDialog selectFileDialog = new TestSelectFileDialog(0);

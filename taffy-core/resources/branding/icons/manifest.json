@@ -1,0 +1,613 @@
+{
+  "manifest_version": 2,
+  "sources": {
+    "color": {
+      "asset": "brand/png/taffygo-mark-color-on-dark.png",
+      "sha256": "61fab10b771aa9bcd4a8b612ece85f42b95f179051878f911b79ef42a39c0d96"
+    },
+    "monochrome": {
+      "asset": "brand/png/taffygo-mark-monochrome-on-dark.png",
+      "sha256": "3c471db417bcd3400a537ee3707c1ed55733de2c052c336d5ca18edf29ed870f"
+    },
+    "lockup": {
+      "asset": "brand/png/taffygo-lockup-color-on-dark.png",
+      "sha256": "a4da3bc138a6eaa44215ee4b93077f4256b87064d2f89d44c0a9fb1af04b616e"
+    }
+  },
+  "source_note": [
+    "Paths are relative to the repository root, not to this file. The",
+    "committed marks live in brand/, which is outside the overlay mount, so",
+    "generate_icons.py resolves the repository root through the mount and",
+    "emits a depfile naming every master it read.",
+    "",
+    "The on-dark colour mark is the master for every colour asset: a launcher",
+    "composites the icon over a surface it owns, so the treatment designed",
+    "for dark surfaces is the one that keeps the ribbon's gradient intact.",
+    "",
+    "role=launcher assets carry TaffyGo's own resource names and feed",
+    ":branding_resources. role=override assets shadow upstream resource",
+    "names by resource-overlay precedence and feed :image_override_resources \u2014 the",
+    "substitution decision 0019 and patch spec 0002 record. The names in",
+    "check-shadowed-names (tools/check_shadowed_names.py) must stay in step.",
+    "",
+    "content_scale 0.611 is the adaptive-icon safe zone: 66dp of visible",
+    "content on a 108dp layer (66/108). A layer rendered full-bleed would be",
+    "cropped by every launcher mask.",
+    "",
+    "monochrome_alpha assets are masks: the launcher or the notification",
+    "shade recolours them, so the colour channels are forced to white and",
+    "only the alpha carries the mark (png_io.to_monochrome_alpha).",
+    "",
+    "launcher assets live under res/ and override assets under res_overrides/:",
+    "the two android_resources targets must own disjoint resource roots,",
+    "because prepare_resources.py refuses any file it finds in a target's",
+    "root that the target's own sources list does not name."
+  ],
+  "assets": [
+    {
+      "id": "taffygo_launcher_mdpi",
+      "output": "res/mipmap-mdpi/taffygo_launcher.png",
+      "density": "mdpi",
+      "dp": 48,
+      "canvas_px": [
+        48,
+        48
+      ],
+      "source": "color",
+      "role": "launcher"
+    },
+    {
+      "id": "taffygo_launcher_hdpi",
+      "output": "res/mipmap-hdpi/taffygo_launcher.png",
+      "density": "hdpi",
+      "dp": 48,
+      "canvas_px": [
+        72,
+        72
+      ],
+      "source": "color",
+      "role": "launcher"
+    },
+    {
+      "id": "taffygo_launcher_xhdpi",
+      "output": "res/mipmap-xhdpi/taffygo_launcher.png",
+      "density": "xhdpi",
+      "dp": 48,
+      "canvas_px": [
+        96,
+        96
+      ],
+      "source": "color",
+      "role": "launcher"
+    },
+    {
+      "id": "taffygo_launcher_xxhdpi",
+      "output": "res/mipmap-xxhdpi/taffygo_launcher.png",
+      "density": "xxhdpi",
+      "dp": 48,
+      "canvas_px": [
+        144,
+        144
+      ],
+      "source": "color",
+      "role": "launcher"
+    },
+    {
+      "id": "taffygo_launcher_xxxhdpi",
+      "output": "res/mipmap-xxxhdpi/taffygo_launcher.png",
+      "density": "xxxhdpi",
+      "dp": 48,
+      "canvas_px": [
+        192,
+        192
+      ],
+      "source": "color",
+      "role": "launcher"
+    },
+    {
+      "id": "app_icon_mdpi",
+      "output": "res_overrides/mipmap-mdpi/app_icon.png",
+      "density": "mdpi",
+      "dp": 48,
+      "canvas_px": [
+        48,
+        48
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "app_icon_hdpi",
+      "output": "res_overrides/mipmap-hdpi/app_icon.png",
+      "density": "hdpi",
+      "dp": 48,
+      "canvas_px": [
+        72,
+        72
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "app_icon_xhdpi",
+      "output": "res_overrides/mipmap-xhdpi/app_icon.png",
+      "density": "xhdpi",
+      "dp": 48,
+      "canvas_px": [
+        96,
+        96
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "app_icon_xxhdpi",
+      "output": "res_overrides/mipmap-xxhdpi/app_icon.png",
+      "density": "xxhdpi",
+      "dp": 48,
+      "canvas_px": [
+        144,
+        144
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "app_icon_xxxhdpi",
+      "output": "res_overrides/mipmap-xxxhdpi/app_icon.png",
+      "density": "xxxhdpi",
+      "dp": 48,
+      "canvas_px": [
+        192,
+        192
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "layered_app_icon_mdpi",
+      "output": "res_overrides/mipmap-mdpi/layered_app_icon.png",
+      "density": "mdpi",
+      "dp": 108,
+      "canvas_px": [
+        108,
+        108
+      ],
+      "source": "color",
+      "role": "override",
+      "content_scale": "0.611"
+    },
+    {
+      "id": "layered_app_icon_hdpi",
+      "output": "res_overrides/mipmap-hdpi/layered_app_icon.png",
+      "density": "hdpi",
+      "dp": 108,
+      "canvas_px": [
+        162,
+        162
+      ],
+      "source": "color",
+      "role": "override",
+      "content_scale": "0.611"
+    },
+    {
+      "id": "layered_app_icon_xhdpi",
+      "output": "res_overrides/mipmap-xhdpi/layered_app_icon.png",
+      "density": "xhdpi",
+      "dp": 108,
+      "canvas_px": [
+        216,
+        216
+      ],
+      "source": "color",
+      "role": "override",
+      "content_scale": "0.611"
+    },
+    {
+      "id": "layered_app_icon_xxhdpi",
+      "output": "res_overrides/mipmap-xxhdpi/layered_app_icon.png",
+      "density": "xxhdpi",
+      "dp": 108,
+      "canvas_px": [
+        324,
+        324
+      ],
+      "source": "color",
+      "role": "override",
+      "content_scale": "0.611"
+    },
+    {
+      "id": "layered_app_icon_xxxhdpi",
+      "output": "res_overrides/mipmap-xxxhdpi/layered_app_icon.png",
+      "density": "xxxhdpi",
+      "dp": 108,
+      "canvas_px": [
+        432,
+        432
+      ],
+      "source": "color",
+      "role": "override",
+      "content_scale": "0.611"
+    },
+    {
+      "id": "layered_app_icon_background_mdpi",
+      "output": "res_overrides/mipmap-mdpi/layered_app_icon_background.png",
+      "density": "mdpi",
+      "dp": 108,
+      "canvas_px": [
+        108,
+        108
+      ],
+      "source": "color",
+      "role": "override",
+      "content_scale": "0.611"
+    },
+    {
+      "id": "layered_app_icon_background_hdpi",
+      "output": "res_overrides/mipmap-hdpi/layered_app_icon_background.png",
+      "density": "hdpi",
+      "dp": 108,
+      "canvas_px": [
+        162,
+        162
+      ],
+      "source": "color",
+      "role": "override",
+      "content_scale": "0.611"
+    },
+    {
+      "id": "layered_app_icon_background_xhdpi",
+      "output": "res_overrides/mipmap-xhdpi/layered_app_icon_background.png",
+      "density": "xhdpi",
+      "dp": 108,
+      "canvas_px": [
+        216,
+        216
+      ],
+      "source": "color",
+      "role": "override",
+      "content_scale": "0.611"
+    },
+    {
+      "id": "layered_app_icon_background_xxhdpi",
+      "output": "res_overrides/mipmap-xxhdpi/layered_app_icon_background.png",
+      "density": "xxhdpi",
+      "dp": 108,
+      "canvas_px": [
+        324,
+        324
+      ],
+      "source": "color",
+      "role": "override",
+      "content_scale": "0.611"
+    },
+    {
+      "id": "layered_app_icon_background_xxxhdpi",
+      "output": "res_overrides/mipmap-xxxhdpi/layered_app_icon_background.png",
+      "density": "xxxhdpi",
+      "dp": 108,
+      "canvas_px": [
+        432,
+        432
+      ],
+      "source": "color",
+      "role": "override",
+      "content_scale": "0.611"
+    },
+    {
+      "id": "taffygo_themed_glyph_mdpi",
+      "output": "res_overrides/mipmap-mdpi/taffygo_themed_glyph.png",
+      "density": "mdpi",
+      "dp": 108,
+      "canvas_px": [
+        108,
+        108
+      ],
+      "source": "monochrome",
+      "role": "override",
+      "content_scale": "0.611",
+      "monochrome_alpha": true
+    },
+    {
+      "id": "taffygo_themed_glyph_hdpi",
+      "output": "res_overrides/mipmap-hdpi/taffygo_themed_glyph.png",
+      "density": "hdpi",
+      "dp": 108,
+      "canvas_px": [
+        162,
+        162
+      ],
+      "source": "monochrome",
+      "role": "override",
+      "content_scale": "0.611",
+      "monochrome_alpha": true
+    },
+    {
+      "id": "taffygo_themed_glyph_xhdpi",
+      "output": "res_overrides/mipmap-xhdpi/taffygo_themed_glyph.png",
+      "density": "xhdpi",
+      "dp": 108,
+      "canvas_px": [
+        216,
+        216
+      ],
+      "source": "monochrome",
+      "role": "override",
+      "content_scale": "0.611",
+      "monochrome_alpha": true
+    },
+    {
+      "id": "taffygo_themed_glyph_xxhdpi",
+      "output": "res_overrides/mipmap-xxhdpi/taffygo_themed_glyph.png",
+      "density": "xxhdpi",
+      "dp": 108,
+      "canvas_px": [
+        324,
+        324
+      ],
+      "source": "monochrome",
+      "role": "override",
+      "content_scale": "0.611",
+      "monochrome_alpha": true
+    },
+    {
+      "id": "taffygo_themed_glyph_xxxhdpi",
+      "output": "res_overrides/mipmap-xxxhdpi/taffygo_themed_glyph.png",
+      "density": "xxxhdpi",
+      "dp": 108,
+      "canvas_px": [
+        432,
+        432
+      ],
+      "source": "monochrome",
+      "role": "override",
+      "content_scale": "0.611",
+      "monochrome_alpha": true
+    },
+    {
+      "id": "taffygo_notification_glyph_mdpi",
+      "output": "res_overrides/drawable-mdpi/taffygo_notification_glyph.png",
+      "density": "mdpi",
+      "dp": 24,
+      "canvas_px": [
+        24,
+        24
+      ],
+      "source": "monochrome",
+      "role": "override",
+      "monochrome_alpha": true
+    },
+    {
+      "id": "taffygo_notification_glyph_hdpi",
+      "output": "res_overrides/drawable-hdpi/taffygo_notification_glyph.png",
+      "density": "hdpi",
+      "dp": 24,
+      "canvas_px": [
+        36,
+        36
+      ],
+      "source": "monochrome",
+      "role": "override",
+      "monochrome_alpha": true
+    },
+    {
+      "id": "taffygo_notification_glyph_xhdpi",
+      "output": "res_overrides/drawable-xhdpi/taffygo_notification_glyph.png",
+      "density": "xhdpi",
+      "dp": 24,
+      "canvas_px": [
+        48,
+        48
+      ],
+      "source": "monochrome",
+      "role": "override",
+      "monochrome_alpha": true
+    },
+    {
+      "id": "taffygo_notification_glyph_xxhdpi",
+      "output": "res_overrides/drawable-xxhdpi/taffygo_notification_glyph.png",
+      "density": "xxhdpi",
+      "dp": 24,
+      "canvas_px": [
+        72,
+        72
+      ],
+      "source": "monochrome",
+      "role": "override",
+      "monochrome_alpha": true
+    },
+    {
+      "id": "taffygo_notification_glyph_xxxhdpi",
+      "output": "res_overrides/drawable-xxxhdpi/taffygo_notification_glyph.png",
+      "density": "xxxhdpi",
+      "dp": 24,
+      "canvas_px": [
+        96,
+        96
+      ],
+      "source": "monochrome",
+      "role": "override",
+      "monochrome_alpha": true
+    },
+    {
+      "id": "fre_product_logo_mdpi",
+      "output": "res_overrides/drawable-mdpi/fre_product_logo.png",
+      "density": "mdpi",
+      "dp": 130,
+      "canvas_px": [
+        130,
+        130
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "fre_product_logo_hdpi",
+      "output": "res_overrides/drawable-hdpi/fre_product_logo.png",
+      "density": "hdpi",
+      "dp": 130,
+      "canvas_px": [
+        195,
+        195
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "fre_product_logo_xhdpi",
+      "output": "res_overrides/drawable-xhdpi/fre_product_logo.png",
+      "density": "xhdpi",
+      "dp": 130,
+      "canvas_px": [
+        260,
+        260
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "fre_product_logo_xxhdpi",
+      "output": "res_overrides/drawable-xxhdpi/fre_product_logo.png",
+      "density": "xxhdpi",
+      "dp": 130,
+      "canvas_px": [
+        390,
+        390
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "fre_product_logo_xxxhdpi",
+      "output": "res_overrides/drawable-xxxhdpi/fre_product_logo.png",
+      "density": "xxxhdpi",
+      "dp": 130,
+      "canvas_px": [
+        520,
+        520
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "product_logo_name_mdpi",
+      "output": "res_overrides/drawable-mdpi/product_logo_name.png",
+      "density": "mdpi",
+      "dp": 103,
+      "canvas_px": [
+        103,
+        21
+      ],
+      "source": "lockup",
+      "role": "override"
+    },
+    {
+      "id": "product_logo_name_hdpi",
+      "output": "res_overrides/drawable-hdpi/product_logo_name.png",
+      "density": "hdpi",
+      "dp": 103,
+      "canvas_px": [
+        154,
+        31
+      ],
+      "source": "lockup",
+      "role": "override"
+    },
+    {
+      "id": "product_logo_name_xhdpi",
+      "output": "res_overrides/drawable-xhdpi/product_logo_name.png",
+      "density": "xhdpi",
+      "dp": 103,
+      "canvas_px": [
+        206,
+        42
+      ],
+      "source": "lockup",
+      "role": "override"
+    },
+    {
+      "id": "product_logo_name_xxhdpi",
+      "output": "res_overrides/drawable-xxhdpi/product_logo_name.png",
+      "density": "xxhdpi",
+      "dp": 103,
+      "canvas_px": [
+        309,
+        63
+      ],
+      "source": "lockup",
+      "role": "override"
+    },
+    {
+      "id": "product_logo_name_xxxhdpi",
+      "output": "res_overrides/drawable-xxxhdpi/product_logo_name.png",
+      "density": "xxxhdpi",
+      "dp": 103,
+      "canvas_px": [
+        412,
+        84
+      ],
+      "source": "lockup",
+      "role": "override"
+    },
+    {
+      "id": "chrome_logo_blue_mdpi",
+      "output": "res_overrides/drawable-mdpi/chrome_logo_blue.png",
+      "density": "mdpi",
+      "dp": 24,
+      "canvas_px": [
+        24,
+        24
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "chrome_logo_blue_hdpi",
+      "output": "res_overrides/drawable-hdpi/chrome_logo_blue.png",
+      "density": "hdpi",
+      "dp": 24,
+      "canvas_px": [
+        36,
+        36
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "chrome_logo_blue_xhdpi",
+      "output": "res_overrides/drawable-xhdpi/chrome_logo_blue.png",
+      "density": "xhdpi",
+      "dp": 24,
+      "canvas_px": [
+        48,
+        48
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "chrome_logo_blue_xxhdpi",
+      "output": "res_overrides/drawable-xxhdpi/chrome_logo_blue.png",
+      "density": "xxhdpi",
+      "dp": 24,
+      "canvas_px": [
+        72,
+        72
+      ],
+      "source": "color",
+      "role": "override"
+    },
+    {
+      "id": "chrome_logo_blue_xxxhdpi",
+      "output": "res_overrides/drawable-xxxhdpi/chrome_logo_blue.png",
+      "density": "xxxhdpi",
+      "dp": 24,
+      "canvas_px": [
+        96,
+        96
+      ],
+      "source": "color",
+      "role": "override"
+    }
+  ]
+}
