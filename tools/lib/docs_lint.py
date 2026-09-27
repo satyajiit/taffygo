@@ -29,6 +29,7 @@ import fnmatch
 import os
 import re
 import sys
+import exemption_table
 
 # --- what gets scanned ------------------------------------------------------
 
@@ -141,19 +142,17 @@ class Findings:
 
 def load_allowlist(root: str) -> list[tuple[str, re.Pattern[str], str]]:
     path = os.path.join(root, "tools", "check.d", "allow-terms.tsv")
+    rows = exemption_table.read_table(path, columns=2, table_name="allow-terms")
     rules: list[tuple[str, re.Pattern[str], str]] = []
-    if not os.path.exists(path):
-        return rules
-    with open(path, encoding="utf-8") as handle:
-        for raw in handle:
-            if not raw.strip() or raw.lstrip().startswith("#"):
-                continue
-            parts = raw.rstrip("\n").split("\t")
-            if len(parts) < 3:
-                continue
-            rules.append((parts[0], re.compile(parts[1], re.IGNORECASE), parts[2]))
+    for row in rows:
+        try:
+            pattern = re.compile(row.fields[1], re.IGNORECASE)
+        except re.error as exc:
+            raise exemption_table.TableError(
+                f"{row.where}: invalid regex in allow-terms: {exc}"
+            ) from exc
+        rules.append((row.fields[0], pattern, row.reason))
     return rules
-
 
 def allowed(rules, rel_path: str, line: str) -> bool:
     for glob, pattern, _reason in rules:
@@ -224,8 +223,13 @@ def main() -> int:
     root = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
     root = os.path.abspath(root)
     findings = Findings()
-    allowlist = load_allowlist(root)
+    try:
+        allowlist = load_allowlist(root)
+    except exemption_table.TableError as exc:
+        print(exc)
+        return 1
     files = markdown_files(root)
+
 
     def rel(path: str) -> str:
         return os.path.relpath(path, root).replace(os.sep, "/")
