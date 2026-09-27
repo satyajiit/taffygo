@@ -9,6 +9,7 @@ import { PhoneFrame } from "@/components/PhoneFrame";
 import { StoreLinks } from "@/components/StoreLinks";
 import { siteHref } from "@/lib/base-path";
 import { product } from "@/lib/content/product";
+import { PageSchema } from "@/components/studio/PageSchema";
 import { pageMetadata } from "@/lib/site";
 
 export const metadata = pageMetadata("/product/");
@@ -17,6 +18,7 @@ export const metadata = pageMetadata("/product/");
 export default function ProductPage() {
   return (
     <>
+      <PageSchema route="/product/" />
       <PageHead
         id="product-title"
         title={product.title}

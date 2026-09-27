@@ -236,22 +236,23 @@ describe("app theme parity", () => {
     expect(layout).toContain('from "next/font/local"');
     expect(layout).toContain('src: "../public/fonts/space-grotesk-latin-variable.woff2"');
     expect(layout).toContain('variable: "--font-grotesk"');
-    expect(layout).toContain("className={grotesk.variable}");
+    expect(layout).toContain("${grotesk.variable} ${instrument.variable}");
+    expect(layout).toContain('src: "../public/fonts/instrument-serif-latin.woff2"');
     expect(css).toContain("--font-sans: var(--font-grotesk)");
     expect(css).not.toContain("@font-face");
     expect(css).not.toMatch(/url\(/);
     for (const file of [...sourceFiles("app"), ...sourceFiles("components")]) {
       expect(readFileSync(file, "utf8"), file).not.toMatch(
-        /(src|srcSet|href)=["'{`]?https?:\/\//,
+        /(src|srcSet)=["'{`]?https?:\/\//,
       );
     }
   });
 
-  it("keeps client JavaScript to the one local preference control", () => {
+  it("keeps client JavaScript limited to interactive surfaces", () => {
     const clients = [...sourceFiles("app"), ...sourceFiles("components")]
       .filter((file) => readFileSync(file, "utf8").includes('"use client"'))
       .map((file) => file.split("/").pop())
       .sort();
-    expect(clients).toEqual(["ThemeSwitch.tsx"]);
+    expect(clients).toEqual(["BrowserWorkbench.tsx", "EnginePresentation.tsx", "Header.tsx", "LocalToolsPreview.tsx", "MotionControl.tsx", "NewTabPreview.tsx", "PageAssistantPreview.tsx", "ProviderDirectory.tsx", "ServiceWorkerRegistration.tsx", "ThemeSwitch.tsx", "WorkflowDemo.tsx"]);
   });
 });

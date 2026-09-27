@@ -4,130 +4,55 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-import type { Metadata } from "next";
+import { ArrowRight, PanelsTopLeft, Moon, Archive, KeyRound, Search, Download } from "lucide-react";
 import { HeroSection } from "@/components/home/HeroSection";
-import { Painting } from "@/components/PageHead";
+import { CommunitySection } from "@/components/home/CommunitySection";
 import { Questions } from "@/components/home/Questions";
-import { ScreenStop } from "@/components/ScreenStop";
 import { StoreLinks } from "@/components/StoreLinks";
-import { getTaffy } from "@/lib/content";
-import { siteHref } from "@/lib/base-path";
-import {
-  download,
-  facts,
-  faqTitle,
-  meetTaffy,
-  stickyGet,
-  tour,
-  type Fact,
-} from "@/lib/content/home";
+import { ProviderRibbon } from "@/components/studio/ProviderRibbon";
+import { WorkflowDemo } from "@/components/studio/WorkflowDemo";
+import { BrowserWorkbench } from "@/components/studio/BrowserWorkbench";
+import { PageAssistantPreview } from "@/components/studio/PageAssistantPreview";
+import { LocalToolsPreview } from "@/components/studio/LocalToolsPreview";
+import { ConnectionPreview } from "@/components/studio/ConnectionPreview";
+import { EnginePresentation } from "@/components/studio/EnginePresentation";
+import { withBasePath } from "@/lib/base-path";
+import { faq, download } from "@/lib/content/home";
 import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = pageMetadata("/");
+export const metadata = pageMetadata("/");
+const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map(item => ({ "@type": "Question", name: item.question, acceptedAnswer: { "@type": "Answer", text: item.answer } })) };
 
-/**
- * The home route: the promise with real screens beside it, a tour of what
- * the app does on annotated captures, Taffy in one painting, the facts in a
- * table, the questions people ask, and the two ways to install.
- */
 export default function Home() {
-  return (
-    <>
-      <HeroSection />
-
-      <section id="tour" aria-labelledby="tour-title" className="tour scroll-mt-6">
-        <div className="container-site pt-[var(--space-3xl)]">
-          <div className="max-w-[42rem]">
-            <h2 id="tour-title" className="type-h2">
-              {tour.title}
-            </h2>
-            <p className="type-lead mt-4 text-secondary">{tour.lede}</p>
-          </div>
-
-          {tour.stops.map((stop) => (
-            <ScreenStop key={stop.id} {...stop} />
-          ))}
-
-          <div className="sticky-get">
-            <span className="hidden font-bold sm:inline">{stickyGet.label}</span>
-            <a href={getTaffy.playHref}>{stickyGet.play}</a>
-            <a href={getTaffy.apkHref}>{stickyGet.apk}</a>
-          </div>
-        </div>
-      </section>
-
-      <section
-        aria-labelledby="meet-taffy-title"
-        className="container-site band py-[var(--space-4xl)]"
-      >
-        <Painting
-          name="website-hero"
-          alt={meetTaffy.imageAlt}
-          sizes="(min-width: 60rem) 60vw, 100vw"
-        />
-        <div className="min-w-0">
-          <h2 id="meet-taffy-title" className="type-h2">
-            {meetTaffy.title}
-          </h2>
-          <p className="mt-4 text-secondary">{meetTaffy.body}</p>
-        </div>
-      </section>
-
-      <section
-        id="facts"
-        aria-labelledby="facts-title"
-        className="container-site grid gap-8 pb-[var(--space-3xl)] lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]"
-      >
-        <h2 id="facts-title" className="type-h2">
-          {facts.title}
-        </h2>
-        <dl className="spec">
-          {(facts.rows as ReadonlyArray<Fact>).map((row) => (
-            <div key={row.label}>
-              <dt>{row.label}</dt>
-              <dd>
-                {row.value}
-                {row.link ? (
-                  <>
-                    <br />
-                    <a
-                      href={siteHref(row.link.href)}
-                      className="font-bold underline decoration-1 underline-offset-4 hover:decoration-2"
-                    >
-                      {row.link.label}
-                    </a>
-                  </>
-                ) : null}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-
-      <section
-        id="questions"
-        aria-labelledby="questions-title"
-        className="container-site grid gap-8 pb-[var(--space-3xl)] lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]"
-      >
-        <h2 id="questions-title" className="type-h2">
-          {faqTitle}
-        </h2>
-        <Questions labelledBy="questions-title" />
-      </section>
-
-      <section id="get" aria-labelledby="get-title" className="tour scroll-mt-6">
-        <div className="container-site py-[var(--space-3xl)]">
-          <h2 id="get-title" className="type-display max-w-[12ch]">
-            {download.title}
-          </h2>
-          <p className="type-lead mt-6 max-w-[36rem] text-secondary">{download.body}</p>
-          <StoreLinks className="mt-8" withSource />
-          <p className="mt-8 max-w-[36rem] text-secondary">{download.note}</p>
-          <a href={download.bugHref} className="link-arrow mt-2">
-            {download.bugLabel}
-          </a>
-        </div>
-      </section>
-    </>
-  );
+  return <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema).replace(/</g, "\\u003c") }} />
+    <HeroSection />
+    <ProviderRibbon />
+    <section className="container-site story-section" id="tour" aria-labelledby="story-title">
+      <div className="section-intro"><h2 id="story-title">Watch Taffy<br /><span>work through a task.</span></h2><p>Try a document download or a banking form. Follow each step, complete the handover, and review the result.</p></div>
+      <WorkflowDemo />
+      <a className="text-link section-end-link" href={withBasePath("/use-cases/")}>Explore the use cases <ArrowRight size={18} /></a>
+    </section>
+    <BrowserWorkbench />
+    <PageAssistantPreview />
+    <section className="container-site feature-section" aria-labelledby="features-title">
+      <h2 id="features-title" data-reveal>The browser features<br />you use every day.</h2>
+      <div className="feature-list">
+        {[
+          { icon: PanelsTopLeft, title: "Separate task tabs", body: "Keep browsing in your own tabs while Taffy’s pages stay grouped in the tab switcher." },
+          { icon: KeyRound, title: "Your provider connection", body: "Use your own API key or an eligible provider plan. Requests go directly from your phone to that provider." },
+          { icon: Archive, title: "Encrypted backup files", body: "Create a backup file and keep it where you choose. Restore it from the app’s backup controls." },
+          { icon: Moon, title: "Light and dark themes", body: "Follow Android’s appearance or choose a theme for TaffyGo in Settings." },
+          { icon: Search, title: "Search, Ask, or Task", body: "Type in one address bar, then choose whether to search the web, ask a question, or start a task." },
+          { icon: Download, title: "Downloads on your phone", body: "Save files from the web and find them in your downloads. No TaffyGo cloud account is required." },
+        ].map(({ icon: Icon, title, body }) => <article key={title} data-reveal><Icon size={24} /><h3>{title}</h3><p>{body}</p></article>)}
+      </div>
+    </section>
+    <LocalToolsPreview />
+    <ConnectionPreview />
+    <EnginePresentation />
+    <CommunitySection />
+    <section className="container-site studio-questions" aria-labelledby="questions-title"><h2 id="questions-title">Questions about TaffyGo</h2><Questions labelledBy="questions-title" /></section>
+    <section id="get" className="download-section" aria-labelledby="get-title"><div className="container-site"><div className="download-top"><h2 id="get-title">Get TaffyGo<br /><span>for Android.</span></h2><div><p>Browse with Taffy.<br />Free and open source.</p><StoreLinks className="mt-6" withSource /><p className="download-note">Android 10 or later · 64-bit ARM</p></div></div><p className="download-note">{download.note}</p></div></section>
+  </>;
 }

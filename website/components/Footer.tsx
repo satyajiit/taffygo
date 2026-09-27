@@ -4,50 +4,23 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
+import { ArrowUpRight, Star } from "lucide-react";
 import { siteHref, withBasePath } from "@/lib/base-path";
-import { footer, header } from "@/lib/content";
+import { footer } from "@/lib/content";
+import { links } from "@/lib/site";
 
-/**
- * Mast-headed footer on the app's dark surface in both themes: the lockup
- * and the line it stands for, one inline row with every page on the site,
- * then the small print. The legal and deletion pages live here rather than
- * in the header.
- */
+/** Product and publisher links share one compact footer. */
 export function Footer() {
   return (
-    <footer className="footer-dark" data-taffy-theme="dark">
-      <div className="container-site pt-[var(--space-3xl)] pb-[var(--space-xl)]">
-        <img
-          src={withBasePath("/brand/taffygo-lockup-color-on-dark-132.webp")}
-          srcSet={`${withBasePath("/brand/taffygo-lockup-color-on-dark-132@2x.webp")} 2x`}
-          width={132}
-          height={66}
-          alt={header.lockupAlt}
-          decoding="async"
-          loading="lazy"
-        />
-        <p className="type-h2 mt-6 max-w-[18ch]">{footer.tagline}</p>
-
-        <nav aria-label={footer.navLabel} className="mt-[var(--space-2xl)] border-t border-outline pt-6">
-          <ul className="flex flex-wrap gap-x-6 gap-y-1">
-            {footer.links.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={siteHref(link.href)}
-                  className="flex min-h-11 items-center whitespace-nowrap underline-offset-4 hover:underline"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="type-small mt-6 grid gap-1 text-secondary">
-          <p>{footer.publisher}</p>
-          <p>{footer.chromium}</p>
-          <p>{footer.licence}</p>
-          <p>{footer.noTrackers}</p>
+    <footer className="footer-dark studio-footer" data-taffy-theme="dark">
+      <div className="container-site">
+        <div className="footer-statement"><p>TaffyGo for Android</p><a href={links.repository} className="btn btn-outline"><Star size={18} /> Star on GitHub <ArrowUpRight size={18} /></a></div>
+        <nav aria-label={footer.navLabel} className="footer-nav">{footer.links.map(link => <a key={link.href} href={siteHref(link.href)}>{link.label}</a>)}</nav>
+        <div className="footer-community"><a href={links.featureRequest}>Request a feature <ArrowUpRight size={14} /></a><a href={links.bugReport}>Report a bug <ArrowUpRight size={14} /></a></div>
+        <div className="machine-links"><a href={withBasePath("/llms.txt")}>For AI readers</a><a href={withBasePath("/index.md")}>Markdown</a><a href={withBasePath("/ai-policy.txt")}>AI training permission</a></div>
+        <div className="footer-colophon">
+          <a href="https://matterwardlabs.com" className="publisher-link"><span>Built by</span><img src={withBasePath("/brand/matterward-labs.svg")} width={240} height={60} alt="Matterward Labs" loading="lazy" /></a>
+          <div><p>{footer.publisher}</p><p>{footer.chromium}</p><p>{footer.licence}</p><p>{footer.noTrackers} Brand icons from <a href="https://svgl.app">SVGL</a>.</p></div>
         </div>
       </div>
     </footer>

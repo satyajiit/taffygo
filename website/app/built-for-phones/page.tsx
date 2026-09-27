@@ -8,6 +8,7 @@ import { PageHead } from "@/components/PageHead";
 import { ScreenStop } from "@/components/ScreenStop";
 import { StoreLinks } from "@/components/StoreLinks";
 import { phoneSections, phonesHero, phonesRequirements } from "@/lib/content/phones";
+import { PageSchema } from "@/components/studio/PageSchema";
 import { pageMetadata } from "@/lib/site";
 
 export const metadata = pageMetadata("/built-for-phones/");
@@ -16,6 +17,7 @@ export const metadata = pageMetadata("/built-for-phones/");
 export default function BuiltForPhonesPage() {
   return (
     <>
+      <PageSchema route="/built-for-phones/" />
       <PageHead id="phones-title" title={phonesHero.title} lede={phonesHero.lede} />
 
       <div className="tour">

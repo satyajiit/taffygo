@@ -63,7 +63,7 @@ export function PageHead({
   return (
     <section
       aria-labelledby={id}
-      className="container-site grid items-center gap-[var(--space-xl)] pt-[var(--space-xl)] pb-[var(--space-3xl)] lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-[var(--space-3xl)]"
+      className="companion-head container-site grid items-center gap-[var(--space-xl)] pt-[var(--space-xl)] pb-[var(--space-3xl)] lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-[var(--space-3xl)]"
     >
       <div className="min-w-0">
         <h1 id={id} className="type-display max-w-[14ch]">
@@ -71,14 +71,7 @@ export function PageHead({
         </h1>
         <p className="type-lead mt-6 max-w-[36rem] text-secondary">{lede}</p>
       </div>
-      {art ? (
-        <Painting
-          name={art.name}
-          alt={art.alt}
-          sizes="(min-width: 60rem) 40vw, 100vw"
-          priority
-        />
-      ) : null}
+      {art ? <div className="companion-cutout"><img src={withBasePath("/cutouts/taffy.webp")} srcSet={`${withBasePath("/cutouts/taffy-360.webp")} 360w, ${withBasePath("/cutouts/taffy-480.webp")} 480w, ${withBasePath("/cutouts/taffy.webp")} 640w`} sizes="(min-width: 960px) 256px, 192px" fetchPriority="high" width={640} height={960} alt="Taffy, the browser’s assistant" /></div> : null}
     </section>
   );
 }

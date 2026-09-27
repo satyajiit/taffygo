@@ -60,7 +60,7 @@ export const product = {
   ],
   providersLink: {
     label: "Connecting your AI provider",
-    href: "/#providers",
+    href: "/providers/",
   },
   closing: {
     title: "Try it on your phone",

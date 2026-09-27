@@ -12,14 +12,14 @@ import { product } from "@/lib/content/product";
 import { screens } from "@/lib/content/screens";
 
 describe("/product/", () => {
-  it("has one h1 and the painting beside it", () => {
+  it("has one h1 and the transparent Taffy asset beside it", () => {
     render(<ProductPage />);
     const h1 = screen.getAllByRole("heading", { level: 1 });
     expect(h1).toHaveLength(1);
     expect(h1[0]).toHaveTextContent(product.title);
-    expect(screen.getByAltText(product.imageAlt)).toHaveAttribute(
+    expect(screen.getByAltText("Taffy, the browser’s assistant")).toHaveAttribute(
       "src",
-      "/art/section-asks-first-720.webp",
+      "/cutouts/taffy.webp",
     );
   });
 
@@ -36,11 +36,11 @@ describe("/product/", () => {
     }
   });
 
-  it("links to the providers stop on the home page and ends with a way to install", () => {
+  it("links to the provider directory and ends with a way to install", () => {
     render(<ProductPage />);
     expect(screen.getByRole("link", { name: product.providersLink.label })).toHaveAttribute(
       "href",
-      "/#providers",
+      "/providers/",
     );
     expect(screen.getByRole("link", { name: getTaffy.apkLabel })).toHaveAttribute(
       "href",

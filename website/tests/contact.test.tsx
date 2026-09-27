@@ -11,12 +11,12 @@ import { contact } from "@/lib/content/contact";
 import { links } from "@/lib/site";
 
 describe("/contact/", () => {
-  it("has one h1 and says there is no inbox and no form", () => {
+  it("has one h1 and directs visitors to GitHub", () => {
     const { container } = render(<ContactPage />);
     const h1 = screen.getAllByRole("heading", { level: 1 });
     expect(h1).toHaveLength(1);
     expect(h1[0]).toHaveTextContent(contact.title);
-    expect(contact.standfirst).toMatch(/no support inbox and no contact form/);
+    expect(contact.standfirst).toMatch(/Reach the maintainers on GitHub/);
     expect(container.querySelector("form, input, textarea")).toBeNull();
     expect(container.querySelector('a[href^="mailto:"]')).toBeNull();
   });

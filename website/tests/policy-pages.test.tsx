@@ -82,13 +82,6 @@ describe("/privacy/", () => {
     expect(website).toContain(links.githubPrivacy);
   });
 
-  it("shows the painting with its description", () => {
-    render(<PrivacyPage />);
-    expect(screen.getByAltText(privacyPolicy.imageAlt)).toHaveAttribute(
-      "src",
-      "/art/section-on-your-phone-720.webp",
-    );
-  });
 
   it("links to the deletion page on this site", () => {
     render(<PrivacyPage />);
@@ -100,8 +93,9 @@ describe("/privacy/", () => {
 });
 
 describe("/delete-my-data/", () => {
-  it("answers first that there is nothing on our side to delete", () => {
-    expect(deleteMyData.standfirst).toMatch(/^There is nothing on our side to delete\./);
+  it("starts with where to delete data and explains that no server copy exists", () => {
+    expect(deleteMyData.standfirst).toMatch(/^Clear your data in TaffyGo/);
+    expect(deleteMyData.standfirst).toMatch(/holds no copy of your app data/);
   });
 
   it("gives the in-app steps in order, then the Android route", () => {

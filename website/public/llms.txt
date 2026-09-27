@@ -1,26 +1,36 @@
 # TaffyGo
 
-> TaffyGo is a free, open-source Chromium browser for Android that blocks ads and trackers. Its built-in assistant, Taffy, works with the AI provider you connect. There is no account, and Matterward Labs runs no server for it.
+> Free, open-source AI-native Chromium browser for Android, with one assistant, Taffy. No account needed. Matterward Labs runs no server for the app.
+
+Published by Matterward Labs Private Limited.
 
 ## Pages
 
-- [TaffyGo, the browser that does the busywork with you](https://taffygo.com/): What the app does, on screens captured from a phone, and how to install it.
-- [Hand Taffy an errand | TaffyGo](https://taffygo.com/product/): One errand from the request to the result, in three screens.
-- [Built for phones | TaffyGo](https://taffygo.com/built-for-phones/): The bottom row, Taffy's tabs kept apart from yours, and the light and dark themes.
-- [Contact | TaffyGo](https://taffygo.com/contact/): Issues, discussions and private security reports, all on GitHub.
-- [Privacy policy | TaffyGo](https://taffygo.com/privacy/): What stays on the phone, what goes to websites and to your AI provider, and what reaches us: nothing.
-- [Delete your data | TaffyGo](https://taffygo.com/delete-my-data/): There is nothing on our side to delete. How to clear what TaffyGo keeps on the phone.
-- [Terms of use | TaffyGo](https://taffygo.com/terms/): The Mozilla Public License 2.0, no warranty, and the services you connect yourself.
-- [Open-source licences | TaffyGo](https://taffygo.com/licenses/): Where the notices for the app and for this website are.
+- [TaffyGo | Open-source AI-native browser for Android](https://taffygo.com/) — [Markdown](https://taffygo.com/index.md)
+- [Hand Taffy an errand | TaffyGo](https://taffygo.com/product/) — [Markdown](https://taffygo.com/product.md)
+- [Built for phones | TaffyGo](https://taffygo.com/built-for-phones/) — [Markdown](https://taffygo.com/built-for-phones.md)
+- [AI-native browser use cases: documents, forms and research | TaffyGo](https://taffygo.com/use-cases/) — [Markdown](https://taffygo.com/use-cases.md)
+- [AI providers and models for Android browsing | TaffyGo](https://taffygo.com/providers/) — [Markdown](https://taffygo.com/providers.md)
+- [Chromium, Rust and on-device Python | TaffyGo](https://taffygo.com/technology/) — [Markdown](https://taffygo.com/technology.md)
+- [Contact | TaffyGo](https://taffygo.com/contact/) — [Markdown](https://taffygo.com/contact.md)
+- [Privacy policy | TaffyGo](https://taffygo.com/privacy/) — [Markdown](https://taffygo.com/privacy.md)
+- [Delete your data | TaffyGo](https://taffygo.com/delete-my-data/) — [Markdown](https://taffygo.com/delete-my-data.md)
+- [Terms of use | TaffyGo](https://taffygo.com/terms/) — [Markdown](https://taffygo.com/terms.md)
+- [Open-source licences | TaffyGo](https://taffygo.com/licenses/) — [Markdown](https://taffygo.com/licenses.md)
 
-## Get it
+## Machine-readable resources
 
-- Google Play: https://play.google.com/store/apps/details?id=com.taffygo.browser
-- APK: https://github.com/satyajiit/taffygo/releases/latest
-- Source: https://github.com/satyajiit/taffygo
+- [Public content and AI training permission](https://taffygo.com/ai-policy.txt)
+- [Machine-readable policy](https://taffygo.com/.well-known/ai-policy.json)
+- [Full provider and model catalog](https://taffygo.com/providers.json)
+- [Site summary](https://taffygo.com/llms-full.txt)
 
-## Contact
+All canonical pages have a Markdown version. The HTML is statically generated and readable without JavaScript. Public first-party site content may be crawled, indexed, used for retrieval, and used for AI training. Third-party material retains its own terms.
 
-Publisher: Matterward Labs Private Limited
+## Get TaffyGo
 
-Bugs and questions: https://github.com/satyajiit/taffygo/issues and https://github.com/satyajiit/taffygo/discussions
+- [Google Play](https://play.google.com/store/apps/details?id=com.taffygo.browser)
+- [APK releases](https://github.com/satyajiit/taffygo/releases/latest)
+- [Source](https://github.com/satyajiit/taffygo)
+- [Report a bug](https://github.com/satyajiit/taffygo/issues)
+- [Discussions](https://github.com/satyajiit/taffygo/discussions)

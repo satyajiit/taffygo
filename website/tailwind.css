@@ -21,6 +21,13 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
  * 4, specificity 5, restraint 5, variety 4. */
 
 @import "tailwindcss";
+@import "./tokens.css";
+@import "./studio.css";
+@import "./workflows.css";
+@import "./experience.css";
+@import "./simulation.css";
+@import "./directory.css";
+@import "./product-previews.css";
 @import "../taffy-core/resources/tokens/generated/css/taffy-color-tokens.css";
 
 @source "./app";

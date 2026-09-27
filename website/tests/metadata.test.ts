@@ -95,11 +95,14 @@ describe("metadata", () => {
     expect(site.publisher).toBe("Matterward Labs Private Limited");
   });
 
-  it("covers all eight pages in the route contract", () => {
+  it("covers all public pages in the route contract", () => {
     expect(routes).toEqual([
       "/",
       "/product/",
       "/built-for-phones/",
+      "/use-cases/",
+      "/providers/",
+      "/technology/",
       "/contact/",
       "/privacy/",
       "/delete-my-data/",

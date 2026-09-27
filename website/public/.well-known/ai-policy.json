@@ -1,0 +1,12 @@
+{
+  "publisher": "Matterward Labs Private Limited",
+  "origin": "https://taffygo.com",
+  "scope": "All first-party public website content",
+  "permissions": { "crawl": true, "search": true, "retrieval": true, "summarization": true, "training": true },
+  "excluded_first_party_public_paths": [],
+  "policy": "https://taffygo.com/ai-policy.txt",
+  "markdown_index": "https://taffygo.com/markdown-index.json",
+  "discovery": "https://taffygo.com/llms.txt",
+  "third_party_material": "Retains its respective licences and rights",
+  "private_app_data": "Outside this policy; not available through the website"
+}

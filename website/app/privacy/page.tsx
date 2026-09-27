@@ -14,7 +14,6 @@ export default function PrivacyPage() {
   return (
     <PolicyPage
       document={privacyPolicy}
-      art={{ name: "section-on-your-phone", alt: privacyPolicy.imageAlt }}
     />
   );
 }

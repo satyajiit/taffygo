@@ -1,6 +1,6 @@
 # TaffyGo website
 
-The site at `https://taffygo.com`: eight pages about TaffyGo 1.0, exported
+The site at `https://taffygo.com`: eleven pages about TaffyGo 1.0, exported
 as plain static files and served by GitHub Pages. There is no server behind
 it, it sets no cookies, and it makes no request to any other host.
 
@@ -11,6 +11,9 @@ it, it sets no cookies, and it makes no request to any other host.
 | `/` | What the app does, on screens captured from a phone, and how to install it |
 | `/product/` | One errand from the request to the result, in three screens |
 | `/built-for-phones/` | The bottom row, Taffy's tabs kept apart from yours, light and dark |
+| `/use-cases/` | Timed document and banking demos, with local image resizing and explicit handovers |
+| `/providers/` | All catalog providers and models, searchable by name and capability |
+| `/technology/` | Chromium, native Android, the Rust service, and embedded Python |
 | `/contact/` | Issues, discussions and private security reports, all on GitHub |
 | `/privacy/` | What stays on the phone, what goes to websites and the AI provider you connect, and what reaches us: nothing |
 | `/delete-my-data/` | There is nothing on our side to delete, and how to clear the phone |
@@ -21,10 +24,11 @@ it, it sets no cookies, and it makes no request to any other host.
 browser on to `/privacy/` and asks search engines not to index it, because
 GitHub Pages has no server redirects.
 
-Every word on the site lives in [`lib/content.ts`](lib/content.ts) (header,
-footer, install links) and one module per route under
-[`lib/content/`](lib/content). The tests read those modules as a whole, so a
-banned word, a stale claim or a link to nowhere fails before it is built.
+Shared navigation and installation copy lives in `lib/content.ts`. Product copy
+lives in `lib/content/` and the route components. `lib/simulation.ts` owns the timed demo state machine; verification and approval are gates. `lib/prepare-demo-photo.ts` resizes the sample image locally, with no external requests.
+The provider directory is generated from the browser catalog; regenerate it with
+`python3 website/scripts/build_provider_directory.py`. The matching `--check`
+refuses drift.
 
 ## Working on it
 
@@ -108,30 +112,33 @@ Taffy character, which the source licence does not cover; see
 
 ## Design
 
-- **Colour** comes from the app. `tailwind.css` imports the CSS generated
-  from `taffy-core/resources/tokens/tokens.json` and maps those tokens to the
-  site's own names, so the site carries no palette of its own. A test fails if
-  a colour value from the app's token file is copied into the stylesheet, and
-  checks the contrast of every text pair the site uses.
-- **Theme** follows the phone or computer until you choose one with the sun
-  and moon buttons in the header, which store the choice in this browser. An
-  inline script sets it before the first paint.
-- **Type** is Space Grotesk, served from this site by `next/font/local` from
-  [`public/fonts/`](public/fonts), with its licence beside it. Headings are
-  upright, in two weights.
-- **Script.** The theme buttons are the only client component. The questions
-  use native disclosure elements, so every page reads the same with
-  JavaScript off.
-- **Motion** is limited to colour changes and a one-pixel press, and is
-  switched off under `prefers-reduced-motion`.
-- **Layout.** No page scrolls sideways at any width from 320 pixels up, and
-  no button or menu link wraps onto a second line.
+`design.md` defines the Hallmark system: floating sticky navigation, an interactive recreation of the app’s idle new-tab UI, transparent Taffy artwork, software layers, and a compact Matterward Labs footer. App light and dark colors remain the base. Space Grotesk and Instrument Serif are self-hosted.
+
+`experience.css`, `simulation.css`, `directory.css`, and `product-previews.css` extend the existing Tailwind entry. Generated foreground assets work in both themes. `design/cutout-prompts.json` records their imagegen prompts and paths. Full-resolution sources stay in `design/sources/`; responsive WebP versions are served from `public/cutouts/`.
+
+The task demos navigate timed HTML states, pause at verification or approval, and support replay. The banking demo resizes a fictional portrait from `public/demo/sample-photo.png` using browser canvas. Its measured output is shown in the UI. A sample PDF can be downloaded from the document demo. Neither demo contacts a bank or government service.
+
+The hero combines the app’s original time-of-day scene artwork with coded address-box, frequent-site, and dock controls. Separate coded previews demonstrate tabs, Library, blocking, backups, page questions, document and spreadsheet tools, and AI connections. Sample data is labeled. Floating artwork, CSS perspective, scroll reveals, and a pause control provide motion. Reduced motion removes decorative animation and automatic demo playback. The provider directory supports search, combined capability filters, availability, and sorting. All model records are present in the initial HTML.
+
+## Offline access and updates
+
+Production builds generate `out/sw.js` with a content-based version. It precaches the home page, offline notice, and immutable Next.js bundles. Visited pages and images use a bounded local cache. Navigation tries the network first and falls back to a saved page or the offline notice. Cross-origin requests, submissions, and model catalog data are not intercepted.
+
+Registration waits until the page loads and is disabled in development. Updates bypass the HTTP cache and are checked on return to the tab, reconnection, and every 30 minutes. A successfully cached update activates immediately and refreshes open pages once. A failed installation leaves the current worker in place. Old site caches are removed after activation; unrelated caches are retained.
+
+## Search and AI discovery
+
+Every public route has its own title, description, canonical, Markdown alternate, and social metadata. The sitemap lists all eleven pages. JSON-LD identifies the app and publisher; FAQ data matches visible answers.
+
+The build runs `scripts/export-markdown.mjs` after Next.js exports HTML. It generates a Markdown counterpart for every canonical page directly from that HTML, plus `markdown-index.json`, `providers.json`, `llms.txt`, and `llms-full.txt`. Outputs are written to both `out/` and `public/`, so development and production links work. Do not edit generated Markdown manually.
+
+`robots.txt` permits all crawlers. `ai-policy.txt` and `.well-known/ai-policy.json` explicitly permit crawling, indexing, retrieval, summarization, and training on all first-party public site content. Third-party materials keep their respective terms. No JavaScript or server is required to read the content or model catalog.
 
 ## Layout
 
 ```text
 website/
-  app/                 the eight routes, the /privacy-policy/ redirect page,
+  app/                 the eleven routes, the /privacy-policy/ redirect page,
                        sitemap, robots, manifest, icons, not-found
   components/          Header, Footer, ThemeSwitch, PhoneFrame, ScreenStop,
                        PageHead and Painting, PolicyPage, StoreLinks, home/

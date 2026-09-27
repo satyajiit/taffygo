@@ -56,9 +56,7 @@ const ol = (...items: Inline[][]): DocBlock => ({ kind: "ol", items });
 export const privacyPolicy = {
   title: "Privacy policy",
   standfirst:
-    "TaffyGo keeps what it knows about you on your phone. Matterward Labs " +
-    "Private Limited, which publishes TaffyGo, runs no server for it, so the " +
-    "app has nothing of ours to send your data to, and it sends us nothing.",
+    "TaffyGo stores your browsing data on your phone. Matterward Labs Private Limited runs no server for the app and receives no app data. When you use AI, your request goes directly to your chosen provider.",
   updated: UPDATED,
   imageAlt:
     "Painting: a hand holds a phone whose screen is a small room, where " +
@@ -160,9 +158,10 @@ export const privacyPolicy = {
       heading: "This website",
       blocks: [
         p(
-          "taffygo.com sets no cookies and runs no analytics. It stores one " +
-            "thing in your browser, your light or dark theme choice, and " +
-            "never sends it anywhere.",
+          "taffygo.com sets no cookies and runs no analytics. Your browser " +
+            "remembers your light or dark theme choice and caches public site " +
+            "files for offline access and automatic updates. These stay on " +
+            "your device. Clear this site’s data in your browser settings to remove them.",
         ),
         p(
           "The site is served by GitHub Pages, so GitHub receives the usual " +
@@ -193,10 +192,7 @@ export const privacyPolicy = {
 export const deleteMyData = {
   title: "Delete your data",
   standfirst:
-    "There is nothing on our side to delete. Matterward Labs Private Limited " +
-    "runs no server for TaffyGo and keeps no account, record or copy of your " +
-    "data. Everything TaffyGo stores is on your phone, and you remove it " +
-    "there.",
+    "Clear your data in TaffyGo or in Android’s app settings. Matterward Labs Private Limited runs no server for TaffyGo and holds no copy of your app data.",
   sections: [
     {
       id: "in-the-app",
@@ -334,6 +330,8 @@ export const terms = {
 
 /** The notices for software this website itself serves. */
 export const websiteNotices = [
+  { name: "Instrument Serif", license: "SIL Open Font License 1.1", href: "/fonts/instrument-serif-OFL.txt" },
+  { name: "SVGL brand icons", license: "MIT License; brand marks belong to their owners", href: "/licenses/svgl-mit.txt" },
   { name: "Space Grotesk", license: "SIL Open Font License 1.1", href: "/fonts/OFL.txt" },
   { name: "Lucide icons", license: "ISC License and notices", href: "/licenses/lucide-isc.txt" },
   { name: "Next.js", license: "MIT License", href: "/licenses/nextjs-mit.txt" },

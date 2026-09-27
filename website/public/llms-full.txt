@@ -1,43 +1,74 @@
 # TaffyGo
 
-> TaffyGo is a free, open-source Chromium browser for Android that blocks ads and trackers. Its built-in assistant, Taffy, works with the AI provider you connect. There is no account, and Matterward Labs runs no server for it.
+> Free, open-source AI-native Chromium browser for Android, with one assistant, Taffy. No account needed. Matterward Labs runs no server for the app.
 
-This file describes every page on taffygo.com and the app itself. The site and the app are published by Matterward Labs Private Limited.
+Published by Matterward Labs Private Limited.
 
-## Home: https://taffygo.com/
+## TaffyGo | Open-source AI-native browser for Android
+https://taffygo.com/
+TaffyGo is a free, open-source AI-native browser for Android. Block ads and trackers, browse with Taffy, and bring your own AI provider. No account needed.
+Markdown: https://taffygo.com/index.md
 
-What the app does, shown on screens captured from an Android phone: ad and tracker blocking with a switch for each site, Taffy answering from the page you are on with its sources, errands across a few sites, connecting your own AI provider, and what stays on the phone.
+## Hand Taffy an errand | TaffyGo
+https://taffygo.com/product/
+One errand in TaffyGo from start to finish, in screens from a phone: you pick the pages, Taffy works in its own tabs while you watch, and the result names its sources.
+Markdown: https://taffygo.com/product.md
 
-## Hand Taffy an errand: https://taffygo.com/product/
+## Built for phones | TaffyGo
+https://taffygo.com/built-for-phones/
+Back, forward, Ask Taffy and your tabs sit in one row at the bottom, and the tabs Taffy opens are grouped apart from yours.
+Markdown: https://taffygo.com/built-for-phones.md
 
-One errand in three screens. You type the request and attach the pages Taffy may read; Taffy works in its own tabs while Take over, Pause and Stop stay in reach; the result puts the answer first, then what each page said, with its source.
+## AI-native browser use cases: documents, forms and research | TaffyGo
+https://taffygo.com/use-cases/
+Try TaffyGo’s interactive document and banking demos: website navigation, verification handovers, local image resizing, and form approval.
+Markdown: https://taffygo.com/use-cases.md
 
-## Built for phones: https://taffygo.com/built-for-phones/
+## AI providers and models for Android browsing | TaffyGo
+https://taffygo.com/providers/
+Explore all 38 provider entries and 667 models in TaffyGo’s catalog. Search Claude, OpenAI, Gemini, DeepSeek and more. Connect your own key or plan.
+Markdown: https://taffygo.com/providers.md
 
-Back, forward, Ask Taffy and your tabs sit in one row at the bottom of every page. Tabs Taffy opens are grouped apart from yours. The app follows the phone's light or dark setting unless you choose one under Settings, Appearance. It runs on Android 10 or later, on a 64-bit ARM processor.
+## Chromium, Rust and on-device Python | TaffyGo
+https://taffygo.com/technology/
+Explore TaffyGo’s native Android interface, Chromium browser, sandboxed Rust core, and integrated on-device Python runtime.
+Markdown: https://taffygo.com/technology.md
 
-## Contact: https://taffygo.com/contact/
+## Contact | TaffyGo
+https://taffygo.com/contact/
+Report a bug or ask a question on GitHub, and report a security problem privately there. TaffyGo has no support inbox and no contact form.
+Markdown: https://taffygo.com/contact.md
 
-Bugs go to GitHub Issues, questions to GitHub Discussions, and security problems to GitHub's private vulnerability reporting. There is no support inbox and no form.
+## Privacy policy | TaffyGo
+https://taffygo.com/privacy/
+TaffyGo keeps your data on your phone. Matterward Labs runs no server for it, collects nothing from the app and has no account for you to make.
+Markdown: https://taffygo.com/privacy.md
 
-## Privacy policy: https://taffygo.com/privacy/
+## Delete your data | TaffyGo
+https://taffygo.com/delete-my-data/
+Matterward Labs holds no data about you, so there is nothing on our side to delete. This is how to clear what TaffyGo keeps on your phone.
+Markdown: https://taffygo.com/delete-my-data.md
 
-History, bookmarks, tabs, saved sign-ins, workspaces and AI provider keys stay on the phone. Pages load from their own sites. When you ask Taffy something, the text it needs and your request go straight from the phone to the provider you connected. Nothing goes to Matterward Labs, which collects nothing. The app is left out of Android's own backups; a backup is an encrypted file you make yourself.
+## Terms of use | TaffyGo
+https://taffygo.com/terms/
+The terms for using TaffyGo: the source licence, what it leaves out, and the services you connect yourself.
+Markdown: https://taffygo.com/terms.md
 
-## Delete your data: https://taffygo.com/delete-my-data/
+## Open-source licences | TaffyGo
+https://taffygo.com/licenses/
+TaffyGo's source is under the Mozilla Public License 2.0. Where to read the notices for the browser and for this website.
+Markdown: https://taffygo.com/licenses.md
 
-There is nothing on our side to delete. In the app, Settings, Privacy, Delete everything erases what TaffyGo keeps. Clearing the app's storage in Android or uninstalling it does the same.
+## Product boundaries
 
-## Terms of use: https://taffygo.com/terms/
+The Android build includes an embedded Python worker for registered document and spreadsheet tools; its phone-level execution checks remain pending. Government-document and banking demos use sample data and are not verified end-to-end phone runs. Model catalog inclusion does not guarantee provider access. AI requests go directly to the chosen provider and may incur provider charges.
 
-The source is under the Mozilla Public License 2.0 and comes without warranty. The AI provider you connect and the sites you visit have their own terms. The TaffyGo name, logo and the Taffy character are not covered by the licence.
+Crawling, retrieval, and training on first-party public site content are allowed: https://taffygo.com/ai-policy.txt
 
-## Open-source licences: https://taffygo.com/licenses/
+## Get TaffyGo
 
-The app's notices are inside the app, under Settings, About and help, Licences. The website's notices are linked from the page.
-
-## Get it
-
-Google Play: https://play.google.com/store/apps/details?id=com.taffygo.browser
-APK: https://github.com/satyajiit/taffygo/releases/latest
-Source: https://github.com/satyajiit/taffygo
+- [Google Play](https://play.google.com/store/apps/details?id=com.taffygo.browser)
+- [APK releases](https://github.com/satyajiit/taffygo/releases/latest)
+- [Source](https://github.com/satyajiit/taffygo)
+- [Report a bug](https://github.com/satyajiit/taffygo/issues)
+- [Discussions](https://github.com/satyajiit/taffygo/discussions)

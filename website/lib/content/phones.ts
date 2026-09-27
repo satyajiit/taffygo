@@ -20,10 +20,9 @@ export type PhoneSection = {
 };
 
 export const phonesHero = {
-  title: "Built for the phone in your hand",
+  title: "See the Android app",
   lede:
-    "TaffyGo runs on Android phones and nothing else, so every screen is " +
-    "laid out for a phone.",
+    "Explore the bottom toolbar, separate task tabs, and light and dark themes in real app captures.",
 } as const;
 
 const bottomRow: ReadonlyArray<Callout> = [

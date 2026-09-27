@@ -22,17 +22,16 @@ export type ContactRoute = {
 export const contact = {
   title: "Contact",
   standfirst:
-    "TaffyGo is developed in the open on GitHub, and that is where to reach " +
-    "the people who make it. There is no support inbox and no contact form.",
+    "Reach the maintainers on GitHub. Use an issue for a bug, a discussion for a question, or a private report for a security problem.",
   routes: [
     {
-      topic: "A bug, or something you want TaffyGo to do",
+      topic: "Bugs and feature requests",
       body: "Say what you did, what you expected and what happened instead.",
       action: "Open an issue",
       href: links.issues,
     },
     {
-      topic: "A question, or an idea to talk through",
+      topic: "Questions and ideas",
       body: "Discussions are public, so the answer helps the next person too.",
       action: "Start a discussion",
       href: links.discussions,
@@ -48,8 +47,7 @@ export const contact = {
     {
       topic: "Your data",
       body:
-        "Matterward Labs holds none. What TaffyGo keeps is on your phone, " +
-        "and you can clear it there.",
+        "Clear browsing data, saved details, and files from TaffyGo on your phone.",
       action: "Delete your data",
       href: "/delete-my-data/",
     },

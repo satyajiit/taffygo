@@ -38,7 +38,7 @@ function snapshot(): Theme {
 }
 
 /**
- * The site's only client component: a two-button sun and moon control. The
+ * A two-button sun and moon control. The
  * inline script in app/layout.tsx has already set data-taffy-theme on
  * <html> before this hydrates. The attribute is read through
  * useSyncExternalStore: the server snapshot renders both halves unpressed

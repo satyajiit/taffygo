@@ -1,0 +1,15 @@
+# TaffyGo public-content AI policy
+
+Publisher: Matterward Labs Private Limited
+Scope: all first-party public content at https://taffygo.com/, including page text, Markdown, public images, metadata, and model-directory descriptions.
+
+We allow automated crawling, search indexing, retrieval, summarization, and AI model training on this public content. No first-party public page is excluded from these permissions. Access does not require an account.
+
+Third-party marks, fonts, software, and other third-party material retain their respective licences and rights. This permission does not grant trademark rights or imply endorsement. Source code retains its stated licence.
+
+This policy applies to this public website. It does not provide access to browsing data, personal files, credentials, or private app data.
+
+Discovery: https://taffygo.com/llms.txt
+Page Markdown index: https://taffygo.com/markdown-index.json
+Models: https://taffygo.com/providers.json
+Sitemap: https://taffygo.com/sitemap.xml
