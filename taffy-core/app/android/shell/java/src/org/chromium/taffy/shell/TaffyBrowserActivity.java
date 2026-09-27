@@ -49,6 +49,7 @@ import org.chromium.taffy.host.TaffyShellViews;
 import org.chromium.ui.base.ActivityWindowAndroid;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.edge_to_edge.EdgeToEdgeSystemBarColorHelper;
+import org.chromium.ui.modaldialog.DialogDismissalCause;
 import org.chromium.ui.modaldialog.ModalDialogManager;
 
 /**
@@ -161,14 +162,6 @@ public class TaffyBrowserActivity extends AsyncInitializationActivity {
 
     /** The tab model as this Window component's Taffy-owned screens see it. */
     private @Nullable ChromiumBrowserMediator mBrowserMediator;
-
-    /**
-     * The dialogs this window's pages ask for — a permission prompt, a page's
-     * own alert. Built with the window and destroyed first in {@link
-     * #onDestroy}, while the pages they belong to still exist. See {@link
-     * TaffyPageDialogs} for why it is the window's and not the activity's.
-     */
-    private @Nullable ModalDialogManager mPageDialogs;
 
     /**
      * Re-shows a tab whose content view was replaced under it. See {@link
@@ -539,17 +532,12 @@ public class TaffyBrowserActivity extends AsyncInitializationActivity {
      * ui/android/.../ActivityWindowAndroid.java:43-60}). Writing them out again
      * would be three more names for no difference in behaviour.
      *
-     * <p><b>The window's dialog manager, and where this departs from
-     * SearchActivity.</b> SearchActivity wraps the window in an anonymous
-     * subclass overriding {@code getModalDialogManager()} so the window can find
-     * the activity's dialog manager, which it builds in {@code
-     * createModalDialogManager()}. This activity wraps its window the same way
-     * but hands it a manager of the window's own, {@link TaffyPageDialogs}: a
-     * page's permission prompt asks its window for one, and without it the
-     * prompt was dismissed while it was still being built, which closed the
-     * browser. {@code createModalDialogManager()} is still not overridden, so the
-     * activity's own dialogs — downloads among them — keep answering as they
-     * did. TaffyGo's own dialogs (SCR-2xx) remain a separate transfer.
+     * <p><b>The window's dialog manager.</b> SearchActivity wraps the window in
+     * an anonymous subclass overriding {@code getModalDialogManager()} so the
+     * window can find the activity's dialog manager, which it builds in {@code
+     * createModalDialogManager()}. This activity does the same, so a page's
+     * dialogs and the browser's own reach one manager. See {@link
+     * #createModalDialogManager()}.
      *
      * <p>{@code getIntentRequestTracker()} is constructed in this class's
      * constructor and
@@ -562,15 +550,37 @@ public class TaffyBrowserActivity extends AsyncInitializationActivity {
      */
     @Override
     protected ActivityWindowAndroid createWindowAndroid() {
-        mPageDialogs = TaffyPageDialogs.create(this);
         return new TaffyFileChooserWindow(this,
                 /* listenToActivityState= */ true, getIntentRequestTracker(), getInsetObserver(),
                 /* occlusionTrackingAllowed= */ true) {
             @Override
             public @Nullable ModalDialogManager getModalDialogManager() {
-                return mPageDialogs;
+                return TaffyBrowserActivity.this.getModalDialogManager();
             }
         };
+    }
+
+    /**
+     * The one dialog manager for this window: a page's dialogs ask the window
+     * for it, and the browser's own ask the activity.
+     *
+     * <p>Upstream's default is null, and the window used to hold a manager of its
+     * own while the activity held none. Chromium's download prompts read the
+     * activity's. The one asking where to save cancelled the download instead
+     * of asking; the ones for a file that can harm the device, a download over
+     * plain HTTP and a file already downloaded call {@code showDialog} on the
+     * null. Tapping a link to an {@code .apk} closed the browser with a
+     * NullPointerException in {@code DangerousDownloadDialogBridge.showDialog},
+     * on the phone on 2026-09-27, in the 1.0 build.
+     *
+     * <p>{@code ChromeBaseAppCompatActivity.onCreate} calls this before the
+     * window exists and destroys what it returns in its own {@code onDestroy}.
+     * {@link TaffyPageDialogs} is built from the context alone, so it can be made
+     * this early.
+     */
+    @Override
+    protected ModalDialogManager createModalDialogManager() {
+        return TaffyPageDialogs.create(this);
     }
 
     /**
@@ -1069,9 +1079,11 @@ public class TaffyBrowserActivity extends AsyncInitializationActivity {
      */
     @Override
     protected void onDestroy() {
-        if (mPageDialogs != null) {
-            mPageDialogs.destroy();
-            mPageDialogs = null;
+        // Dialogs close first, while the pages they belong to still exist. The
+        // manager itself is destroyed by ChromeBaseAppCompatActivity.
+        ModalDialogManager dialogs = getModalDialogManager();
+        if (dialogs != null) {
+            dialogs.dismissAllDialogs(DialogDismissalCause.ACTIVITY_DESTROYED);
         }
         if (mWindowComponent != null) {
             mWindowComponent.lifetime().close();

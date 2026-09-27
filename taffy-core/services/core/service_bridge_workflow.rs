@@ -37,13 +37,17 @@ pub(crate) fn continue_reviewed_workflow(
     task_id: &TaskId,
     now_monotonic_ms: u64,
 ) -> Result<Option<ffi::BridgeResponse>, ()> {
-    if bridge
-        .pending_task_effects
-        .values()
-        .any(|pending| {
-            pending.task_id == task_id.as_str() && !pending.is_bootstrap_observation(bridge)
-        })
-    {
+    // `AwaitInFlightWork` is the settlement waiting, not work in flight. It
+    // stays pending until the settlement is accepted, and a pause or stop
+    // made during a model call cannot settle until the walk records the
+    // reply (agent table row 3a). Counting it here stopped that walk, so
+    // `PauseSettled` met a turn still in flight, was refused, and the task
+    // read "Pausing" for good. That happened on the phone on 2026-09-27.
+    if bridge.pending_task_effects.values().any(|pending| {
+        pending.task_id == task_id.as_str()
+            && !pending.is_settlement_wait()
+            && !pending.is_bootstrap_observation(bridge)
+    }) {
         return Ok(None);
     }
     let service_generation = bridge.generation.value();

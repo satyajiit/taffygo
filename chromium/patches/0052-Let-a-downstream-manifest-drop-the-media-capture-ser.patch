@@ -1,0 +1,56 @@
+From 05e67314bfea75c55064cc05240bc04d5dbd55c8 Mon Sep 17 00:00:00 2001
+From: Matterward Labs <admin@matterwardlabs.com>
+Date: Sun, 27 Sep 2026 14:28:51 +0530
+Subject: Let a downstream manifest drop the media-capture service types
+
+The camera, microphone and media-projection foreground-service permissions,
+and the same three types on MediaCaptureNotificationService, are used only
+when background media capture is on, and that feature is enabled in
+desktop Android builds alone. A phone product that never starts the service
+in the foreground still has to declare and demonstrate all three to Play.
+
+As with the package-query permission, an extending template cannot remove
+them: there is no block to override, and tools:node="remove" is ignored for
+an element the rendered document declares itself.
+
+Wrap the three permissions and the service's type attribute in two blocks,
+and move the enable_screen_capture assignment above the first so it stays a
+template-level name. Every template that does not override the blocks
+renders what it rendered before.
+
+Taffy-Patch: 0052
+
+diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
+index 23226acb007a5..ba82c6f3e6648 100644
+--- a/chrome/android/java/AndroidManifest.xml
++++ b/chrome/android/java/AndroidManifest.xml
+@@ -72,12 +72,14 @@ by a child template that "extends" this file.
+     <uses-permission android:name="android.permission.CAPTURE_KEYBOARD" />
+     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
++    {% set enable_screen_capture = enable_screen_capture|default(0) %}
++    {% block media_capture_foreground_service_permissions %}
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+-    {% set enable_screen_capture = enable_screen_capture|default(0) %}
+     {% if enable_screen_capture == "true" %}
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+     {% endif %}
++    {% endblock %}
+     <!-- TODO(crbug.com/40259231): Remove this tools:ignore attribute once it's no longer necessary. -->
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" tools:ignore="SystemPermissionTypo" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" tools:ignore="SystemPermissionTypo" />
+@@ -1250,11 +1252,13 @@ by a child template that "extends" this file.
+             android:exported="false"/>
+ 
+         <service android:name="org.chromium.chrome.browser.media.MediaCaptureNotificationService"
++            {% block media_capture_foreground_service_type %}
+             {% if enable_screen_capture == "true" %}
+             android:foregroundServiceType="camera|microphone|mediaProjection|mediaPlayback"
+             {% else %}
+             android:foregroundServiceType="camera|microphone"
+             {% endif %}
++            {% endblock %}
+             android:exported="false"/>
+         <service android:name="org.chromium.chrome.browser.GracefulShutdownService"
+             android:foregroundServiceType="shortService|dataSync"

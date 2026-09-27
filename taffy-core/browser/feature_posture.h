@@ -76,6 +76,9 @@ void ApplyFeaturePosture(base::FeatureList* feature_list);
 
 // Overrides the default of every pref in the posture list. Call after the
 // prefs are registered, from the end of RegisterProfilePrefs (patch 0016).
+// On Android it also turns off the first-download location prompt, which is
+// not a posture: the shell has no dialog host for it, and an unhosted prompt
+// cancels the download.
 void OverrideProfilePrefDefaults(PrefRegistrySimple* registry);
 
 // The lists themselves, so tests walk exactly what the product applies.

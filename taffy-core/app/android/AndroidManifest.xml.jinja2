@@ -79,6 +79,20 @@ package's Play Store listing.
 #}
 {% block query_all_packages_permission %}{% endblock %}
 
+{#
+The camera, microphone and media-projection foreground-service types are
+upstream's, for MediaCaptureNotificationService. The only path that starts it
+in the foreground with them is background media capture, which upstream turns
+on for desktop Android builds alone and the feature posture turns off by name
+(taffy-core/browser/feature_posture.cc). On a phone a site's call stops when
+the browser leaves the screen, so the three were declared and never used, and
+Play asks for a declaration and a video for each type a manifest carries.
+Upstream patch 0052 puts them in the two blocks overridden here with nothing,
+for the reason patch 0051 records (decision 0252, point 6).
+#}
+{% block media_capture_foreground_service_permissions %}{% endblock %}
+{% block media_capture_foreground_service_type %}{% endblock %}
+
 {% block extra_application_attributes %}
 {{ super() }}
 android:dataExtractionRules="@xml/taffy_data_extraction_rules"

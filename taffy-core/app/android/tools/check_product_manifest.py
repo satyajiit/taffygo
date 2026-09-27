@@ -75,6 +75,20 @@ BLOCK_OVERRIDE = re.compile(
 )
 QUERIES_ELEMENT = re.compile(r"<queries>(?P<body>.*?)</queries>", re.DOTALL)
 SUBTYPE = "user_initiated_browser_research_with_visible_pause_stop_resume"
+#: Decision 0252, point 6: the manifest declares only the foreground-service
+#: types the build starts. Upstream patch 0052 wraps the media-capture service's
+#: camera, microphone and media-projection declarations in these two blocks and
+#: the overlay overrides both with nothing; the feature posture keeps background
+#: capture, the one path that would start them, off by name.
+MEDIA_CAPTURE_BLOCKS = (
+    "media_capture_foreground_service_permissions",
+    "media_capture_foreground_service_type",
+)
+MEDIA_CAPTURE_PERMISSIONS = (
+    "FOREGROUND_SERVICE_CAMERA",
+    "FOREGROUND_SERVICE_MICROPHONE",
+    "FOREGROUND_SERVICE_MEDIA_PROJECTION",
+)
 BASE_TEMPLATE_EXTENDS = '{% extends "chrome/android/java/AndroidManifest.xml" %}'
 MODERN_DOMAINS = {
     "root",
@@ -231,6 +245,7 @@ def verify_product_template(root: Path) -> None:
     )
     verify_cast_untouched(text)
     verify_package_visibility(text)
+    verify_media_capture_types(text)
 
 
 def verify_package_visibility(text: str) -> None:
@@ -273,6 +288,34 @@ def verify_package_visibility(text: str) -> None:
         body.count(VIEW_ACTION) == 3,
         f"{PRODUCT_TEMPLATE}: each queried intent states the view action",
     )
+
+
+def verify_media_capture_types(text: str) -> None:
+    """Decision 0252, point 6: no media-capture service type is declared."""
+    for block in MEDIA_CAPTURE_BLOCKS:
+        override = re.search(
+            r"\{%\s*block\s+" + block + r"\s*%\}(?P<body>.*?)\{%\s*endblock",
+            text,
+            re.DOTALL,
+        )
+        require(
+            override is not None,
+            f"{PRODUCT_TEMPLATE}: missing the {block} override. Upstream patch "
+            "0052 declares that block so this template can decline the "
+            "media-capture service types; without the override Play asks for a "
+            "declaration and a video for types the product never starts",
+        )
+        require(
+            not override.group("body").strip(),
+            f"{PRODUCT_TEMPLATE}: {block} must be overridden with nothing",
+        )
+    for permission in MEDIA_CAPTURE_PERMISSIONS:
+        require(
+            permission not in text,
+            f"{PRODUCT_TEMPLATE}: {permission} must not be declared here. "
+            "Background capture is off in the feature posture, so nothing "
+            "starts a service with that type",
+        )
 
 
 def verify_cast_untouched(text: str) -> None:

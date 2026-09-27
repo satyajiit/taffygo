@@ -479,6 +479,11 @@ source_set("feature_posture") {
 
     # kMediaDrmPreprovisioning (media_switches.h).
     "//media",
+
+    # kPromptForDownloadAndroid (chrome/common/pref_names.h). Used on Android
+    # only, and named for every platform because gn check reads an include
+    # under #if as if it were always compiled.
+    "//chrome/common:constants",
   ]
 }
 
@@ -530,6 +535,10 @@ source_set("unit_tests") {
     # PrefRegistrySimple and reads the default store back.
     "//components/prefs",
     "//components/prefs:test_support",
+
+    # And reads kPromptForDownloadAndroid, on Android only; named for every
+    # platform for the reason given in feature_posture above.
+    "//chrome/common:constants",
 
     # task_source_selection_registry_restored_tabs_unittest.cc puts a real
     # preference store on a TestBrowserContext, which is how the register of

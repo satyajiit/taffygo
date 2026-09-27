@@ -13,9 +13,15 @@
 #include "base/feature_list.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/test/scoped_feature_list.h"
+#include "build/build_config.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_store.h"
 #include "testing/gtest/include/gtest/gtest.h"
+
+#if BUILDFLAG(IS_ANDROID)
+#include "chrome/browser/download/download_prompt_status.h"  // nogncheck
+#include "chrome/common/pref_names.h"
+#endif
 
 namespace taffy {
 namespace {
@@ -72,6 +78,12 @@ TEST(FeaturePostureTest, PrefDefaultsAreOverriddenOnARealRegistry) {
   for (const PrefPostureEntry& entry : PrefPostureForTesting()) {
     registry->RegisterBooleanPref(entry.pref_name, !entry.default_value);
   }
+#if BUILDFLAG(IS_ANDROID)
+  // Registered by DownloadPrefs before the override runs in the product.
+  registry->RegisterIntegerPref(
+      prefs::kPromptForDownloadAndroid,
+      static_cast<int>(DownloadPromptStatus::SHOW_INITIAL));
+#endif
 
   OverrideProfilePrefDefaults(registry.get());
 
@@ -84,6 +96,15 @@ TEST(FeaturePostureTest, PrefDefaultsAreOverriddenOnARealRegistry) {
         << entry.pref_name
         << " default was not overridden; its reason: " << entry.reason;
   }
+#if BUILDFLAG(IS_ANDROID)
+  // The first-download prompt has no dialog host in this shell, and an
+  // unhosted prompt cancels the download it was asking about.
+  const base::Value* prompt = nullptr;
+  ASSERT_TRUE(
+      registry->defaults()->GetValue(prefs::kPromptForDownloadAndroid, &prompt));
+  ASSERT_NE(prompt, nullptr);
+  EXPECT_EQ(prompt->GetInt(), static_cast<int>(DownloadPromptStatus::DONT_SHOW));
+#endif
 }
 
 }  // namespace

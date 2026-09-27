@@ -44,6 +44,10 @@ include_rules = [
   "+components/prefs",
   "+components/signin/public/base/signin_pref_names.h",
   "+components/signin/public/base/signin_switches.h",
+  # The first-download prompt default beside the posture: the pref's name and
+  # the dependency-free enum its value is read from.
+  "+chrome/browser/download/download_prompt_status.h",
+  "+chrome/common/pref_names.h",
   "+components/translate/core/browser/translate_ranker_impl.h",
   "+components/user_prefs/user_prefs.h",
   "+media/base/media_switches.h",

@@ -12,5 +12,6 @@
 # this file.
 #
 # 797704204 is the code Chromium derives from 152.0.7977.42. The first upload
-# to the internal track took it on 2026-09-11.
-play_accepted_version_code=797704204
+# to the internal track took it on 2026-09-11. The internal track then took
+# 797704214 and 797704224 on 2026-09-27.
+play_accepted_version_code=797704224

@@ -65,6 +65,12 @@ pub(crate) struct PendingTaskEffect {
 }
 
 impl PendingTaskEffect {
+    /// A settlement waiting for in-flight work to finish, which is not itself
+    /// work in flight. See `continue_reviewed_workflow`.
+    pub(crate) fn is_settlement_wait(&self) -> bool {
+        self.kind == wire::TaskReducerEffectKind::AwaitInFlightWork
+    }
+
     /// Only scheduler-created whole-page reads may overlap the next proposal.
     /// The resident proposal is the authority for the shape, not a wire label.
     pub(crate) fn is_bootstrap_observation(&self, bridge: &ServiceBridge) -> bool {
@@ -124,6 +130,10 @@ pub(crate) struct RestoredTaskEffects {
     pub(crate) effects: Vec<core_runtime::Effect>,
 }
 
+/// Drops the wait an accepted settlement answers. The wait was emitted at the
+/// revision that began settling, and a reply recorded while settling moves the
+/// task past it, so every wait at or below the accepted revision is answered,
+/// not only one at exactly that revision.
 pub(crate) fn acknowledge_settlement_effect(
     bridge: &mut ServiceBridge,
     task_id: &str,
@@ -132,7 +142,7 @@ pub(crate) fn acknowledge_settlement_effect(
     bridge.pending_task_effects.retain(|_, pending| {
         pending.kind != wire::TaskReducerEffectKind::AwaitInFlightWork
             || pending.task_id != task_id
-            || pending.operation.task_revision != task_revision
+            || pending.operation.task_revision > task_revision
     });
 }
 

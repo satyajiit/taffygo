@@ -95,9 +95,13 @@ enable_vr = false
 # digits}{package digit}{ABI digit}. 152.0.7977.42 on arm64-only gives
 # 7977 042 0 4 = 797704204, which is the code Play accepted from the internal
 # upload of 2026-09-11, so the same derivation can never be uploaded again.
-# 797704214 keeps BUILD, PATCH and the ABI digit and raises only the package
-# digit, so it sorts above 797704204 and below 797704304, the lowest code the
-# next pin (152.0.7977.43) derives. The version name stays Chromium's.
+# 797704214 kept BUILD, PATCH and the ABI digit and raised only the package
+# digit, so it sorted above 797704204 and below 797704304, the lowest code the
+# next pin (152.0.7977.43) derives. Play took 797704214 on its internal track on
+# 2026-09-27, then 797704224, which fixed page downloads, and the build that
+# replaced both before review raises the package digit a third time, to
+# 797704234: 797704224 closed the browser on any download that asks the person
+# first. The version name stays Chromium's.
 #
 # It lives in this fragment rather than in the release profile because every
 # profile has to carry the same code. Android refuses to install a lower code
@@ -107,5 +111,5 @@ enable_vr = false
 # release-arm64 agree, and the phone moves between them in both directions.
 #
 # Remove this line when chromium/REVISION moves: the derived code is then above
-# this one. A second release on this pin takes a higher code below 797704304.
-android_override_version_code = "797704214"
+# this one. A further release on this pin takes a higher code below 797704304.
+android_override_version_code = "797704234"

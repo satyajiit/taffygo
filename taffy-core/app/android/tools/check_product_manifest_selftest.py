@@ -27,6 +27,7 @@ from check_product_manifest import (
     EXTRACTION_RULES,
     GRADLE_MANIFEST,
     LEGACY_RULES,
+    MEDIA_CAPTURE_BLOCKS,
     PRODUCT_TARGET,
     PRODUCT_TEMPLATE,
     QUERY_ALL_PACKAGES_BLOCK,
@@ -182,6 +183,33 @@ def self_test() -> None:
             '<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />',
         )
         expect_failure(root, "QUERY_ALL_PACKAGES must not be declared here")
+
+        # Decision 0252, point 6: each block, and a permission put back beside
+        # the overrides, which a revert of patch 0052's overlay half would do.
+        for block in MEDIA_CAPTURE_BLOCKS:
+            write_fixture(root)
+            rewrite(root, PRODUCT_TEMPLATE, "{% block " + block + " %}{% endblock %}", "")
+            expect_failure(root, f"missing the {block} override")
+
+            write_fixture(root)
+            rewrite(
+                root,
+                PRODUCT_TEMPLATE,
+                "{% block " + block + " %}{% endblock %}",
+                "{% block " + block + " %}"
+                'android:foregroundServiceType="mediaPlayback"{% endblock %}',
+            )
+            expect_failure(root, f"{block} must be overridden with nothing")
+
+        write_fixture(root)
+        rewrite(
+            root,
+            PRODUCT_TEMPLATE,
+            '<uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />',
+            '<uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />\n'
+            '<uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />',
+        )
+        expect_failure(root, "FOREGROUND_SERVICE_CAMERA must not be declared here")
 
         # A revert or a rebase putting either Cast removal back is the shape
         # this rule exists to catch, so the mutation adds one rather than

@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 
 import org.chromium.base.supplier.OneshotSupplier;
 import org.chromium.base.test.BaseRobolectricTestRunner;
+import org.chromium.chrome.browser.ChromeBaseAppCompatActivity;
 import org.chromium.chrome.browser.init.ActivityProfileProvider;
 import org.chromium.chrome.browser.init.AsyncInitializationActivity;
 import org.chromium.chrome.browser.lifecycle.ActivityLifecycleDispatcher;
@@ -24,6 +25,7 @@ import org.chromium.chrome.browser.lifecycle.DestroyObserver;
 import org.chromium.ui.base.ActivityWindowAndroid;
 import org.chromium.ui.base.IntentRequestTracker;
 import org.chromium.ui.insets.InsetObserver;
+import org.chromium.ui.modaldialog.ModalDialogManager;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -70,6 +72,26 @@ public class TaffyBrowserActivityWindowTest {
                 upstream.getReturnType(),
                 override.getReturnType());
         assertEquals(ActivityWindowAndroid.class, override.getReturnType());
+        assertEquals(0, override.getParameterCount());
+    }
+
+    @Test
+    public void theActivityHasTheDialogManagerDownloadsAskFor() throws NoSuchMethodException {
+        Method upstream =
+                ChromeBaseAppCompatActivity.class.getDeclaredMethod("createModalDialogManager");
+        Method override =
+                TaffyBrowserActivity.class.getDeclaredMethod("createModalDialogManager");
+
+        // Chromium's download prompts ask the activity for its dialog manager, and upstream's
+        // default is `return null`. The prompts for a harmful file, a plain-HTTP download and a
+        // repeated one call showDialog on that null, which closed the browser on 2026-09-27. An
+        // override that stopped matching this signature would compile and restore the default.
+        assertEquals(
+                "createModalDialogManager must return the type upstream declares, or it is a new"
+                        + " method rather than an override",
+                upstream.getReturnType(),
+                override.getReturnType());
+        assertEquals(ModalDialogManager.class, override.getReturnType());
         assertEquals(0, override.getParameterCount());
     }
 

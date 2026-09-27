@@ -36,10 +36,9 @@ import org.chromium.ui.modelutil.PropertyModel;
  * <p><b>What this gives the window, and what it does not.</b> The prompt is Chromium's own, shown
  * the way Chromium shows it outside a tab strip, and the person answers it: TaffyGo answers nothing
  * on their behalf and Taffy never grants a permission (PAR-PERM-001; the page-intelligence protocol
- * forbids bypassing a permission prompt). The manager is handed out through the window only, which
- * is the object a page's dialogs ask. It is deliberately not the activity's {@code
- * createModalDialogManager()}: that one also answers the browser's own activity-level dialogs —
- * downloads among them — and those stay as they are until TaffyGo's own dialogs (SCR-2xx) are built.
+ * forbids bypassing a permission prompt). The activity hands the same manager out as its own, from
+ * {@code createModalDialogManager()}, because Chromium's download prompts ask the activity and not
+ * the window; see {@code TaffyBrowserActivity.createModalDialogManager}.
  *
  * <p><b>Why a second presenter.</b> Chrome shows a page's dialogs over the tab, through a tab-modal
  * presenter this window does not have. Here they are shown app-modal, as {@code SearchActivity} shows
@@ -52,7 +51,7 @@ import org.chromium.ui.modelutil.PropertyModel;
 final class TaffyPageDialogs {
     private TaffyPageDialogs() {}
 
-    /** One window's manager for the dialogs its pages ask for. Destroy it with the window. */
+    /** One window's manager for its pages' dialogs and the browser's own. */
     static ModalDialogManager create(Context context) {
         ModalDialogManager manager =
                 new ModalDialogManager(new AppModalPresenter(context), ModalDialogType.APP);

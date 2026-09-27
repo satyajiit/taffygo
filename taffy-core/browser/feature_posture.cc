@@ -25,6 +25,14 @@
 #include "media/base/media_switches.h"
 #include "taffy/browser/profile_preferences.h"
 
+#if BUILDFLAG(IS_ANDROID)
+// A dependency-free enum header. //chrome/browser depends on this target
+// through patch 0016, so a GN edge back to //chrome/browser/download would be
+// a cycle.
+#include "chrome/browser/download/download_prompt_status.h"  // nogncheck
+#include "chrome/common/pref_names.h"
+#endif
+
 namespace taffy {
 
 namespace {
@@ -84,6 +92,13 @@ const FeaturePostureEntry kFeaturePosture[] = {
      "profile). Disabling defers provisioning to first EME use, so DRM "
      "playback capability is unchanged (OD-021 owns that) and the covert "
      "startup traffic is gone."},
+    {&media::kAndroidEnableBackgroundMediaCapturing, kDisable,
+     "Not a Google posture: a manifest coupling. Background capture is the "
+     "only path that starts MediaCaptureNotificationService in the foreground "
+     "with the camera, microphone and media-projection types, and the product "
+     "manifest declares none of them (upstream patch 0052, decision 0252). "
+     "Upstream enables it on desktop Android builds only; if its default ever "
+     "changed, capture would ask Android for a type the app never declared."},
 #endif
     {&switches::kAvoidAutoTriggerListAccountsOnStale, kEnable,
      "The one deliberate enable: the flag's ON state is the quiet one, "
@@ -131,6 +146,18 @@ void OverrideProfilePrefDefaults(PrefRegistrySimple* registry) {
     registry->SetDefaultPrefValue(entry.pref_name,
                                   base::Value(entry.default_value));
   }
+#if BUILDFLAG(IS_ANDROID)
+  // Not a Google posture: a dialog this shell cannot show. Chromium asks where
+  // to save a first download through the activity's own dialog manager, and
+  // TaffyBrowserActivity has none, so the dialog was dismissed as if the
+  // activity were being destroyed and the download was cancelled without a
+  // word. Every file a page offered was lost that way. A download now goes to
+  // the download directory without asking, which is the path the errand
+  // download tests already set.
+  registry->SetDefaultPrefValue(
+      prefs::kPromptForDownloadAndroid,
+      base::Value(static_cast<int>(DownloadPromptStatus::DONT_SHOW)));
+#endif
 }
 
 base::span<const FeaturePostureEntry> FeaturePostureForTesting() {
