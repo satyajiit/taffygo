@@ -8,7 +8,7 @@ it, it sets no cookies, and it makes no request to any other host.
 
 | Route | What it says |
 |---|---|
-| `/` | What the app does, on screens captured from a phone, and how to install it |
+| `/` | The interactive new tab, launch film, browser features, and how to install it |
 | `/product/` | One errand from the request to the result, in three screens |
 | `/built-for-phones/` | The bottom row, Taffy's tabs kept apart from yours, light and dark |
 | `/use-cases/` | Timed document and banking demos, with local image resizing and explicit handovers |
@@ -29,6 +29,36 @@ lives in `lib/content/` and the route components. `lib/simulation.ts` owns the t
 The provider directory is generated from the browser catalog; regenerate it with
 `python3 website/scripts/build_provider_directory.py`. The matching `--check`
 refuses drift.
+
+## Launch film
+
+[Watch on taffygo.com](https://taffygo.com/#launch-film). The public repository
+README also contains a native GitHub video player, backed by the same 4K60
+WebM uploaded as a GitHub attachment. Its source is
+`tools/export-public.d/overlay/README.md` in the private working repository.
+
+The 1:58 film sits immediately after the hero in
+[`LaunchFilm`](components/home/LaunchFilm.tsx). Hallmark's component treatment
+inherits the site's type, surfaces and spacing from `design.md`; its styles
+live in `launch-film.css`.
+
+`public/media/taffygo-launch-4k60.webm` contains the complete 3840×2160,
+60 fps film with VP9 video and Opus audio. The generated thumbnail is
+`public/media/launch-film-thumbnail.webp`; its full-resolution source and
+image-generation prompt are in `design/sources/launch-film-thumbnail.png`
+and `design/launch-film-thumbnail.json`. `design/asset-manifest.json` records
+the assets and their hashes.
+
+Playback starts on click, with sound, native controls, fullscreen and English
+captions. A transcript and download link are available underneath. The film
+uses `preload="none"`, never autoplays, and remains playable with native
+controls when JavaScript is disabled. The offline worker neither precaches
+the video nor intercepts audio, video or range requests. All media URLs use
+`withBasePath()`, including the caption track and poster.
+
+See the film project for the native 4K
+render and WebM export commands. Copy the completed WebM and captions into
+`public/media/` before building the site.
 
 ## Working on it
 

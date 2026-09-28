@@ -65,6 +65,7 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
   if (request.method !== "GET" || url.origin !== SCOPE.origin || !url.pathname.startsWith(SCOPE.pathname)) return;
+  if (request.destination === "video" || request.destination === "audio" || request.headers.has("range")) return;
   if (request.mode === "navigate") {
     event.respondWith(navigate(request, event));
   } else if (!url.search && (precached.has(url.href) || /\.(?:webp|png|svg|woff2)$/.test(url.pathname))) {

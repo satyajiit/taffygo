@@ -121,5 +121,34 @@
     "source_sha256": "27c0fd8ceba8a365c8c54f732081088e5b0398194b398fd941b5bd4a9e352989",
     "tool": "Original app asset",
     "processing": "cwebp: resize to 320x240, quality 78"
+  },
+  {
+    "path": "public/media/launch-film-thumbnail.webp",
+    "sha256": "01f6ed3c5d8accab4e7fabffbcc7083cb38efeaae033b6bbe2e42192e93f9701",
+    "source": "design/sources/launch-film-thumbnail.png",
+    "source_sha256": "0290eee99716daa05b7fb3fae530c8a93a8ed32309cccd803fd0a2b6edad304e",
+    "width": 1600,
+    "height": 900,
+    "bytes": 66994,
+    "tool": "built-in image_gen",
+    "prompt": "design/launch-film-thumbnail.json",
+    "processing": "cwebp: resize to 1600x900 and compression only, quality 88"
+  },
+  {
+    "path": "public/media/taffygo-launch-4k60.webm",
+    "sha256": "60d8768caa9e9d371db0380f8e1f680800553b884bb09ca3fd128cf41736005f",
+    "source": "../videos/taffygo-launch/renders/taffygo-launch-v4-4k60.mp4",
+    "source_sha256": "65ef2e4193e7c1441150cfd84f76b1da949fdfe160d753d93798ff8450f80433",
+    "width": 3840,
+    "height": 2160,
+    "fps": 60,
+    "duration_seconds": 118,
+    "frames": 7080,
+    "bytes": 41805711,
+    "video_codec": "VP9",
+    "audio_codec": "Opus",
+    "tool": "HyperFrames 0.8.80 + FFmpeg",
+    "processing": "Native composition render at 2x browser pixel density; VP9 CRF 30 and Opus 160k; front-loaded WebM seek index",
+    "command": "../videos/taffygo-launch/tools/export-webm.sh"
   }
 ]

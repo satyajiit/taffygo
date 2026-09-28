@@ -63,4 +63,15 @@ describe("service worker lifecycle", () => {
       expect(respondWith).not.toHaveBeenCalled();
     }
   });
+
+  it("lets the browser serve media ranges without interception", () => {
+    const app = worker();
+    const respondWith = vi.fn();
+    app.handlers.get("fetch")!({
+      request: new Request("https://taffygo.com/taffygo/media/film.webm", { headers: { Range: "bytes=1000-" } }),
+      respondWith,
+    });
+    expect(respondWith).not.toHaveBeenCalled();
+    expect(app.fetch).not.toHaveBeenCalled();
+  });
 });

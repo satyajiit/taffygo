@@ -28,6 +28,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 @import "./simulation.css";
 @import "./directory.css";
 @import "./product-previews.css";
+@import "./launch-film.css";
 @import "../taffy-core/resources/tokens/generated/css/taffy-color-tokens.css";
 
 @source "./app";

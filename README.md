@@ -28,6 +28,14 @@
   <a href="SECURITY.md">Security</a>
 </p>
 
+## Watch TaffyGo
+
+https://github.com/user-attachments/assets/a15d0af1-5d7b-4fde-ad25-c423d3d7f68c
+
+The 1 minute 58 second launch film, in 4K at 60 fps with sound.
+[Watch on the website](https://taffygo.com/#launch-film) for English captions,
+or [download the film](https://taffygo.com/media/taffygo-launch-4k60.webm).
+
 <table align="center">
   <tr>
     <td align="center"><img src=".github/assets/screens/03-ad-blocking.webp" width="160" alt="The page sheet on a recipe site: 20 ads and trackers blocked on this page, and a switch for the site"></td>

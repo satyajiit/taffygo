@@ -38,6 +38,34 @@ Try the address box and dock
 
 Interactive app preview · sample sites and tasks
 
+## Watch TaffyGo work.
+
+From everyday browsing to getting things done. The launch film, in under two minutes.
+
+[Watch the TaffyGo launch film](https://taffygo.com/media/taffygo-launch-4k60.webm)
+
+Launch film 4K · 60 fps Sound on [Download film](https://taffygo.com/media/taffygo-launch-4k60.webm)
+
+### Read the transcript
+
+Researcher? You. Tab collector? You. Copy. Paste. Repeat. What if your browser could help carry the work?
+
+Meet TaffyGo. Your AI-native browser for Android. You browse. Taffy helps with the work.
+
+A form needs a photo under two hundred kilobytes. Your photo is too big. Just ask Taffy. Taffy fills your selected details. It resizes and compresses a copy on your phone. Then attaches it. Your original stays untouched. You review. You approve. Taffy submits.
+
+Built-in ad blocking. Fewer ads. Fewer trackers. More room for the page. Keep your tabs and saved pages close. Connect the AI provider you choose.
+
+Turn pages into something useful. Ask Taffy to collect a table from selected pages. Keep the source links. Save a spreadsheet. File processing happens on your device.
+
+Compare products across websites. Bring prices, specs, and reviews from multiple sources into one clear view.
+
+Spot downloadable videos across supported sites. Queue them in the download manager. Watch in the built-in player.
+
+TaffyGo SDK. On-device MCP and IPC. Let AI agents in other apps use your browser, with your permission.
+
+TaffyGo is being built as open-source software, under the Mozilla Public License. Developers, designers, translators, and curious testers: come build it with us. Make the browser you want to use. TaffyGo. Browse with a little help.
+
 Your browser. Your choice of AI.
 
 [38 providers · 667 model entries](https://taffygo.com/providers/)

@@ -253,6 +253,6 @@ describe("app theme parity", () => {
       .filter((file) => readFileSync(file, "utf8").includes('"use client"'))
       .map((file) => file.split("/").pop())
       .sort();
-    expect(clients).toEqual(["BrowserWorkbench.tsx", "EnginePresentation.tsx", "Header.tsx", "LocalToolsPreview.tsx", "MotionControl.tsx", "NewTabPreview.tsx", "PageAssistantPreview.tsx", "ProviderDirectory.tsx", "ServiceWorkerRegistration.tsx", "ThemeSwitch.tsx", "WorkflowDemo.tsx"]);
+    expect(clients).toEqual(["BrowserWorkbench.tsx", "EnginePresentation.tsx", "Header.tsx", "LaunchFilm.tsx", "LocalToolsPreview.tsx", "MotionControl.tsx", "NewTabPreview.tsx", "PageAssistantPreview.tsx", "ProviderDirectory.tsx", "ServiceWorkerRegistration.tsx", "ThemeSwitch.tsx", "WorkflowDemo.tsx"]);
   });
 });

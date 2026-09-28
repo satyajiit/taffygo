@@ -6,6 +6,7 @@
 
 import { ArrowRight, PanelsTopLeft, Moon, Archive, KeyRound, Search, Download } from "lucide-react";
 import { HeroSection } from "@/components/home/HeroSection";
+import { LaunchFilm } from "@/components/home/LaunchFilm";
 import { CommunitySection } from "@/components/home/CommunitySection";
 import { Questions } from "@/components/home/Questions";
 import { StoreLinks } from "@/components/StoreLinks";
@@ -27,6 +28,7 @@ export default function Home() {
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema).replace(/</g, "\\u003c") }} />
     <HeroSection />
+    <LaunchFilm />
     <ProviderRibbon />
     <section className="container-site story-section" id="tour" aria-labelledby="story-title">
       <div className="section-intro"><h2 id="story-title">Watch Taffy<br /><span>work through a task.</span></h2><p>Try a document download or a banking form. Follow each step, complete the handover, and review the result.</p></div>
