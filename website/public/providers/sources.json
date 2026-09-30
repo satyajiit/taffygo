@@ -1,0 +1,186 @@
+[
+  {
+    "id": "nvidia",
+    "title": "NVIDIA",
+    "source": "https://svgl.app/library/nvidia-icon-light.svg",
+    "brand": "https://www.nvidia.com",
+    "library": "https://svgl.app",
+    "sha256": "034bb5cb032e6174f16c5bfffaaf03f9453c95ae707f4c3cee3ffb0e53e8a8c0"
+  },
+  {
+    "id": "moonshot",
+    "title": "Kimi",
+    "source": "https://svgl.app/library/kimi-icon.svg",
+    "brand": "https://kimi.ai",
+    "library": "https://svgl.app",
+    "sha256": "0ba35ce31b57bb6db39d4e454925e39f88f46a3b52a07898bd8262c3902df7fc"
+  },
+  {
+    "id": "together",
+    "title": "Together AI",
+    "source": "https://svgl.app/library/togetherai_light.svg",
+    "brand": "https://www.together.ai/",
+    "library": "https://svgl.app",
+    "sha256": "a783e1fe58888d2221b621490017b967a3c583886a1b2aa4da5c193640536703"
+  },
+  {
+    "id": "groq",
+    "title": "Groq",
+    "source": "https://svgl.app/library/groq.svg",
+    "brand": "https://groq.com/",
+    "library": "https://svgl.app",
+    "sha256": "f8b4420340ff8875a1f04ce80909325dd81b0cb78d0c7a15fd567977338ae956"
+  },
+  {
+    "id": "github-copilot",
+    "title": "GitHub Copilot",
+    "source": "https://svgl.app/library/copilot.svg",
+    "brand": "https://github.com/features/copilot",
+    "library": "https://svgl.app",
+    "sha256": "f9a0867d6e367502b33b093b638b066092b0f1b8814cd1450c745360aa92f1ba"
+  },
+  {
+    "id": "xai",
+    "title": "Grok",
+    "source": "https://svgl.app/library/grok-light.svg",
+    "brand": "https://grok.com/",
+    "library": "https://svgl.app",
+    "sha256": "a127a7cd42b0450f7d3827a331b0730aab49fd99c3fe920d172475b9ffc83992"
+  },
+  {
+    "id": "openai",
+    "title": "OpenAI",
+    "source": "https://svgl.app/library/openai.svg",
+    "brand": "https://openai.com/",
+    "library": "https://svgl.app",
+    "sha256": "71eba8e11d265af0e3375ad610db95b4a5fedf9f07c40e5252e73942b8c5982e"
+  },
+  {
+    "id": "chromium",
+    "title": "Chromium",
+    "source": "https://svgl.app/library/chromium.svg",
+    "brand": "https://www.chromium.org",
+    "library": "https://svgl.app",
+    "sha256": "f10fd8a8cdd4bb4d9057c561e9590aaf2d749cd108045c89121dc32c36cd0dfb"
+  },
+  {
+    "id": "rust",
+    "title": "Rust",
+    "source": "https://svgl.app/library/rust.svg",
+    "brand": "https://www.rust-lang.org/",
+    "library": "https://svgl.app",
+    "sha256": "383a6e47b7ef50f2646c626084896af12d79a7262f60a318cc51bfb780a0529d"
+  },
+  {
+    "id": "android",
+    "title": "Android",
+    "source": "https://svgl.app/library/android-icon.svg",
+    "brand": "https://www.android.com/",
+    "library": "https://svgl.app",
+    "sha256": "f94c0bd4465701e7eb708fae6f3ee69dbdf6b363901f44e1a3d5d5410f4adb14"
+  },
+  {
+    "id": "mistral",
+    "title": "Mistral AI",
+    "source": "https://svgl.app/library/mistral-ai_logo.svg",
+    "brand": "https://mistral.ai/",
+    "library": "https://svgl.app",
+    "sha256": "792480de7c64c395ad438cfe0dd668cf7577961a8e653512ea6a45591a2f488e"
+  },
+  {
+    "id": "huggingface",
+    "title": "Hugging Face",
+    "source": "https://svgl.app/library/hugging_face.svg",
+    "brand": "https://huggingface.co/",
+    "library": "https://svgl.app",
+    "sha256": "b5d3cd5fd73e72a38784cc834f153aa1c985b4071f32154ba506862fce18a0ee"
+  },
+  {
+    "id": "anthropic",
+    "title": "Claude AI",
+    "source": "https://svgl.app/library/claude-ai-icon.svg",
+    "brand": "https://claude.ai/",
+    "library": "https://svgl.app",
+    "sha256": "0df6dad23995f5a76c6db8cc2a4e646ff45bd7a0626ef98662a7025646e5eea1"
+  },
+  {
+    "id": "deepseek",
+    "title": "DeepSeek",
+    "source": "https://svgl.app/library/deepseek.svg",
+    "brand": "https://deepseek.com/",
+    "library": "https://svgl.app",
+    "sha256": "360336e87a3336f60b7d2432ecdea2982537806886e20b170163fd5d3dda825b"
+  },
+  {
+    "id": "vercel-ai-gateway",
+    "title": "Vercel",
+    "source": "https://svgl.app/library/vercel.svg",
+    "brand": "https://vercel.com/",
+    "library": "https://svgl.app",
+    "sha256": "565f40e56abbd9c9f31e113c45e90ce456cc112d4811f2f49d1d5041fe501b7c"
+  },
+  {
+    "id": "google-ai-studio",
+    "title": "Gemini",
+    "source": "https://svgl.app/library/gemini.svg",
+    "brand": "https://gemini.google.com/",
+    "library": "https://svgl.app",
+    "sha256": "c11d94a9e3ecb32f67dd9350848cf3124d617680533275c672e1e6bf61ce8cd4"
+  },
+  {
+    "id": "qwen",
+    "title": "Qwen",
+    "source": "https://svgl.app/library/qwen_light.svg",
+    "brand": "https://chat.qwenlm.ai/",
+    "library": "https://svgl.app",
+    "sha256": "dcb3ba2f2b55ccbacbade0ca0bf98921fbaf8a07848972974b4a9bf8077376cf"
+  },
+  {
+    "id": "github",
+    "title": "GitHub",
+    "source": "https://svgl.app/library/github_light.svg",
+    "brand": "https://github.com/",
+    "library": "https://svgl.app",
+    "sha256": "64568845c83d5e840e6a1fb7af1939fed14709636427ce9be2fbcdc14ac5e021"
+  },
+  {
+    "id": "openrouter",
+    "title": "OpenRouter",
+    "source": "https://svgl.app/library/openrouter_light.svg",
+    "brand": "https://openrouter.ai/",
+    "library": "https://svgl.app",
+    "sha256": "fec63b6dc071651e45a784031c4755250384314289e3a2695a3383635f6de1d3"
+  },
+  {
+    "id": "kilocode",
+    "title": "Kilo Code",
+    "source": "https://svgl.app/library/kilocode-light.svg",
+    "brand": "https://kilocode.ai/",
+    "library": "https://svgl.app",
+    "sha256": "02386f2469272dcd72ea34c5bd7fa703833739ab44dd579b1c2f90ae3bd48054"
+  },
+  {
+    "id": "opencode",
+    "title": "OpenCode",
+    "source": "https://svgl.app/library/opencode.svg",
+    "brand": "https://opencode.ai/",
+    "library": "https://svgl.app",
+    "sha256": "5a44ee78769508c7226d8ac35b7b9738f929176a6c63b15f594a617afbc82a72"
+  },
+  {
+    "id": "cerebras",
+    "title": "Cerebras",
+    "source": "https://svgl.app/library/cerebras-dark.svg",
+    "brand": "https://www.cerebras.ai/",
+    "library": "https://svgl.app",
+    "sha256": "3cbda26043bed3b35f41ece45f7b4d76e859bfad52c6a2d31b15fe8fa54ee2d8"
+  },
+  {
+    "id": "python",
+    "title": "Python",
+    "source": "https://raw.githubusercontent.com/pheralb/svgl/main/static/library/python.svg",
+    "brand": "https://www.python.org",
+    "library": "https://svgl.app",
+    "sha256": "e4d80b4ca9418d1ebb4ff880eb7cbe6896d60d61d9f44ead6723db29a4ed962e"
+  }
+]

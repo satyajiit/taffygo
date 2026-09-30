@@ -1,0 +1,70 @@
+{
+  "pages": [
+    {
+      "title": "TaffyGo | Open-source AI-native browser for Android",
+      "description": "TaffyGo is a free, open-source AI-native browser for Android. Block ads and trackers, browse with Taffy, and bring your own AI provider. No account needed.",
+      "url": "https://taffygo.com/",
+      "markdown": "https://taffygo.com/index.md"
+    },
+    {
+      "title": "Hand Taffy an errand | TaffyGo",
+      "description": "One errand in TaffyGo from start to finish, in screens from a phone: you pick the pages, Taffy works in its own tabs while you watch, and the result names its sources.",
+      "url": "https://taffygo.com/product/",
+      "markdown": "https://taffygo.com/product.md"
+    },
+    {
+      "title": "Built for phones | TaffyGo",
+      "description": "Back, forward, Ask Taffy and your tabs sit in one row at the bottom, and the tabs Taffy opens are grouped apart from yours.",
+      "url": "https://taffygo.com/built-for-phones/",
+      "markdown": "https://taffygo.com/built-for-phones.md"
+    },
+    {
+      "title": "AI-native browser use cases: documents, forms and research | TaffyGo",
+      "description": "Try TaffyGo’s interactive document and banking demos: website navigation, verification handovers, local image resizing, and form approval.",
+      "url": "https://taffygo.com/use-cases/",
+      "markdown": "https://taffygo.com/use-cases.md"
+    },
+    {
+      "title": "AI providers and models for Android browsing | TaffyGo",
+      "description": "Explore all 38 provider entries and 667 models in TaffyGo’s catalog. Search Claude, OpenAI, Gemini, DeepSeek and more. Connect your own key or plan.",
+      "url": "https://taffygo.com/providers/",
+      "markdown": "https://taffygo.com/providers.md"
+    },
+    {
+      "title": "Chromium, Rust and on-device Python | TaffyGo",
+      "description": "Explore TaffyGo’s native Android interface, Chromium browser, sandboxed Rust core, and integrated on-device Python runtime.",
+      "url": "https://taffygo.com/technology/",
+      "markdown": "https://taffygo.com/technology.md"
+    },
+    {
+      "title": "Contact | TaffyGo",
+      "description": "Report a bug or ask a question on GitHub, and report a security problem privately there. TaffyGo has no support inbox and no contact form.",
+      "url": "https://taffygo.com/contact/",
+      "markdown": "https://taffygo.com/contact.md"
+    },
+    {
+      "title": "Privacy policy | TaffyGo",
+      "description": "TaffyGo keeps your data on your phone. Matterward Labs runs no server for it, collects nothing from the app and has no account for you to make.",
+      "url": "https://taffygo.com/privacy/",
+      "markdown": "https://taffygo.com/privacy.md"
+    },
+    {
+      "title": "Delete your data | TaffyGo",
+      "description": "Matterward Labs holds no data about you, so there is nothing on our side to delete. This is how to clear what TaffyGo keeps on your phone.",
+      "url": "https://taffygo.com/delete-my-data/",
+      "markdown": "https://taffygo.com/delete-my-data.md"
+    },
+    {
+      "title": "Terms of use | TaffyGo",
+      "description": "The terms for using TaffyGo: the source licence, what it leaves out, and the services you connect yourself.",
+      "url": "https://taffygo.com/terms/",
+      "markdown": "https://taffygo.com/terms.md"
+    },
+    {
+      "title": "Open-source licences | TaffyGo",
+      "description": "TaffyGo's source is under the Mozilla Public License 2.0. Where to read the notices for the browser and for this website.",
+      "url": "https://taffygo.com/licenses/",
+      "markdown": "https://taffygo.com/licenses.md"
+    }
+  ]
+}

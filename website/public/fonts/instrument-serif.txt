@@ -1,0 +1,6 @@
+Instrument Serif Regular, Latin subset
+Source: https://fonts.gstatic.com/s/instrumentserif/v5/jizBRFtNs2ka5fXjeivQ4LroWlx-6zUTjg.woff2
+Project: https://github.com/google/fonts/tree/main/ofl/instrumentserif
+Licence: SIL Open Font License 1.1, instrument-serif-OFL.txt
+Recorded: 2026-09-27
+sha256=5eb09b5ac0e28b67c2f041c8ba6d244604ca0c0980d65912ab2d47fed84ddc31

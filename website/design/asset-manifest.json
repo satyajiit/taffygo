@@ -1,0 +1,154 @@
+[
+  {
+    "path": "public/studio/engine.webp",
+    "sha256": "4e17ff1b5bb57813ef5644ebb313782070e03689e182306e18ee8a5a6dfa6ce5",
+    "source": "design/sources/engine.png",
+    "source_sha256": "ae24a4b99d4a72b0034e3ec4c3e14adb3cc85775eea1506fd36a6ad3e7c0b1e2",
+    "tool": "built-in image_gen",
+    "processing": "cwebp: resize and compression only"
+  },
+  {
+    "path": "public/studio/social-ff17215e4f59.webp",
+    "sha256": "ff17215e4f5976203bd9466fbf5254a289ca731833fe74bd33fd7dac37eec11f",
+    "source": "design/sources/social.png",
+    "source_sha256": "1a1d66ccefca973a30e2ed88b8ba3e39206872b723b7017539888644d5fd7960",
+    "tool": "built-in image_gen",
+    "processing": "cwebp: resize and compression only"
+  },
+  {
+    "path": "public/studio/taffy-atelier.webp",
+    "sha256": "b09ecdc8a48ba5993b2adbd2c3a01d9ce91d30a13da02b7235f8b595f546c893",
+    "source": "design/sources/taffy-atelier.png",
+    "source_sha256": "6283f679602c42f68620fea49cae1abda47df88ccd37dfd18e688ecbef709587",
+    "tool": "built-in image_gen",
+    "processing": "cwebp: resize and compression only"
+  },
+  {
+    "path": "public/brand/matterward-labs.svg",
+    "sha256": "ae22d56ea5ae34af3237fb4aaa7e9d524e4ecb4049ba0fdc3bbf1dfe4473d1d4",
+    "source": "Matterward Labs company website, assets/brand/matterward/svg/matterward-lockup-c-horizontal-on-dark.svg",
+    "owner": "Matterward Labs Private Limited",
+    "source_url": "https://matterwardlabs.com"
+  },
+  {
+    "path": "public/studio/taffy-atelier-480.webp",
+    "sha256": "7be18c87f94294619379e46896a18ca8e592230f2a9d84f035dda22e28ae8062",
+    "source": "design/sources/taffy-atelier.png",
+    "source_sha256": "6283f679602c42f68620fea49cae1abda47df88ccd37dfd18e688ecbef709587",
+    "tool": "built-in image_gen",
+    "processing": "cwebp: resize and compression only"
+  },
+  {
+    "path": "public/studio/taffy-atelier-720.webp",
+    "sha256": "76e952ffd0d0045713a38062c38bd56e0e4f199c9fb858d91b6cba44cc952f0a",
+    "source": "design/sources/taffy-atelier.png",
+    "source_sha256": "6283f679602c42f68620fea49cae1abda47df88ccd37dfd18e688ecbef709587",
+    "tool": "built-in image_gen",
+    "processing": "cwebp: resize and compression only"
+  },
+  {
+    "path": "public/studio/social-product-3bccbb12b347.webp",
+    "source": "design/sources/social-card.png",
+    "width": 1200,
+    "height": 630,
+    "bytes": 48532,
+    "sha256": "3bccbb12b347a437b2d242894554ece6fc02dbc1ffa0d7f73468664ddbf5fb6a",
+    "source_sha256": "31e6098b677d79f03c113a15316da3ffa7993b13ef7e9e6b742cb009f2086448",
+    "tool": "HTML capture + built-in image_gen assets",
+    "processing": "Browser capture of design/social-card.html; cwebp compression"
+  },
+  {
+    "path": "public/studio/social-newtab-ea3faf4e6b45.webp",
+    "source": "design/sources/social-card-newtab.png",
+    "width": 1200,
+    "height": 630,
+    "bytes": 36470,
+    "sha256": "ea3faf4e6b45e6b3cdb5dd84b585b7359043ef200efd49b1ba7cfcd689029333",
+    "source_sha256": "9be92d9cefdff4b3e4902383ca95ca5f81c50203024e420b302c51e0165f9290",
+    "tool": "HTML capture + built-in image_gen assets",
+    "processing": "Browser capture of coded new-tab preview and design/social-card.html; cwebp compression"
+  },
+  {
+    "path": "public/start-scenes/morning.webp",
+    "sha256": "4f3238f898dc901050dcba4243ac9ae21ff03036bfef6712ff08a6debbbba809",
+    "source": "taffy-core/ui/android/core/ui/vendor/start-scenes/webp/morning-4.webp",
+    "source_sha256": "4f3238f898dc901050dcba4243ac9ae21ff03036bfef6712ff08a6debbbba809",
+    "tool": "Original app asset",
+    "processing": "Copied without modification"
+  },
+  {
+    "path": "public/start-scenes/evening.webp",
+    "sha256": "27c0fd8ceba8a365c8c54f732081088e5b0398194b398fd941b5bd4a9e352989",
+    "source": "taffy-core/ui/android/core/ui/vendor/start-scenes/webp/evening-1.webp",
+    "source_sha256": "27c0fd8ceba8a365c8c54f732081088e5b0398194b398fd941b5bd4a9e352989",
+    "tool": "Original app asset",
+    "processing": "Copied without modification"
+  },
+  {
+    "path": "public/studio/social-newtab-7c3e9999cd6b.webp",
+    "source": "design/sources/social-card-newtab-final.png",
+    "width": 1200,
+    "height": 630,
+    "bytes": 36338,
+    "sha256": "7c3e9999cd6bc38446ba1c3faa67b6c5c7c3124c9e03aca344ab1404f6066c14",
+    "source_sha256": "94593dc92446038ac1bb3216e6df0c95c9766f7c64c6647df776100bb58f4985",
+    "tool": "HTML capture + built-in image_gen assets",
+    "processing": "Browser capture of coded new-tab preview and design/social-card.html; cwebp compression"
+  },
+  {
+    "path": "public/studio/social-newtab-1f7ebe6eb42e.jpg",
+    "source": "design/sources/social-card-newtab-final.jpg",
+    "width": 1200,
+    "height": 630,
+    "bytes": 76404,
+    "sha256": "1f7ebe6eb42e5d606548b5d55dd6da1dc7cec8e0a4d7d8e66ef1984697d53df9",
+    "source_sha256": "1f7ebe6eb42e5d606548b5d55dd6da1dc7cec8e0a4d7d8e66ef1984697d53df9",
+    "tool": "HTML capture + built-in image_gen assets",
+    "processing": "Browser capture as JPEG for social platform compatibility"
+  },
+  {
+    "path": "public/start-scenes/morning-320.webp",
+    "source": "public/start-scenes/morning.webp",
+    "sha256": "401e535f4793f41469264ef228f3726fd515fdbf4391e4cdf54dbdf79d3e394b",
+    "source_sha256": "4f3238f898dc901050dcba4243ac9ae21ff03036bfef6712ff08a6debbbba809",
+    "tool": "Original app asset",
+    "processing": "cwebp: resize to 320x240, quality 78"
+  },
+  {
+    "path": "public/start-scenes/evening-320.webp",
+    "source": "public/start-scenes/evening.webp",
+    "sha256": "d25c6a12a990a030cd1e8b1ee8d3fceb78b4e3b054aa7dd9fccd2b17b78aa388",
+    "source_sha256": "27c0fd8ceba8a365c8c54f732081088e5b0398194b398fd941b5bd4a9e352989",
+    "tool": "Original app asset",
+    "processing": "cwebp: resize to 320x240, quality 78"
+  },
+  {
+    "path": "public/media/launch-film-thumbnail.webp",
+    "sha256": "01f6ed3c5d8accab4e7fabffbcc7083cb38efeaae033b6bbe2e42192e93f9701",
+    "source": "design/sources/launch-film-thumbnail.png",
+    "source_sha256": "0290eee99716daa05b7fb3fae530c8a93a8ed32309cccd803fd0a2b6edad304e",
+    "width": 1600,
+    "height": 900,
+    "bytes": 66994,
+    "tool": "built-in image_gen",
+    "prompt": "design/launch-film-thumbnail.json",
+    "processing": "cwebp: resize to 1600x900 and compression only, quality 88"
+  },
+  {
+    "path": "public/media/taffygo-launch-4k60.webm",
+    "sha256": "60d8768caa9e9d371db0380f8e1f680800553b884bb09ca3fd128cf41736005f",
+    "source": "../videos/taffygo-launch/renders/taffygo-launch-v4-4k60.mp4",
+    "source_sha256": "65ef2e4193e7c1441150cfd84f76b1da949fdfe160d753d93798ff8450f80433",
+    "width": 3840,
+    "height": 2160,
+    "fps": 60,
+    "duration_seconds": 118,
+    "frames": 7080,
+    "bytes": 41805711,
+    "video_codec": "VP9",
+    "audio_codec": "Opus",
+    "tool": "HyperFrames 0.8.80 + FFmpeg",
+    "processing": "Native composition render at 2x browser pixel density; VP9 CRF 30 and Opus 160k; front-loaded WebM seek index",
+    "command": "../videos/taffygo-launch/tools/export-webm.sh"
+  }
+]

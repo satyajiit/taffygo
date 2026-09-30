@@ -4,184 +4,83 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import HomePage from "@/app/page";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { SkipLink } from "@/components/SkipLink";
-import { footer, getTaffy, header } from "@/lib/content";
-import {
-  download,
-  facts,
-  faq,
-  hero,
-  meetTaffy,
-  stickyGet,
-  tour,
-  type TourShot,
-} from "@/lib/content/home";
-import { screens } from "@/lib/content/screens";
+import { getTaffy } from "@/lib/content";
+import { faq } from "@/lib/content/home";
+import { links } from "@/lib/site";
 
 function renderPage() {
-  return render(
-    <>
-      <SkipLink />
-      <Header />
-      <main id="main">
-        <HomePage />
-      </main>
-      <Footer />
-    </>,
-  );
+  return render(<><SkipLink /><Header /><main id="main"><HomePage /></main><Footer /></>);
 }
 
 describe("landing page", () => {
-  it("puts a skip link first in the focus order", () => {
+  it("puts the skip link first and gives the page one descriptive heading", () => {
     const { container } = renderPage();
-    const focusable = container.querySelectorAll("a[href], button, summary");
-    expect(focusable[0]).toHaveAttribute("href", "#main");
-    expect(focusable[0]).toHaveTextContent("Skip to content");
+    expect(container.querySelector("a[href], button, summary")).toHaveAttribute("href", "#main");
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("The AI-nativebrowser for Android.");
   });
 
-  it("has exactly one first-level heading, and it is the promise", () => {
-    renderPage();
-    const headings = screen.getAllByRole("heading", { level: 1 });
-    expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent(hero.title);
-  });
-
-  it("offers Google Play and the APK in the hero and in the download section", () => {
+  it("offers real install destinations in the hero and download section", () => {
     const { container } = renderPage();
     for (const selector of ['section[aria-labelledby="hero-title"]', "#get"]) {
-      const region = container.querySelector(selector) as HTMLElement;
-      expect(region, selector).not.toBeNull();
-      const play = within(region).getByRole("link", { name: getTaffy.playBadgeAlt });
-      expect(play).toHaveAttribute("href", getTaffy.playHref);
-      expect(within(region).getByRole("link", { name: getTaffy.apkLabel })).toHaveAttribute(
-        "href",
-        getTaffy.apkHref,
-      );
-      expect(within(region).getByRole("link", { name: getTaffy.sourceLabel })).toHaveAttribute(
-        "href",
-        getTaffy.sourceHref,
-      );
+      const section = within(container.querySelector(selector) as HTMLElement);
+      expect(section.getByRole("link", { name: getTaffy.playBadgeAlt })).toHaveAttribute("href", links.googlePlay);
+      expect(section.getByRole("link", { name: getTaffy.apkLabel })).toHaveAttribute("href", links.releases);
     }
+    expect(screen.getAllByRole("link", { name: /Star on GitHub/ })).toHaveLength(2);
   });
 
-  it("shows the hero strip as real screens, the first one fetched first", () => {
-    const { container } = renderPage();
-    const strip = screen.getByRole("group", { name: hero.stripLabel });
-    const images = within(strip).getAllByRole("img");
-    expect(images.map((image) => image.getAttribute("alt"))).toEqual(
-      hero.strip.map((id) => screens[id].alt),
-    );
-    expect(images[0]).toHaveAttribute("fetchpriority", "high");
-    expect(images[0]).toHaveAttribute("loading", "eager");
-    for (const image of images.slice(1)) {
-      expect(image).toHaveAttribute("loading", "lazy");
-    }
-    expect(container.querySelector(".hero-strip")).not.toBeNull();
-  });
-
-  it("gives every tour stop its screens, and one pin per numbered note", () => {
-    const { container } = renderPage();
-    for (const stop of tour.stops) {
-      const article = container.querySelector(`article#${stop.id}`) as HTMLElement;
-      expect(article, stop.id).not.toBeNull();
-      expect(within(article).getByRole("heading", { level: 3 })).toHaveTextContent(stop.title);
-      for (const shot of stop.shots as ReadonlyArray<TourShot>) {
-        expect(within(article).getByAltText(screens[shot.screen].alt)).toBeInTheDocument();
-        if (shot.caption) expect(article).toHaveTextContent(shot.caption);
-        if (shot.callouts) {
-          const pins = article.querySelectorAll(".pin");
-          const notes = article.querySelectorAll(".callouts li");
-          expect(pins).toHaveLength(shot.callouts.length);
-          expect(notes).toHaveLength(shot.callouts.length);
-          expect(pins[0]!.closest('[aria-hidden="true"]')).not.toBeNull();
-        }
-      }
-    }
-    expect(container.querySelector("article#providers")).not.toBeNull();
-  });
-
-  it("keeps a get bar in the tour that stays in view while it scrolls", () => {
-    const { container } = renderPage();
-    const bar = container.querySelector("#tour .sticky-get") as HTMLElement;
-    expect(bar).not.toBeNull();
-    expect(within(bar).getByRole("link", { name: stickyGet.play })).toHaveAttribute(
-      "href",
-      getTaffy.playHref,
-    );
-    expect(within(bar).getByRole("link", { name: stickyGet.apk })).toHaveAttribute(
-      "href",
-      getTaffy.apkHref,
-    );
-  });
-
-  it("introduces Taffy with a described painting", () => {
+  it("shows the idle new-tab UI with the app’s scene and can pause motion", () => {
     renderPage();
-    expect(screen.getByRole("heading", { name: meetTaffy.title })).toBeInTheDocument();
-    expect(screen.getByAltText(meetTaffy.imageAlt)).toHaveAttribute(
-      "srcset",
-      expect.stringContaining("/art/website-hero-1600.webp 1600w"),
-    );
+    expect(screen.getByText("Where to today?")).toBeInTheDocument();
+    expect(screen.getByAltText(/app’s morning scene/)).toHaveAttribute("src", "/start-scenes/morning-320.webp");
+    expect(screen.getByRole("textbox", { name: "Try the address box" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Preview downloads" })).toBeInTheDocument();
+    expect(screen.getByAltText(/winged assistant/)).toHaveAttribute("src", "/cutouts/taffy-240.webp");
+    fireEvent.click(screen.getByRole("button", { name: "Pause motion" }));
+    expect(document.documentElement.dataset.motionPaused).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Play motion" }));
+    expect(document.documentElement.dataset.motionPaused).toBe("false");
   });
 
-  it("sets the facts out as a list of terms, each with its value", () => {
+  it("opens navigation for touch and closes it with Escape", () => {
     const { container } = renderPage();
-    const list = container.querySelector("#facts dl.spec") as HTMLElement;
-    expect(list).not.toBeNull();
-    const terms = [...list.querySelectorAll("dt")].map((term) => term.textContent);
-    expect(terms).toEqual(facts.rows.map((row) => row.label));
-    const values = [...list.querySelectorAll("dd")];
-    for (const [index, row] of facts.rows.entries()) {
-      expect(values[index]).toHaveTextContent(row.value);
+    const menu = container.querySelector(".explore-menu") as HTMLDetailsElement;
+    menu.open = true;
+    fireEvent.keyDown(menu.querySelector("summary")!, { key: "Escape" });
+    expect(menu.open).toBe(false);
+    expect(document.activeElement).toBe(menu.querySelector("summary"));
+    expect(within(menu).getByRole("link", { name: /AI models/, hidden: true })).toHaveAttribute("href", "/providers/");
+  });
+
+  it("gives the visible FAQ matching machine-readable answers", () => {
+    const { container } = renderPage();
+    const structured = [...container.querySelectorAll('script[type="application/ld+json"]')].map(node => JSON.parse(node.textContent!));
+    const data = structured.find(item => item["@type"] === "FAQPage");
+    expect(data.mainEntity).toHaveLength(faq.length);
+    for (const item of faq) {
+      const question = screen.getByText(item.question, { selector: "summary" });
+      expect(question.closest("details")).toHaveTextContent(item.answer);
+      expect(data.mainEntity).toContainEqual({ "@type": "Question", name: item.question, acceptedAnswer: { "@type": "Answer", text: item.answer } });
     }
-    expect(within(list).getByRole("link", { name: "github.com/satyajiit/taffygo" })).toHaveAttribute(
-      "href",
-      "https://github.com/satyajiit/taffygo",
-    );
   });
 
-  it("answers each question in a native disclosure", () => {
-    const { container } = renderPage();
-    const details = container.querySelectorAll("#questions details");
-    expect(details).toHaveLength(faq.length);
-    for (const [index, item] of faq.entries()) {
-      expect(details[index]!.querySelector("summary")).toHaveTextContent(item.question);
-    }
-  });
-
-  it("ends with the download section the header points at", () => {
-    const { container } = renderPage();
-    expect(header.getHref).toBe("/#get");
-    const get = container.querySelector("section#get") as HTMLElement;
-    expect(within(get).getByRole("heading", { level: 2 })).toHaveTextContent(download.title);
-    expect(get).toHaveTextContent(download.note);
-    expect(within(get).getByRole("link", { name: download.bugLabel })).toHaveAttribute(
-      "href",
-      download.bugHref,
-    );
-  });
-
-  it("links every page from the footer on the dark surface", () => {
+  it("credits Matterward with its real brand asset and links privacy controls", () => {
     renderPage();
-    const nav = screen.getByRole("navigation", { name: footer.navLabel });
-    for (const link of footer.links) {
-      expect(within(nav).getByRole("link", { name: link.label })).toHaveAttribute(
-        "href",
-        link.href,
-      );
+    expect(screen.getByAltText("Matterward Labs")).toHaveAttribute("src", "/brand/matterward-labs.svg");
+    expect(screen.getByRole("link", { name: "Delete your data" })).toHaveAttribute("href", "/delete-my-data/");
+    expect(screen.getByText(/This site sets no cookies/)).toBeInTheDocument();
+    for (const link of screen.getAllByRole("link", { name: /Request a feature/ })) {
+      expect(link).toHaveAttribute("href", "https://github.com/satyajiit/taffygo/issues/new?template=feature_request.yml");
     }
-    expect(nav.closest("footer")).toHaveAttribute("data-taffy-theme", "dark");
-  });
-
-  it("draws no device chrome around a screen", () => {
-    const { container } = renderPage();
-    for (const frame of container.querySelectorAll(".phone-frame")) {
-      expect(frame.querySelectorAll("svg")).toHaveLength(0);
-      expect(frame.children[0]!.tagName).toBe("IMG");
+    for (const link of screen.getAllByRole("link", { name: /Report a bug/ })) {
+      expect(link).toHaveAttribute("href", "https://github.com/satyajiit/taffygo/issues/new?template=bug_report.yml");
     }
   });
 });

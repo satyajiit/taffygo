@@ -1,0 +1,34 @@
+{
+  "public/cutouts/taffy.webp": {
+    "bytes": 113566,
+    "sha256": "269d9d69401bbd27338a5658e443ba4547b7574b061f981a6dea3842ac33baec"
+  },
+  "public/cutouts/taffy-480.webp": {
+    "bytes": 68184,
+    "sha256": "5e92f4256f50893d9a04a41f2fc4601fdc85a6ae23e7476f4ec7b9bcd99a090c"
+  },
+  "public/cutouts/taffy-360.webp": {
+    "bytes": 44178,
+    "sha256": "631ebad8f7eb94dbdc0419e1019aeafe529f5fb435fc50ce1825d06dabd76219"
+  },
+  "public/cutouts/document.webp": {
+    "bytes": 10008,
+    "sha256": "e3d540c062bac85b8c97dfb838cf601b4fca32ae044c569a1396f9200d3318eb"
+  },
+  "public/demo/sample-photo.png": {
+    "bytes": 1976619,
+    "sha256": "f689e6098c6413f633471b23a4c71712dededd5b6b3f21b7380c53f9238dd257"
+  },
+  "public/demo/residence-sample.pdf": {
+    "bytes": 866,
+    "sha256": "c846c46f11485e2ff2c8f9ef40a698729e450a173cc359a8a6274c357a277de7"
+  },
+  "public/studio/social-product-3bccbb12b347.webp": {
+    "bytes": 48532,
+    "sha256": "3bccbb12b347a437b2d242894554ece6fc02dbc1ffa0d7f73468664ddbf5fb6a"
+  },
+  "public/cutouts/taffy-240.webp": {
+    "bytes": 23460,
+    "sha256": "dd0b2615e19208422a631b85a59ee6613e460f1ce3b7a0dac75fb01da8206af0"
+  }
+}

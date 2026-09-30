@@ -1,0 +1,75 @@
+/* Copyright (c) 2026 Matterward Labs Private Limited.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
+.workflow-choices { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-bottom: var(--space-lg); }
+.workflow-choices button { display: flex; align-items: center; justify-content: space-between; gap: var(--space-lg); border: 1px solid var(--outline); border-radius: 3rem; padding: var(--space-sm) var(--space-lg); min-height: 48px; font-size: .8125rem; cursor: pointer; white-space: nowrap; }
+.workflow-choices button[aria-pressed='true'] { background: var(--text-primary); color: var(--surface); border-color: var(--text-primary); }
+.workflow-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-lg); }
+.workflow-story { padding-top: var(--space-lg); }
+.workflow-story h3 { font-size: clamp(1.35rem, 2vw, 1.65rem); letter-spacing: -.035em; font-weight: 700; line-height: 1.3; }
+.workflow-story > p { max-width: 35rem; margin-top: var(--space-sm); font-size: .875rem; color: var(--text-secondary); }
+.workflow-steps { margin-top: var(--space-lg); }
+.workflow-steps li { border-bottom: 1px solid var(--outline); }
+.workflow-steps button { display: flex; gap: var(--space-md); text-align: left; cursor: pointer; width: 100%; padding: var(--space-md) var(--space-xs); }
+.workflow-step-number { display: grid; place-items: center; flex-shrink: 0; width: 1.5rem; height: 1.5rem; font-size: .6875rem; border: 1px solid var(--outline); border-radius: 50%; font-variant-numeric: tabular-nums; }
+.workflow-steps strong { font-size: .8125rem; font-weight: 500; }
+.step-description { display: none; color: var(--text-secondary); max-width: 36rem; font-size: .8125rem; margin-top: .5rem; line-height: 1.65; }
+.workflow-steps button[aria-current='step'] .step-description { display: block; }
+.workflow-steps button[aria-current='step'] .workflow-step-number { background: var(--text-primary); color: var(--surface); border-color: var(--text-primary); }
+.workflow-steps button[aria-current='step'] strong { font-weight: 700; }
+.workflow-stage { background: var(--studio-sand); color: var(--studio-ink); border-radius: var(--radius-studio); padding: var(--space-lg); display: flex; flex-direction: column; min-width: 0; }
+.demo-caption { display: flex; align-items: center; gap: var(--space-xs); font-size: .6875rem; color: var(--studio-muted); }
+.task-object { padding: var(--space-xl) var(--space-xs); flex: 1; text-align: center; }
+.task-object-symbol { width: 7rem; height: 7rem; display: grid; place-items: center; margin: 0 auto var(--space-lg); background: var(--studio-paper); border-radius: 1.75rem; box-shadow: 10px 12px 0 var(--studio-rule); transform: perspective(500px) rotateY(-15deg) rotateX(10deg); }
+.task-object[data-waiting='true'] .task-object-symbol { background: var(--studio-amber); }
+.task-actor { font-size: .75rem; margin-bottom: var(--space-sm); color: var(--studio-muted); }
+.task-object h4 { font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 2.75rem); font-weight: 400; line-height: 1.12; max-width: 16ch; margin-inline: auto; }
+.task-object > p:last-of-type { color: var(--studio-muted); font-size: .8125rem; margin: var(--space-md) auto 0; max-width: 33ch; }
+.handover-note { display: inline-flex; align-items: center; gap: var(--space-xs); margin-top: var(--space-lg); font-size: .8125rem; font-weight: 700; }
+.example-file { display: flex; align-items: center; gap: var(--space-sm); border-top: 1px solid var(--studio-rule); margin-top: var(--space-lg); padding-top: var(--space-md); text-align: left; }
+.example-file > span { flex: 1; }
+.example-file strong, .example-file small { display: block; font-size: .75rem; }
+.example-file small { color: var(--studio-muted); font-weight: 400; }
+.demo-controls { display: flex; justify-content: space-between; align-items: center; gap: var(--space-sm); }
+.demo-controls > span { font-size: .75rem; color: var(--studio-muted); font-variant-numeric: tabular-nums; }
+.demo-controls .btn { background: var(--studio-ink); color: var(--studio-paper); font-size: .75rem; padding-inline: var(--space-md); min-height: 44px; border-radius: 3rem; }
+.icon-button { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--studio-rule); border-radius: 50%; cursor: pointer; }
+.demo-footnote { font-size: .625rem; color: var(--studio-muted); margin-top: var(--space-md); max-width: 45ch; }
+.workflow-notice { color: var(--text-secondary); font-size: .75rem; max-width: 85ch; margin-top: var(--space-lg); }
+.catalog-summary { display: flex; flex-wrap: wrap; gap: var(--space-xl); margin-block: var(--space-xl); }
+.catalog-summary div { display: grid; gap: var(--space-2xs); }
+.catalog-summary strong { font-family: var(--font-display); font-size: 3rem; font-weight: 400; line-height: 1; }
+.catalog-summary span { color: var(--text-secondary); font-size: .8125rem; }
+.directory-controls { display: grid; gap: var(--space-md); padding-block: var(--space-lg); border-block: 1px solid var(--outline); }
+.directory-controls label { display: block; font-size: .8125rem; margin-bottom: var(--space-xs); }
+.directory-search > div { display: flex; align-items: center; gap: var(--space-sm); padding-inline: var(--space-md); border: 1px solid var(--outline); border-radius: var(--radius-control); background: var(--surface-raised); }
+.directory-search input { width: 100%; min-width: 0; min-height: 48px; background: transparent; font-size: .875rem; border: 0; }
+.directory-search input::placeholder { color: var(--text-secondary); }
+.directory-search input::-webkit-search-cancel-button { display: none; }
+.directory-search button { display: grid; place-items: center; min-width: 44px; min-height: 44px; cursor: pointer; }
+.directory-filter select { min-height: 50px; border: 1px solid var(--outline); border-radius: var(--radius-control); background: var(--surface-raised); padding-inline: var(--space-md); width: 100%; font-size: .875rem; }
+.directory-count { font-size: .8125rem; color: var(--text-secondary); margin-block: var(--space-lg); }
+.provider-row { border-bottom: 1px solid var(--outline); }
+.provider-row summary { display: flex; align-items: center; gap: var(--space-sm); list-style: none; padding-block: var(--space-lg); cursor: pointer; }
+.provider-row summary::-webkit-details-marker { display: none; }
+.provider-row[open] summary > svg:last-child { transform: rotate(180deg); }
+.provider-logo { display: grid; place-items: center; width: 48px; height: 48px; flex-shrink: 0; background: var(--studio-paper); color: var(--studio-ink); border-radius: .75rem; }
+.provider-logo img { object-fit: contain; }
+.provider-name { font-weight: 700; font-size: .875rem; flex: 1; }
+.provider-name small { font-weight: 400; display: block; color: var(--text-secondary); font-size: .6875rem; }
+.provider-count { font-size: .75rem; color: var(--text-secondary); white-space: nowrap; }
+.model-list { padding-bottom: var(--space-lg); }
+.model-list li { display: flex; flex-wrap: wrap; gap: var(--space-sm); justify-content: space-between; padding: var(--space-md); background: var(--surface-sunken); border-bottom: 1px solid var(--outline); }
+.model-list strong { display: block; font-size: .8125rem; overflow-wrap: anywhere; }
+.model-list small { display: block; font-size: .6875rem; color: var(--text-secondary); overflow-wrap: anywhere; }
+.model-capabilities { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs); }
+.model-capabilities > span { font-size: .625rem; border: 1px solid var(--outline); border-radius: .25rem; padding: .125rem .375rem; }
+.directory-empty { padding-block: var(--space-2xl); }
+.directory-empty h2 { font-size: 1.5rem; font-weight: 700; }
+.directory-empty p { margin-block: var(--space-sm) var(--space-lg); color: var(--text-secondary); }
+.provider-empty { margin-bottom: var(--space-lg); color: var(--text-secondary); font-size: .875rem; }
+@media (min-width: 40rem) { .directory-controls { grid-template-columns: 2fr 1fr; } }
+@media (min-width: 60rem) { .workflow-body { grid-template-columns: 1.1fr 1fr; gap: var(--space-2xl); } .workflow-stage { padding: var(--space-xl); } }
+@media (prefers-reduced-motion: reduce) { .task-object-symbol { transform: none; } }

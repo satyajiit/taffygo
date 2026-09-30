@@ -38,7 +38,7 @@ export type TourStop = {
 };
 
 export const hero = {
-  title: "A browser that does the busywork with you.",
+  title: "The AI-native browser for Android.",
   lede:
     "TaffyGo is a Chromium browser for Android. It blocks ads and trackers, " +
     "and its built-in assistant, Taffy, can answer from the page you're on " +

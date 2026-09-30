@@ -33,6 +33,7 @@ a fork can find and remove them mechanically:
 | The settings illustrations | `taffy-core/ui/android/feature/settings/vendor/masters/` and the built copies under `.../src/main/res/drawable-*/` | 4 masters |
 | The profile pictures | `taffy-core/ui/android/core/ui/vendor/profile-banners/` and the shipped copies under `.../src/main/assets/profile-banners/` | 31 each |
 | The website's paintings and its link-preview card | `website/public/art/` and `website/public/og-image-2655c535d406.jpg` | 6 files, 1 card |
+| The launch film and its generated thumbnail | `website/public/media/taffygo-launch-4k60.webm`, `website/public/media/launch-film-thumbnail.webp` and `website/design/sources/launch-film-thumbnail.png` | 1 film, 1 thumbnail and its source |
 | The repository banner and social preview | `.github/assets/banner.png` and `.github/social-preview.png` | 2 |
 | The screenshots of the app | `website/public/screens/`, `.github/assets/screens/` and `tools/play.d/metadata/android/en-GB/images/phoneScreenshots/` | 26, 5 and 8 |
 | The store icon and feature graphic | `tools/play.d/metadata/android/en-GB/images/icon.png` and `tools/play.d/metadata/android/en-GB/images/featureGraphic.png` | 2 |

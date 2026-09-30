@@ -24,7 +24,10 @@ export const header = {
   navLabel: "Main",
   /** Shown from 48rem up; the footer lists every page at every width. */
   nav: [
-    { label: "Errands", href: "/product/" },
+    { label: "The browser", href: "/product/" },
+    { label: "Use cases", href: "/use-cases/" },
+    { label: "AI providers", href: "/providers/" },
+    { label: "Technology", href: "/technology/" },
     { label: "Built for phones", href: "/built-for-phones/" },
     { label: "Privacy", href: "/privacy/" },
   ],
@@ -52,7 +55,10 @@ export const footer = {
   tagline: "A browser that does the busywork with you.",
   navLabel: "Site",
   links: [
-    { label: "Errands", href: "/product/" },
+    { label: "The browser", href: "/product/" },
+    { label: "Use cases", href: "/use-cases/" },
+    { label: "AI providers", href: "/providers/" },
+    { label: "Technology", href: "/technology/" },
     { label: "Built for phones", href: "/built-for-phones/" },
     { label: "Privacy", href: "/privacy/" },
     { label: "Delete your data", href: "/delete-my-data/" },

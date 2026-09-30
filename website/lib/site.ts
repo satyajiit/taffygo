@@ -20,6 +20,8 @@ export const links = {
   repository: REPOSITORY,
   releases: `${REPOSITORY}/releases/latest`,
   issues: `${REPOSITORY}/issues`,
+  bugReport: `${REPOSITORY}/issues/new?template=bug_report.yml`,
+  featureRequest: `${REPOSITORY}/issues/new?template=feature_request.yml`,
   discussions: `${REPOSITORY}/discussions`,
   securityReport: `${REPOSITORY}/security/advisories/new`,
   licence: `${REPOSITORY}/blob/main/LICENSE`,
@@ -34,16 +36,13 @@ export const site = {
   name: "TaffyGo",
   assistant: "Taffy",
   publisher: "Matterward Labs Private Limited",
-  title: "TaffyGo, the browser that does the busywork with you",
+  title: "TaffyGo | Open-source AI-native browser for Android",
   description:
-    "TaffyGo is a free, open-source Android browser that blocks ads and " +
-    "trackers. Its assistant, Taffy, uses the AI provider you connect. No " +
-    "account, no TaffyGo server.",
+    "TaffyGo is a free, open-source AI-native browser for Android. Block ads and trackers, browse with Taffy, and bring your own AI provider. No account needed.",
   url: CANONICAL_URL,
-  ogImage: "/og-image-2655c535d406.jpg",
+  ogImage: "/studio/social-newtab-1f7ebe6eb42e.jpg",
   ogImageAlt:
-    "The TaffyGo logo beside a painting of Taffy, a small winged character, " +
-    "sitting on a desk next to a phone.",
+    "TaffyGo, the open-source AI-native browser for Android, with an interactive new-tab preview and Taffy.",
 } as const;
 
 /**
@@ -69,6 +68,18 @@ export const routeMeta = {
     description:
       "Back, forward, Ask Taffy and your tabs sit in one row at the bottom, " +
       "and the tabs Taffy opens are grouped apart from yours.",
+  },
+  "/use-cases/": {
+    title: "AI-native browser use cases: documents, forms and research | TaffyGo",
+    description: "Try TaffyGo’s interactive document and banking demos: website navigation, verification handovers, local image resizing, and form approval.",
+  },
+  "/providers/": {
+    title: "AI providers and models for Android browsing | TaffyGo",
+    description: "Explore all 38 provider entries and 667 models in TaffyGo’s catalog. Search Claude, OpenAI, Gemini, DeepSeek and more. Connect your own key or plan.",
+  },
+  "/technology/": {
+    title: "Chromium, Rust and on-device Python | TaffyGo",
+    description: "Explore TaffyGo’s native Android interface, Chromium browser, sandboxed Rust core, and integrated on-device Python runtime.",
   },
   "/contact/": {
     title: "Contact | TaffyGo",
@@ -133,7 +144,7 @@ export function pageMetadata(route: RoutePath): Metadata {
   return {
     title: { absolute: page.title },
     description: page.description,
-    alternates: { canonical: route },
+    alternates: { canonical: route, types: { "text/markdown": absoluteUrl(route === "/" ? "/index.md" : `${route.slice(0, -1)}.md`) } },
     openGraph: {
       type: "website",
       siteName: site.name,

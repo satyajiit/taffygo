@@ -1,0 +1,38 @@
+/* Hallmark · macrostructure: Workbench · tone: premium editorial · anchor hue: warm amber */
+/* Copyright (c) 2026 Matterward Labs Private Limited.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+/* Hallmark · macrostructure: Workbench · genre: editorial · theme: Atelier
+ * adapted to the existing Taffy palette · nav: N11 · footer: Ft4
+ * Audience: Android users · action: get TaffyGo · tone: premium editorial
+ * Enrichment: generated 3D stills + real app captures + interactive HTML.
+ * Hallmark · pre-emit critique: P5 H4 E4 S5 R4 V5 */
+
+
+:root {
+  --font-display: var(--font-instrument), ui-serif, serif;
+  --font-body: var(--font-grotesk), ui-sans-serif, sans-serif;
+  --studio-cream: oklch(96% 0.018 80);
+  --studio-sand: oklch(91% 0.032 80);
+  --studio-ink: oklch(23% 0.015 65);
+  --studio-muted: oklch(47% 0.022 65);
+  --studio-amber: oklch(76% 0.135 75);
+  --studio-shadow: oklch(22% 0.02 65 / 0.2);
+  --studio-rule: oklch(76% 0.024 80);
+  --studio-paper: oklch(98% 0.009 80);
+  --studio-positive: oklch(39% 0.065 150);
+  --studio-error: oklch(45% 0.13 25);
+  --dur-micro: 120ms;
+  --dur-medium: 250ms;
+  --dur-long: 420ms;
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --z-raised: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --radius-studio: 1.75rem;
+  --radius-control: 0.6rem;
+  --text-hero: clamp(3.4rem, 5.6vw, 6rem);
+  --text-section: clamp(2.8rem, 4.3vw, 4.5rem);
+}

@@ -160,9 +160,12 @@ describe("copy", () => {
     }
   });
 
-  it("keeps the header short and lists every page in the footer", () => {
+  it("lists all exploration routes and every page in the footer", () => {
     expect(shared.header.nav.map((item) => item.href)).toEqual([
       "/product/",
+      "/use-cases/",
+      "/providers/",
+      "/technology/",
       "/built-for-phones/",
       "/privacy/",
     ]);

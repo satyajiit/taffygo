@@ -1,0 +1,62 @@
+/* Copyright (c) 2026 Matterward Labs Private Limited.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+/* Hallmark · component: launch-film player · genre: modern-minimal
+ * theme: inherited Taffy surfaces · states: idle, hover, focus, active,
+ * disabled, loading, error, playing, paused, ended
+ * Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 */
+
+.launch-film { padding-block: var(--space-xl) var(--space-3xl); }
+.launch-film__heading { display: flex; align-items: end; justify-content: space-between; gap: var(--space-xl); margin-bottom: var(--space-xl); }
+.launch-film__heading h2 { font-family: var(--font-display); font-size: var(--text-section); font-weight: 500; letter-spacing: -.045em; line-height: 1.12; }
+.launch-film__heading p { font-size: var(--size-small); line-height: 1.7; color: var(--text-secondary); }
+.launch-film__figure { margin: 0; }
+.launch-film__stage { position: relative; isolation: isolate; aspect-ratio: 16 / 9; overflow: clip; border: 1px solid var(--outline); border-radius: var(--radius-studio); background: var(--surface-sunken); }
+.launch-film__stage video { display: block; width: 100%; height: 100%; aspect-ratio: 16 / 9; object-fit: contain; }
+.launch-film__stage video:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: -4px; }
+.launch-film__cover { position: absolute; inset: 0; display: flex; align-items: end; padding: var(--space-xl); width: 100%; text-align: left; cursor: pointer; background: transparent; border: 0; color: var(--text-inverse); }
+.launch-film__play { display: inline-flex; align-items: center; gap: var(--space-sm); min-height: 56px; padding: var(--space-sm) var(--space-lg); border: 1px solid var(--outline); border-radius: var(--radius-pill); background: var(--surface-inverse); font-size: var(--size-small); font-weight: 500; transform: translateY(0); transition: transform var(--dur-medium) var(--ease-out); }
+.launch-film__play > svg { width: 20px; height: 20px; flex-shrink: 0; }
+.launch-film__duration { padding-left: var(--space-sm); border-left: 1px solid currentColor; font-variant-numeric: tabular-nums; }
+.launch-film__cover:hover:not(:disabled) .launch-film__play { transform: translateY(-3px); }
+.launch-film__cover:active:not(:disabled) .launch-film__play { transform: translateY(0) scale(.98); }
+.launch-film__cover:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: -6px; border-radius: inherit; }
+.launch-film__cover:focus-visible .launch-film__play { outline: 2px solid var(--text-inverse); outline-offset: 4px; }
+.launch-film__cover:disabled { cursor: wait; }
+.launch-film__cover:disabled .launch-film__play { opacity: .8; }
+.launch-film__spinner { animation: film-loading 1s linear infinite; }
+.launch-film__caption { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); padding-top: var(--space-sm); color: var(--text-secondary); font-size: var(--size-small); }
+.launch-film__caption > span { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm); }
+.launch-film__caption a { display: inline-flex; align-items: center; gap: var(--space-xs); min-height: 44px; white-space: nowrap; }
+.launch-film__caption a:hover, .launch-film__error a:hover { color: var(--text-primary); text-decoration: underline; text-underline-offset: .25em; }
+.launch-film__caption a:active { opacity: .75; }
+.launch-film__caption a:focus-visible, .launch-film__transcript summary:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 4px; border-radius: var(--radius-control); }
+.launch-film__transcript { margin-top: var(--space-xs); color: var(--text-secondary); font-size: var(--size-small); }
+.launch-film__transcript summary { width: fit-content; min-height: 44px; align-content: center; cursor: pointer; }
+.launch-film__transcript summary:hover, .launch-film__transcript[open] summary { color: var(--text-primary); }
+.launch-film__transcript > div { max-width: var(--measure); padding-block: var(--space-md); }
+.launch-film__transcript p + p { margin-top: var(--space-md); }
+.launch-film__transcript p { line-height: 1.8; }
+.launch-film__error { margin-top: var(--space-md); color: var(--text-primary); font-size: var(--size-small); }
+.launch-film__error a { text-decoration: underline; }
+@keyframes film-loading { to { transform: rotate(360deg); } }
+@media (max-width: 48rem) {
+  .launch-film__heading { align-items: start; flex-direction: column; gap: var(--space-md); margin-bottom: var(--space-lg); }
+  .launch-film__stage { border-radius: var(--radius-card); }
+  .launch-film__cover { padding: var(--space-xs); }
+  .launch-film__play { min-height: 36px; padding: var(--space-xs) var(--space-md); }
+  .launch-film__duration { display: none; }
+  .launch-film__caption { align-items: start; flex-direction: column; gap: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .launch-film__play { transition: none; }
+  .launch-film__cover:hover:not(:disabled) .launch-film__play, .launch-film__cover:active:not(:disabled) .launch-film__play { transform: none; }
+  .launch-film__spinner { animation: none; }
+}
+@media (max-width: 24rem) {
+  .launch-film__cover { align-items: start; justify-content: end; }
+  .launch-film__play { min-height: 40px; padding: var(--space-sm); }
+  .launch-film__play > span { display: none; }
+}
+[data-motion-paused='true'] .launch-film__play { transition: none; }

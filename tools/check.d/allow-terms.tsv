@@ -23,3 +23,5 @@ docs/decisions/0009-single-assistant-no-multi-agent.md	.	The decision record tha
 docs/decisions/0012-repository-directory-structure.md	multi-agent crates	Explains which crates the single-assistant decision makes unnecessary.
 brand/README.md	(real|premultiplied|straight) alpha|alpha (channel|matte)	The image transparency channel of the logo extraction, not a release milestone.
 *	iso 3166-1 alpha-2	The ISO standard's own name for its two-letter part, not a release stage.
+
+website/public/providers.md	^- .*(?:DeepSeek|Qwen|GLM|Kimi|MiniMax|Llama|Mistral|Gemma|V[1-9]|R1|Alpha|Beta|multi-agent)	Generated third-party model names and identifiers retain their vendor versions; these are not TaffyGo release or actor names.

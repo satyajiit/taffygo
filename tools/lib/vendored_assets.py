@@ -225,6 +225,11 @@ REGISTER: dict[str, dict] = {
         "licences": [],
         "checks": [("sha256", "gradle/wrapper/gradle-wrapper.jar")],
     },
+    "website/public/fonts/instrument-serif.txt": {
+        "assets": ["website/public/fonts/instrument-serif-latin.woff2"],
+        "licences": ["website/public/fonts/instrument-serif-OFL.txt"],
+        "checks": [("sha256", "website/public/fonts/instrument-serif-latin.woff2")],
+    },
     "website/public/fonts/space-grotesk.txt": {
         "assets": ["website/public/fonts/space-grotesk-latin-variable.woff2"],
         "licences": ["website/public/fonts/OFL.txt"],

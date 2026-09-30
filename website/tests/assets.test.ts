@@ -119,10 +119,8 @@ describe("generated website images", () => {
     const path = `public${site.ogImage}`;
     expect(size(path)).toEqual([1200, 630]);
     expect(basename(path)).toContain(sha256(path).slice(0, 12));
-    const lockup = join(root, "../brand/png/taffygo-lockup-color-on-light.png");
-    const lockupSha = createHash("sha256").update(readFileSync(lockup)).digest("hex");
-    expect(record).toContain(`lockup_sha256=${lockupSha}`);
-    expect(record).toContain("No generated logo layer is involved");
+    const studio = JSON.parse(readFileSync(join(root, "design/asset-manifest.json"), "utf8"));
+    expect(studio).toContainEqual(expect.objectContaining({ path, sha256: sha256(path), tool: "HTML capture + built-in image_gen assets" }));
   });
 
   it("ships no retired images", () => {

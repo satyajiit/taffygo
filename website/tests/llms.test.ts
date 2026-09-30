@@ -21,8 +21,7 @@ const CANONICAL = /const CANONICAL_URL = "([^"]+)"/.exec(read("lib/site.ts"))?.[
 
 const BANNED = [/early access/i, /\bbeta\b/i, /AI-powered/i, /wishlist/i];
 
-// The retired pre-release wording. TaffyGo 1.0 is out, so none of it may
-// survive in the files that describe the site to crawlers.
+// Retired launch wording should not reappear in the discovery summary.
 const PRE_RELEASE = [
   /not published yet/i,
   /not been released/i,
